@@ -1,0 +1,6 @@
+framework module AXSwift {
+  umbrella header "AXSwift-umbrella.h"
+
+  export *
+  module * { export * }
+}
