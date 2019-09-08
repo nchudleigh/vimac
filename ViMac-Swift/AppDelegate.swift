@@ -33,38 +33,43 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if let application = NSWorkspace.shared.frontmostApplication {
             let axSwiftApp = Application.init(forProcessID: application.processIdentifier)!
             let focusedWindow: UIElement = try! axSwiftApp.attribute(Attribute.focusedWindow)!
-            traverseUIElementForButtons(element: focusedWindow, level: 1)
+            let buttons = traverseUIElementForButtons(element: focusedWindow, level: 1)
+            for button in buttons {
+                if let position: CGPoint = try! button.attribute(.position),
+                    let size: CGSize = try! button.attribute(.size) {
+                    let controller = storyboard.instantiateController(withIdentifier: "overlayWindowControllerID") as! NSWindowController
+                    let frame = controller.window?.frame
+                    if var uFrame = frame {
+                        uFrame.origin = toOrigin(point: position, size: size)
+                        uFrame.size = size
+                        controller.window?.setFrame(uFrame, display: true, animate: false)
+                        controller.window?.orderFront(nil)
+                    }
+    
+                    controller.showWindow(nil)
+                    controllers.append(controller)
+                }
+            }
         }
     }
     
-    func traverseUIElementForButtons(element: UIElement, level: Int) {
+    func traverseUIElementForButtons(element: UIElement, level: Int) -> [UIElement] {
         let role = try! element.role();
         if (role == Role.button) {
-            if let position: CGPoint = try! element.attribute(.position),
-                let size: CGSize = try! element.attribute(.size) {
-                print(element)
-                print(position)
-                print(size)
-                let controller = storyboard.instantiateController(withIdentifier: "overlayWindowControllerID") as! NSWindowController
-                let frame = controller.window?.frame
-                if var uFrame = frame {
-                    uFrame.origin = toOrigin(point: position, size: size)
-                    uFrame.size = size
-                    controller.window?.setFrame(uFrame, display: true, animate: false)
-                    controller.window?.orderFront(nil)
-                }
-                
-                controller.showWindow(nil)
-                controllers.append(controller)
-            }
+            return [element]
         }
         
         let children = try! element.attribute(Attribute.children) as [AXUIElement]?;
-        if let c = children {
-            for child in c {
-                traverseUIElementForButtons(element: UIElement.init(child), level: level + 1)
-            }
+        if let unwrappedChildren = children {
+            return unwrappedChildren
+                .map({child -> [UIElement] in
+                    return traverseUIElementForButtons(element: UIElement.init(child), level: level + 1)
+                })
+                .reduce([]) {(result, next) -> [UIElement] in
+                    return result + next
+                }
         }
+        return []
     }
     
     func toOrigin(point: CGPoint, size: CGSize) -> CGPoint {
