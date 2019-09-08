@@ -30,9 +30,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         // Get Active Application
-        if let application = NSWorkspace.shared.frontmostApplication {
-            let axSwiftApp = Application.init(forProcessID: application.processIdentifier)!
-            let focusedWindow: UIElement = try! axSwiftApp.attribute(Attribute.focusedWindow)!
+        if let application = NSWorkspace.shared.frontmostApplication,
+            let axSwiftApp = Application.init(forProcessID: application.processIdentifier),
+            let focusedWindow: UIElement = try! axSwiftApp.attribute(Attribute.focusedWindow) {
+
             let buttons = traverseUIElementForButtons(element: focusedWindow, level: 1)
             for button in buttons {
                 if let position: CGPoint = try! button.attribute(.position),
