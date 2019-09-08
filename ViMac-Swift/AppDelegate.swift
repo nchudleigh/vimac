@@ -31,13 +31,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         // Get Active Application
         if let application = NSWorkspace.shared.frontmostApplication {
-            if let bundleIdentifier = application.bundleIdentifier {
-                let apps = Application.allForBundleID(bundleIdentifier)
-                let windows = try! apps.first!.windows()
-                for window in windows! {
-                    traverseUIElementForButtons(element: window, level: 1)
-                }
-            }
+            let axSwiftApp = Application.init(forProcessID: application.processIdentifier)!
+            let focusedWindow: UIElement = try! axSwiftApp.attribute(Attribute.focusedWindow)!
+            traverseUIElementForButtons(element: focusedWindow, level: 1)
         }
     }
     
