@@ -28,8 +28,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             NSRunningApplication.current.terminate()
             return
         }
-        
-        sleep(2)
 
         // Get Active Application
         if let application = NSWorkspace.shared.frontmostApplication {
