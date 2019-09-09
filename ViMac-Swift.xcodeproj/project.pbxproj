@@ -242,6 +242,11 @@
 				TargetAttributes = {
 					E261721F2322968500E396CA = {
 						CreatedOnToolsVersion = 10.3;
+						SystemCapabilities = {
+							com.apple.Sandbox = {
+								enabled = 0;
+							};
+						};
 					};
 					E26172312322968700E396CA = {
 						CreatedOnToolsVersion = 10.3;
@@ -560,7 +565,6 @@
 			baseConfigurationReference = B30FF7C31BF019D692EE897C /* Pods-ViMac-Swift.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = "ViMac-Swift/ViMac_Swift.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = "ViMac-Swift/Info.plist";
@@ -579,7 +583,6 @@
 			baseConfigurationReference = B9677058C37D4B6985948CB2 /* Pods-ViMac-Swift.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = "ViMac-Swift/ViMac_Swift.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = "ViMac-Swift/Info.plist";
