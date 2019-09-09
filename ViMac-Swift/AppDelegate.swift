@@ -14,6 +14,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     var controllers: [NSWindowController]
     var storyboard: NSStoryboard
+    var observer: Observer?
     
     override init() {
         controllers = [NSWindowController]()
@@ -31,25 +32,43 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         // Get Active Application
         if let application = NSWorkspace.shared.frontmostApplication,
-            let axSwiftApp = Application.init(forProcessID: application.processIdentifier),
-            let focusedWindow: UIElement = try! axSwiftApp.attribute(Attribute.focusedWindow) {
-
-            let buttons = traverseUIElementForButtons(element: focusedWindow, level: 1)
-            for button in buttons {
-                if let position: CGPoint = try! button.attribute(.position),
-                    let size: CGSize = try! button.attribute(.size) {
-                    let controller = storyboard.instantiateController(withIdentifier: "overlayWindowControllerID") as! NSWindowController
-                    let frame = controller.window?.frame
-                    if var uFrame = frame {
-                        uFrame.origin = toOrigin(point: position, size: size)
-                        uFrame.size = size
-                        controller.window?.setFrame(uFrame, display: true, animate: false)
-                        controller.window?.orderFront(nil)
-                    }
-    
-                    controller.showWindow(nil)
-                    controllers.append(controller)
+            let axSwiftApp = Application.init(forProcessID: application.processIdentifier) {
+            
+            observer = axSwiftApp.createObserver { (observer: Observer, element: UIElement, event: AXNotification) in
+                let optionalFocusedWindow: UIElement? = try! axSwiftApp.attribute(Attribute.focusedWindow)
+                if let focusedWindow = optionalFocusedWindow {
+                    self.updateOverlays(focusedWindow: focusedWindow)
                 }
+            }
+
+            let events: [AXNotification] = [.windowCreated, .windowMiniaturized, .windowMoved, .windowResized, .focusedWindowChanged]
+            for event in events {
+                try! observer?.addNotification(event, forElement: axSwiftApp)
+            }
+        }
+    }
+    
+    func updateOverlays(focusedWindow: UIElement) {
+        controllers.forEach({(controller) -> Void in
+            controller.close()
+        })
+        controllers.removeAll()
+        
+        let buttons = traverseUIElementForButtons(element: focusedWindow, level: 1)
+        for button in buttons {
+            if let position: CGPoint = try! button.attribute(.position),
+                let size: CGSize = try! button.attribute(.size) {
+                let controller = storyboard.instantiateController(withIdentifier: "overlayWindowControllerID") as! NSWindowController
+                let frame = controller.window?.frame
+                if var uFrame = frame {
+                    uFrame.origin = toOrigin(point: position, size: size)
+                    uFrame.size = size
+                    controller.window?.setFrame(uFrame, display: true, animate: false)
+                    controller.window?.orderFront(nil)
+                }
+                
+                controller.showWindow(nil)
+                controllers.append(controller)
             }
         }
     }
