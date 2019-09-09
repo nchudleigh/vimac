@@ -15,6 +15,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var controllers: [NSWindowController]
     var storyboard: NSStoryboard
     var observer: Observer?
+    let events: [AXNotification] = [.windowCreated, .windowMiniaturized, .windowMoved, .windowResized, .focusedWindowChanged]
     
     override init() {
         controllers = [NSWindowController]()
@@ -34,17 +35,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if let application = NSWorkspace.shared.frontmostApplication,
             let axSwiftApp = Application.init(forProcessID: application.processIdentifier) {
             
-            observer = axSwiftApp.createObserver { (observer: Observer, element: UIElement, event: AXNotification) in
-                let optionalFocusedWindow: UIElement? = try! axSwiftApp.attribute(Attribute.focusedWindow)
-                if let focusedWindow = optionalFocusedWindow {
-                    self.updateOverlays(focusedWindow: focusedWindow)
-                }
-            }
-
-            let events: [AXNotification] = [.windowCreated, .windowMiniaturized, .windowMoved, .windowResized, .focusedWindowChanged]
-            for event in events {
-                try! observer?.addNotification(event, forElement: axSwiftApp)
-            }
+            attachObserverToApplication(application: axSwiftApp)
         }
     }
     
@@ -70,6 +61,27 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 controller.showWindow(nil)
                 controllers.append(controller)
             }
+        }
+    }
+    
+    func attachObserverToApplication(application: Application) -> Observer {
+        observer = application.createObserver { (observer: Observer, element: UIElement, event: AXNotification) in
+            let optionalFocusedWindow: UIElement? = try! application.attribute(Attribute.focusedWindow)
+            if let focusedWindow = optionalFocusedWindow {
+                self.updateOverlays(focusedWindow: focusedWindow)
+            }
+        }
+
+        for event in events {
+            try! observer?.addNotification(event, forElement: application)
+        }
+        
+        return observer!
+    }
+    
+    func detachObserver(application: Application, observer: Observer) {
+        for event in events {
+            try! observer.removeNotification(event, forElement: application)
         }
     }
     
