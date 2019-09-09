@@ -1,0 +1,44 @@
+# taken from http://blog.illuminex.com/2009/10/better-sample-gitignore-file-for-xcode.html
+
+# Mac OS X Finder and whatnot
+.DS_Store
+
+
+# Sparkle distribution Private Key (Don't check me in!)
+dsa_priv.pem
+
+
+# XCode (and ancestors) per-user config (very noisy, and not relevant)
+*.mode1
+*.mode1v3
+*.mode2v3
+*.perspective
+*.perspectivev3
+*.pbxuser
+
+# Xcode 4 http://stackoverflow.com/questions/49478/git-ignore-file-for-xcode-projects
+xcuserdata
+
+
+# Generated files
+VersionX-revision.h
+
+
+# build products
+build/
+*.[oa]
+
+# Other source repository archive directories (protects when importing)
+.hg
+.svn
+CVS
+
+
+# automatic backup files
+*~.nib
+*.swp
+*~
+*(Autosaved).rtfd/
+Backup[ ]of[ ]*.pages/
+Backup[ ]of[ ]*.key/
+Backup[ ]of[ ]*.numbers/
