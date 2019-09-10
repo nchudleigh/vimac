@@ -50,6 +50,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             .flatMap { appOptional -> Observable<UIElement?> in
                 if let app = appOptional {
                     return Observable.create { observer in
+                        let windowOptional: UIElement? = {
+                            do {
+                                return try app.attribute(Attribute.focusedWindow)
+                            } catch {
+                                return nil
+                            }
+                        }()
+                        if let window = windowOptional {
+                            observer.on(.next(window))
+                        }
+
                         let newWindowObserver = app.createObserver { (_observer: Observer, _element: UIElement, _event: AXNotification) in
                             let window: UIElement? = {
                                 do {
@@ -92,71 +103,38 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             NSRunningApplication.current.terminate()
             return
         }
+        
+        windowObservable
+            .observeOn(MainScheduler.instance)
+            .subscribe(onNext: { windowOptional in
+                if let window = windowOptional {
+                    self.setOverlays(window: window)
+                }
+            })
+    }
 
-        updateOverlays()
-        listenForDeactivatedApplication()
-    }
-    
-    func listenForDeactivatedApplication() {
-//        let center =  NSWorkspace.shared.notificationCenter
-//        center.addObserver(self, selector: #selector(AppDelegate.updateOverlays), name: NSWorkspace.didDeactivateApplicationNotification, object: nil)
-    }
-    
-    @objc func updateOverlays() {
+    func setOverlays(window: UIElement) {
         controllers.forEach({(controller) -> Void in
             controller.close()
         })
         controllers.removeAll()
         
-        if let application = optionalApplication,
-            let observer = optionalObserver {
-            detachObserver(application: application, observer: observer)
-            optionalApplication = nil
-            optionalObserver = nil
-        }
-        
-        if let nsApplication = NSWorkspace.shared.frontmostApplication,
-            let application = Application.init(nsApplication) {
-            optionalApplication = application
-            optionalObserver = attachObserverToApplication(application: application)
-            let optionalFocusedWindow: UIElement? = try! application.attribute(Attribute.focusedWindow)
-            if let focusedWindow = optionalFocusedWindow {
-                let buttons = traverseUIElementForButtons(element: focusedWindow, level: 1)
-                for button in buttons {
-                    if let position: CGPoint = try! button.attribute(.position),
-                        let size: CGSize = try! button.attribute(.size) {
-                        let controller = storyboard.instantiateController(withIdentifier: "overlayWindowControllerID") as! NSWindowController
-                        let frame = controller.window?.frame
-                        if var uFrame = frame {
-                            uFrame.origin = toOrigin(point: position, size: size)
-                            uFrame.size = size
-                            controller.window?.setFrame(uFrame, display: true, animate: false)
-                            controller.window?.orderFront(nil)
-                        }
-                        
-                        controller.showWindow(nil)
-                        controllers.append(controller)
-                    }
+        let buttons = traverseUIElementForButtons(element: window, level: 1)
+        for button in buttons {
+            if let position: CGPoint = try! button.attribute(.position),
+                let size: CGSize = try! button.attribute(.size) {
+                let controller = storyboard.instantiateController(withIdentifier: "overlayWindowControllerID") as! NSWindowController
+                let frame = controller.window?.frame
+                if var uFrame = frame {
+                    uFrame.origin = toOrigin(point: position, size: size)
+                    uFrame.size = size
+                    controller.window?.setFrame(uFrame, display: true, animate: false)
+                    controller.window?.orderFront(nil)
                 }
+                
+                controller.showWindow(nil)
+                controllers.append(controller)
             }
-        }
-    }
-    
-    func attachObserverToApplication(application: Application) -> Observer {
-        let optionalObserver = application.createObserver { (observer: Observer, element: UIElement, event: AXNotification) in
-            self.updateOverlays()
-        }
-        
-        for event in events {
-            try! optionalObserver?.addNotification(event, forElement: application)
-        }
-        
-        return optionalObserver!
-    }
-    
-    func detachObserver(application: Application, observer: Observer) {
-        for event in events {
-            try! observer.removeNotification(event, forElement: application)
         }
     }
     
