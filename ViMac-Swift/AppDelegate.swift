@@ -20,7 +20,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let events: [AXNotification] = [.windowMiniaturized, .windowMoved, .windowResized, .focusedWindowChanged]
     var optionalApplication: Application?
     
-    let application: Observable<Application?>
+    let applicationObservable: Observable<Application?>
+    let windowObservable: Observable<UIElement?>
 
     static func createApplicationObservable() -> Observable<Application?> {
         return Observable.create { observer in
@@ -44,11 +45,43 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
     
+    static func createWindowObservable(applicationObservable: Observable<Application?>) -> Observable<UIElement?> {
+        return applicationObservable
+            .flatMap { appOptional -> Observable<UIElement?> in
+                if let app = appOptional {
+                    return Observable.create { observer in
+                        let newWindowObserver = app.createObserver { (_observer: Observer, _element: UIElement, _event: AXNotification) in
+                            let window: UIElement? = {
+                                do {
+                                    return try app.attribute(Attribute.focusedWindow)
+                                } catch {
+                                    return nil
+                                }
+                            }()
+                            os_log("Focused window changed")
+                            observer.on(.next(window))
+                        }
+                        
+                        try! newWindowObserver?.addNotification(.focusedWindowChanged, forElement: app)
+                        
+                        let cancel = Disposables.create {
+                            os_log("Window observable disposed")
+                            try! newWindowObserver?.removeNotification(.focusedWindowChanged, forElement: app)
+                        }
+                        return cancel
+                    }
+                } else {
+                    return Observable.just(nil)
+                }
+        }
+    }
+    
     override init() {
         controllers = [NSWindowController]()
         storyboard =
             NSStoryboard.init(name: "Main", bundle: nil)
-        application = AppDelegate.createApplicationObservable()
+        applicationObservable = AppDelegate.createApplicationObservable()
+        windowObservable = AppDelegate.createWindowObservable(applicationObservable: applicationObservable)
         super.init()
     }
 
