@@ -16,12 +16,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     var controllers: [NSWindowController]
     var storyboard: NSStoryboard
-    var optionalObserver: Observer?
-    let events: [AXNotification] = [.windowMiniaturized, .windowMoved, .windowResized, .focusedWindowChanged]
-    var optionalApplication: Application?
     
     let applicationObservable: Observable<Application?>
     let windowObservable: Observable<UIElement?>
+    let cancelTrackingObservable: Observable<Void>
 
     static func createApplicationObservable() -> Observable<Application?> {
         return Observable.create { observer in
@@ -86,6 +84,36 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 }
         }
     }
+
+    static func createCancelTrackingObservable(windowObservable: Observable<UIElement?>) -> Observable<Void> {
+        return windowObservable
+            .flatMap { windowOptional -> Observable<Void> in
+                if let window = windowOptional {
+                    return Observable.create { observer in
+                        let windowUpdatedObserver = try! Observer.init(processID: window.pid(), callback: { (_observer: Observer, _element: UIElement, _event: AXNotification) in
+                            observer.on(.next(Void()))
+                        })
+
+                        // events that do not cause active window to change
+                        let events: [AXNotification] = [.windowMiniaturized, .windowMoved, .windowResized]
+                        
+                        for event in events {
+                            try! windowUpdatedObserver.addNotification(event, forElement: window)
+                        }
+                        
+                        let cancel = Disposables.create {
+                            os_log("Should Cancel observable disposed")
+                            for event in events {
+                                try! windowUpdatedObserver.removeNotification(event, forElement: window)
+                            }
+                        }
+                        return cancel
+                    }
+                } else {
+                    return Observable.empty()
+                }
+            }
+    }
     
     override init() {
         controllers = [NSWindowController]()
@@ -93,6 +121,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             NSStoryboard.init(name: "Main", bundle: nil)
         applicationObservable = AppDelegate.createApplicationObservable()
         windowObservable = AppDelegate.createWindowObservable(applicationObservable: applicationObservable)
+        cancelTrackingObservable = AppDelegate.createCancelTrackingObservable(windowObservable: windowObservable)
         super.init()
     }
 
@@ -111,13 +140,23 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     self.setOverlays(window: window)
                 }
             })
+        
+        cancelTrackingObservable
+            .observeOn(MainScheduler.instance)
+            .subscribe(onNext: {
+                self.hideOverlays()
+            })
     }
-
-    func setOverlays(window: UIElement) {
+    
+    func hideOverlays() {
         controllers.forEach({(controller) -> Void in
             controller.close()
         })
         controllers.removeAll()
+    }
+
+    func setOverlays(window: UIElement) {
+        hideOverlays()
         
         let buttons = traverseUIElementForButtons(element: window, level: 1)
         for button in buttons {
