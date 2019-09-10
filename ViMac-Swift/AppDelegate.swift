@@ -13,6 +13,7 @@ import os
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
+    // This struct allows us to propagate the original source value (application) when doing a flatMap/flatMapLatest to get the notification.
     struct AppNotificationAppPair {
         let app: Application?
         let notification: AXNotification?
