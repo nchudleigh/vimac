@@ -13,13 +13,18 @@ import os
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
-
+    struct AppNotificationAppPair {
+        let app: Application?
+        let notification: AXNotification?
+    }
+    
     var controllers: [NSWindowController]
     var storyboard: NSStoryboard
     
     let applicationObservable: Observable<Application?>
-    let windowObservable: Observable<UIElement?>
-    let cancelTrackingObservable: Observable<Void>
+    let applicationNotificationObservable: Observable<AppNotificationAppPair>
+
+    static let windowEvents: [AXNotification] = [.windowMiniaturized, .windowMoved, .windowResized]
 
     static func createApplicationObservable() -> Observable<Application?> {
         return Observable.create { observer in
@@ -43,76 +48,33 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
     
-    static func createWindowObservable(applicationObservable: Observable<Application?>) -> Observable<UIElement?> {
+    static func createApplicationNotificationObservable(applicationObservable: Observable<Application?>) -> Observable<AppNotificationAppPair> {
         return applicationObservable
-            .flatMapLatest { appOptional -> Observable<UIElement?> in
+            .flatMapLatest { appOptional -> Observable<AppNotificationAppPair> in
                 if let app = appOptional {
                     return Observable.create { observer in
-                        let windowOptional: UIElement? = {
-                            do {
-                                return try app.attribute(Attribute.focusedWindow)
-                            } catch {
-                                return nil
-                            }
-                        }()
-                        if let window = windowOptional {
-                            observer.on(.next(window))
-                        }
-
-                        let newWindowObserver = app.createObserver { (_observer: Observer, _element: UIElement, _event: AXNotification) in
-                            let window: UIElement? = {
-                                do {
-                                    return try app.attribute(Attribute.focusedWindow)
-                                } catch {
-                                    return nil
-                                }
-                            }()
-                            os_log("Focused window changed")
-                            observer.on(.next(window))
+                        let notificationObserver = app.createObserver { (_observer: Observer, _element: UIElement, event: AXNotification) in
+                            os_log("New App Notification")
+                            let pair = AppNotificationAppPair(app: app, notification: event)
+                            observer.on(.next(pair))
                         }
                         
-                        try! newWindowObserver?.addNotification(.focusedWindowChanged, forElement: app)
+                        let events = [AXNotification.focusedWindowChanged] + windowEvents
+                        for event in events {
+                            try! notificationObserver?.addNotification(event, forElement: app)
+                        }
                         
                         let cancel = Disposables.create {
-                            os_log("Window observable disposed")
-                            try! newWindowObserver?.removeNotification(.focusedWindowChanged, forElement: app)
+                            for event in events {
+                                try! notificationObserver?.removeNotification(event, forElement: app)
+                            }
                         }
                         return cancel
                     }
                 } else {
-                    return Observable.just(nil)
+                    return Observable.just(AppNotificationAppPair(app: nil, notification: nil))
                 }
         }
-    }
-
-    static func createCancelTrackingObservable(windowObservable: Observable<UIElement?>) -> Observable<Void> {
-        return windowObservable
-            .flatMapLatest { windowOptional -> Observable<Void> in
-                if let window = windowOptional {
-                    return Observable.create { observer in
-                        let windowUpdatedObserver = try! Observer.init(processID: window.pid(), callback: { (_observer: Observer, _element: UIElement, _event: AXNotification) in
-                            observer.on(.next(Void()))
-                        })
-
-                        // events that do not cause active window to change
-                        let events: [AXNotification] = [.windowMiniaturized, .windowMoved, .windowResized]
-                        
-                        for event in events {
-                            try! windowUpdatedObserver.addNotification(event, forElement: window)
-                        }
-                        
-                        let cancel = Disposables.create {
-                            os_log("Should Cancel observable disposed")
-                            for event in events {
-                                try! windowUpdatedObserver.removeNotification(event, forElement: window)
-                            }
-                        }
-                        return cancel
-                    }
-                } else {
-                    return Observable.empty()
-                }
-            }
     }
     
     override init() {
@@ -120,8 +82,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         storyboard =
             NSStoryboard.init(name: "Main", bundle: nil)
         applicationObservable = AppDelegate.createApplicationObservable().share()
-        windowObservable = AppDelegate.createWindowObservable(applicationObservable: applicationObservable).share()
-        cancelTrackingObservable = AppDelegate.createCancelTrackingObservable(windowObservable: windowObservable)
+        applicationNotificationObservable = AppDelegate.createApplicationNotificationObservable(applicationObservable: applicationObservable)
         super.init()
     }
 
@@ -132,23 +93,35 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             NSRunningApplication.current.terminate()
             return
         }
-        
-        windowObservable
+
+        applicationNotificationObservable
             .observeOn(MainScheduler.instance)
-            .subscribe(onNext: { windowOptional in
-                if let window = windowOptional {
-                    self.setOverlays(window: window)
+            .subscribe(onNext: { pair in
+                if let notification = pair.notification,
+                    let app = pair.app {
+                    if notification == .focusedWindowChanged {
+                        os_log("Focused window changed")
+                        let windowOptional: UIElement? = {
+                            do {
+                                return try app.attribute(Attribute.focusedWindow)
+                            } catch {
+                                return nil
+                            }
+                        }()
+                        if let window = windowOptional {
+                            self.setOverlays(window: window)
+                        } else {
+                            self.hideOverlays()
+                        }
+                    } else if (AppDelegate.windowEvents.contains(notification)) {
+                        self.hideOverlays()
+                    }
                 }
-            })
-        
-        cancelTrackingObservable
-            .observeOn(MainScheduler.instance)
-            .subscribe(onNext: {
-                self.hideOverlays()
             })
     }
     
     func hideOverlays() {
+        os_log("Hiding overlays")
         controllers.forEach({(controller) -> Void in
             controller.close()
         })
@@ -204,7 +177,4 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationWillTerminate(_ aNotification: Notification) {
         // Insert code here to tear down your application
     }
-
-
 }
-
