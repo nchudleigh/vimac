@@ -53,6 +53,23 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             .flatMapLatest { appOptional -> Observable<AppNotificationAppPair> in
                 if let app = appOptional {
                     return Observable.create { observer in
+                        // currently, overlays are drawn when the .focusedWindowChanged event is emitted.
+                        // to allow the overlays to shown for the initial window, we check if there is a focused window and emit the event if there is.
+                        // this is a hack and a better solution is needed.
+                        // we can consider extending AXNotification to include a initialWindow event
+                        let windowOptional: UIElement? = {
+                            do {
+                                return try app.attribute(Attribute.focusedWindow)
+                            } catch {
+                                return nil
+                            }
+                        }()
+                        
+                        if let window = windowOptional {
+                            let pair = AppNotificationAppPair(app: app, notification: .focusedWindowChanged)
+                            observer.on(.next(pair))
+                        }
+                        
                         let notificationObserver = app.createObserver { (_observer: Observer, _element: UIElement, event: AXNotification) in
                             os_log("New App Notification")
                             let pair = AppNotificationAppPair(app: app, notification: event)
