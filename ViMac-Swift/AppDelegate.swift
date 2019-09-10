@@ -8,6 +8,8 @@
 
 import Cocoa
 import AXSwift
+import RxSwift
+import os
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
@@ -18,9 +20,35 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let events: [AXNotification] = [.windowMiniaturized, .windowMoved, .windowResized, .focusedWindowChanged]
     var optionalApplication: Application?
     
+    let application: Observable<Application?>
+
+    static func createApplicationObservable() -> Observable<Application?> {
+        return Observable.create { observer in
+            let center = NSWorkspace.shared.notificationCenter
+            center.addObserver(forName: NSWorkspace.didDeactivateApplicationNotification, object: nil, queue: nil) { notification in
+                if let nsApplication = NSWorkspace.shared.frontmostApplication,
+                    let application = Application.init(nsApplication) {
+                    os_log("New frontmost application")
+                    observer.on(.next(application))
+                } else {
+                    os_log("No frontmost applications")
+                    observer.on(.next(nil))
+                }
+            }
+            let cancel = Disposables.create {
+                center.removeObserver(self)
+                os_log("Application observable disposed")
+            }
+            
+            return cancel
+        }
+    }
+    
     override init() {
         controllers = [NSWindowController]()
-        storyboard = NSStoryboard.init(name: "Main", bundle: nil)
+        storyboard =
+            NSStoryboard.init(name: "Main", bundle: nil)
+        application = AppDelegate.createApplicationObservable()
         super.init()
     }
 
@@ -37,8 +65,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func listenForDeactivatedApplication() {
-        let center =  NSWorkspace.shared.notificationCenter
-        center.addObserver(self, selector: #selector(AppDelegate.updateOverlays), name: NSWorkspace.didDeactivateApplicationNotification, object: nil)
+//        let center =  NSWorkspace.shared.notificationCenter
+//        center.addObserver(self, selector: #selector(AppDelegate.updateOverlays), name: NSWorkspace.didDeactivateApplicationNotification, object: nil)
     }
     
     @objc func updateOverlays() {
