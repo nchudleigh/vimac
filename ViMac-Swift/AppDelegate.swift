@@ -119,8 +119,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         controllers = [NSWindowController]()
         storyboard =
             NSStoryboard.init(name: "Main", bundle: nil)
-        applicationObservable = AppDelegate.createApplicationObservable()
-        windowObservable = AppDelegate.createWindowObservable(applicationObservable: applicationObservable)
+        applicationObservable = AppDelegate.createApplicationObservable().share()
+        windowObservable = AppDelegate.createWindowObservable(applicationObservable: applicationObservable).share()
         cancelTrackingObservable = AppDelegate.createCancelTrackingObservable(windowObservable: windowObservable)
         super.init()
     }
