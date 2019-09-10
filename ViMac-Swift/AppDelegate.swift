@@ -45,7 +45,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     static func createWindowObservable(applicationObservable: Observable<Application?>) -> Observable<UIElement?> {
         return applicationObservable
-            .flatMap { appOptional -> Observable<UIElement?> in
+            .flatMapLatest { appOptional -> Observable<UIElement?> in
                 if let app = appOptional {
                     return Observable.create { observer in
                         let windowOptional: UIElement? = {
@@ -87,7 +87,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     static func createCancelTrackingObservable(windowObservable: Observable<UIElement?>) -> Observable<Void> {
         return windowObservable
-            .flatMap { windowOptional -> Observable<Void> in
+            .flatMapLatest { windowOptional -> Observable<Void> in
                 if let window = windowOptional {
                     return Observable.create { observer in
                         let windowUpdatedObserver = try! Observer.init(processID: window.pid(), callback: { (_observer: Observer, _element: UIElement, _event: AXNotification) in
