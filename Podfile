@@ -1,5 +1,5 @@
 # Uncomment the next line to define a global platform for your project
-# platform :ios, '9.0'
+platform :osx, '10.14'
 
 target 'ViMac-Swift' do
   # Comment the next line if you don't want to use dynamic frameworks
@@ -8,6 +8,8 @@ target 'ViMac-Swift' do
   # Pods for ViMac-Swift
 
   pod 'AXSwift', '~> 0.2'
+  pod 'RxSwift', '~> 5'
+  pod 'RxCocoa', '~> 5'
 
   target 'ViMac-SwiftTests' do
     inherit! :search_paths

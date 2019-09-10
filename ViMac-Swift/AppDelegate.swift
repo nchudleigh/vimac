@@ -8,19 +8,99 @@
 
 import Cocoa
 import AXSwift
+import RxSwift
+import os
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
-
+    // This struct allows us to propagate the original source value (application) when doing a flatMap/flatMapLatest to get the notification.
+    struct AppNotificationAppPair {
+        let app: Application?
+        let notification: AXNotification?
+    }
+    
     var controllers: [NSWindowController]
     var storyboard: NSStoryboard
-    var optionalObserver: Observer?
-    let events: [AXNotification] = [.windowMiniaturized, .windowMoved, .windowResized, .focusedWindowChanged]
-    var optionalApplication: Application?
+    
+    let applicationObservable: Observable<Application?>
+    let applicationNotificationObservable: Observable<AppNotificationAppPair>
+
+    static let windowEvents: [AXNotification] = [.windowMiniaturized, .windowMoved, .windowResized]
+
+    static func createApplicationObservable() -> Observable<Application?> {
+        return Observable.create { observer in
+            let center = NSWorkspace.shared.notificationCenter
+            center.addObserver(forName: NSWorkspace.didDeactivateApplicationNotification, object: nil, queue: nil) { notification in
+                if let nsApplication = NSWorkspace.shared.frontmostApplication,
+                    let application = Application.init(nsApplication) {
+                    os_log("New frontmost application")
+                    observer.on(.next(application))
+                } else {
+                    os_log("No frontmost applications")
+                    observer.on(.next(nil))
+                }
+            }
+            let cancel = Disposables.create {
+                center.removeObserver(self)
+                os_log("Application observable disposed")
+            }
+            
+            return cancel
+        }
+    }
+    
+    static func createApplicationNotificationObservable(applicationObservable: Observable<Application?>) -> Observable<AppNotificationAppPair> {
+        return applicationObservable
+            .flatMapLatest { appOptional -> Observable<AppNotificationAppPair> in
+                if let app = appOptional {
+                    return Observable.create { observer in
+                        // currently, overlays are drawn when the .focusedWindowChanged event is emitted.
+                        // to allow the overlays to shown for the initial window, we check if there is a focused window and emit the event if there is.
+                        // this is a hack and a better solution is needed.
+                        // we can consider extending AXNotification to include a initialWindow event
+                        let windowOptional: UIElement? = {
+                            do {
+                                return try app.attribute(Attribute.focusedWindow)
+                            } catch {
+                                return nil
+                            }
+                        }()
+                        
+                        if let window = windowOptional {
+                            let pair = AppNotificationAppPair(app: app, notification: .focusedWindowChanged)
+                            observer.on(.next(pair))
+                        }
+                        
+                        let notificationObserver = app.createObserver { (_observer: Observer, _element: UIElement, event: AXNotification) in
+                            os_log("New App Notification")
+                            let pair = AppNotificationAppPair(app: app, notification: event)
+                            observer.on(.next(pair))
+                        }
+                        
+                        let events = [AXNotification.focusedWindowChanged] + windowEvents
+                        for event in events {
+                            try! notificationObserver?.addNotification(event, forElement: app)
+                        }
+                        
+                        let cancel = Disposables.create {
+                            for event in events {
+                                try! notificationObserver?.removeNotification(event, forElement: app)
+                            }
+                        }
+                        return cancel
+                    }
+                } else {
+                    return Observable.just(AppNotificationAppPair(app: nil, notification: nil))
+                }
+        }
+    }
     
     override init() {
         controllers = [NSWindowController]()
-        storyboard = NSStoryboard.init(name: "Main", bundle: nil)
+        storyboard =
+            NSStoryboard.init(name: "Main", bundle: nil)
+        applicationObservable = AppDelegate.createApplicationObservable().share()
+        applicationNotificationObservable = AppDelegate.createApplicationNotificationObservable(applicationObservable: applicationObservable)
         super.init()
     }
 
@@ -32,70 +112,59 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             return
         }
 
-        updateOverlays()
-        listenForDeactivatedApplication()
+        applicationNotificationObservable
+            .observeOn(MainScheduler.instance)
+            .subscribe(onNext: { pair in
+                if let notification = pair.notification,
+                    let app = pair.app {
+                    if notification == .focusedWindowChanged {
+                        os_log("Focused window changed")
+                        let windowOptional: UIElement? = {
+                            do {
+                                return try app.attribute(Attribute.focusedWindow)
+                            } catch {
+                                return nil
+                            }
+                        }()
+                        if let window = windowOptional {
+                            self.setOverlays(window: window)
+                        } else {
+                            self.hideOverlays()
+                        }
+                    } else if (AppDelegate.windowEvents.contains(notification)) {
+                        self.hideOverlays()
+                    }
+                }
+            })
     }
     
-    func listenForDeactivatedApplication() {
-        let center =  NSWorkspace.shared.notificationCenter
-        center.addObserver(self, selector: #selector(AppDelegate.updateOverlays), name: NSWorkspace.didDeactivateApplicationNotification, object: nil)
-    }
-    
-    @objc func updateOverlays() {
+    func hideOverlays() {
+        os_log("Hiding overlays")
         controllers.forEach({(controller) -> Void in
             controller.close()
         })
         controllers.removeAll()
+    }
+
+    func setOverlays(window: UIElement) {
+        hideOverlays()
         
-        if let application = optionalApplication,
-            let observer = optionalObserver {
-            detachObserver(application: application, observer: observer)
-            optionalApplication = nil
-            optionalObserver = nil
-        }
-        
-        if let nsApplication = NSWorkspace.shared.frontmostApplication,
-            let application = Application.init(nsApplication) {
-            optionalApplication = application
-            optionalObserver = attachObserverToApplication(application: application)
-            let optionalFocusedWindow: UIElement? = try! application.attribute(Attribute.focusedWindow)
-            if let focusedWindow = optionalFocusedWindow {
-                let buttons = traverseUIElementForButtons(element: focusedWindow, level: 1)
-                for button in buttons {
-                    if let position: CGPoint = try! button.attribute(.position),
-                        let size: CGSize = try! button.attribute(.size) {
-                        let controller = storyboard.instantiateController(withIdentifier: "overlayWindowControllerID") as! NSWindowController
-                        let frame = controller.window?.frame
-                        if var uFrame = frame {
-                            uFrame.origin = toOrigin(point: position, size: size)
-                            uFrame.size = size
-                            controller.window?.setFrame(uFrame, display: true, animate: false)
-                            controller.window?.orderFront(nil)
-                        }
-                        
-                        controller.showWindow(nil)
-                        controllers.append(controller)
-                    }
+        let buttons = traverseUIElementForButtons(element: window, level: 1)
+        for button in buttons {
+            if let position: CGPoint = try! button.attribute(.position),
+                let size: CGSize = try! button.attribute(.size) {
+                let controller = storyboard.instantiateController(withIdentifier: "overlayWindowControllerID") as! NSWindowController
+                let frame = controller.window?.frame
+                if var uFrame = frame {
+                    uFrame.origin = toOrigin(point: position, size: size)
+                    uFrame.size = size
+                    controller.window?.setFrame(uFrame, display: true, animate: false)
+                    controller.window?.orderFront(nil)
                 }
+                
+                controller.showWindow(nil)
+                controllers.append(controller)
             }
-        }
-    }
-    
-    func attachObserverToApplication(application: Application) -> Observer {
-        let optionalObserver = application.createObserver { (observer: Observer, element: UIElement, event: AXNotification) in
-            self.updateOverlays()
-        }
-        
-        for event in events {
-            try! optionalObserver?.addNotification(event, forElement: application)
-        }
-        
-        return optionalObserver!
-    }
-    
-    func detachObserver(application: Application, observer: Observer) {
-        for event in events {
-            try! observer.removeNotification(event, forElement: application)
         }
     }
     
@@ -126,7 +195,4 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationWillTerminate(_ aNotification: Notification) {
         // Insert code here to tear down your application
     }
-
-
 }
-
