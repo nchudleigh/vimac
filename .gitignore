@@ -17,7 +17,9 @@ dsa_priv.pem
 *.pbxuser
 
 # Xcode 4 http://stackoverflow.com/questions/49478/git-ignore-file-for-xcode-projects
-/ViMac-Swift.xcodeproj/xcuserdata
+/ViMac-Swift.xcworkspace/xcuserdata
+Pods/
+
 # Generated files
 VersionX-revision.h
 
