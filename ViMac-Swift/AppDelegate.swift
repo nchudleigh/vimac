@@ -33,16 +33,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             center.addObserver(forName: NSWorkspace.didDeactivateApplicationNotification, object: nil, queue: nil) { notification in
                 if let nsApplication = NSWorkspace.shared.frontmostApplication,
                     let application = Application.init(nsApplication) {
-                    os_log("New frontmost application")
+                    os_log("Current frontmost application: %@", log: Log.accessibility, String(describing: application))
                     observer.on(.next(application))
                 } else {
-                    os_log("No frontmost applications")
+                    os_log("Current frontmost application: nil", log: Log.accessibility)
                     observer.on(.next(nil))
                 }
             }
             let cancel = Disposables.create {
                 center.removeObserver(self)
-                os_log("Application observable disposed")
+                os_log("Removed application observer", log: Log.accessibility)
             }
             
             return cancel
@@ -72,20 +72,30 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                         }
                         
                         let notificationObserver = app.createObserver { (_observer: Observer, _element: UIElement, event: AXNotification) in
-                            os_log("New App Notification")
+                            os_log("New app notification: %@", log: Log.accessibility, String(describing: event))
                             let pair = AppNotificationAppPair(app: app, notification: event)
                             observer.on(.next(pair))
                         }
                         
                         let events = [AXNotification.focusedWindowChanged] + windowEvents
                         for event in events {
-                            try! notificationObserver?.addNotification(event, forElement: app)
+                            do {
+                                try notificationObserver?.addNotification(event, forElement: app)
+                            } catch {
+                                os_log("Error adding notification observer for event: %@ and application %@. Error: %@", log: Log.accessibility, type: .error, String(describing: event), String(describing: app), String(describing: error))
+                            }
                         }
                         
                         let cancel = Disposables.create {
+                            
                             for event in events {
-                                try! notificationObserver?.removeNotification(event, forElement: app)
+                                do {
+                                    try notificationObserver?.removeNotification(event, forElement: app)
+                                } catch {
+                                    os_log("Error removing notification observer for event: %@ and application %@. Error: %@", log: Log.accessibility, type: .error, String(describing: event), String(describing: app), String(describing: error))
+                                }
                             }
+                            os_log("Removed notification observers for %@.", log: Log.accessibility, String(describing: app))
                         }
                         return cancel
                     }
@@ -118,7 +128,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 if let notification = pair.notification,
                     let app = pair.app {
                     if notification == .focusedWindowChanged {
-                        os_log("Focused window changed")
                         let windowOptional: UIElement? = {
                             do {
                                 return try app.attribute(Attribute.focusedWindow)
@@ -126,6 +135,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                                 return nil
                             }
                         }()
+                        os_log("Current window: %@", log: Log.accessibility, String(describing: windowOptional))
                         if let window = windowOptional {
                             self.setOverlays(window: window)
                         } else {
@@ -139,7 +149,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func hideOverlays() {
-        os_log("Hiding overlays")
+        os_log("Hiding overlays", log: Log.drawing)
         borderWindowController?.close()
         
         // delete all current border views
@@ -150,6 +160,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func setOverlays(window: UIElement) {
         hideOverlays()
+        
+        os_log("Set overlays for window: %@", log: Log.drawing, String(describing: window))
         
         if let windowPosition: CGPoint = try! window.attribute(.position),
             let windowSize: CGSize = try! window.attribute(.size),
