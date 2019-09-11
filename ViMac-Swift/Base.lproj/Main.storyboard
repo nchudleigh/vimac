@@ -708,12 +708,6 @@
                     <view key="view" id="WD1-49-5YF">
                         <rect key="frame" x="0.0" y="0.0" width="480" height="270"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gkh-zs-sbY" customClass="BorderView" customModule="ViMac_Swift" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="0.0" width="480" height="270"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                            </customView>
-                        </subviews>
                     </view>
                 </viewController>
                 <customObject id="7x5-hi-eT7" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>

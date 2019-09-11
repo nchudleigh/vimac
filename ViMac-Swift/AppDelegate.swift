@@ -18,8 +18,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let app: Application?
         let notification: AXNotification?
     }
-    
-    var controllers: [NSWindowController]
+
+    var borderWindowController: NSWindowController?
     var storyboard: NSStoryboard
     
     let applicationObservable: Observable<Application?>
@@ -96,9 +96,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     override init() {
-        controllers = [NSWindowController]()
         storyboard =
             NSStoryboard.init(name: "Main", bundle: nil)
+        borderWindowController = storyboard.instantiateController(withIdentifier: "overlayWindowControllerID") as! NSWindowController
         applicationObservable = AppDelegate.createApplicationObservable().share()
         applicationNotificationObservable = AppDelegate.createApplicationNotificationObservable(applicationObservable: applicationObservable)
         super.init()
@@ -140,31 +140,41 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     func hideOverlays() {
         os_log("Hiding overlays")
-        controllers.forEach({(controller) -> Void in
-            controller.close()
+        borderWindowController?.close()
+        
+        // delete all current border views
+        borderWindowController?.window?.contentView?.subviews.forEach({ view in
+            view.removeFromSuperview()
         })
-        controllers.removeAll()
     }
 
     func setOverlays(window: UIElement) {
         hideOverlays()
         
-        let buttons = traverseUIElementForButtons(element: window, level: 1)
-        for button in buttons {
-            if let position: CGPoint = try! button.attribute(.position),
-                let size: CGSize = try! button.attribute(.size) {
-                let controller = storyboard.instantiateController(withIdentifier: "overlayWindowControllerID") as! NSWindowController
-                let frame = controller.window?.frame
-                if var uFrame = frame {
-                    uFrame.origin = toOrigin(point: position, size: size)
-                    uFrame.size = size
-                    controller.window?.setFrame(uFrame, display: true, animate: false)
-                    controller.window?.orderFront(nil)
+        if let windowPosition: CGPoint = try! window.attribute(.position),
+            let windowSize: CGSize = try! window.attribute(.size),
+            let borderWindow = borderWindowController?.window {
+            
+            // resize overlay window so border views can be drawn onto the screen
+            var newOverlayWindowFrame = borderWindow.frame
+            newOverlayWindowFrame.origin = toOrigin(point: windowPosition, size: windowSize)
+            newOverlayWindowFrame.size = windowSize
+            borderWindowController?.window?.setFrame(newOverlayWindowFrame, display: true, animate: false)
+            
+            // add border views to overlay window
+            let buttons = traverseUIElementForButtons(element: window, level: 1)
+            for button in buttons {
+                if let position: CGPoint = try! button.attribute(.position),
+                    let size: CGSize = try! button.attribute(.size) {
+                    let screenRect = NSRect(origin: toOrigin(point: position, size: size), size: size)
+                    // convert screen coordinate to window coordinate
+                    let windowRect = borderWindow.convertFromScreen(screenRect)
+                    let borderView = BorderView(frame: windowRect)
+                    borderWindowController?.window?.contentView?.addSubview(borderView)
                 }
-                
-                controller.showWindow(nil)
-                controllers.append(controller)
             }
+            
+            borderWindowController?.showWindow(nil)
         }
     }
     
