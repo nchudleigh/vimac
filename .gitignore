@@ -20,6 +20,7 @@ dsa_priv.pem
 *.xcodeproj/
 DerivedData/
 Pods/
+*.xcworkspace/
 
 # Generated files
 VersionX-revision.h
