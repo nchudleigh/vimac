@@ -18,8 +18,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let app: Application?
         let notification: AXNotification?
     }
-    
-    //var controllers: [NSWindowController]
+
     var borderWindowController: NSWindowController?
     var storyboard: NSStoryboard
     
