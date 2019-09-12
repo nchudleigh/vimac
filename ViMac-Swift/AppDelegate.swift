@@ -27,6 +27,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let applicationObservable: Observable<Application?>
     let applicationNotificationObservable: Observable<AppNotificationAppPair>
     let windowSubject: BehaviorSubject<UIElement?>
+    let overlayEventSubject: PublishSubject<OverlayEvent>
 
     static let windowEvents: [AXNotification] = [.windowMiniaturized, .windowMoved, .windowResized]
 
@@ -98,6 +99,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         applicationObservable = AppDelegate.createApplicationObservable().share()
         applicationNotificationObservable = AppDelegate.createApplicationNotificationObservable(applicationObservable: applicationObservable)
         windowSubject = BehaviorSubject(value: nil)
+        overlayEventSubject = PublishSubject()
         shortcut =  MASShortcut.init(keyCode: kVK_Space, modifierFlags: [.command, .shift])
         super.init()
     }
@@ -109,10 +111,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             NSRunningApplication.current.terminate()
             return
         }
-        
-        MASShortcutMonitor.shared().register(shortcut, withAction: {
-            print("shortcut activated")
-        })
         
         applicationObservable
             .subscribeOn(MainScheduler.instance)
@@ -147,7 +145,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     }
                     
                     if (AppDelegate.windowEvents.contains(notification)) {
-                        self.windowSubject.onNext(nil)
+                        self.overlayEventSubject.onNext(.activeWindowUpdated)
                         return
                     }
                 }
@@ -158,11 +156,29 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             .subscribe(onNext: { windowOptional in
                 os_log("Current window: %@", log: Log.accessibility, String(describing: windowOptional))
                 guard let window = windowOptional else {
-                    self.hideOverlays()
+                    self.overlayEventSubject.onNext(.noActiveWindow)
                     return
                 }
-                self.setOverlays(window: window)
+                self.overlayEventSubject.onNext(.newActiveWindow(window: window))
             })
+        
+        overlayEventSubject
+            .observeOn(MainScheduler.instance)
+            .subscribe(onNext: { event in
+                switch event {
+                case .newActiveWindow(let window):
+                    self.hideOverlays()
+                    self.setOverlays(window: window)
+                case .noActiveWindow:
+                    self.hideOverlays()
+                case .activeWindowUpdated:
+                    self.hideOverlays()
+                }
+            })
+        
+        MASShortcutMonitor.shared().register(shortcut, withAction: {
+            print("shortcut activated")
+        })
     }
     
     func hideOverlays() {
@@ -176,10 +192,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func setOverlays(window: UIElement) {
-        hideOverlays()
-        
-        os_log("Set overlays for window: %@", log: Log.drawing, String(describing: window))
-        
+        os_log("Setting overlays for window: %@", log: Log.drawing, String(describing: window))
         if let windowPosition: CGPoint = try! window.attribute(.position),
             let windowSize: CGSize = try! window.attribute(.size),
             let borderWindow = borderWindowController?.window {

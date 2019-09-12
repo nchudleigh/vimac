@@ -11,6 +11,7 @@
 		A748E07DD920884D134567B3 /* Pods_ViMac_SwiftTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DE3D9CDCF08A5858FDCD7376 /* Pods_ViMac_SwiftTests.framework */; };
 		D8C125B0719D3A268AC30B29 /* Pods_ViMac_Swift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 76C3AC6022115352D333CBFC /* Pods_ViMac_Swift.framework */; };
 		E20696F923290D41001EFDB2 /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20696F823290D41001EFDB2 /* Log.swift */; };
+		E20696FE232A3A87001EFDB2 /* OverlayEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20696FD232A3A87001EFDB2 /* OverlayEvent.swift */; };
 		E26172242322968500E396CA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26172232322968500E396CA /* AppDelegate.swift */; };
 		E26172262322968500E396CA /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26172252322968500E396CA /* ViewController.swift */; };
 		E26172282322968600E396CA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E26172272322968600E396CA /* Assets.xcassets */; };
@@ -49,6 +50,7 @@
 		DE3D9CDCF08A5858FDCD7376 /* Pods_ViMac_SwiftTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ViMac_SwiftTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E20696F823290D41001EFDB2 /* Log.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Log.swift; sourceTree = "<group>"; };
 		E20696FC232A0021001EFDB2 /* VimacBridgingHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VimacBridgingHeader.h; sourceTree = "<group>"; };
+		E20696FD232A3A87001EFDB2 /* OverlayEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayEvent.swift; sourceTree = "<group>"; };
 		E26172202322968500E396CA /* ViMac-Swift.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ViMac-Swift.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E26172232322968500E396CA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E26172252322968500E396CA /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -153,6 +155,7 @@
 				E26172592324EC7100E396CA /* OverlayWindow.swift */,
 				E20696F823290D41001EFDB2 /* Log.swift */,
 				E20696FC232A0021001EFDB2 /* VimacBridgingHeader.h */,
+				E20696FD232A3A87001EFDB2 /* OverlayEvent.swift */,
 			);
 			path = "ViMac-Swift";
 			sourceTree = "<group>";
@@ -415,6 +418,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E261725A2324EC7100E396CA /* OverlayWindow.swift in Sources */,
+				E20696FE232A3A87001EFDB2 /* OverlayEvent.swift in Sources */,
 				E26172262322968500E396CA /* ViewController.swift in Sources */,
 				E20696F923290D41001EFDB2 /* Log.swift in Sources */,
 				E26172542323D97700E396CA /* BorderView.swift in Sources */,
