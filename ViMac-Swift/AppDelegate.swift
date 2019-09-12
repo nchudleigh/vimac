@@ -9,6 +9,7 @@
 import Cocoa
 import AXSwift
 import RxSwift
+import MASShortcut
 import os
 
 @NSApplicationMain
@@ -19,11 +20,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let notification: AXNotification?
     }
 
-    var borderWindowController: NSWindowController?
+    var borderWindowController: NSWindowController
     var storyboard: NSStoryboard
+    let shortcut: MASShortcut
     
     let applicationObservable: Observable<Application?>
     let applicationNotificationObservable: Observable<AppNotificationAppPair>
+    let windowSubject: BehaviorSubject<UIElement?>
+    let overlayEventSubject: PublishSubject<OverlayEvent>
 
     static let windowEvents: [AXNotification] = [.windowMiniaturized, .windowMoved, .windowResized]
 
@@ -54,23 +58,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             .flatMapLatest { appOptional -> Observable<AppNotificationAppPair> in
                 if let app = appOptional {
                     return Observable.create { observer in
-                        // currently, overlays are drawn when the .focusedWindowChanged event is emitted.
-                        // to allow the overlays to shown for the initial window, we check if there is a focused window and emit the event if there is.
-                        // this is a hack and a better solution is needed.
-                        // we can consider extending AXNotification to include a initialWindow event
-                        let windowOptional: UIElement? = {
-                            do {
-                                return try app.attribute(Attribute.focusedWindow)
-                            } catch {
-                                return nil
-                            }
-                        }()
-                        
-                        if let window = windowOptional {
-                            let pair = AppNotificationAppPair(app: app, notification: .focusedWindowChanged)
-                            observer.on(.next(pair))
-                        }
-                        
                         let notificationObserver = app.createObserver { (_observer: Observer, _element: UIElement, event: AXNotification) in
                             os_log("New app notification: %@", log: Log.accessibility, String(describing: event))
                             let pair = AppNotificationAppPair(app: app, notification: event)
@@ -111,6 +98,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         borderWindowController = storyboard.instantiateController(withIdentifier: "overlayWindowControllerID") as! NSWindowController
         applicationObservable = AppDelegate.createApplicationObservable().share()
         applicationNotificationObservable = AppDelegate.createApplicationNotificationObservable(applicationObservable: applicationObservable)
+        windowSubject = BehaviorSubject(value: nil)
+        overlayEventSubject = PublishSubject()
+        shortcut =  MASShortcut.init(keyCode: kVK_Space, modifierFlags: [.command, .shift])
         super.init()
     }
 
@@ -121,6 +111,21 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             NSRunningApplication.current.terminate()
             return
         }
+        
+        applicationObservable
+            .subscribeOn(MainScheduler.instance)
+            .subscribe(onNext: { appOptional in
+                if let app = appOptional {
+                    let windowOptional: UIElement? = {
+                        do {
+                            return try app.attribute(Attribute.focusedWindow)
+                        } catch {
+                            return nil
+                        }
+                    }()
+                    self.windowSubject.onNext(windowOptional)
+                }
+            })
 
         applicationNotificationObservable
             .observeOn(MainScheduler.instance)
@@ -135,43 +140,86 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                                 return nil
                             }
                         }()
-                        os_log("Current window: %@", log: Log.accessibility, String(describing: windowOptional))
-                        if let window = windowOptional {
-                            self.setOverlays(window: window)
-                        } else {
-                            self.hideOverlays()
-                        }
-                    } else if (AppDelegate.windowEvents.contains(notification)) {
-                        self.hideOverlays()
+                        self.windowSubject.onNext(windowOptional)
+                        return
+                    }
+                    
+                    if (AppDelegate.windowEvents.contains(notification)) {
+                        self.overlayEventSubject.onNext(.activeWindowUpdated)
+                        return
                     }
                 }
             })
+        
+        windowSubject
+            .observeOn(MainScheduler.instance)
+            .subscribe(onNext: { windowOptional in
+                os_log("Current window: %@", log: Log.accessibility, String(describing: windowOptional))
+                guard let window = windowOptional else {
+                    self.overlayEventSubject.onNext(.noActiveWindow)
+                    return
+                }
+                self.overlayEventSubject.onNext(.newActiveWindow)
+            })
+        
+        overlayEventSubject
+            .observeOn(MainScheduler.instance)
+            .subscribe(onNext: { event in
+                switch event {
+                case .newActiveWindow:
+                    self.hideOverlays()
+                case .noActiveWindow:
+                    self.hideOverlays()
+                case .activeWindowUpdated:
+                    self.hideOverlays()
+                case .commandPressed:
+                    if self.borderWindowController.window!.contentView!.subviews.count > 0 {
+                        self.hideOverlays()
+                        return
+                    }
+                    
+                    let windowOptional: UIElement? = {
+                        do {
+                            return try self.windowSubject.value()
+                        } catch {
+                            return nil
+                        }
+                    }()
+                    
+                    guard let window = windowOptional else {
+                        return
+                    }
+                    
+                    self.setOverlays(window: window)
+                }
+            })
+        
+        MASShortcutMonitor.shared().register(shortcut, withAction: {
+            self.overlayEventSubject.onNext(.commandPressed)
+        })
     }
     
     func hideOverlays() {
         os_log("Hiding overlays", log: Log.drawing)
-        borderWindowController?.close()
+        borderWindowController.close()
         
         // delete all current border views
-        borderWindowController?.window?.contentView?.subviews.forEach({ view in
+        borderWindowController.window?.contentView?.subviews.forEach({ view in
             view.removeFromSuperview()
         })
     }
 
     func setOverlays(window: UIElement) {
-        hideOverlays()
-        
-        os_log("Set overlays for window: %@", log: Log.drawing, String(describing: window))
-        
+        os_log("Setting overlays for window: %@", log: Log.drawing, String(describing: window))
         if let windowPosition: CGPoint = try! window.attribute(.position),
             let windowSize: CGSize = try! window.attribute(.size),
-            let borderWindow = borderWindowController?.window {
+            let borderWindow = borderWindowController.window {
             
             // resize overlay window so border views can be drawn onto the screen
             var newOverlayWindowFrame = borderWindow.frame
             newOverlayWindowFrame.origin = toOrigin(point: windowPosition, size: windowSize)
             newOverlayWindowFrame.size = windowSize
-            borderWindowController?.window?.setFrame(newOverlayWindowFrame, display: true, animate: false)
+            borderWindowController.window?.setFrame(newOverlayWindowFrame, display: true, animate: false)
             
             // add border views to overlay window
             let buttons = traverseUIElementForButtons(element: window, level: 1)
@@ -182,11 +230,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     // convert screen coordinate to window coordinate
                     let windowRect = borderWindow.convertFromScreen(screenRect)
                     let borderView = BorderView(frame: windowRect)
-                    borderWindowController?.window?.contentView?.addSubview(borderView)
+                    borderWindowController.window?.contentView?.addSubview(borderView)
                 }
             }
             
-            borderWindowController?.showWindow(nil)
+            borderWindowController.showWindow(nil)
         }
     }
     
