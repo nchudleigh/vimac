@@ -20,8 +20,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let notification: AXNotification?
     }
 
-    var borderWindowController: NSWindowController
-    var storyboard: NSStoryboard
+    let borderWindowController: NSWindowController
+    let storyboard: NSStoryboard
     let shortcut: MASShortcut
     
     let applicationObservable: Observable<Application?>
