@@ -26,6 +26,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     let applicationObservable: Observable<Application?>
     let applicationNotificationObservable: Observable<AppNotificationAppPair>
+    let windowSubject: BehaviorSubject<UIElement?>
 
     static let windowEvents: [AXNotification] = [.windowMiniaturized, .windowMoved, .windowResized]
 
@@ -96,6 +97,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         borderWindowController = storyboard.instantiateController(withIdentifier: "overlayWindowControllerID") as! NSWindowController
         applicationObservable = AppDelegate.createApplicationObservable().share()
         applicationNotificationObservable = AppDelegate.createApplicationNotificationObservable(applicationObservable: applicationObservable)
+        windowSubject = BehaviorSubject(value: nil)
         shortcut =  MASShortcut.init(keyCode: kVK_Space, modifierFlags: [.command, .shift])
         super.init()
     }
@@ -123,7 +125,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                             return nil
                         }
                     }()
-                    self.onNewWindow(windowOptional: windowOptional)
+                    self.windowSubject.onNext(windowOptional)
                 }
             })
 
@@ -140,21 +142,27 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                                 return nil
                             }
                         }()
-                        os_log("Current window: %@", log: Log.accessibility, String(describing: windowOptional))
-                        self.onNewWindow(windowOptional: windowOptional)
-                    } else if (AppDelegate.windowEvents.contains(notification)) {
-                        self.hideOverlays()
+                        self.windowSubject.onNext(windowOptional)
+                        return
+                    }
+                    
+                    if (AppDelegate.windowEvents.contains(notification)) {
+                        self.windowSubject.onNext(nil)
+                        return
                     }
                 }
             })
-    }
-    
-    func onNewWindow(windowOptional: UIElement?) {
-        guard let window = windowOptional else {
-            self.hideOverlays()
-            return
-        }
-        setOverlays(window: window)
+        
+        windowSubject
+            .observeOn(MainScheduler.instance)
+            .subscribe(onNext: { windowOptional in
+                os_log("Current window: %@", log: Log.accessibility, String(describing: windowOptional))
+                guard let window = windowOptional else {
+                    self.hideOverlays()
+                    return
+                }
+                self.setOverlays(window: window)
+            })
     }
     
     func hideOverlays() {
