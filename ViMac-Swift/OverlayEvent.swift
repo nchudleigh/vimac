@@ -9,5 +9,5 @@
 import AXSwift
 
 enum OverlayEvent {
-    case activeWindowUpdated, newActiveWindow(window: UIElement), noActiveWindow
+    case activeWindowUpdated, newActiveWindow(window: UIElement), noActiveWindow, commandPressed
 }

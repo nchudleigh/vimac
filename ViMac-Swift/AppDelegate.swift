@@ -20,7 +20,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let notification: AXNotification?
     }
 
-    var borderWindowController: NSWindowController?
+    var borderWindowController: NSWindowController
     var storyboard: NSStoryboard
     let shortcut: MASShortcut
     
@@ -173,20 +173,39 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     self.hideOverlays()
                 case .activeWindowUpdated:
                     self.hideOverlays()
+                case .commandPressed:
+                    if self.borderWindowController.window!.contentView!.subviews.count > 0 {
+                        self.hideOverlays()
+                        return
+                    }
+                    
+                    let windowOptional: UIElement? = {
+                        do {
+                            return try self.windowSubject.value()
+                        } catch {
+                            return nil
+                        }
+                    }()
+                    
+                    guard let window = windowOptional else {
+                        return
+                    }
+                    
+                    self.setOverlays(window: window)
                 }
             })
         
         MASShortcutMonitor.shared().register(shortcut, withAction: {
-            print("shortcut activated")
+            self.overlayEventSubject.onNext(.commandPressed)
         })
     }
     
     func hideOverlays() {
         os_log("Hiding overlays", log: Log.drawing)
-        borderWindowController?.close()
+        borderWindowController.close()
         
         // delete all current border views
-        borderWindowController?.window?.contentView?.subviews.forEach({ view in
+        borderWindowController.window?.contentView?.subviews.forEach({ view in
             view.removeFromSuperview()
         })
     }
@@ -195,13 +214,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         os_log("Setting overlays for window: %@", log: Log.drawing, String(describing: window))
         if let windowPosition: CGPoint = try! window.attribute(.position),
             let windowSize: CGSize = try! window.attribute(.size),
-            let borderWindow = borderWindowController?.window {
+            let borderWindow = borderWindowController.window {
             
             // resize overlay window so border views can be drawn onto the screen
             var newOverlayWindowFrame = borderWindow.frame
             newOverlayWindowFrame.origin = toOrigin(point: windowPosition, size: windowSize)
             newOverlayWindowFrame.size = windowSize
-            borderWindowController?.window?.setFrame(newOverlayWindowFrame, display: true, animate: false)
+            borderWindowController.window?.setFrame(newOverlayWindowFrame, display: true, animate: false)
             
             // add border views to overlay window
             let buttons = traverseUIElementForButtons(element: window, level: 1)
@@ -212,11 +231,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     // convert screen coordinate to window coordinate
                     let windowRect = borderWindow.convertFromScreen(screenRect)
                     let borderView = BorderView(frame: windowRect)
-                    borderWindowController?.window?.contentView?.addSubview(borderView)
+                    borderWindowController.window?.contentView?.addSubview(borderView)
                 }
             }
             
-            borderWindowController?.showWindow(nil)
+            borderWindowController.showWindow(nil)
         }
     }
     
