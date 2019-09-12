@@ -9,6 +9,7 @@
 import Cocoa
 import AXSwift
 import RxSwift
+import MASShortcut
 import os
 
 @NSApplicationMain
@@ -21,6 +22,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     var borderWindowController: NSWindowController?
     var storyboard: NSStoryboard
+    let shortcut: MASShortcut
     
     let applicationObservable: Observable<Application?>
     let applicationNotificationObservable: Observable<AppNotificationAppPair>
@@ -54,23 +56,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             .flatMapLatest { appOptional -> Observable<AppNotificationAppPair> in
                 if let app = appOptional {
                     return Observable.create { observer in
-                        // currently, overlays are drawn when the .focusedWindowChanged event is emitted.
-                        // to allow the overlays to shown for the initial window, we check if there is a focused window and emit the event if there is.
-                        // this is a hack and a better solution is needed.
-                        // we can consider extending AXNotification to include a initialWindow event
-                        let windowOptional: UIElement? = {
-                            do {
-                                return try app.attribute(Attribute.focusedWindow)
-                            } catch {
-                                return nil
-                            }
-                        }()
-                        
-                        if let window = windowOptional {
-                            let pair = AppNotificationAppPair(app: app, notification: .focusedWindowChanged)
-                            observer.on(.next(pair))
-                        }
-                        
                         let notificationObserver = app.createObserver { (_observer: Observer, _element: UIElement, event: AXNotification) in
                             os_log("New app notification: %@", log: Log.accessibility, String(describing: event))
                             let pair = AppNotificationAppPair(app: app, notification: event)
@@ -111,6 +96,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         borderWindowController = storyboard.instantiateController(withIdentifier: "overlayWindowControllerID") as! NSWindowController
         applicationObservable = AppDelegate.createApplicationObservable().share()
         applicationNotificationObservable = AppDelegate.createApplicationNotificationObservable(applicationObservable: applicationObservable)
+        shortcut =  MASShortcut.init(keyCode: kVK_Space, modifierFlags: [.command, .shift])
         super.init()
     }
 
@@ -121,6 +107,25 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             NSRunningApplication.current.terminate()
             return
         }
+        
+        MASShortcutMonitor.shared().register(shortcut, withAction: {
+            print("shortcut activated")
+        })
+        
+        applicationObservable
+            .subscribeOn(MainScheduler.instance)
+            .subscribe(onNext: { appOptional in
+                if let app = appOptional {
+                    let windowOptional: UIElement? = {
+                        do {
+                            return try app.attribute(Attribute.focusedWindow)
+                        } catch {
+                            return nil
+                        }
+                    }()
+                    self.onNewWindow(windowOptional: windowOptional)
+                }
+            })
 
         applicationNotificationObservable
             .observeOn(MainScheduler.instance)
@@ -136,16 +141,20 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                             }
                         }()
                         os_log("Current window: %@", log: Log.accessibility, String(describing: windowOptional))
-                        if let window = windowOptional {
-                            self.setOverlays(window: window)
-                        } else {
-                            self.hideOverlays()
-                        }
+                        self.onNewWindow(windowOptional: windowOptional)
                     } else if (AppDelegate.windowEvents.contains(notification)) {
                         self.hideOverlays()
                     }
                 }
             })
+    }
+    
+    func onNewWindow(windowOptional: UIElement?) {
+        guard let window = windowOptional else {
+            self.hideOverlays()
+            return
+        }
+        setOverlays(window: window)
     }
     
     func hideOverlays() {
