@@ -48,6 +48,7 @@
 		BC08535C76EBCBC974B09397 /* Pods-ViMac-SwiftTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ViMac-SwiftTests.debug.xcconfig"; path = "Target Support Files/Pods-ViMac-SwiftTests/Pods-ViMac-SwiftTests.debug.xcconfig"; sourceTree = "<group>"; };
 		DE3D9CDCF08A5858FDCD7376 /* Pods_ViMac_SwiftTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ViMac_SwiftTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E20696F823290D41001EFDB2 /* Log.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Log.swift; sourceTree = "<group>"; };
+		E20696FC232A0021001EFDB2 /* VimacBridgingHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VimacBridgingHeader.h; sourceTree = "<group>"; };
 		E26172202322968500E396CA /* ViMac-Swift.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ViMac-Swift.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E26172232322968500E396CA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E26172252322968500E396CA /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -151,6 +152,7 @@
 				E26172532323D97700E396CA /* BorderView.swift */,
 				E26172592324EC7100E396CA /* OverlayWindow.swift */,
 				E20696F823290D41001EFDB2 /* Log.swift */,
+				E20696FC232A0021001EFDB2 /* VimacBridgingHeader.h */,
 			);
 			path = "ViMac-Swift";
 			sourceTree = "<group>";
