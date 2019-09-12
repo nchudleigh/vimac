@@ -159,16 +159,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     self.overlayEventSubject.onNext(.noActiveWindow)
                     return
                 }
-                self.overlayEventSubject.onNext(.newActiveWindow(window: window))
+                self.overlayEventSubject.onNext(.newActiveWindow)
             })
         
         overlayEventSubject
             .observeOn(MainScheduler.instance)
             .subscribe(onNext: { event in
                 switch event {
-                case .newActiveWindow(let window):
+                case .newActiveWindow:
                     self.hideOverlays()
-                    self.setOverlays(window: window)
                 case .noActiveWindow:
                     self.hideOverlays()
                 case .activeWindowUpdated:
