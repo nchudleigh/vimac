@@ -159,6 +159,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     self.overlayEventSubject.onNext(.noActiveWindow)
                     return
                 }
+                
                 self.overlayEventSubject.onNext(.newActiveWindow)
             })
         
@@ -261,7 +262,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 borderWindowController.window?.contentView?.addSubview(view)
             }
             
+            let textField = NSTextField(frame: NSRect(x: 0, y: 0, width: 500, height: 500))
+            textField.isEditable = true
+            textField.delegate = self
+            textField.isHidden = true
+            borderWindow.contentView?.addSubview(textField)
             borderWindowController.showWindow(nil)
+            borderWindow.makeKeyAndOrderFront(nil)
+            textField.becomeFirstResponder()
         }
     }
     
@@ -295,5 +303,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     func applicationWillTerminate(_ aNotification: Notification) {
         // Insert code here to tear down your application
+    }
+}
+
+extension AppDelegate: NSTextFieldDelegate {
+    func controlTextDidChange(_ obj: Notification) {
+        let textField = obj.object as! NSTextField
+        print(textField.stringValue)
     }
 }

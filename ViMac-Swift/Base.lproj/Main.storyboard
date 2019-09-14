@@ -685,7 +685,6 @@
             <objects>
                 <windowController storyboardIdentifier="overlayWindowControllerID" id="8mH-dK-Dlx" sceneMemberID="viewController">
                     <window key="window" title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" hasShadow="NO" releasedWhenClosed="NO" frameAutosaveName="" animationBehavior="default" id="qOo-UR-Afh" customClass="OverlayWindow" customModule="ViMac_Swift" customModuleProvider="target">
-                        <windowStyleMask key="styleMask" titled="YES"/>
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
                         <rect key="contentRect" x="294" y="313" width="480" height="360"/>
                         <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>

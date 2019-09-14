@@ -16,11 +16,11 @@
 		E26172242322968500E396CA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26172232322968500E396CA /* AppDelegate.swift */; };
 		E26172262322968500E396CA /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26172252322968500E396CA /* ViewController.swift */; };
 		E26172282322968600E396CA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E26172272322968600E396CA /* Assets.xcassets */; };
-		E261722B2322968700E396CA /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E26172292322968700E396CA /* Main.storyboard */; };
 		E26172372322968700E396CA /* ViMac_SwiftTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26172362322968700E396CA /* ViMac_SwiftTests.swift */; };
 		E26172422322968700E396CA /* ViMac_SwiftUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26172412322968700E396CA /* ViMac_SwiftUITests.swift */; };
 		E26172542323D97700E396CA /* BorderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26172532323D97700E396CA /* BorderView.swift */; };
 		E261725A2324EC7100E396CA /* OverlayWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26172592324EC7100E396CA /* OverlayWindow.swift */; };
+		E2F6C9A3232CE37E00F2975B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E26172292322968700E396CA /* Main.storyboard */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -291,7 +291,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E26172282322968600E396CA /* Assets.xcassets in Resources */,
-				E261722B2322968700E396CA /* Main.storyboard in Resources */,
+				E2F6C9A3232CE37E00F2975B /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
