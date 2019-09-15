@@ -318,7 +318,7 @@ extension AppDelegate: NSTextFieldDelegate {
                 let o: Observable<Void> = Observable.just(Void())
                 o
                     .subscribeOn(MainScheduler.asyncInstance)
-                    .subscribe({ x in
+                    .subscribe(onNext: { x in
                         do {
                             try button.performAction(.press)
                         } catch {
