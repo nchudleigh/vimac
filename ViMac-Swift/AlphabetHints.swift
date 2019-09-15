@@ -13,6 +13,10 @@ class AlphabetHints {
     let hintKeystrokeQueue: [String] = []
     
     func hintStrings(linkCount: Int) -> [String] {
+        if linkCount == 0 {
+            return []
+        }
+        
         var hints = [""]
         var offset = 0
         while hints.count - offset < linkCount || hints.count == 1 {
