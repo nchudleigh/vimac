@@ -268,14 +268,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 return nil
             }
         }()
-        
-        guard let actions = actionsOptional else {
-            return []
-        }
-        
-        if (actions.contains(.press)) {
-            return [element]
-        }
 
         let children: [AXUIElement] = {
             do {
@@ -288,13 +280,22 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 return []
             }
         }()
-        return children
+        
+        let recursiveChildren = children
             .map({child -> [UIElement] in
                 return traverseUIElementForPressables(element: UIElement.init(child), level: level + 1)
             })
             .reduce([]) {(result, next) -> [UIElement] in
                 return result + next
             }
+        
+        if let actions = actionsOptional {
+            if (actions.contains(.press)) {
+                return [element] + recursiveChildren
+            }
+        }
+        
+        return recursiveChildren
     }
     
     func applicationWillTerminate(_ aNotification: Notification) {
