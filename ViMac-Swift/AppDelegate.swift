@@ -29,7 +29,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let windowSubject: BehaviorSubject<UIElement?>
     let overlayEventSubject: PublishSubject<OverlayEvent>
     
-    var buttonByHint: [String : UIElement]
+    var pressableElementByHint: [String : UIElement]
 
     static let windowEvents: [AXNotification] = [.windowMiniaturized, .windowMoved, .windowResized]
 
@@ -103,7 +103,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         windowSubject = BehaviorSubject(value: nil)
         overlayEventSubject = PublishSubject()
         shortcut = MASShortcut.init(keyCode: kVK_Space, modifierFlags: [.command, .shift])
-        buttonByHint = [String : UIElement]()
+        pressableElementByHint = [String : UIElement]()
         super.init()
     }
 
@@ -205,7 +205,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     func hideOverlays() {
         os_log("Hiding overlays", log: Log.drawing)
-        buttonByHint = [String : UIElement]()
+        pressableElementByHint = [String : UIElement]()
         borderWindowController.close()
         
         // delete all current border views
@@ -226,17 +226,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             newOverlayWindowFrame.size = windowSize
             borderWindowController.window?.setFrame(newOverlayWindowFrame, display: true, animate: false)
             
-            let buttons = traverseUIElementForButtons(element: window, level: 1)
+            let pressableElements = traverseUIElementForPressables(element: window, level: 1)
             
-            let hintStrings = AlphabetHints().hintStrings(linkCount: buttons.count)
+            let hintStrings = AlphabetHints().hintStrings(linkCount: pressableElements.count)
             // map buttons to hint views to be added to overlay window
-            let hintViews: [HintView] = buttons
+            let hintViews: [HintView] = pressableElements
                 .enumerated()
                 .map { (index, button) in
                     if let positionFlipped: CGPoint = try! button.attribute(.position) {
                         let text = HintView(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
                         text.initializeHint(hintText: hintStrings[index], positionFlipped: positionFlipped, window: borderWindow)
-                        buttonByHint[hintStrings[index]] = button
+                        pressableElementByHint[hintStrings[index]] = button
                         return text
                     }
                     return nil
@@ -259,23 +259,41 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
     
-    func traverseUIElementForButtons(element: UIElement, level: Int) -> [UIElement] {
-        let role = try! element.role();
-        if (role == Role.button) {
-            return [element]
+    func traverseUIElementForPressables(element: UIElement, level: Int) -> [UIElement] {
+        let actionsOptional: [Action]? = {
+            do {
+                return try element.actions();
+            } catch {
+                return nil
+            }
+        }()
+        
+        guard let actions = actionsOptional else {
+            return []
         }
         
-        let children = try! element.attribute(Attribute.children) as [AXUIElement]?;
-        if let unwrappedChildren = children {
-            return unwrappedChildren
-                .map({child -> [UIElement] in
-                    return traverseUIElementForButtons(element: UIElement.init(child), level: level + 1)
-                })
-                .reduce([]) {(result, next) -> [UIElement] in
-                    return result + next
-                }
+        if (actions.contains(.press)) {
+            return [element]
         }
-        return []
+
+        let children: [AXUIElement] = {
+            do {
+                let childrenOptional = try element.attribute(Attribute.children) as [AXUIElement]?;
+                guard let children = childrenOptional else {
+                    return []
+                }
+                return children
+            } catch {
+                return []
+            }
+        }()
+        return children
+            .map({child -> [UIElement] in
+                return traverseUIElementForPressables(element: UIElement.init(child), level: level + 1)
+            })
+            .reduce([]) {(result, next) -> [UIElement] in
+                return result + next
+            }
     }
     
     func applicationWillTerminate(_ aNotification: Notification) {
@@ -291,7 +309,7 @@ extension AppDelegate: NSTextFieldDelegate {
             let matchingHintViews = hintViews.filter { $0.stringValue.starts(with: text) }
             if matchingHintViews.count == 1 {
                 let hintView = matchingHintViews.first!
-                let button = buttonByHint[hintView.stringValue]!
+                let button = pressableElementByHint[hintView.stringValue]!
                 let o: Observable<Void> = Observable.just(Void())
                 o
                     .subscribeOn(MainScheduler.asyncInstance)
