@@ -207,7 +207,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         os_log("Hiding overlays", log: Log.drawing)
         pressableElementByHint = [String : UIElement]()
         borderWindowController.close()
-        
+        self.removeOverlaySubviews()
+    }
+    
+    func removeOverlaySubviews() {
         // delete all current border views
         borderWindowController.window?.contentView?.subviews.forEach({ view in
             view.removeFromSuperview()
@@ -330,7 +333,7 @@ extension AppDelegate: NSTextFieldDelegate {
                 return
             }
             
-            self.hideOverlays()
+            self.removeOverlaySubviews()
             
             let windowOptional: UIElement? = {
                 do {
