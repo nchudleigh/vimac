@@ -271,6 +271,21 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 return nil
             }
         }()
+        
+        let roleOptional: Role? = {
+            do {
+                return try element.role()
+            } catch {
+                return nil
+            }
+        }()
+        
+        // ignore subcomponents of a scrollbar
+        if let role = roleOptional {
+            if role == .scrollBar {
+                return []
+            }
+        }
 
         let children: [AXUIElement] = {
             do {
