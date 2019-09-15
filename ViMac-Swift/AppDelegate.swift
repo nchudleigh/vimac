@@ -194,7 +194,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                         return
                     }
                     
-                    self.setOverlays(window: window)
+                    self.setOverlays(window: window, typed: "")
                 }
             })
         
@@ -214,7 +214,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         })
     }
 
-    func setOverlays(window: UIElement) {
+    func setOverlays(window: UIElement, typed: String) {
         os_log("Setting overlays for window: %@", log: Log.drawing, String(describing: window))
         if let windowPosition: CGPoint = try! window.attribute(.position),
             let windowSize: CGSize = try! window.attribute(.size),
@@ -235,7 +235,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 .map { (index, button) in
                     if let positionFlipped: CGPoint = try! button.attribute(.position) {
                         let text = HintView(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
-                        text.initializeHint(hintText: hintStrings[index], positionFlipped: positionFlipped, window: borderWindow)
+                        text.initializeHint(hintText: hintStrings[index], typed: typed, positionFlipped: positionFlipped, window: borderWindow)
                         pressableElementByHint[hintStrings[index]] = button
                         return text
                     }
@@ -248,7 +248,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 borderWindowController.window?.contentView?.addSubview(view)
             }
             
-            let textField = NSTextField(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
+            let textField = OverlayTextField(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
+            textField.stringValue = typed
             textField.isEditable = true
             textField.delegate = self
             textField.isHidden = true
@@ -307,6 +308,10 @@ extension AppDelegate: NSTextFieldDelegate {
         let text = textField.stringValue.uppercased()
         if let hintViews = borderWindowController.window?.contentView?.subviews.filter ({ $0 is HintView }) as! [HintView]? {
             let matchingHintViews = hintViews.filter { $0.stringValue.starts(with: text) }
+            if matchingHintViews.count == 0 {
+                return
+            }
+            
             if matchingHintViews.count == 1 {
                 let hintView = matchingHintViews.first!
                 let button = pressableElementByHint[hintView.stringValue]!
@@ -323,6 +328,23 @@ extension AppDelegate: NSTextFieldDelegate {
                 self.hideOverlays()
                 return
             }
+            
+            self.hideOverlays()
+            
+            let windowOptional: UIElement? = {
+                do {
+                    return try self.windowSubject.value()
+                } catch {
+                    return nil
+                }
+            }()
+            
+            guard let window = windowOptional else {
+                return
+            }
+            
+            self.setOverlays(window: window, typed: text)
+            
         }
     }
 }

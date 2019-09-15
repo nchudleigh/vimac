@@ -9,6 +9,10 @@
 import Cocoa
 
 class HintView: NSTextField {
+    static let backgroundColor = NSColor(red: 255 / 255, green: 197 / 255, blue: 66 / 255, alpha: 1)
+    static let untypedHintColor = NSColor.black
+    static let typedHintColor = NSColor(red: 212 / 255, green: 172 / 255, blue: 58 / 255, alpha: 1)
+    
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
     }
@@ -17,19 +21,25 @@ class HintView: NSTextField {
         super.init(coder: coder)
     }
     
-    func initializeHint(hintText: String, positionFlipped: NSPoint, window: NSWindow) {
-        self.stringValue = hintText
+    func initializeHint(hintText: String, typed: String, positionFlipped: NSPoint, window: NSWindow) {
+        let attr = NSMutableAttributedString(string: hintText)
+        let range = NSMakeRange(0, hintText.count)
+        attr.addAttributes([NSAttributedString.Key.foregroundColor : HintView.untypedHintColor], range: range)
+        if hintText.starts(with: typed) {
+            let typedRange = NSMakeRange(0, typed.count)
+            attr.addAttributes([NSAttributedString.Key.foregroundColor : HintView.typedHintColor], range: typedRange)
+        }
+        self.attributedStringValue = attr
+        
+        //self.stringValue = hintText
         self.wantsLayer = true
         self.isBordered = true
         self.drawsBackground = true
         
-        let backgroundColor = NSColor(red: 255 / 255, green: 197 / 255, blue: 66 / 255, alpha: 1)
-        let textColor = NSColor.black
+        self.backgroundColor = HintView.backgroundColor
         
-        self.backgroundColor = backgroundColor
-        self.textColor = textColor
-        self.layer?.backgroundColor = backgroundColor.cgColor
-        self.layer?.borderColor = backgroundColor.cgColor
+        self.layer?.backgroundColor = HintView.backgroundColor.cgColor
+        self.layer?.borderColor = HintView.backgroundColor.cgColor
         self.layer?.borderWidth = 1
         self.layer?.cornerRadius = 5
         self.font = NSFont.boldSystemFont(ofSize: NSFont.systemFontSize)
