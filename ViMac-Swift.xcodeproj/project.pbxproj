@@ -21,6 +21,8 @@
 		E26172542323D97700E396CA /* BorderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26172532323D97700E396CA /* BorderView.swift */; };
 		E261725A2324EC7100E396CA /* OverlayWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26172592324EC7100E396CA /* OverlayWindow.swift */; };
 		E2F6C9A3232CE37E00F2975B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E26172292322968700E396CA /* Main.storyboard */; };
+		E2F6C9AD232DE89F00F2975B /* HintView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2F6C9AC232DE89F00F2975B /* HintView.swift */; };
+		E2F6C9AF232DEA1800F2975B /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2F6C9AE232DEA1800F2975B /* Utils.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -68,6 +70,8 @@
 		E26172432322968700E396CA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E26172532323D97700E396CA /* BorderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BorderView.swift; sourceTree = "<group>"; };
 		E26172592324EC7100E396CA /* OverlayWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayWindow.swift; sourceTree = "<group>"; };
+		E2F6C9AC232DE89F00F2975B /* HintView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HintView.swift; sourceTree = "<group>"; };
+		E2F6C9AE232DEA1800F2975B /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		EA6A7F7F788AC590C0151C42 /* Pods_ViMac_SwiftUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ViMac_SwiftUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -159,6 +163,8 @@
 				E20696FC232A0021001EFDB2 /* VimacBridgingHeader.h */,
 				E20696FD232A3A87001EFDB2 /* OverlayEvent.swift */,
 				E20696FF232A52EA001EFDB2 /* AlphabetHints.swift */,
+				E2F6C9AC232DE89F00F2975B /* HintView.swift */,
+				E2F6C9AE232DEA1800F2975B /* Utils.swift */,
 			);
 			path = "ViMac-Swift";
 			sourceTree = "<group>";
@@ -422,11 +428,13 @@
 			files = (
 				E261725A2324EC7100E396CA /* OverlayWindow.swift in Sources */,
 				E20696FE232A3A87001EFDB2 /* OverlayEvent.swift in Sources */,
+				E2F6C9AF232DEA1800F2975B /* Utils.swift in Sources */,
 				E26172262322968500E396CA /* ViewController.swift in Sources */,
 				E2069700232A52EA001EFDB2 /* AlphabetHints.swift in Sources */,
 				E20696F923290D41001EFDB2 /* Log.swift in Sources */,
 				E26172542323D97700E396CA /* BorderView.swift in Sources */,
 				E26172242322968500E396CA /* AppDelegate.swift in Sources */,
+				E2F6C9AD232DE89F00F2975B /* HintView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

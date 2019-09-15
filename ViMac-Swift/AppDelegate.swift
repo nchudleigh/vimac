@@ -218,7 +218,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             
             // resize overlay window so hint views can be drawn onto the screen
             var newOverlayWindowFrame = borderWindow.frame
-            newOverlayWindowFrame.origin = toOrigin(point: windowPosition, size: windowSize)
+            newOverlayWindowFrame.origin = Utils.toOrigin(point: windowPosition, size: windowSize)
             newOverlayWindowFrame.size = windowSize
             borderWindowController.window?.setFrame(newOverlayWindowFrame, display: true, animate: false)
             
@@ -226,31 +226,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             
             let hintStrings = AlphabetHints().hintStrings(linkCount: buttons.count)
             // map buttons to hint views to be added to overlay window
-            let hintViews: [NSTextField] = buttons
+            let hintViews: [HintView] = buttons
                 .enumerated()
                 .map { (index, button) in
                     if let positionFlipped: CGPoint = try! button.attribute(.position) {
-                        let text = NSTextField(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
-                        text.stringValue = hintStrings[index]
-                        text.wantsLayer = true
-                        text.isBordered = true
-                        text.drawsBackground = true
-                        
-                        let backgroundColor = NSColor(red: 255 / 255, green: 197 / 255, blue: 66 / 255, alpha: 1)
-                        let textColor = NSColor.black
-
-                        text.backgroundColor = backgroundColor
-                        text.textColor = textColor
-                        text.layer?.backgroundColor = backgroundColor.cgColor
-                        text.layer?.borderColor = backgroundColor.cgColor
-                        text.layer?.borderWidth = 1
-                        text.layer?.cornerRadius = 5
-                        text.font = NSFont.boldSystemFont(ofSize: NSFont.systemFontSize)
-                        
-                        text.sizeToFit()
-                        let positionRelativeToScreen = toOrigin(point: positionFlipped, size: text.frame.size)
-                        let positionRelativeToWindow = borderWindow.convertPoint(fromScreen: positionRelativeToScreen)
-                        text.frame.origin = positionRelativeToWindow
+                        let text = HintView(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
+                        text.initializeHint(hintText: hintStrings[index], positionFlipped: positionFlipped, window: borderWindow)
                         return text
                     }
                     return nil
@@ -262,7 +243,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 borderWindowController.window?.contentView?.addSubview(view)
             }
             
-            let textField = NSTextField(frame: NSRect(x: 0, y: 0, width: 500, height: 500))
+            let textField = NSTextField(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
             textField.isEditable = true
             textField.delegate = self
             textField.isHidden = true
@@ -292,15 +273,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         return []
     }
     
-    // This function returns the position of the point after the y-axis is flipped.
-    // We need this because accessing the position of a AXUIElement gives us the position from top-left,
-    // but the coordinate system in macOS starts from bottom-left.
-    // https://developer.apple.com/documentation/applicationservices/kaxpositionattribute?language=objc
-    func toOrigin(point: CGPoint, size: CGSize) -> CGPoint {
-        let screenHeight = NSScreen.screens.first?.frame.size.height
-        return CGPoint(x: point.x, y: screenHeight! - size.height - point.y)
-    }
-    
     func applicationWillTerminate(_ aNotification: Notification) {
         // Insert code here to tear down your application
     }
@@ -309,6 +281,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 extension AppDelegate: NSTextFieldDelegate {
     func controlTextDidChange(_ obj: Notification) {
         let textField = obj.object as! NSTextField
-        print(textField.stringValue)
+//        if let hintViews = borderWindowController.window?.contentView?.subviews.filter { $0 is NSTextField } {
+//            let matchingHintViews = hintViews.filter { $0 }
+//        }
     }
 }
