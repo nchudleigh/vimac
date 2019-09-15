@@ -9,6 +9,7 @@
 import Cocoa
 
 class HintView: NSTextField {
+    static let borderColor = NSColor(red: 212 / 255, green: 172 / 255, blue: 58 / 255, alpha: 1)
     static let backgroundColor = NSColor(red: 255 / 255, green: 197 / 255, blue: 66 / 255, alpha: 1)
     static let untypedHintColor = NSColor.black
     static let typedHintColor = NSColor(red: 212 / 255, green: 172 / 255, blue: 58 / 255, alpha: 1)
@@ -39,7 +40,7 @@ class HintView: NSTextField {
         self.backgroundColor = HintView.backgroundColor
         
         self.layer?.backgroundColor = HintView.backgroundColor.cgColor
-        self.layer?.borderColor = HintView.backgroundColor.cgColor
+        self.layer?.borderColor = HintView.borderColor.cgColor
         self.layer?.borderWidth = 1
         self.layer?.cornerRadius = 5
         self.font = NSFont.boldSystemFont(ofSize: NSFont.systemFontSize)
