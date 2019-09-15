@@ -28,6 +28,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let applicationNotificationObservable: Observable<AppNotificationAppPair>
     let windowSubject: BehaviorSubject<UIElement?>
     let overlayEventSubject: PublishSubject<OverlayEvent>
+    
+    var pressableElementByHint: [String : UIElement]
 
     static let windowEvents: [AXNotification] = [.windowMiniaturized, .windowMoved, .windowResized]
 
@@ -100,7 +102,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         applicationNotificationObservable = AppDelegate.createApplicationNotificationObservable(applicationObservable: applicationObservable)
         windowSubject = BehaviorSubject(value: nil)
         overlayEventSubject = PublishSubject()
-        shortcut =  MASShortcut.init(keyCode: kVK_Space, modifierFlags: [.command, .shift])
+        shortcut = MASShortcut.init(keyCode: kVK_Space, modifierFlags: [.command, .shift])
+        pressableElementByHint = [String : UIElement]()
         super.init()
     }
 
@@ -159,6 +162,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     self.overlayEventSubject.onNext(.noActiveWindow)
                     return
                 }
+                
                 self.overlayEventSubject.onNext(.newActiveWindow)
             })
         
@@ -190,7 +194,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                         return
                     }
                     
-                    self.setOverlays(window: window)
+                    self.setOverlays(window: window, typed: "")
                 }
             })
         
@@ -201,68 +205,166 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     func hideOverlays() {
         os_log("Hiding overlays", log: Log.drawing)
+        pressableElementByHint = [String : UIElement]()
         borderWindowController.close()
-        
+        self.removeOverlaySubviews()
+    }
+    
+    func removeOverlaySubviews() {
         // delete all current border views
         borderWindowController.window?.contentView?.subviews.forEach({ view in
             view.removeFromSuperview()
         })
     }
 
-    func setOverlays(window: UIElement) {
+    func setOverlays(window: UIElement, typed: String) {
         os_log("Setting overlays for window: %@", log: Log.drawing, String(describing: window))
         if let windowPosition: CGPoint = try! window.attribute(.position),
             let windowSize: CGSize = try! window.attribute(.size),
             let borderWindow = borderWindowController.window {
             
-            // resize overlay window so border views can be drawn onto the screen
+            // resize overlay window so hint views can be drawn onto the screen
             var newOverlayWindowFrame = borderWindow.frame
-            newOverlayWindowFrame.origin = toOrigin(point: windowPosition, size: windowSize)
+            newOverlayWindowFrame.origin = Utils.toOrigin(point: windowPosition, size: windowSize)
             newOverlayWindowFrame.size = windowSize
             borderWindowController.window?.setFrame(newOverlayWindowFrame, display: true, animate: false)
             
-            // add border views to overlay window
-            let buttons = traverseUIElementForButtons(element: window, level: 1)
-            for button in buttons {
-                if let position: CGPoint = try! button.attribute(.position),
-                    let size: CGSize = try! button.attribute(.size) {
-                    let screenRect = NSRect(origin: toOrigin(point: position, size: size), size: size)
-                    // convert screen coordinate to window coordinate
-                    let windowRect = borderWindow.convertFromScreen(screenRect)
-                    let borderView = BorderView(frame: windowRect)
-                    borderWindowController.window?.contentView?.addSubview(borderView)
-                }
+            let pressableElements = traverseUIElementForPressables(element: window, level: 1)
+            
+            let hintStrings = AlphabetHints().hintStrings(linkCount: pressableElements.count)
+            // map buttons to hint views to be added to overlay window
+            let hintViews: [HintView] = pressableElements
+                .enumerated()
+                .map { (index, button) in
+                    if let positionFlipped: CGPoint = try! button.attribute(.position) {
+                        let text = HintView(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
+                        text.initializeHint(hintText: hintStrings[index], typed: typed, positionFlipped: positionFlipped, window: borderWindow)
+                        pressableElementByHint[hintStrings[index]] = button
+                        return text
+                    }
+                    return nil
+                // filters nil results
+                }.compactMap({ $0 })
+
+            hintViews.forEach { view in
+                // add view to overlay window
+                borderWindowController.window?.contentView?.addSubview(view)
             }
             
+            let textField = OverlayTextField(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
+            textField.stringValue = typed
+            textField.isEditable = true
+            textField.delegate = self
+            textField.isHidden = true
+            borderWindow.contentView?.addSubview(textField)
             borderWindowController.showWindow(nil)
+            borderWindow.makeKeyAndOrderFront(nil)
+            textField.becomeFirstResponder()
         }
     }
     
-    func traverseUIElementForButtons(element: UIElement, level: Int) -> [UIElement] {
-        let role = try! element.role();
-        if (role == Role.button) {
-            return [element]
+    func traverseUIElementForPressables(element: UIElement, level: Int) -> [UIElement] {
+        let actionsOptional: [Action]? = {
+            do {
+                return try element.actions();
+            } catch {
+                return nil
+            }
+        }()
+        
+        let roleOptional: Role? = {
+            do {
+                return try element.role()
+            } catch {
+                return nil
+            }
+        }()
+        
+        // ignore subcomponents of a scrollbar
+        if let role = roleOptional {
+            if role == .scrollBar {
+                return []
+            }
+        }
+
+        let children: [AXUIElement] = {
+            do {
+                let childrenOptional = try element.attribute(Attribute.children) as [AXUIElement]?;
+                guard let children = childrenOptional else {
+                    return []
+                }
+                return children
+            } catch {
+                return []
+            }
+        }()
+        
+        let recursiveChildren = children
+            .map({child -> [UIElement] in
+                return traverseUIElementForPressables(element: UIElement.init(child), level: level + 1)
+            })
+            .reduce([]) {(result, next) -> [UIElement] in
+                return result + next
+            }
+        
+        if let actions = actionsOptional {
+            if (actions.contains(.press)) {
+                return [element] + recursiveChildren
+            }
         }
         
-        let children = try! element.attribute(Attribute.children) as [AXUIElement]?;
-        if let unwrappedChildren = children {
-            return unwrappedChildren
-                .map({child -> [UIElement] in
-                    return traverseUIElementForButtons(element: UIElement.init(child), level: level + 1)
-                })
-                .reduce([]) {(result, next) -> [UIElement] in
-                    return result + next
-                }
-        }
-        return []
-    }
-    
-    func toOrigin(point: CGPoint, size: CGSize) -> CGPoint {
-        let screenHeight = NSScreen.screens.first?.frame.size.height
-        return CGPoint(x: point.x, y: screenHeight! - size.height - point.y)
+        return recursiveChildren
     }
     
     func applicationWillTerminate(_ aNotification: Notification) {
         // Insert code here to tear down your application
+    }
+}
+
+extension AppDelegate: NSTextFieldDelegate {
+    func controlTextDidChange(_ obj: Notification) {
+        let textField = obj.object as! NSTextField
+        let typed = textField.stringValue.uppercased()
+        if let hintViews = borderWindowController.window?.contentView?.subviews.filter ({ $0 is HintView }) as! [HintView]? {
+            let matchingHintViews = hintViews.filter { $0.stringValue.starts(with: typed) }
+            if matchingHintViews.count == 0 && typed.count > 0 {
+                self.hideOverlays()
+                return
+            }
+            
+            if matchingHintViews.count == 1 {
+                let hintView = matchingHintViews.first!
+                let button = pressableElementByHint[hintView.stringValue]!
+                let o: Observable<Void> = Observable.just(Void())
+                o
+                    .subscribeOn(MainScheduler.asyncInstance)
+                    .subscribe(onNext: { x in
+                        do {
+                            try button.performAction(.press)
+                        } catch {
+                        }
+                    })
+                
+                self.hideOverlays()
+                return
+            }
+            
+            self.removeOverlaySubviews()
+            
+            let windowOptional: UIElement? = {
+                do {
+                    return try self.windowSubject.value()
+                } catch {
+                    return nil
+                }
+            }()
+            
+            guard let window = windowOptional else {
+                return
+            }
+            
+            self.setOverlays(window: window, typed: typed)
+            
+        }
     }
 }

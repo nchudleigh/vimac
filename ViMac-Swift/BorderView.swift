@@ -9,10 +9,8 @@
 import Cocoa
 
 class BorderView: NSView {
-
-//    let RADIUS = CGFloat(0.0)
     let SIZE = CGFloat(1)
-//
+
     override func draw(_ dirtyRect: NSRect) {
         let rect = cleanRect(dirtyRect: dirtyRect, size: SIZE)
         let border = NSBezierPath.init(rect: rect)
@@ -24,5 +22,4 @@ class BorderView: NSView {
     func cleanRect(dirtyRect: NSRect, size: CGFloat) -> NSRect {
         return NSInsetRect(dirtyRect, size / 2.0, size / 2.0)
     }
-    
 }
