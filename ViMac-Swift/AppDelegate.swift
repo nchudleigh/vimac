@@ -28,6 +28,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let applicationNotificationObservable: Observable<AppNotificationAppPair>
     let windowSubject: BehaviorSubject<UIElement?>
     let overlayEventSubject: PublishSubject<OverlayEvent>
+    
+    var buttonByHint: [String : UIElement]
 
     static let windowEvents: [AXNotification] = [.windowMiniaturized, .windowMoved, .windowResized]
 
@@ -100,7 +102,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         applicationNotificationObservable = AppDelegate.createApplicationNotificationObservable(applicationObservable: applicationObservable)
         windowSubject = BehaviorSubject(value: nil)
         overlayEventSubject = PublishSubject()
-        shortcut =  MASShortcut.init(keyCode: kVK_Space, modifierFlags: [.command, .shift])
+        shortcut = MASShortcut.init(keyCode: kVK_Space, modifierFlags: [.command, .shift])
+        buttonByHint = [String : UIElement]()
         super.init()
     }
 
@@ -202,6 +205,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     func hideOverlays() {
         os_log("Hiding overlays", log: Log.drawing)
+        buttonByHint = [String : UIElement]()
         borderWindowController.close()
         
         // delete all current border views
@@ -232,6 +236,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     if let positionFlipped: CGPoint = try! button.attribute(.position) {
                         let text = HintView(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
                         text.initializeHint(hintText: hintStrings[index], positionFlipped: positionFlipped, window: borderWindow)
+                        buttonByHint[hintStrings[index]] = button
                         return text
                     }
                     return nil
@@ -281,8 +286,25 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 extension AppDelegate: NSTextFieldDelegate {
     func controlTextDidChange(_ obj: Notification) {
         let textField = obj.object as! NSTextField
-//        if let hintViews = borderWindowController.window?.contentView?.subviews.filter { $0 is NSTextField } {
-//            let matchingHintViews = hintViews.filter { $0 }
-//        }
+        let text = textField.stringValue.uppercased()
+        if let hintViews = borderWindowController.window?.contentView?.subviews.filter ({ $0 is HintView }) as! [HintView]? {
+            let matchingHintViews = hintViews.filter { $0.stringValue.starts(with: text) }
+            if matchingHintViews.count == 1 {
+                let hintView = matchingHintViews.first!
+                let button = buttonByHint[hintView.stringValue]!
+                let o: Observable<Void> = Observable.just(Void())
+                o
+                    .subscribeOn(MainScheduler.asyncInstance)
+                    .subscribe({ x in
+                        do {
+                            try button.performAction(.press)
+                        } catch {
+                        }
+                    })
+                
+                self.hideOverlays()
+                return
+            }
+        }
     }
 }
