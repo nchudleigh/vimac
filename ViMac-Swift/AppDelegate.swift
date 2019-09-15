@@ -324,10 +324,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 extension AppDelegate: NSTextFieldDelegate {
     func controlTextDidChange(_ obj: Notification) {
         let textField = obj.object as! NSTextField
-        let text = textField.stringValue.uppercased()
+        let typed = textField.stringValue.uppercased()
         if let hintViews = borderWindowController.window?.contentView?.subviews.filter ({ $0 is HintView }) as! [HintView]? {
-            let matchingHintViews = hintViews.filter { $0.stringValue.starts(with: text) }
-            if matchingHintViews.count == 0 {
+            let matchingHintViews = hintViews.filter { $0.stringValue.starts(with: typed) }
+            if matchingHintViews.count == 0 && typed.count > 0 {
+                self.hideOverlays()
                 return
             }
             
@@ -362,7 +363,7 @@ extension AppDelegate: NSTextFieldDelegate {
                 return
             }
             
-            self.setOverlays(window: window, typed: text)
+            self.setOverlays(window: window, typed: typed)
             
         }
     }
