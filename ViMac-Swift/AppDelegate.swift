@@ -529,6 +529,7 @@ extension AppDelegate: NSTextFieldDelegate {
                             for subview in view.subviews {
                                 subview.removeFromSuperview()
                             }
+                            borderView.setBorderToGreen()
                         }
                     }
                     
