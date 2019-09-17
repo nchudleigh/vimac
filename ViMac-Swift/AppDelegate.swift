@@ -22,7 +22,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     let borderWindowController: NSWindowController
     let storyboard: NSStoryboard
-    let shortcut: MASShortcut
+    let hintShortcut: MASShortcut
+    let scrollShortcut: MASShortcut
     
     let applicationObservable: Observable<Application?>
     let applicationNotificationObservable: Observable<AppNotificationAppPair>
@@ -32,6 +33,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var pressableElementByHint: [String : UIElement]
 
     static let windowEvents: [AXNotification] = [.windowMiniaturized, .windowMoved, .windowResized]
+    
+    let HINT_TEXT_FIELD_TAG = 1
+    let SCROLL_TEXT_FIELD_TAG = 2
 
     static func createApplicationObservable() -> Observable<Application?> {
         return Observable.create { observer in
@@ -102,7 +106,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         applicationNotificationObservable = AppDelegate.createApplicationNotificationObservable(applicationObservable: applicationObservable)
         windowSubject = BehaviorSubject(value: nil)
         overlayEventSubject = PublishSubject()
-        shortcut = MASShortcut.init(keyCode: kVK_Space, modifierFlags: [.command, .shift])
+        hintShortcut = MASShortcut.init(keyCode: kVK_Space, modifierFlags: [.command, .option, .control])
+        scrollShortcut = MASShortcut.init(keyCode: kVK_ANSI_C, modifierFlags: [.command, .option, .control])
         pressableElementByHint = [String : UIElement]()
         super.init()
     }
@@ -176,7 +181,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     self.hideOverlays()
                 case .activeWindowUpdated:
                     self.hideOverlays()
-                case .commandPressed:
+                case .hintCommandPressed:
                     if self.borderWindowController.window!.contentView!.subviews.count > 0 {
                         self.hideOverlays()
                         return
@@ -194,12 +199,35 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                         return
                     }
                     
-                    self.setOverlays(window: window, typed: "")
+                    self.setHintOverlays(window: window, typed: "")
+                case .scrollCommandPressed:
+                    if self.borderWindowController.window!.contentView!.subviews.count > 0 {
+                        self.hideOverlays()
+                        return
+                    }
+                    
+                    let windowOptional: UIElement? = {
+                        do {
+                            return try self.windowSubject.value()
+                        } catch {
+                            return nil
+                        }
+                    }()
+                    
+                    guard let window = windowOptional else {
+                        return
+                    }
+                    
+                    self.setScrollOverlays()
                 }
             })
         
-        MASShortcutMonitor.shared().register(shortcut, withAction: {
-            self.overlayEventSubject.onNext(.commandPressed)
+        MASShortcutMonitor.shared().register(hintShortcut, withAction: {
+            self.overlayEventSubject.onNext(.hintCommandPressed)
+        })
+        
+        MASShortcutMonitor.shared().register(scrollShortcut, withAction: {
+            self.overlayEventSubject.onNext(.scrollCommandPressed)
         })
     }
     
@@ -216,8 +244,28 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             view.removeFromSuperview()
         })
     }
+    
+    func setScrollOverlays() {
+        if let borderWindow = borderWindowController.window {
+            // resize overlay window so hint views can be drawn onto the screen
+            var newOverlayWindowFrame = borderWindow.frame
+            newOverlayWindowFrame.origin = Utils.toOrigin(point: NSPoint(x: 0, y: 0), size: NSSize(width: 0, height: 0))
+            newOverlayWindowFrame.size = NSSize(width: 0, height: 0)
+            borderWindowController.window?.setFrame(newOverlayWindowFrame, display: true, animate: false)
 
-    func setOverlays(window: UIElement, typed: String) {
+            let textField = OverlayTextField(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
+            textField.isEditable = true
+            textField.delegate = self
+            textField.isHidden = true
+            textField.tag = SCROLL_TEXT_FIELD_TAG
+            borderWindow.contentView?.addSubview(textField)
+            borderWindowController.showWindow(nil)
+            borderWindow.makeKeyAndOrderFront(nil)
+            textField.becomeFirstResponder()
+        }
+    }
+
+    func setHintOverlays(window: UIElement, typed: String) {
         os_log("Setting overlays for window: %@", log: Log.drawing, String(describing: window))
         if let windowPosition: CGPoint = try! window.attribute(.position),
             let windowSize: CGSize = try! window.attribute(.size),
@@ -256,6 +304,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             textField.isEditable = true
             textField.delegate = self
             textField.isHidden = true
+            textField.tag = HINT_TEXT_FIELD_TAG
             borderWindow.contentView?.addSubview(textField)
             borderWindowController.showWindow(nil)
             borderWindow.makeKeyAndOrderFront(nil)
@@ -324,47 +373,74 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 extension AppDelegate: NSTextFieldDelegate {
     func controlTextDidChange(_ obj: Notification) {
         let textField = obj.object as! NSTextField
-        let typed = textField.stringValue.uppercased()
-        if let hintViews = borderWindowController.window?.contentView?.subviews.filter ({ $0 is HintView }) as! [HintView]? {
-            let matchingHintViews = hintViews.filter { $0.stringValue.starts(with: typed) }
-            if matchingHintViews.count == 0 && typed.count > 0 {
-                self.hideOverlays()
+        let typed = textField.stringValue
+        
+        if textField.tag == SCROLL_TEXT_FIELD_TAG {
+            var yPixels = 0
+            var xPixels = 0
+            
+            switch (typed.last?.uppercased()) {
+            case "J":
+                yPixels = -2
+                xPixels = 0
+            case "K":
+                yPixels = 2
+                xPixels = 0
+            case "H":
+                yPixels = 0
+                xPixels = 2
+            case "L":
+                yPixels = 0
+                xPixels = -2
+            default:
                 return
             }
             
-            if matchingHintViews.count == 1 {
-                let hintView = matchingHintViews.first!
-                let button = pressableElementByHint[hintView.stringValue]!
-                let o: Observable<Void> = Observable.just(Void())
-                o
-                    .subscribeOn(MainScheduler.asyncInstance)
-                    .subscribe(onNext: { x in
-                        do {
-                            try button.performAction(.press)
-                        } catch {
-                        }
-                    })
-                
-                self.hideOverlays()
-                return
-            }
-            
-            self.removeOverlaySubviews()
-            
-            let windowOptional: UIElement? = {
-                do {
-                    return try self.windowSubject.value()
-                } catch {
-                    return nil
+            let event = CGEvent.init(scrollWheelEvent2Source: nil, units: .pixel, wheelCount: 1, wheel1: Int32(0), wheel2: Int32(0), wheel3: 0)!
+            event.setIntegerValueField(.scrollWheelEventDeltaAxis1, value: Int64(yPixels))
+            event.setIntegerValueField(.scrollWheelEventDeltaAxis2, value: Int64(xPixels))
+            event.post(tap: .cgSessionEventTap)
+        } else if (textField.tag == HINT_TEXT_FIELD_TAG) {
+            if let hintViews = borderWindowController.window?.contentView?.subviews.filter ({ $0 is HintView }) as! [HintView]? {
+                let matchingHintViews = hintViews.filter { $0.stringValue.starts(with: typed.uppercased()) }
+                if matchingHintViews.count == 0 && typed.count > 0 {
+                    self.hideOverlays()
+                    return
                 }
-            }()
-            
-            guard let window = windowOptional else {
-                return
+                
+                if matchingHintViews.count == 1 {
+                    let hintView = matchingHintViews.first!
+                    let button = pressableElementByHint[hintView.stringValue]!
+                    let o: Observable<Void> = Observable.just(Void())
+                    o
+                        .subscribeOn(MainScheduler.asyncInstance)
+                        .subscribe(onNext: { x in
+                            do {
+                                try button.performAction(.press)
+                            } catch {
+                            }
+                        })
+                    
+                    self.hideOverlays()
+                    return
+                }
+                
+                self.removeOverlaySubviews()
+                
+                let windowOptional: UIElement? = {
+                    do {
+                        return try self.windowSubject.value()
+                    } catch {
+                        return nil
+                    }
+                }()
+                
+                guard let window = windowOptional else {
+                    return
+                }
+                
+                self.setHintOverlays(window: window, typed: typed.uppercased())
             }
-            
-            self.setOverlays(window: window, typed: typed)
-            
         }
     }
 }
