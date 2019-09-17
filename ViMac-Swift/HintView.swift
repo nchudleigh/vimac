@@ -22,7 +22,7 @@ class HintView: NSTextField {
         super.init(coder: coder)
     }
     
-    func initializeHint(hintText: String, typed: String, positionFlipped: NSPoint, window: NSWindow) {
+    func initializeHint(hintText: String, typed: String) {
         let attr = NSMutableAttributedString(string: hintText)
         let range = NSMakeRange(0, hintText.count)
         attr.addAttributes([NSAttributedString.Key.foregroundColor : HintView.untypedHintColor], range: range)
@@ -46,9 +46,5 @@ class HintView: NSTextField {
         self.font = NSFont.boldSystemFont(ofSize: NSFont.systemFontSize)
         
         self.sizeToFit()
-        
-        let positionRelativeToScreen = Utils.toOrigin(point: positionFlipped, size: self.frame.size)
-        let positionRelativeToWindow = window.convertPoint(fromScreen: positionRelativeToScreen)
-        self.frame.origin = positionRelativeToWindow
     }
 }

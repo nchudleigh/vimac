@@ -31,11 +31,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let overlayEventSubject: PublishSubject<OverlayEvent>
     
     var pressableElementByHint: [String : UIElement]
+    var scrollAreaByHint: [String : UIElement]
 
     static let windowEvents: [AXNotification] = [.windowMiniaturized, .windowMoved, .windowResized]
     
     let HINT_TEXT_FIELD_TAG = 1
     let SCROLL_TEXT_FIELD_TAG = 2
+    let SCROLL_SELECTOR_TEXT_FIELD_TAG = 3
 
     static func createApplicationObservable() -> Observable<Application?> {
         return Observable.create { observer in
@@ -109,6 +111,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         hintShortcut = MASShortcut.init(keyCode: kVK_Space, modifierFlags: [.command, .option, .control])
         scrollShortcut = MASShortcut.init(keyCode: kVK_ANSI_C, modifierFlags: [.command, .option, .control])
         pressableElementByHint = [String : UIElement]()
+        scrollAreaByHint = [String : UIElement]()
         super.init()
     }
 
@@ -218,7 +221,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                         return
                     }
                     
-                    self.setScrollOverlays()
+                    self.setScrollOverlays(window: window, typed: "")
                 }
             })
         
@@ -234,6 +237,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func hideOverlays() {
         os_log("Hiding overlays", log: Log.drawing)
         pressableElementByHint = [String : UIElement]()
+        scrollAreaByHint = [String : UIElement]()
         borderWindowController.close()
         self.removeOverlaySubviews()
     }
@@ -245,23 +249,53 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         })
     }
     
-    func setScrollOverlays() {
-        if let borderWindow = borderWindowController.window {
-            // resize overlay window so hint views can be drawn onto the screen
+    func setScrollOverlays(window: UIElement, typed: String) {
+        if let windowPosition: CGPoint = try! window.attribute(.position),
+            let windowSize: CGSize = try! window.attribute(.size),
+            let borderWindow = borderWindowController.window {
+            // show overlay window with borders around scroll areas
             var newOverlayWindowFrame = borderWindow.frame
-            newOverlayWindowFrame.origin = Utils.toOrigin(point: NSPoint(x: 0, y: 0), size: NSSize(width: 0, height: 0))
-            newOverlayWindowFrame.size = NSSize(width: 0, height: 0)
+            newOverlayWindowFrame.origin = Utils.toOrigin(point: windowPosition, size: windowSize)
+            newOverlayWindowFrame.size = windowSize
             borderWindowController.window?.setFrame(newOverlayWindowFrame, display: true, animate: false)
 
-            let textField = OverlayTextField(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
-            textField.isEditable = true
-            textField.delegate = self
-            textField.isHidden = true
-            textField.tag = SCROLL_TEXT_FIELD_TAG
-            borderWindow.contentView?.addSubview(textField)
+            let scrollAreas = traverseUIElementForScrollAreas(element: window, level: 1)
+            let borderViews: [BorderView] = scrollAreas
+                .map { scrollArea in
+                    if let positionFlipped: CGPoint = try! scrollArea.attribute(.position),
+                        let size: CGSize = try! scrollArea.attribute(.size) {
+                        let positionRelativeToScreen = Utils.toOrigin(point: positionFlipped, size: size)
+                        let positionRelativeToWindow = borderWindow.convertPoint(fromScreen: positionRelativeToScreen)
+                        return BorderView(frame: NSRect(origin: positionRelativeToWindow, size: size))
+                    }
+                    return nil
+                // filters nil results
+                }.compactMap({ $0 })
+            
+            let hintStrings = AlphabetHints().hintStrings(linkCount: borderViews.count)
+            // map buttons to hint views to be added to overlay window
+            let range = Int(0)...Int(borderViews.count-1)
+            let hintViews: [HintView] = range
+                .map { (index) in
+                    let text = HintView(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
+                    text.initializeHint(hintText: hintStrings[index], typed: typed)
+                    return text
+                }
+            for (index, view) in borderViews.enumerated() {
+                view.addSubview(hintViews[index])
+                borderWindow.contentView?.addSubview(view)
+            }
+
+            let selectorTextField = OverlayTextField(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
+            selectorTextField.stringValue = typed
+            selectorTextField.isEditable = true
+            selectorTextField.delegate = self
+            selectorTextField.isHidden = true
+            selectorTextField.tag = SCROLL_SELECTOR_TEXT_FIELD_TAG
+            borderWindow.contentView?.addSubview(selectorTextField)
             borderWindowController.showWindow(nil)
             borderWindow.makeKeyAndOrderFront(nil)
-            textField.becomeFirstResponder()
+            selectorTextField.becomeFirstResponder()
         }
     }
 
@@ -286,7 +320,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 .map { (index, button) in
                     if let positionFlipped: CGPoint = try! button.attribute(.position) {
                         let text = HintView(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
-                        text.initializeHint(hintText: hintStrings[index], typed: typed, positionFlipped: positionFlipped, window: borderWindow)
+                        text.initializeHint(hintText: hintStrings[index], typed: typed)
+                        let positionRelativeToScreen = Utils.toOrigin(point: positionFlipped, size: text.frame.size)
+                        let positionRelativeToWindow = borderWindow.convertPoint(fromScreen: positionRelativeToScreen)
+                        text.frame.origin = positionRelativeToWindow
                         pressableElementByHint[hintStrings[index]] = button
                         return text
                     }
@@ -299,17 +336,47 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 borderWindowController.window?.contentView?.addSubview(view)
             }
             
-            let textField = OverlayTextField(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
-            textField.stringValue = typed
-            textField.isEditable = true
-            textField.delegate = self
-            textField.isHidden = true
-            textField.tag = HINT_TEXT_FIELD_TAG
-            borderWindow.contentView?.addSubview(textField)
+            let scrollingTextField = OverlayTextField(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
+            scrollingTextField.stringValue = typed
+            scrollingTextField.isEditable = true
+            scrollingTextField.delegate = self
+            scrollingTextField.isHidden = true
+            scrollingTextField.tag = HINT_TEXT_FIELD_TAG
+            borderWindow.contentView?.addSubview(scrollingTextField)
             borderWindowController.showWindow(nil)
             borderWindow.makeKeyAndOrderFront(nil)
-            textField.becomeFirstResponder()
+            scrollingTextField.becomeFirstResponder()
         }
+    }
+    
+    func traverseUIElementForScrollAreas(element: UIElement, level: Int) -> [UIElement] {
+        let roleOptional: Role? = {
+            do {
+                return try element.role();
+            } catch {
+                return nil
+            }
+        }()
+        
+        if roleOptional == Role.scrollArea {
+            return [element]
+        }
+        
+        let children: [AXUIElement] = {
+            do {
+                let childrenOptional = try element.attribute(Attribute.children) as [AXUIElement]?;
+                guard let children = childrenOptional else {
+                    return []
+                }
+                return children
+            } catch {
+                return []
+            }
+        }()
+        return children
+            .map { child in UIElement(child) }
+            .map { child in traverseUIElementForScrollAreas(element: child, level: level + 1) }
+            .reduce([]) {(result, next) in result + next }
     }
     
     func traverseUIElementForPressables(element: UIElement, level: Int) -> [UIElement] {
@@ -422,6 +489,62 @@ extension AppDelegate: NSTextFieldDelegate {
                         })
                     
                     self.hideOverlays()
+                    return
+                }
+                
+                self.removeOverlaySubviews()
+                
+                let windowOptional: UIElement? = {
+                    do {
+                        return try self.windowSubject.value()
+                    } catch {
+                        return nil
+                    }
+                }()
+                
+                guard let window = windowOptional else {
+                    return
+                }
+                
+                self.setHintOverlays(window: window, typed: typed.uppercased())
+            }
+        } else if (textField.tag == SCROLL_SELECTOR_TEXT_FIELD_TAG) {
+            if let borderWindow = borderWindowController.window,
+                let borderViews = borderWindow.contentView?.subviews.filter ({ $0 is BorderView }) as! [BorderView]? {
+                let borderViewsWithMatchingHint = borderViews.filter { borderView in
+                    let hintView = borderView.subviews.first! as! HintView
+                    return hintView.stringValue.starts(with: typed.uppercased())
+                }
+                if borderViewsWithMatchingHint.count == 0 && typed.count > 0 {
+                    self.hideOverlays()
+                    return
+                }
+                
+                if borderViewsWithMatchingHint.count == 1 {
+                    let borderView = borderViewsWithMatchingHint.first!
+                    borderWindowController.window?.contentView?.subviews.forEach { view in
+                        if view !== borderView {
+                            view.removeFromSuperview()
+                        } else {
+                            for subview in view.subviews {
+                                subview.removeFromSuperview()
+                            }
+                        }
+                    }
+                    
+                    // move mouse to scroll area
+                    let mousePositionFlipped = borderWindow.convertPoint(toScreen: borderView.frame.origin)
+                    let mousePosition = NSPoint(x: mousePositionFlipped.x + 4, y: NSScreen.screens.first!.frame.size.height - mousePositionFlipped.y - 4)
+                    let moveEvent = CGEvent(mouseEventSource: nil, mouseType: .mouseMoved, mouseCursorPosition: mousePosition, mouseButton: .left)
+                    moveEvent?.post(tap: .cgSessionEventTap)
+                    
+                    let textField = OverlayTextField(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
+                    textField.isEditable = true
+                    textField.delegate = self
+                    textField.isHidden = true
+                    textField.tag = SCROLL_TEXT_FIELD_TAG
+                    borderWindowController.window?.contentView?.addSubview(textField)
+                    textField.becomeFirstResponder()
                     return
                 }
                 
