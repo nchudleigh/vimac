@@ -76,12 +76,13 @@ class ScrollMode: NSObject, BaseModeProtocol {
             }.compactMap({ $0 })
         let hintStrings = AlphabetHints().hintStrings(linkCount: borderViews.count)
         // map buttons to hint views to be added to overlay window
-        let range = Int(0)...max(0, Int(borderViews.count-1))
-        let hintViews: [HintView] = range
-            .map { (index) in
+        var hintViews = [HintView]()
+        if borderViews.count > 0 {
+            for i in 1...borderViews.count {
                 let text = HintView(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
-                text.initializeHint(hintText: hintStrings[index], typed: "")
-                return text
+                text.initializeHint(hintText: hintStrings[i - 1], typed: "")
+                hintViews.append(text)
+            }
         }
         for (index, view) in borderViews.enumerated() {
             view.addSubview(hintViews[index])
