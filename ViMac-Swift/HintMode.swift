@@ -64,7 +64,7 @@ class HintMode: NSObject, BaseModeProtocol {
     }
     
     func setSelectorMode() {
-        let pressableElements = traverseUIElementForPressables(element: self.applicationWindow, level: 1)
+        let pressableElements = traverseUIElementForPressables(rootElement: self.applicationWindow)
         let hintStrings = AlphabetHints().hintStrings(linkCount: pressableElements.count)
         // map buttons to hint views to be added to overlay window
         let hintViews: [HintView] = pressableElements
@@ -101,57 +101,56 @@ class HintMode: NSObject, BaseModeProtocol {
         
     }
     
-    func traverseUIElementForPressables(element: UIElement, level: Int) -> [UIElement] {
-        let actionsOptional: [Action]? = {
-            do {
-                return try element.actions();
-            } catch {
-                return nil
+    func traverseUIElementForPressables(rootElement: UIElement) -> [UIElement] {
+        var elements = [UIElement]()
+        func fn(element: UIElement, level: Int) -> Void {
+            let actionsOptional: [Action]? = {
+                do {
+                    return try element.actions();
+                } catch {
+                    return nil
+                }
+            }()
+            
+            let roleOptional: Role? = {
+                do {
+                    return try element.role()
+                } catch {
+                    return nil
+                }
+            }()
+            
+            // ignore subcomponents of a scrollbar
+            if let role = roleOptional {
+                if role == .scrollBar {
+                    return
+                }
             }
-        }()
-        
-        let roleOptional: Role? = {
-            do {
-                return try element.role()
-            } catch {
-                return nil
+            
+            if let actions = actionsOptional {
+                if (actions.contains(.press)) {
+                    elements.append(element)
+                }
             }
-        }()
-        
-        // ignore subcomponents of a scrollbar
-        if let role = roleOptional {
-            if role == .scrollBar {
-                return []
-            }
-        }
-        
-        let children: [AXUIElement] = {
-            do {
-                let childrenOptional = try element.attribute(Attribute.children) as [AXUIElement]?;
-                guard let children = childrenOptional else {
+            
+            let children: [AXUIElement] = {
+                do {
+                    let childrenOptional = try element.attribute(Attribute.children) as [AXUIElement]?;
+                    guard let children = childrenOptional else {
+                        return []
+                    }
+                    return children
+                } catch {
                     return []
                 }
-                return children
-            } catch {
-                return []
-            }
-        }()
-        
-        let recursiveChildren = children
-            .map({child -> [UIElement] in
-                return traverseUIElementForPressables(element: UIElement.init(child), level: level + 1)
-            })
-            .reduce([]) {(result, next) -> [UIElement] in
-                return result + next
-        }
-        
-        if let actions = actionsOptional {
-            if (actions.contains(.press)) {
-                return [element] + recursiveChildren
+            }()
+            
+            children.forEach { child in
+                fn(element: UIElement(child), level: level + 1)
             }
         }
-        
-        return recursiveChildren
+        fn(element: rootElement, level: 1)
+        return elements
     }
 
     func updateHints(typed: String) {
