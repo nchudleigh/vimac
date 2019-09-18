@@ -62,7 +62,7 @@ class ScrollMode: NSObject, BaseModeProtocol {
     
     func setHintsAndBorders() {
         // show overlay window with borders around scroll areas
-        let scrollAreas = traverseUIElementForScrollAreas(element: self.applicationWindow, level: 1)
+        let scrollAreas = traverseUIElementForScrollAreas(rootElement: self.applicationWindow)
         let borderViews: [BorderView] = scrollAreas
             .map { scrollArea in
                 if let positionFlipped: CGPoint = try! scrollArea.attribute(.position),
@@ -133,34 +133,41 @@ class ScrollMode: NSObject, BaseModeProtocol {
         textField.becomeFirstResponder()
     }
     
-    func traverseUIElementForScrollAreas(element: UIElement, level: Int) -> [UIElement] {
-        let roleOptional: Role? = {
-            do {
-                return try element.role();
-            } catch {
-                return nil
+    func traverseUIElementForScrollAreas(rootElement: UIElement) -> [UIElement] {
+        var elements = [UIElement]()
+        
+        func fn(element: UIElement, level: Int) -> Void {
+            let roleOptional: Role? = {
+                do {
+                    return try element.role();
+                } catch {
+                    return nil
+                }
+            }()
+            
+            if roleOptional == Role.scrollArea {
+                elements.append(element)
+                return
             }
-        }()
-        
-        if roleOptional == Role.scrollArea {
-            return [element]
-        }
-        
-        let children: [AXUIElement] = {
-            do {
-                let childrenOptional = try element.attribute(Attribute.children) as [AXUIElement]?;
-                guard let children = childrenOptional else {
+            
+            let children: [AXUIElement] = {
+                do {
+                    let childrenOptional = try element.attribute(Attribute.children) as [AXUIElement]?;
+                    guard let children = childrenOptional else {
+                        return []
+                    }
+                    return children
+                } catch {
                     return []
                 }
-                return children
-            } catch {
-                return []
+            }()
+            children.forEach { child in
+                fn(element: UIElement(child), level: level + 1)
             }
-        }()
-        return children
-            .map { child in UIElement(child) }
-            .map { child in traverseUIElementForScrollAreas(element: child, level: level + 1) }
-            .reduce([]) {(result, next) in result + next }
+        }
+        
+        fn(element: rootElement, level: 1)
+        return elements
     }
     
     func showWindow() {
