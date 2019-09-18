@@ -274,7 +274,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             
             let hintStrings = AlphabetHints().hintStrings(linkCount: borderViews.count)
             // map buttons to hint views to be added to overlay window
-            let range = Int(0)...Int(borderViews.count-1)
+            let range = Int(0)...max(0, Int(borderViews.count-1))
             let hintViews: [HintView] = range
                 .map { (index) in
                     let text = HintView(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
@@ -443,8 +443,8 @@ extension AppDelegate: NSTextFieldDelegate {
         let typed = textField.stringValue
         
         if textField.tag == SCROLL_TEXT_FIELD_TAG {
-            var yPixels = 0
-            var xPixels = 0
+            var yPixels: CGFloat = 0
+            var xPixels: CGFloat = 0
             
             switch (typed.last?.uppercased()) {
             case "J":
@@ -459,13 +459,30 @@ extension AppDelegate: NSTextFieldDelegate {
             case "L":
                 yPixels = 0
                 xPixels = -2
+            case "D":
+                if let overlayWindow = self.borderWindowController.window,
+                    let borders = overlayWindow.contentView?.subviews.filter ({ $0 is BorderView }) as! [BorderView]?,
+                    let firstBorder = borders.first {
+                    if borders.count == 1 && firstBorder.active {
+                        yPixels = -1 * (firstBorder.frame.size.height / 2)
+                        xPixels = 0
+                    }
+                }
+            case "U":
+                if let borders = self.borderWindowController.window?.contentView?.subviews.filter ({ $0 is BorderView }) as! [BorderView]?,
+                    let firstBorder = borders.first {
+                    if borders.count == 1 {
+                        yPixels = firstBorder.frame.size.height / 2
+                        xPixels = 0
+                    }
+                }
             default:
                 return
             }
             
-            let event = CGEvent.init(scrollWheelEvent2Source: nil, units: .pixel, wheelCount: 1, wheel1: Int32(0), wheel2: Int32(0), wheel3: 0)!
-            event.setIntegerValueField(.scrollWheelEventDeltaAxis1, value: Int64(yPixels))
-            event.setIntegerValueField(.scrollWheelEventDeltaAxis2, value: Int64(xPixels))
+            let event = CGEvent.init(scrollWheelEvent2Source: nil, units: .pixel, wheelCount: 1, wheel1: Int32(yPixels), wheel2: Int32(xPixels), wheel3: 0)!
+            //event.setIntegerValueField(.scrollWheelEventDeltaAxis1, value: Int64(yPixels))
+            //event.setIntegerValueField(.scrollWheelEventDeltaAxis2, value: Int64(xPixels))
             event.post(tap: .cgSessionEventTap)
         } else if (textField.tag == HINT_TEXT_FIELD_TAG) {
             if let hintViews = borderWindowController.window?.contentView?.subviews.filter ({ $0 is HintView }) as! [HintView]? {
@@ -529,7 +546,7 @@ extension AppDelegate: NSTextFieldDelegate {
                             for subview in view.subviews {
                                 subview.removeFromSuperview()
                             }
-                            borderView.setBorderToGreen()
+                            borderView.setActive()
                         }
                     }
                     

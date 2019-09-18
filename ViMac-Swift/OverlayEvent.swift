@@ -6,8 +6,6 @@
 //  Copyright © 2019 Dexter Leng. All rights reserved.
 //
 
-import AXSwift
-
 enum OverlayEvent {
     case activeWindowUpdated, newActiveWindow, noActiveWindow, hintCommandPressed, scrollCommandPressed
 }

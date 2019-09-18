@@ -10,13 +10,21 @@ import Cocoa
 
 class BorderView: NSView {
     let SIZE = CGFloat(2)
-    var color = NSColor.red
+    let inactiveColor = NSColor.red
+    let activeColor = NSColor.green
+    var active = false
 
     override func draw(_ dirtyRect: NSRect) {
         let rect = cleanRect(dirtyRect: dirtyRect, size: SIZE)
         let border = NSBezierPath.init(rect: rect)
         border.lineWidth = SIZE
-        self.color.set()
+        
+        if active {
+            self.activeColor.set()
+        } else {
+            self.inactiveColor.set()
+        }
+        
         border.stroke()
     }
 
@@ -24,8 +32,8 @@ class BorderView: NSView {
         return NSInsetRect(dirtyRect, size / 2.0, size / 2.0)
     }
     
-    func setBorderToGreen() {
-        self.color = NSColor.green
+    func setActive() {
+        self.active = true
         self.display()
     }
 }
