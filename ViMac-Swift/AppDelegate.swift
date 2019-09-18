@@ -110,9 +110,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 case .activeWindowUpdated:
                     self.hideOverlays()
                 case .hintCommandPressed:
-                    if let mHintMode = self.hintMode {
-                        mHintMode.deactivate()
-                        self.hintMode = nil
+                    let isHintModeNow = self.hintMode != nil
+                    self.hideOverlays()
+
+                    if isHintModeNow {
                         return
                     }
                     
@@ -129,11 +130,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     }
                     
                     self.hintMode = HintMode(applicationWindow: window)
-                    self.hintMode?.setSelectorMode()
+                    self.hintMode?.activate()
                 case .scrollCommandPressed:
-                    if let mScrollMode = self.scrollMode {
-                        mScrollMode.deactivate()
-                        self.scrollMode = nil
+                    let isScrollModeNow = self.scrollMode != nil
+                    self.hideOverlays()
+                    
+                    if isScrollModeNow {
                         return
                     }
                     
@@ -150,7 +152,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     }
                     
                     self.scrollMode = ScrollMode(applicationWindow: window)
-                    self.scrollMode?.setSelectorMode()
+                    self.scrollMode?.activate()
                 }
             })
         
@@ -164,10 +166,20 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func hideOverlays() {
-
+        hintMode?.deactivate()
+        scrollMode?.deactivate()
+        hintMode = nil
+        scrollMode = nil
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {
         // Insert code here to tear down your application
+    }
+}
+
+
+extension AppDelegate : ModeDelegate {
+    func onDeactivate() {
+        
     }
 }

@@ -11,15 +11,17 @@ import AXSwift
 import RxCocoa
 import RxSwift
 
-class HintMode: NSObject {
+class HintMode: NSObject, BaseModeProtocol {
     let overlayWindowController: NSWindowController
     var selectorTextField: OverlayTextField?
     let applicationWindow: UIElement
     var pressableElementByHint: [String : UIElement]
+    
+    weak var delegate: ModeDelegate?
 
     let HINT_TEXT_FIELD_TAG = 1
     
-    init(applicationWindow: UIElement) {
+    required init(applicationWindow: UIElement) {
         let storyboard = NSStoryboard.init(name: "Main", bundle: nil)
         overlayWindowController = storyboard.instantiateController(withIdentifier: "overlayWindowControllerID") as! NSWindowController
         self.applicationWindow = applicationWindow
@@ -32,7 +34,6 @@ class HintMode: NSObject {
             let frame = NSRect(origin: origin, size: windowSize)
             overlayWindowController.window!.setFrame(frame, display: true, animate: false)
         }
-        super.init()
     }
     
     func showWindow() {
@@ -44,9 +45,16 @@ class HintMode: NSObject {
         return self.overlayWindowController.window!
     }
     
+    func activate() {
+        self.setSelectorMode()
+    }
+    
     func deactivate() {
         self.overlayWindowController.close()
         self.removeSubviews()
+        if let d = self.delegate {
+            d.onDeactivate()
+        }
     }
     
     func removeSubviews() {
