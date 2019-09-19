@@ -718,7 +718,7 @@
         <scene sceneID="mPp-s6-aeO">
             <objects>
                 <windowController storyboardIdentifier="PreferencesWindowController" id="lIH-rt-ykR" customClass="PreferencesWindowController" customModule="ViMac_Swift" customModuleProvider="target" sceneMemberID="viewController">
-                    <window key="window" title="Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="SXy-Zp-506">
+                    <window key="window" title="Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="SXy-Zp-506">
                         <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
                         <rect key="contentRect" x="196" y="240" width="480" height="269"/>
@@ -732,7 +732,6 @@
                         </connections>
                     </window>
                     <connections>
-                        <outlet property="preferencesWindow" destination="SXy-Zp-506" id="nUi-9h-CbW"/>
                         <segue destination="sfh-uP-PxU" kind="relationship" relationship="window.shadowedContentViewController" id="HNp-Bt-0F5"/>
                     </connections>
                 </windowController>
