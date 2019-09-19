@@ -128,7 +128,7 @@ class HintMode: NSObject, BaseModeProtocol {
             }
             
             if let actions = actionsOptional {
-                if (actions.contains(.press)) {
+                if (actions.count > 0) {
                     elements.append(element)
                 }
             }
@@ -181,15 +181,15 @@ class HintMode: NSObject, BaseModeProtocol {
             if matchingHints.count == 1 {
                 let matchingHint = matchingHints.first!
                 let button = pressableElementByHint[matchingHint.stringValue]!
-                let o: Observable<Void> = Observable.just(Void())
-                o
-                    .subscribeOn(MainScheduler.asyncInstance)
-                    .subscribe(onNext: { x in
-                        do {
-                            try button.performAction(.press)
-                        } catch {
-                        }
-                    })
+                if let buttonPosition: NSPoint = try! button.attribute(.position),
+                    let buttonSize: NSSize = try! button.attribute(.size) {
+                    let centerPositionX = buttonPosition.x + (buttonSize.width / 2)
+                    let centerPositionY = buttonPosition.y + (buttonSize.height / 2)
+                    let centerPosition = NSPoint(x: centerPositionX, y: centerPositionY)
+                    Utils.moveMouse(position: centerPosition)
+                    Utils.leftClickMouse(position: centerPosition)
+                }
+                
                 self.deactivate()
                 return
             }

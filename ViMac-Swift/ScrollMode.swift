@@ -122,7 +122,7 @@ class ScrollMode: NSObject, BaseModeProtocol {
         // move mouse to scroll area
         let mousePositionFlipped = getWindow().convertPoint(toScreen: selectedBorder.frame.origin)
         let mousePosition = NSPoint(x: mousePositionFlipped.x + 4, y: NSScreen.screens.first!.frame.size.height - mousePositionFlipped.y - 4)
-        self.moveMouse(position: mousePosition)
+        Utils.moveMouse(position: mousePosition)
         
         // set scrolling text field
         let textField = OverlayTextField(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
@@ -184,11 +184,6 @@ class ScrollMode: NSObject, BaseModeProtocol {
         getWindow().contentView?.subviews.forEach({ view in
             view.removeFromSuperview()
         })
-    }
-    
-    func moveMouse(position: CGPoint) {
-        let moveEvent = CGEvent(mouseEventSource: nil, mouseType: .mouseMoved, mouseCursorPosition: position, mouseButton: .left)
-        moveEvent?.post(tap: .cgSessionEventTap)
     }
     
     func onScrollSelectorTextChange(textField: NSTextField) {

@@ -17,4 +17,16 @@ class Utils: NSObject {
         let screenHeight = NSScreen.screens.first?.frame.size.height
         return CGPoint(x: point.x, y: screenHeight! - size.height - point.y)
     }
+    
+    static func moveMouse(position: CGPoint) {
+        let moveEvent = CGEvent(mouseEventSource: nil, mouseType: .mouseMoved, mouseCursorPosition: position, mouseButton: .left)
+        moveEvent?.post(tap: .cgSessionEventTap)
+    }
+    
+    static func leftClickMouse(position: CGPoint) {
+        let event = CGEvent(mouseEventSource: nil, mouseType: .leftMouseDown, mouseCursorPosition: position, mouseButton: .left)
+        let event2 = CGEvent(mouseEventSource: nil, mouseType: .leftMouseUp, mouseCursorPosition: position, mouseButton: .left)
+        event?.post(tap: .cgSessionEventTap)
+        event2?.post(tap: .cgSessionEventTap)
+    }
 }
