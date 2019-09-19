@@ -685,7 +685,7 @@
         <scene sceneID="79a-OA-79s">
             <objects>
                 <windowController storyboardIdentifier="overlayWindowControllerID" id="8mH-dK-Dlx" sceneMemberID="viewController">
-                    <window key="window" title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" hasShadow="NO" releasedWhenClosed="NO" frameAutosaveName="" animationBehavior="default" id="qOo-UR-Afh" customClass="OverlayWindow" customModule="ViMac_Swift" customModuleProvider="target">
+                    <window key="window" title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" hasShadow="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="qOo-UR-Afh" customClass="OverlayWindow" customModule="ViMac_Swift" customModuleProvider="target">
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
                         <rect key="contentRect" x="294" y="313" width="480" height="360"/>
                         <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
@@ -718,7 +718,7 @@
         <scene sceneID="mPp-s6-aeO">
             <objects>
                 <windowController storyboardIdentifier="PreferencesWindowController" id="lIH-rt-ykR" customClass="PreferencesWindowController" customModule="ViMac_Swift" customModuleProvider="target" sceneMemberID="viewController">
-                    <window key="window" title="Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="SXy-Zp-506">
+                    <window key="window" title="Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" frameAutosaveName="" animationBehavior="default" id="SXy-Zp-506">
                         <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
                         <rect key="contentRect" x="196" y="240" width="480" height="269"/>

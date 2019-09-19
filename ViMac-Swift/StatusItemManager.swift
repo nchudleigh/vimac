@@ -34,6 +34,7 @@ class StatusItemManager: NSMenu, NSMenuDelegate {
     @objc func preferencesClick() {
         let storyboard = NSStoryboard.init(name: "Main", bundle: nil)
         controller = storyboard.instantiateController(withIdentifier: "PreferencesWindowController") as! NSWindowController
+        NSApp.activate(ignoringOtherApps: true)
         controller?.showWindow(nil)
         controller?.window?.makeKeyAndOrderFront(nil)
     }
