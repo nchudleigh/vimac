@@ -130,6 +130,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     }
                     
                     self.hintMode = HintMode(applicationWindow: window)
+                    self.hintMode?.delegate = self
                     self.hintMode?.activate()
                 case .scrollCommandPressed:
                     let isScrollModeNow = self.scrollMode != nil
@@ -152,6 +153,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     }
                     
                     self.scrollMode = ScrollMode(applicationWindow: window)
+                    self.scrollMode?.delegate = self
                     self.scrollMode?.activate()
                 }
             })
@@ -180,6 +182,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
 extension AppDelegate : ModeDelegate {
     func onDeactivate() {
-        
+        hintMode = nil
+        scrollMode = nil
     }
 }
