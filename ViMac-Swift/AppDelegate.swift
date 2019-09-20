@@ -28,6 +28,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     let hintShortcutObservable: Observable<Void>
     let scrollShortcutObservable: Observable<Void>
+    
+    var compositeDisposable: CompositeDisposable
 
     static let windowEvents: [AXNotification] = [.windowMiniaturized, .windowMoved, .windowResized]
     
@@ -96,6 +98,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             return d
         }
         
+        self.compositeDisposable = CompositeDisposable()
+        
         super.init()
     }
 
@@ -107,7 +111,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             return
         }
 
-        applicationNotificationObservable
+        self.compositeDisposable.insert(applicationNotificationObservable
             .observeOn(MainScheduler.instance)
             .subscribe(onNext: { pair in
                 if let notification = pair.notification,
@@ -120,17 +124,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     self.hideOverlays()
                 }
             })
+        )
         
-        windowObservable
+        self.compositeDisposable.insert(windowObservable
             .observeOn(MainScheduler.instance)
             .subscribe(onNext: { windowOptional in
                 self.hideOverlays()
                 os_log("Current window: %@", log: Log.accessibility, String(describing: windowOptional))
             })
+        )
 
         let windowNoNilObservable = windowObservable.compactMap { $0 }
         
-        hintShortcutObservable
+        self.compositeDisposable.insert(hintShortcutObservable
             .withLatestFrom(windowNoNilObservable, resultSelector: { _, window in
                 return window
             })
@@ -147,8 +153,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 self.hintMode?.delegate = self
                 self.hintMode?.activate()
             })
+        )
         
-        scrollShortcutObservable
+        self.compositeDisposable.insert(scrollShortcutObservable
             .withLatestFrom(windowNoNilObservable, resultSelector: { _, window in
                 return window
             })
@@ -165,6 +172,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 self.scrollMode?.delegate = self
                 self.scrollMode?.activate()
             })
+        )
     }
     
     func hideOverlays() {
@@ -175,7 +183,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {
-        // Insert code here to tear down your application
+        self.compositeDisposable.dispose()
     }
 }
 
