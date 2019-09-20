@@ -15,9 +15,11 @@
 		E225BD1523322A7700ECDEF4 /* ScrollMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = E225BD1423322A7700ECDEF4 /* ScrollMode.swift */; };
 		E225BD172332457400ECDEF4 /* HintMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = E225BD162332457300ECDEF4 /* HintMode.swift */; };
 		E225BD1923325BB400ECDEF4 /* BaseMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = E225BD1823325BB400ECDEF4 /* BaseMode.swift */; };
+		E225BD1D233292B800ECDEF4 /* StatusItemManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E225BD1C233292B800ECDEF4 /* StatusItemManager.swift */; };
+		E225BD25233365C100ECDEF4 /* PreferencesTabViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E225BD23233365C100ECDEF4 /* PreferencesTabViewController.swift */; };
+		E225BD282333700D00ECDEF4 /* PreferencesWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E225BD272333700D00ECDEF4 /* PreferencesWindowController.swift */; };
 		E25F8711233222A9007AA958 /* AccessibilityObservables.swift in Sources */ = {isa = PBXBuildFile; fileRef = E25F8710233222A9007AA958 /* AccessibilityObservables.swift */; };
 		E26172242322968500E396CA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26172232322968500E396CA /* AppDelegate.swift */; };
-		E26172262322968500E396CA /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26172252322968500E396CA /* ViewController.swift */; };
 		E26172282322968600E396CA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E26172272322968600E396CA /* Assets.xcassets */; };
 		E26172372322968700E396CA /* ViMac_SwiftTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26172362322968700E396CA /* ViMac_SwiftTests.swift */; };
 		E26172422322968700E396CA /* ViMac_SwiftUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26172412322968700E396CA /* ViMac_SwiftUITests.swift */; };
@@ -61,10 +63,12 @@
 		E225BD1423322A7700ECDEF4 /* ScrollMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollMode.swift; sourceTree = "<group>"; };
 		E225BD162332457300ECDEF4 /* HintMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HintMode.swift; sourceTree = "<group>"; };
 		E225BD1823325BB400ECDEF4 /* BaseMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseMode.swift; sourceTree = "<group>"; };
+		E225BD1C233292B800ECDEF4 /* StatusItemManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusItemManager.swift; sourceTree = "<group>"; };
+		E225BD23233365C100ECDEF4 /* PreferencesTabViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesTabViewController.swift; sourceTree = "<group>"; };
+		E225BD272333700D00ECDEF4 /* PreferencesWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesWindowController.swift; sourceTree = "<group>"; };
 		E25F8710233222A9007AA958 /* AccessibilityObservables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessibilityObservables.swift; sourceTree = "<group>"; };
 		E26172202322968500E396CA /* ViMac-Swift.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ViMac-Swift.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E26172232322968500E396CA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		E26172252322968500E396CA /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		E26172272322968600E396CA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E261722A2322968700E396CA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		E261722C2322968700E396CA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -134,6 +138,23 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		E225BD1E233354AD00ECDEF4 /* Windows */ = {
+			isa = PBXGroup;
+			children = (
+				E225BD20233354E900ECDEF4 /* Preferences */,
+			);
+			path = Windows;
+			sourceTree = "<group>";
+		};
+		E225BD20233354E900ECDEF4 /* Preferences */ = {
+			isa = PBXGroup;
+			children = (
+				E225BD23233365C100ECDEF4 /* PreferencesTabViewController.swift */,
+				E225BD272333700D00ECDEF4 /* PreferencesWindowController.swift */,
+			);
+			path = Preferences;
+			sourceTree = "<group>";
+		};
 		E26172172322968500E396CA = {
 			isa = PBXGroup;
 			children = (
@@ -159,9 +180,10 @@
 		E26172222322968500E396CA /* ViMac-Swift */ = {
 			isa = PBXGroup;
 			children = (
+				E225BD1E233354AD00ECDEF4 /* Windows */,
 				E225BD162332457300ECDEF4 /* HintMode.swift */,
 				E26172232322968500E396CA /* AppDelegate.swift */,
-				E26172252322968500E396CA /* ViewController.swift */,
+				E225BD1C233292B800ECDEF4 /* StatusItemManager.swift */,
 				E26172272322968600E396CA /* Assets.xcassets */,
 				E26172292322968700E396CA /* Main.storyboard */,
 				E261722C2322968700E396CA /* Info.plist */,
@@ -443,12 +465,14 @@
 				E2F6C9AF232DEA1800F2975B /* Utils.swift in Sources */,
 				E25F8711233222A9007AA958 /* AccessibilityObservables.swift in Sources */,
 				E225BD1923325BB400ECDEF4 /* BaseMode.swift in Sources */,
-				E26172262322968500E396CA /* ViewController.swift in Sources */,
 				E2069700232A52EA001EFDB2 /* AlphabetHints.swift in Sources */,
 				E225BD1523322A7700ECDEF4 /* ScrollMode.swift in Sources */,
+				E225BD25233365C100ECDEF4 /* PreferencesTabViewController.swift in Sources */,
 				E20696F923290D41001EFDB2 /* Log.swift in Sources */,
 				E26172542323D97700E396CA /* BorderView.swift in Sources */,
 				E225BD172332457400ECDEF4 /* HintMode.swift in Sources */,
+				E225BD1D233292B800ECDEF4 /* StatusItemManager.swift in Sources */,
+				E225BD282333700D00ECDEF4 /* PreferencesWindowController.swift in Sources */,
 				E26172242322968500E396CA /* AppDelegate.swift in Sources */,
 				E2F6C9AD232DE89F00F2975B /* HintView.swift in Sources */,
 			);

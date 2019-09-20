@@ -17,8 +17,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     static let hintShortcut = MASShortcut.init(keyCode: kVK_Space, modifierFlags: [.command, .option, .control])
     static let scrollShortcut = MASShortcut.init(keyCode: kVK_ANSI_C, modifierFlags: [.command, .option, .control])
     
-    let storyboard: NSStoryboard
-    
     let applicationObservable: Observable<Application?>
     let applicationNotificationObservable: Observable<AccessibilityObservables.AppNotificationAppPair>
     let windowObservable: Observable<UIElement?>
@@ -34,8 +32,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     static let windowEvents: [AXNotification] = [.windowMiniaturized, .windowMoved, .windowResized]
     
     override init() {
-        storyboard =
-            NSStoryboard.init(name: "Main", bundle: nil)
         applicationObservable = AccessibilityObservables.createApplicationObservable().share()
         applicationNotificationObservable = AccessibilityObservables.createApplicationNotificationObservable(applicationObservable: applicationObservable, notifications: AppDelegate.windowEvents + [AXNotification.focusedWindowChanged]).share()
         
