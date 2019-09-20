@@ -14,17 +14,22 @@ import os
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
+    static let hintShortcut = MASShortcut.init(keyCode: kVK_Space, modifierFlags: [.command, .option, .control])
+    static let scrollShortcut = MASShortcut.init(keyCode: kVK_ANSI_C, modifierFlags: [.command, .option, .control])
+    
     let storyboard: NSStoryboard
-    let hintShortcut: MASShortcut
-    let scrollShortcut: MASShortcut
     
     let applicationObservable: Observable<Application?>
     let applicationNotificationObservable: Observable<AccessibilityObservables.AppNotificationAppPair>
-    let windowSubject: BehaviorSubject<UIElement?>
-    let overlayEventSubject: PublishSubject<OverlayEvent>
+    let windowObservable: Observable<UIElement?>
     
     var scrollMode: ScrollMode?
     var hintMode: HintMode?
+    
+    let hintShortcutObservable: Observable<Void>
+    let scrollShortcutObservable: Observable<Void>
+    
+    var compositeDisposable: CompositeDisposable
 
     static let windowEvents: [AXNotification] = [.windowMiniaturized, .windowMoved, .windowResized]
     
@@ -32,11 +37,69 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         storyboard =
             NSStoryboard.init(name: "Main", bundle: nil)
         applicationObservable = AccessibilityObservables.createApplicationObservable().share()
-        applicationNotificationObservable = AccessibilityObservables.createApplicationNotificationObservable(applicationObservable: applicationObservable, notifications: AppDelegate.windowEvents + [AXNotification.focusedWindowChanged])
-        windowSubject = BehaviorSubject(value: nil)
-        overlayEventSubject = PublishSubject()
-        hintShortcut = MASShortcut.init(keyCode: kVK_Space, modifierFlags: [.command, .option, .control])
-        scrollShortcut = MASShortcut.init(keyCode: kVK_ANSI_C, modifierFlags: [.command, .option, .control])
+        applicationNotificationObservable = AccessibilityObservables.createApplicationNotificationObservable(applicationObservable: applicationObservable, notifications: AppDelegate.windowEvents + [AXNotification.focusedWindowChanged]).share()
+        
+        let initialWindowFromApplicationObservable: Observable<UIElement?> = applicationObservable
+            .map { appOptional in
+                guard let app = appOptional else {
+                    return nil
+                }
+                let windowOptional: UIElement? = {
+                    do {
+                        return try app.attribute(Attribute.focusedWindow)
+                    } catch {
+                        return nil
+                    }
+                }()
+                return windowOptional
+            }
+        
+        let windowFromApplicationNotificationObservable: Observable<UIElement?> = applicationNotificationObservable
+            .map { pair in
+                guard let notification = pair.notification,
+                    let app = pair.app else {
+                    return nil
+                }
+                
+                if notification != .focusedWindowChanged {
+                    return nil
+                }
+                
+                let windowOptional: UIElement? = {
+                    do {
+                        return try app.attribute(Attribute.focusedWindow)
+                    } catch {
+                        return nil
+                    }
+                }()
+                
+                return windowOptional
+            }
+        
+        windowObservable = Observable.merge([windowFromApplicationNotificationObservable, initialWindowFromApplicationObservable])
+
+        hintShortcutObservable = Observable.create { observer in
+            MASShortcutMonitor.shared().register(AppDelegate.hintShortcut, withAction: {
+                observer.onNext(Void())
+            })
+            let d = Disposables.create {
+                MASShortcutMonitor.shared()?.unregisterShortcut(AppDelegate.hintShortcut)
+            }
+            return d
+        }
+        
+        scrollShortcutObservable = Observable.create { observer in
+            MASShortcutMonitor.shared().register(AppDelegate.scrollShortcut, withAction: {
+                observer.onNext(Void())
+            })
+            let d = Disposables.create {
+                MASShortcutMonitor.shared()?.unregisterShortcut(AppDelegate.scrollShortcut)
+            }
+            return d
+        }
+        
+        self.compositeDisposable = CompositeDisposable()
+        
         super.init()
     }
 
@@ -47,122 +110,69 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             NSRunningApplication.current.terminate()
             return
         }
-        
-        applicationObservable
-            .subscribeOn(MainScheduler.instance)
-            .subscribe(onNext: { appOptional in
-                if let app = appOptional {
-                    let windowOptional: UIElement? = {
-                        do {
-                            return try app.attribute(Attribute.focusedWindow)
-                        } catch {
-                            return nil
-                        }
-                    }()
-                    self.windowSubject.onNext(windowOptional)
-                }
-            })
 
-        applicationNotificationObservable
+        self.compositeDisposable.insert(applicationNotificationObservable
             .observeOn(MainScheduler.instance)
             .subscribe(onNext: { pair in
                 if let notification = pair.notification,
                     let app = pair.app {
-                    if notification == .focusedWindowChanged {
-                        let windowOptional: UIElement? = {
-                            do {
-                                return try app.attribute(Attribute.focusedWindow)
-                            } catch {
-                                return nil
-                            }
-                        }()
-                        self.windowSubject.onNext(windowOptional)
-                        return
-                    }
                     
-                    if (AppDelegate.windowEvents.contains(notification)) {
-                        self.overlayEventSubject.onNext(.activeWindowUpdated)
+                    if notification == .focusedWindowChanged {
                         return
                     }
+
+                    self.hideOverlays()
                 }
             })
+        )
         
-        windowSubject
+        self.compositeDisposable.insert(windowObservable
             .observeOn(MainScheduler.instance)
             .subscribe(onNext: { windowOptional in
+                self.hideOverlays()
                 os_log("Current window: %@", log: Log.accessibility, String(describing: windowOptional))
-                guard let window = windowOptional else {
-                    self.overlayEventSubject.onNext(.noActiveWindow)
+            })
+        )
+
+        let windowNoNilObservable = windowObservable.compactMap { $0 }
+        
+        self.compositeDisposable.insert(hintShortcutObservable
+            .withLatestFrom(windowNoNilObservable, resultSelector: { _, window in
+                return window
+            })
+            .observeOn(MainScheduler.instance)
+            .subscribe(onNext: { window in
+                let isHintModeNow = self.hintMode != nil
+                self.hideOverlays()
+                
+                if isHintModeNow {
                     return
                 }
                 
-                self.overlayEventSubject.onNext(.newActiveWindow)
+                self.hintMode = HintMode(applicationWindow: window)
+                self.hintMode?.delegate = self
+                self.hintMode?.activate()
             })
+        )
         
-        overlayEventSubject
+        self.compositeDisposable.insert(scrollShortcutObservable
+            .withLatestFrom(windowNoNilObservable, resultSelector: { _, window in
+                return window
+            })
             .observeOn(MainScheduler.instance)
-            .subscribe(onNext: { event in
-                switch event {
-                case .newActiveWindow:
-                    self.hideOverlays()
-                case .noActiveWindow:
-                    self.hideOverlays()
-                case .activeWindowUpdated:
-                    self.hideOverlays()
-                case .hintCommandPressed:
-                    let isHintModeNow = self.hintMode != nil
-                    self.hideOverlays()
-
-                    if isHintModeNow {
-                        return
-                    }
-                    
-                    let windowOptional: UIElement? = {
-                        do {
-                            return try self.windowSubject.value()
-                        } catch {
-                            return nil
-                        }
-                    }()
-                    
-                    guard let window = windowOptional else {
-                        return
-                    }
-                    
-                    self.hintMode = HintMode(applicationWindow: window)
-                    self.hintMode?.activate()
-                case .scrollCommandPressed:
-                    let isScrollModeNow = self.scrollMode != nil
-                    self.hideOverlays()
-                    
-                    if isScrollModeNow {
-                        return
-                    }
-                    
-                    let windowOptional: UIElement? = {
-                        do {
-                            return try self.windowSubject.value()
-                        } catch {
-                            return nil
-                        }
-                    }()
-                    
-                    guard let window = windowOptional else {
-                        return
-                    }
-                    
-                    self.scrollMode = ScrollMode(applicationWindow: window)
-                    self.scrollMode?.activate()
+            .subscribe(onNext: { window in
+                let isScrollModeNow = self.scrollMode != nil
+                self.hideOverlays()
+                
+                if isScrollModeNow {
+                    return
                 }
+                
+                self.scrollMode = ScrollMode(applicationWindow: window)
+                self.scrollMode?.delegate = self
+                self.scrollMode?.activate()
             })
-        
-        MASShortcutMonitor.shared().register(hintShortcut, withAction: {
-            self.overlayEventSubject.onNext(.hintCommandPressed)
-        })
-        
-        MASShortcutMonitor.shared().register(scrollShortcut, withAction: {
-            self.overlayEventSubject.onNext(.scrollCommandPressed)
-        })
+        )
     }
     
     func hideOverlays() {
@@ -173,13 +183,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {
-        // Insert code here to tear down your application
+        self.compositeDisposable.dispose()
     }
 }
 
 
 extension AppDelegate : ModeDelegate {
     func onDeactivate() {
-        
+        hintMode = nil
+        scrollMode = nil
     }
 }
