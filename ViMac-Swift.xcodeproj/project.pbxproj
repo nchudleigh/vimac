@@ -18,6 +18,8 @@
 		E225BD1D233292B800ECDEF4 /* StatusItemManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E225BD1C233292B800ECDEF4 /* StatusItemManager.swift */; };
 		E225BD25233365C100ECDEF4 /* PreferencesTabViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E225BD23233365C100ECDEF4 /* PreferencesTabViewController.swift */; };
 		E225BD282333700D00ECDEF4 /* PreferencesWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E225BD272333700D00ECDEF4 /* PreferencesWindowController.swift */; };
+		E225BD2A2334D78F00ECDEF4 /* NormalMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = E225BD292334D78F00ECDEF4 /* NormalMode.swift */; };
+		E225BD2E2334E96B00ECDEF4 /* Command.swift in Sources */ = {isa = PBXBuildFile; fileRef = E225BD2D2334E96B00ECDEF4 /* Command.swift */; };
 		E25F8711233222A9007AA958 /* AccessibilityObservables.swift in Sources */ = {isa = PBXBuildFile; fileRef = E25F8710233222A9007AA958 /* AccessibilityObservables.swift */; };
 		E26172242322968500E396CA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26172232322968500E396CA /* AppDelegate.swift */; };
 		E26172282322968600E396CA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E26172272322968600E396CA /* Assets.xcassets */; };
@@ -66,6 +68,8 @@
 		E225BD1C233292B800ECDEF4 /* StatusItemManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusItemManager.swift; sourceTree = "<group>"; };
 		E225BD23233365C100ECDEF4 /* PreferencesTabViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesTabViewController.swift; sourceTree = "<group>"; };
 		E225BD272333700D00ECDEF4 /* PreferencesWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesWindowController.swift; sourceTree = "<group>"; };
+		E225BD292334D78F00ECDEF4 /* NormalMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NormalMode.swift; sourceTree = "<group>"; };
+		E225BD2D2334E96B00ECDEF4 /* Command.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Command.swift; sourceTree = "<group>"; };
 		E25F8710233222A9007AA958 /* AccessibilityObservables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessibilityObservables.swift; sourceTree = "<group>"; };
 		E26172202322968500E396CA /* ViMac-Swift.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ViMac-Swift.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E26172232322968500E396CA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -199,6 +203,8 @@
 				E25F8710233222A9007AA958 /* AccessibilityObservables.swift */,
 				E225BD1423322A7700ECDEF4 /* ScrollMode.swift */,
 				E225BD1823325BB400ECDEF4 /* BaseMode.swift */,
+				E225BD292334D78F00ECDEF4 /* NormalMode.swift */,
+				E225BD2D2334E96B00ECDEF4 /* Command.swift */,
 			);
 			path = "ViMac-Swift";
 			sourceTree = "<group>";
@@ -460,6 +466,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E225BD2E2334E96B00ECDEF4 /* Command.swift in Sources */,
 				E261725A2324EC7100E396CA /* OverlayWindow.swift in Sources */,
 				E2F6C9B1232E337500F2975B /* OverlayTextField.swift in Sources */,
 				E2F6C9AF232DEA1800F2975B /* Utils.swift in Sources */,
@@ -469,6 +476,7 @@
 				E225BD1523322A7700ECDEF4 /* ScrollMode.swift in Sources */,
 				E225BD25233365C100ECDEF4 /* PreferencesTabViewController.swift in Sources */,
 				E20696F923290D41001EFDB2 /* Log.swift in Sources */,
+				E225BD2A2334D78F00ECDEF4 /* NormalMode.swift in Sources */,
 				E26172542323D97700E396CA /* BorderView.swift in Sources */,
 				E225BD172332457400ECDEF4 /* HintMode.swift in Sources */,
 				E225BD1D233292B800ECDEF4 /* StatusItemManager.swift in Sources */,

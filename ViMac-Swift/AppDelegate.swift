@@ -16,6 +16,7 @@ import os
 class AppDelegate: NSObject, NSApplicationDelegate {
     static let hintShortcut = MASShortcut.init(keyCode: kVK_Space, modifierFlags: [.command, .option, .control])
     static let scrollShortcut = MASShortcut.init(keyCode: kVK_ANSI_C, modifierFlags: [.command, .option, .control])
+    static let normalShortcut = MASShortcut.init(keyCode: kVK_Space, modifierFlags: [.command, .shift])
     
     let applicationObservable: Observable<Application?>
     let applicationNotificationObservable: Observable<AccessibilityObservables.AppNotificationAppPair>
@@ -23,9 +24,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     var scrollMode: ScrollMode?
     var hintMode: HintMode?
+    var normalMode: NormalMode?
     
     let hintShortcutObservable: Observable<Void>
     let scrollShortcutObservable: Observable<Void>
+    let normalShortcutObservable: Observable<Void>
     
     var compositeDisposable: CompositeDisposable
 
@@ -90,6 +93,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             })
             let d = Disposables.create {
                 MASShortcutMonitor.shared()?.unregisterShortcut(AppDelegate.scrollShortcut)
+            }
+            return d
+        }
+        
+        normalShortcutObservable = Observable.create { observer in
+            MASShortcutMonitor.shared().register(AppDelegate.normalShortcut, withAction: {
+                observer.onNext(Void())
+            })
+            let d = Disposables.create {
+                MASShortcutMonitor.shared()?.unregisterShortcut(AppDelegate.normalShortcut)
             }
             return d
         }
@@ -169,13 +182,35 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 self.scrollMode?.activate()
             })
         )
+        
+        self.compositeDisposable.insert(normalShortcutObservable
+            .withLatestFrom(windowNoNilObservable, resultSelector: { _, window in
+                return window
+            })
+            .observeOn(MainScheduler.instance)
+            .subscribe(onNext: { window in
+                let isNormalModeNow = self.normalMode != nil
+                self.hideOverlays()
+                
+                if isNormalModeNow {
+                    return
+                }
+                
+                self.normalMode = NormalMode(applicationWindow: window)
+                self.normalMode?.delegate = self
+                self.normalMode?.commandDelegate = self
+                self.normalMode?.activate()
+            })
+        )
     }
     
     func hideOverlays() {
         hintMode?.deactivate()
         scrollMode?.deactivate()
+        normalMode?.deactivate()
         hintMode = nil
         scrollMode = nil
+        normalMode = nil
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {
@@ -188,5 +223,16 @@ extension AppDelegate : ModeDelegate {
     func onDeactivate() {
         hintMode = nil
         scrollMode = nil
+        normalMode = nil
+    }
+}
+
+extension AppDelegate : NormalModeDelegate {
+    func onInvalidCommand() {
+        self.normalMode?.deactivate()
+    }
+    
+    func onCommand(command: Command) {
+        self.normalMode?.deactivate()
     }
 }
