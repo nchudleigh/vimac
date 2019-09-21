@@ -280,8 +280,23 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             let centerPosition = NSPoint(x: centerPositionX, y: centerPositionY)
             print("Matching hint found. Performing command and exiting Hint Mode.")
             self.hideOverlays()
+            
+            guard let command = textField.command else {
+                print("Couldn't find text field's associated command")
+                return
+            }
+            
             Utils.moveMouse(position: centerPosition)
-            Utils.leftClickMouse(position: centerPosition)
+            if command == .leftClick {
+                Utils.leftClickMouse(position: centerPosition)
+            } else if command == .rightClick {
+                Utils.rightClickMouse(position: centerPosition)
+            } else if command == .doubleLeftClick {
+                Utils.leftClickMouse(position: centerPosition)
+                Utils.leftClickMouse(position: centerPosition)
+            }
+            
+            
             return
         }
         

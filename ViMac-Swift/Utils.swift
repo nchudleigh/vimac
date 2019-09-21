@@ -31,6 +31,13 @@ class Utils: NSObject {
         event2?.post(tap: .cgSessionEventTap)
     }
     
+    static func rightClickMouse(position: CGPoint) {
+        let event = CGEvent(mouseEventSource: nil, mouseType: .rightMouseDown, mouseCursorPosition: position, mouseButton: .right)
+        let event2 = CGEvent(mouseEventSource: nil, mouseType: .rightMouseUp, mouseCursorPosition: position, mouseButton: .right)
+        event?.post(tap: .cgSessionEventTap)
+        event2?.post(tap: .cgSessionEventTap)
+    }
+    
     static func traverseUIElementForPressables(rootElement: UIElement) -> [UIElement] {
         var elements = [UIElement]()
         func fn(element: UIElement, level: Int) -> Void {
