@@ -155,11 +155,38 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func setNormalMode() {
-        let textField = OverlayTextField(frame: NSRect(x: 0, y: 0, width: 530, height: 30))
+        self.resizeOverlayWindow()
+        let textField = OverlayTextField(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
         textField.stringValue = ""
+        textField.placeholderString = "Enter Command"
         textField.isEditable = true
         textField.delegate = self
         textField.tag = AppDelegate.NORMAL_MODE_TEXT_FIELD_TAG
+        
+        textField.font = NSFont.systemFont(ofSize: NSFont.systemFontSize)
+        
+        textField.wantsLayer = true
+        textField.layer?.borderColor = NSColor.gray.cgColor
+        textField.layer?.borderWidth = 2
+        textField.layer?.cornerRadius = 3
+        textField.layer?.backgroundColor = NSColor.white.cgColor
+        textField.focusRingType = .none
+        // need this otherwise the background color is ignored
+        textField.appearance = NSAppearance(named: NSAppearance.Name.aqua)
+        textField.drawsBackground = true
+        textField.backgroundColor = NSColor.white
+        textField.textColor = NSColor.black
+        textField.bezelStyle = .roundedBezel
+        textField.cell?.usesSingleLineMode = true
+        
+        textField.sizeToFit()
+        textField.setFrameSize(NSSize(width: 530, height: textField.frame.height))
+        
+        textField.setFrameOrigin(NSPoint(
+            x: (NSScreen.screens.first!.frame.width / 2) - (textField.frame.width / 2),
+            y: (NSScreen.screens.first!.frame.height / 2) + (textField.frame.height / 2)
+        ))
+        
         self.overlayWindowController.window?.contentView?.addSubview(textField)
         self.overlayWindowController.showWindow(nil)
         self.overlayWindowController.window?.makeKeyAndOrderFront(nil)
