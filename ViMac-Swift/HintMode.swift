@@ -21,9 +21,8 @@ class HintMode: NSObject, BaseModeProtocol {
 
     let HINT_TEXT_FIELD_TAG = 1
     
-    required init(applicationWindow: UIElement) {
-        let storyboard = NSStoryboard.init(name: "Main", bundle: nil)
-        overlayWindowController = storyboard.instantiateController(withIdentifier: "overlayWindowControllerID") as! NSWindowController
+    required init(applicationWindow: UIElement, controller: NSWindowController) {
+        overlayWindowController = controller
         self.applicationWindow = applicationWindow
         self.pressableElementByHint = [String : UIElement]()
         
@@ -50,8 +49,6 @@ class HintMode: NSObject, BaseModeProtocol {
     }
     
     func deactivate() {
-        self.overlayWindowController.close()
-        self.removeSubviews()
         if let d = self.delegate {
             d.onDeactivate()
         }

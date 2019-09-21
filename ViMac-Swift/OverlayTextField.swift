@@ -9,6 +9,8 @@
 import Cocoa
 
 class OverlayTextField: NSTextField {
+    var command: Command?
+    
     required init?(coder: NSCoder) {
         super.init(coder: coder)
     }

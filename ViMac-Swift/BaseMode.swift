@@ -12,7 +12,7 @@ import AXSwift
 protocol BaseModeProtocol {
     func deactivate() -> Void
     func activate() -> Void
-    init(applicationWindow: UIElement)
+//    init(applicationWindow: UIElement)
 }
 
 protocol ModeDelegate: AnyObject {

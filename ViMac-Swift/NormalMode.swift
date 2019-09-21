@@ -21,11 +21,9 @@ class NormalMode: NSObject, BaseModeProtocol {
     
     let NORMAL_MODE_TAG = 1
     
-    required init(applicationWindow: UIElement) {
-        let storyboard = NSStoryboard.init(name: "Main", bundle: nil)
-        overlayWindowController = storyboard.instantiateController(withIdentifier: "overlayWindowControllerID") as! NSWindowController
+    required init(applicationWindow: UIElement, controller: NSWindowController) {
         self.applicationWindow = applicationWindow
-        
+        self.overlayWindowController = controller
         // resize overlay window to same size as application window
         if let windowPosition: CGPoint = try! applicationWindow.attribute(.position),
             let windowSize: CGSize = try! applicationWindow.attribute(.size) {
@@ -49,8 +47,6 @@ class NormalMode: NSObject, BaseModeProtocol {
     }
     
     func deactivate() {
-        self.overlayWindowController.close()
-        self.removeSubviews()
         if let d = self.delegate {
             d.onDeactivate()
         }

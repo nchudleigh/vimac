@@ -38,8 +38,6 @@ class ScrollMode: NSObject, BaseModeProtocol {
     }
     
     func deactivate() {
-        self.overlayWindowController.close()
-        self.removeSubviews()
         if let d = self.delegate {
             d.onDeactivate()
         }

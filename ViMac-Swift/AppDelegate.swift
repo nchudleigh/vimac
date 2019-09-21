@@ -14,27 +14,28 @@ import os
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
-    static let hintShortcut = MASShortcut.init(keyCode: kVK_Space, modifierFlags: [.command, .option, .control])
-    static let scrollShortcut = MASShortcut.init(keyCode: kVK_ANSI_C, modifierFlags: [.command, .option, .control])
     static let normalShortcut = MASShortcut.init(keyCode: kVK_Space, modifierFlags: [.command, .shift])
+    
+    static let NORMAL_MODE_TEXT_FIELD_TAG = 1
+    static let HINT_SELECTOR_TEXT_FIELD_TAG = 2
     
     let applicationObservable: Observable<Application?>
     let applicationNotificationObservable: Observable<AccessibilityObservables.AppNotificationAppPair>
     let windowObservable: Observable<UIElement?>
-    
-    var scrollMode: ScrollMode?
-    var hintMode: HintMode?
-    var normalMode: NormalMode?
-    
-    let hintShortcutObservable: Observable<Void>
-    let scrollShortcutObservable: Observable<Void>
+    let windowSubject: BehaviorSubject<UIElement?>
+
     let normalShortcutObservable: Observable<Void>
     
     var compositeDisposable: CompositeDisposable
+    
+    let overlayWindowController: NSWindowController
 
     static let windowEvents: [AXNotification] = [.windowMiniaturized, .windowMoved, .windowResized]
     
     override init() {
+        let storyboard = NSStoryboard.init(name: "Main", bundle: nil)
+        overlayWindowController = storyboard.instantiateController(withIdentifier: "overlayWindowControllerID") as! NSWindowController
+        
         applicationObservable = AccessibilityObservables.createApplicationObservable().share()
         applicationNotificationObservable = AccessibilityObservables.createApplicationNotificationObservable(applicationObservable: applicationObservable, notifications: AppDelegate.windowEvents + [AXNotification.focusedWindowChanged]).share()
         
@@ -76,27 +77,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             }
         
         windowObservable = Observable.merge([windowFromApplicationNotificationObservable, initialWindowFromApplicationObservable])
+        windowSubject = BehaviorSubject(value: nil)
 
-        hintShortcutObservable = Observable.create { observer in
-            MASShortcutMonitor.shared().register(AppDelegate.hintShortcut, withAction: {
-                observer.onNext(Void())
-            })
-            let d = Disposables.create {
-                MASShortcutMonitor.shared()?.unregisterShortcut(AppDelegate.hintShortcut)
-            }
-            return d
-        }
-        
-        scrollShortcutObservable = Observable.create { observer in
-            MASShortcutMonitor.shared().register(AppDelegate.scrollShortcut, withAction: {
-                observer.onNext(Void())
-            })
-            let d = Disposables.create {
-                MASShortcutMonitor.shared()?.unregisterShortcut(AppDelegate.scrollShortcut)
-            }
-            return d
-        }
-        
         normalShortcutObservable = Observable.create { observer in
             MASShortcutMonitor.shared().register(AppDelegate.normalShortcut, withAction: {
                 observer.onNext(Void())
@@ -140,48 +122,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             .subscribe(onNext: { windowOptional in
                 self.hideOverlays()
                 os_log("Current window: %@", log: Log.accessibility, String(describing: windowOptional))
+                self.windowSubject.onNext(windowOptional)
             })
         )
 
         let windowNoNilObservable = windowObservable.compactMap { $0 }
-        
-        self.compositeDisposable.insert(hintShortcutObservable
-            .withLatestFrom(windowNoNilObservable, resultSelector: { _, window in
-                return window
-            })
-            .observeOn(MainScheduler.instance)
-            .subscribe(onNext: { window in
-                let isHintModeNow = self.hintMode != nil
-                self.hideOverlays()
-                
-                if isHintModeNow {
-                    return
-                }
-                
-                self.hintMode = HintMode(applicationWindow: window)
-                self.hintMode?.delegate = self
-                self.hintMode?.activate()
-            })
-        )
-        
-        self.compositeDisposable.insert(scrollShortcutObservable
-            .withLatestFrom(windowNoNilObservable, resultSelector: { _, window in
-                return window
-            })
-            .observeOn(MainScheduler.instance)
-            .subscribe(onNext: { window in
-                let isScrollModeNow = self.scrollMode != nil
-                self.hideOverlays()
-                
-                if isScrollModeNow {
-                    return
-                }
-                
-                self.scrollMode = ScrollMode(applicationWindow: window)
-                self.scrollMode?.delegate = self
-                self.scrollMode?.activate()
-            })
-        )
         
         self.compositeDisposable.insert(normalShortcutObservable
             .withLatestFrom(windowNoNilObservable, resultSelector: { _, window in
@@ -189,28 +134,184 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             })
             .observeOn(MainScheduler.instance)
             .subscribe(onNext: { window in
-                let isNormalModeNow = self.normalMode != nil
+                let isOverlayEmpty = self.overlayWindowController.window?.contentView?.subviews.count == 0
                 self.hideOverlays()
                 
-                if isNormalModeNow {
+                if !isOverlayEmpty {
                     return
                 }
                 
-                self.normalMode = NormalMode(applicationWindow: window)
-                self.normalMode?.delegate = self
-                self.normalMode?.commandDelegate = self
-                self.normalMode?.activate()
+                self.setNormalMode()
             })
         )
     }
     
     func hideOverlays() {
-        hintMode?.deactivate()
-        scrollMode?.deactivate()
-        normalMode?.deactivate()
-        hintMode = nil
-        scrollMode = nil
-        normalMode = nil
+        print("hiding overlays")
+        self.overlayWindowController.close()
+        self.overlayWindowController.window?.contentView?.subviews.forEach({ view in
+            view.removeFromSuperview()
+        })
+    }
+    
+    func setNormalMode() {
+        let textField = OverlayTextField(frame: NSRect(x: 0, y: 0, width: 530, height: 30))
+        textField.stringValue = ""
+        textField.isEditable = true
+        textField.delegate = self
+        textField.tag = AppDelegate.NORMAL_MODE_TEXT_FIELD_TAG
+        self.overlayWindowController.window?.contentView?.addSubview(textField)
+        self.overlayWindowController.showWindow(nil)
+        self.overlayWindowController.window?.makeKeyAndOrderFront(nil)
+        textField.becomeFirstResponder()
+    }
+    
+    func resizeOverlayWindow(applicationWindow: UIElement) {
+        // resize overlay window to same size as application window
+        if let windowPosition: CGPoint = try! applicationWindow.attribute(.position),
+            let windowSize: CGSize = try! applicationWindow.attribute(.size) {
+            let origin = Utils.toOrigin(point: windowPosition, size: windowSize)
+            let frame = NSRect(origin: origin, size: windowSize)
+            overlayWindowController.window!.setFrame(frame, display: true, animate: false)
+        } else {
+            print("Failed to resize overlay window to fit application window.")
+            self.hideOverlays()
+        }
+    }
+    
+    func setHintSelectorMode(command: Command) {
+        guard let applicationWindow = try! self.windowSubject.value(),
+            let window = self.overlayWindowController.window else {
+            print("Failed to set Hint Selector")
+            self.hideOverlays()
+            return
+        }
+        
+        self.resizeOverlayWindow(applicationWindow: applicationWindow)
+
+        let pressableElements = Utils.traverseUIElementForPressables(rootElement: applicationWindow)
+        let hintStrings = AlphabetHints().hintStrings(linkCount: pressableElements.count)
+
+        let hintViews: [HintView] = pressableElements
+            .enumerated()
+            .map { (index, button) in
+                if let positionFlipped: CGPoint = try! button.attribute(.position) {
+                    let text = HintView(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
+                    text.initializeHint(hintText: hintStrings[index], typed: "")
+                    let positionRelativeToScreen = Utils.toOrigin(point: positionFlipped, size: text.frame.size)
+                    let positionRelativeToWindow = window.convertPoint(fromScreen: positionRelativeToScreen)
+                    text.associatedButton = button
+                    text.frame.origin = positionRelativeToWindow
+                    return text
+                }
+                return nil
+            }.compactMap({ $0 })
+        
+        hintViews.forEach { view in
+            window.contentView!.addSubview(view)
+        }
+        
+        let selectorTextField = OverlayTextField(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
+        selectorTextField.stringValue = ""
+        selectorTextField.isEditable = true
+        selectorTextField.delegate = self
+        selectorTextField.isHidden = true
+        selectorTextField.tag = AppDelegate.HINT_SELECTOR_TEXT_FIELD_TAG
+        selectorTextField.command = command
+        window.contentView?.addSubview(selectorTextField)
+        self.overlayWindowController.showWindow(nil)
+        window.makeKeyAndOrderFront(nil)
+        selectorTextField.becomeFirstResponder()
+    }
+    
+    func updateHints(typed: String) {
+        guard let window = self.overlayWindowController.window,
+            let hintViews = window.contentView?.subviews.filter ({ $0 is HintView }) as! [HintView]? else {
+            self.hideOverlays()
+            return
+        }
+
+        hintViews.forEach { hintView in
+            hintView.removeFromSuperview()
+            if hintView.stringValue.starts(with: typed.uppercased()) {
+                let newHintView = HintView(frame: hintView.frame)
+                newHintView.initializeHint(hintText: hintView.stringValue, typed: typed.uppercased())
+                newHintView.associatedButton = hintView.associatedButton
+                window.contentView!.addSubview(newHintView)
+            }
+        }
+    }
+    
+    func onHintSelectorTextChange(textField: OverlayTextField) {
+        let typed = textField.stringValue
+        guard let window = self.overlayWindowController.window,
+            let hintViews = window.contentView?.subviews.filter ({ $0 is HintView }) as! [HintView]?,
+            let command = textField.command else {
+            print("Failed to update hints.")
+            self.hideOverlays()
+            return
+        }
+        let matchingHints = hintViews.filter { hintView in
+            return hintView.stringValue.starts(with: typed.uppercased())
+        }
+        
+        if matchingHints.count == 0 && typed.count > 0 {
+            print("No matching hints. Exiting Hint Mode")
+            self.hideOverlays()
+            return
+        }
+        
+        if matchingHints.count == 1 {
+            let matchingHint = matchingHints.first!
+            let buttonOptional = matchingHint.associatedButton
+            guard let button = buttonOptional else {
+                print("Couldn't find HintView's associated button. Exiting.")
+                self.hideOverlays()
+                return
+            }
+            
+            guard let buttonPosition: NSPoint = try! button.attribute(.position),
+                let buttonSize: NSSize = try! button.attribute(.size) else {
+                return
+            }
+            
+            let centerPositionX = buttonPosition.x + (buttonSize.width / 2)
+            let centerPositionY = buttonPosition.y + (buttonSize.height / 2)
+            let centerPosition = NSPoint(x: centerPositionX, y: centerPositionY)
+            print("Matching hint found. Performing command and exiting Hint Mode.")
+            self.hideOverlays()
+            Utils.moveMouse(position: centerPosition)
+            Utils.leftClickMouse(position: centerPosition)
+            return
+        }
+        
+        // update hints to reflect new typed text
+        self.updateHints(typed: typed)
+    }
+    
+    func onInputSubmitted(input: String) {
+        self.hideOverlays()
+        let commandOptional = parseInput(input: input)
+        guard let command = commandOptional else {
+            return
+        }
+        self.setHintSelectorMode(command: command)
+    }
+    
+    func parseInput(input: String) -> Command? {
+        let inputTrimmed = input.trimmingCharacters(in: .whitespacesAndNewlines)
+        switch inputTrimmed {
+        case "ce":
+            return Command.leftClick
+        case "dce":
+            return Command.doubleLeftClick
+        case "rce":
+            return Command.rightClick
+        case "se":
+            return Command.scroll
+        default:
+            return nil
+        }
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {
@@ -218,21 +319,24 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 }
 
-
-extension AppDelegate : ModeDelegate {
-    func onDeactivate() {
-        hintMode = nil
-        scrollMode = nil
-        normalMode = nil
-    }
-}
-
-extension AppDelegate : NormalModeDelegate {
-    func onInvalidCommand() {
-        self.normalMode?.deactivate()
+extension AppDelegate : NSTextFieldDelegate {
+    func control(_ control: NSControl, textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
+        if control.tag == AppDelegate.NORMAL_MODE_TEXT_FIELD_TAG {
+            if commandSelector == #selector(NSResponder.insertNewline(_:)) {
+                self.onInputSubmitted(input: textView.string)
+            }
+        }
+        return false
     }
     
-    func onCommand(command: Command) {
-        self.normalMode?.deactivate()
+    func controlTextDidChange(_ obj: Notification) {
+        let textField = obj.object as! NSTextField
+
+        switch textField.tag {
+        case AppDelegate.HINT_SELECTOR_TEXT_FIELD_TAG:
+            self.onHintSelectorTextChange(textField: textField as! OverlayTextField)
+        default:
+            return
+        }
     }
 }
