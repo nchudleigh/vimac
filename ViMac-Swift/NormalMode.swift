@@ -88,8 +88,6 @@ class NormalMode: NSObject, BaseModeProtocol {
             return Command.doubleLeftClick
         case "rce":
             return Command.rightClick
-        case "se":
-            return Command.scroll
         default:
             return nil
         }

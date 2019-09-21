@@ -322,8 +322,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             return Command.doubleLeftClick
         case "rce":
             return Command.rightClick
-        case "se":
-            return Command.scroll
         default:
             return nil
         }
