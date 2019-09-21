@@ -166,17 +166,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         textField.becomeFirstResponder()
     }
     
-    func resizeOverlayWindow(applicationWindow: UIElement) {
-        // resize overlay window to same size as application window
-        if let windowPosition: CGPoint = try! applicationWindow.attribute(.position),
-            let windowSize: CGSize = try! applicationWindow.attribute(.size) {
-            let origin = Utils.toOrigin(point: windowPosition, size: windowSize)
-            let frame = NSRect(origin: origin, size: windowSize)
-            overlayWindowController.window!.setFrame(frame, display: true, animate: false)
-        } else {
-            print("Failed to resize overlay window to fit application window.")
-            self.hideOverlays()
-        }
+    func resizeOverlayWindow() {
+        overlayWindowController.window!.setFrame(NSScreen.screens.first!.frame, display: true, animate: false)
     }
     
     func setHintSelectorMode(command: Command) {
@@ -187,7 +178,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             return
         }
         
-        self.resizeOverlayWindow(applicationWindow: applicationWindow)
+        self.resizeOverlayWindow()
 
         let pressableElements = Utils.traverseUIElementForPressables(rootElement: applicationWindow)
         let hintStrings = AlphabetHints().hintStrings(linkCount: pressableElements.count)
@@ -199,9 +190,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     let text = HintView(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
                     text.initializeHint(hintText: hintStrings[index], typed: "")
                     let positionRelativeToScreen = Utils.toOrigin(point: positionFlipped, size: text.frame.size)
-                    let positionRelativeToWindow = window.convertPoint(fromScreen: positionRelativeToScreen)
                     text.associatedButton = button
-                    text.frame.origin = positionRelativeToWindow
+                    text.frame.origin = positionRelativeToScreen
                     return text
                 }
                 return nil
