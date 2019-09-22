@@ -55,25 +55,29 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             }
         
         let windowFromApplicationNotificationObservable: Observable<UIElement?> = applicationNotificationObservable
-            .map { pair in
-                guard let notification = pair.notification,
-                    let app = pair.app else {
-                    return nil
-                }
-                
-                if notification != .focusedWindowChanged {
-                    return nil
-                }
-                
-                let windowOptional: UIElement? = {
-                    do {
-                        return try app.attribute(Attribute.focusedWindow)
-                    } catch {
-                        return nil
+            .flatMapLatest { pair in
+                return Observable.create { observer in
+                    guard let notification = pair.notification,
+                        let app = pair.app else {
+                        observer.onNext(nil)
+                        return Disposables.create()
                     }
-                }()
-                
-                return windowOptional
+                    
+                    if notification != .focusedWindowChanged {
+                        return Disposables.create()
+                    }
+                    
+                    let windowOptional: UIElement? = {
+                        do {
+                            return try app.attribute(Attribute.focusedWindow)
+                        } catch {
+                            return nil
+                        }
+                    }()
+                    
+                    observer.onNext(windowOptional)
+                    return Disposables.create()
+                }
             }
         
         windowObservable = Observable.merge([windowFromApplicationNotificationObservable, initialWindowFromApplicationObservable])
