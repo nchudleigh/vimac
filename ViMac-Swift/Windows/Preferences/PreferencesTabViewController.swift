@@ -9,8 +9,6 @@
 import Cocoa
 
 class PreferencesTabViewController: NSTabViewController {
-    var currentTabViewController: NSViewController?
-    var currentWindowController: NSWindowController?
     
     override func viewDidLoad() {
         super.viewDidLoad()

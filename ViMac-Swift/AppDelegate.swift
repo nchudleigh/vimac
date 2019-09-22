@@ -14,7 +14,6 @@ import os
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
-    static let normalShortcut = MASShortcut.init(keyCode: kVK_Space, modifierFlags: [.command, .shift])
     
     static let NORMAL_MODE_TEXT_FIELD_TAG = 1
     static let HINT_SELECTOR_TEXT_FIELD_TAG = 2
@@ -84,13 +83,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         windowSubject = BehaviorSubject(value: nil)
 
         normalShortcutObservable = Observable.create { observer in
-            MASShortcutMonitor.shared().register(AppDelegate.normalShortcut, withAction: {
-                observer.onNext(Void())
-            })
-            let d = Disposables.create {
-                MASShortcutMonitor.shared()?.unregisterShortcut(AppDelegate.normalShortcut)
+            let tempView = MASShortcutView.init()
+            tempView.associatedUserDefaultsKey = Utils.commandShortcutKey
+            if tempView.shortcutValue == nil {
+                tempView.shortcutValue = Utils.defaultCommandShortcut
             }
-            return d
+            
+            MASShortcutBinder.shared()
+                .bindShortcut(withDefaultsKey: Utils.commandShortcutKey, toAction: {
+                    observer.onNext(Void())
+                })
+            return Disposables.create()
         }
         
         self.compositeDisposable = CompositeDisposable()

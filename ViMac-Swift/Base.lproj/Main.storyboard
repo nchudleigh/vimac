@@ -717,19 +717,12 @@
         <!--Window Controller-->
         <scene sceneID="mPp-s6-aeO">
             <objects>
-                <windowController storyboardIdentifier="PreferencesWindowController" id="lIH-rt-ykR" customClass="PreferencesWindowController" customModule="ViMac_Swift" customModuleProvider="target" sceneMemberID="viewController">
+                <windowController storyboardIdentifier="PreferencesWindowController" id="lIH-rt-ykR" sceneMemberID="viewController">
                     <window key="window" title="Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" frameAutosaveName="" animationBehavior="default" id="SXy-Zp-506">
                         <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
                         <rect key="contentRect" x="196" y="240" width="480" height="269"/>
                         <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
-                        <toolbar key="toolbar" implicitIdentifier="22A6E160-54DA-4C6B-B7A8-A8EE8C1810A8" autosavesConfiguration="NO" displayMode="iconAndLabel" sizeMode="regular" id="Xca-9M-TJm">
-                            <allowedToolbarItems/>
-                            <defaultToolbarItems/>
-                        </toolbar>
-                        <connections>
-                            <outlet property="delegate" destination="lIH-rt-ykR" id="qw2-0J-BkA"/>
-                        </connections>
                     </window>
                     <connections>
                         <segue destination="sfh-uP-PxU" kind="relationship" relationship="window.shadowedContentViewController" id="HNp-Bt-0F5"/>
@@ -742,7 +735,7 @@
         <!--General-->
         <scene sceneID="xFM-46-YiN">
             <objects>
-                <viewController title="General" storyboardIdentifier="scroll_mode" id="Xcg-2B-Laa" sceneMemberID="viewController">
+                <viewController title="General" storyboardIdentifier="general" id="Xcg-2B-Laa" customClass="PreferencesGeneralViewController" customModule="ViMac_Swift" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="lIT-PR-R6C">
                         <rect key="frame" x="0.0" y="0.0" width="480" height="270"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -763,14 +756,14 @@
                                     <customView identifier="command_shortcut_id" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="GVY-1h-CEw" customClass="MASShortcutView">
                                         <rect key="frame" x="248" y="223" width="150" height="20"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                        <connections>
-                                            <binding destination="Xcg-2B-Laa" name="hidden" keyPath="self.currentWindowController" id="Szc-Qw-DtP"/>
-                                        </connections>
                                     </customView>
                                 </subviews>
                             </visualEffectView>
                         </subviews>
                     </view>
+                    <connections>
+                        <outlet property="shortcutView" destination="GVY-1h-CEw" id="f04-fx-2CB"/>
+                    </connections>
                 </viewController>
                 <customObject id="rTA-ok-Q0d" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
@@ -779,9 +772,9 @@
         <!--Tab View Controller-->
         <scene sceneID="89Q-kf-tkS">
             <objects>
-                <tabViewController id="sfh-uP-PxU" sceneMemberID="viewController">
+                <tabViewController selectedTabViewItemIndex="0" id="sfh-uP-PxU" sceneMemberID="viewController">
                     <tabViewItems>
-                        <tabViewItem id="Oqu-eg-QfP"/>
+                        <tabViewItem id="Kwa-kP-tod"/>
                     </tabViewItems>
                     <tabView key="tabView" type="noTabsNoBorder" id="YR3-f6-ICl">
                         <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
@@ -793,7 +786,7 @@
                     </tabView>
                     <connections>
                         <outlet property="tabView" destination="YR3-f6-ICl" id="hXY-C0-Fpj"/>
-                        <segue destination="Xcg-2B-Laa" kind="relationship" relationship="tabItems" id="CZi-kb-4nH"/>
+                        <segue destination="Xcg-2B-Laa" kind="relationship" relationship="tabItems" id="KOF-Pc-Wh0"/>
                     </connections>
                 </tabViewController>
                 <customObject id="MmE-mp-Omu" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
