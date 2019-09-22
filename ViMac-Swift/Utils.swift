@@ -57,6 +57,8 @@ class Utils: NSObject {
     }
     
     static func traverseUIElementForPressables(rootElement: UIElement) -> [UIElement] {
+        let windowFrame: NSRect = (try! rootElement.attribute(.frame))!
+        
         var elements = [UIElement]()
         func fn(element: UIElement, level: Int) -> Void {
             let actionsOptional: [Action]? = {
@@ -79,6 +81,13 @@ class Utils: NSObject {
             if let role = roleOptional {
                 if role == .scrollBar {
                     return
+                }
+                
+                if role == .row {
+                    let position: NSPoint = (try! element.attribute(.position))!
+                    if !windowFrame.contains(position) {
+                        return
+                    }
                 }
             }
             
