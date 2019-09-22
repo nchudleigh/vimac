@@ -7,6 +7,7 @@
 //
 
 import Cocoa
+import AXSwift
 
 class Utils: NSObject {
     // This function returns the position of the point after the y-axis is flipped.
@@ -28,5 +29,78 @@ class Utils: NSObject {
         let event2 = CGEvent(mouseEventSource: nil, mouseType: .leftMouseUp, mouseCursorPosition: position, mouseButton: .left)
         event?.post(tap: .cgSessionEventTap)
         event2?.post(tap: .cgSessionEventTap)
+    }
+    
+    static func doubleLeftClickMouse(position: CGPoint) {
+        let event = CGEvent(mouseEventSource: nil, mouseType: .leftMouseDown, mouseCursorPosition: position, mouseButton: .left)
+        event?.post(tap: .cgSessionEventTap)
+        event?.type = .leftMouseUp
+        event?.post(tap: .cgSessionEventTap)
+        
+        event?.setIntegerValueField(.mouseEventClickState, value: 2)
+        
+        event?.type = .leftMouseDown
+        event?.post(tap: .cgSessionEventTap)
+        event?.type = .leftMouseUp
+        event?.post(tap: .cgSessionEventTap)
+    }
+    
+    static func rightClickMouse(position: CGPoint) {
+        let event = CGEvent(mouseEventSource: nil, mouseType: .rightMouseDown, mouseCursorPosition: position, mouseButton: .right)
+        let event2 = CGEvent(mouseEventSource: nil, mouseType: .rightMouseUp, mouseCursorPosition: position, mouseButton: .right)
+        event?.post(tap: .cgSessionEventTap)
+        event2?.post(tap: .cgSessionEventTap)
+    }
+    
+    static func traverseUIElementForPressables(rootElement: UIElement) -> [UIElement] {
+        var elements = [UIElement]()
+        func fn(element: UIElement, level: Int) -> Void {
+            let actionsOptional: [Action]? = {
+                do {
+                    return try element.actions();
+                } catch {
+                    return nil
+                }
+            }()
+            
+            let roleOptional: Role? = {
+                do {
+                    return try element.role()
+                } catch {
+                    return nil
+                }
+            }()
+            
+            // ignore subcomponents of a scrollbar
+            if let role = roleOptional {
+                if role == .scrollBar {
+                    return
+                }
+            }
+            
+            if let actions = actionsOptional {
+                if (actions.count > 0) {
+                    elements.append(element)
+                }
+            }
+            
+            let children: [AXUIElement] = {
+                do {
+                    let childrenOptional = try element.attribute(Attribute.children) as [AXUIElement]?;
+                    guard let children = childrenOptional else {
+                        return []
+                    }
+                    return children
+                } catch {
+                    return []
+                }
+            }()
+            
+            children.forEach { child in
+                fn(element: UIElement(child), level: level + 1)
+            }
+        }
+        fn(element: rootElement, level: 1)
+        return elements
     }
 }

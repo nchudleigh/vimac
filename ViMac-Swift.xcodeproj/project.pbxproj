@@ -12,12 +12,10 @@
 		D8C125B0719D3A268AC30B29 /* Pods_ViMac_Swift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 76C3AC6022115352D333CBFC /* Pods_ViMac_Swift.framework */; };
 		E20696F923290D41001EFDB2 /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20696F823290D41001EFDB2 /* Log.swift */; };
 		E2069700232A52EA001EFDB2 /* AlphabetHints.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20696FF232A52EA001EFDB2 /* AlphabetHints.swift */; };
-		E225BD1523322A7700ECDEF4 /* ScrollMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = E225BD1423322A7700ECDEF4 /* ScrollMode.swift */; };
-		E225BD172332457400ECDEF4 /* HintMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = E225BD162332457300ECDEF4 /* HintMode.swift */; };
-		E225BD1923325BB400ECDEF4 /* BaseMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = E225BD1823325BB400ECDEF4 /* BaseMode.swift */; };
 		E225BD1D233292B800ECDEF4 /* StatusItemManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E225BD1C233292B800ECDEF4 /* StatusItemManager.swift */; };
 		E225BD25233365C100ECDEF4 /* PreferencesTabViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E225BD23233365C100ECDEF4 /* PreferencesTabViewController.swift */; };
 		E225BD282333700D00ECDEF4 /* PreferencesWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E225BD272333700D00ECDEF4 /* PreferencesWindowController.swift */; };
+		E225BD2E2334E96B00ECDEF4 /* Command.swift in Sources */ = {isa = PBXBuildFile; fileRef = E225BD2D2334E96B00ECDEF4 /* Command.swift */; };
 		E25F8711233222A9007AA958 /* AccessibilityObservables.swift in Sources */ = {isa = PBXBuildFile; fileRef = E25F8710233222A9007AA958 /* AccessibilityObservables.swift */; };
 		E26172242322968500E396CA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26172232322968500E396CA /* AppDelegate.swift */; };
 		E26172282322968600E396CA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E26172272322968600E396CA /* Assets.xcassets */; };
@@ -60,12 +58,10 @@
 		E20696F823290D41001EFDB2 /* Log.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Log.swift; sourceTree = "<group>"; };
 		E20696FC232A0021001EFDB2 /* VimacBridgingHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VimacBridgingHeader.h; sourceTree = "<group>"; };
 		E20696FF232A52EA001EFDB2 /* AlphabetHints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlphabetHints.swift; sourceTree = "<group>"; };
-		E225BD1423322A7700ECDEF4 /* ScrollMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollMode.swift; sourceTree = "<group>"; };
-		E225BD162332457300ECDEF4 /* HintMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HintMode.swift; sourceTree = "<group>"; };
-		E225BD1823325BB400ECDEF4 /* BaseMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseMode.swift; sourceTree = "<group>"; };
 		E225BD1C233292B800ECDEF4 /* StatusItemManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusItemManager.swift; sourceTree = "<group>"; };
 		E225BD23233365C100ECDEF4 /* PreferencesTabViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesTabViewController.swift; sourceTree = "<group>"; };
 		E225BD272333700D00ECDEF4 /* PreferencesWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesWindowController.swift; sourceTree = "<group>"; };
+		E225BD2D2334E96B00ECDEF4 /* Command.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Command.swift; sourceTree = "<group>"; };
 		E25F8710233222A9007AA958 /* AccessibilityObservables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessibilityObservables.swift; sourceTree = "<group>"; };
 		E26172202322968500E396CA /* ViMac-Swift.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ViMac-Swift.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E26172232322968500E396CA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -181,7 +177,6 @@
 			isa = PBXGroup;
 			children = (
 				E225BD1E233354AD00ECDEF4 /* Windows */,
-				E225BD162332457300ECDEF4 /* HintMode.swift */,
 				E26172232322968500E396CA /* AppDelegate.swift */,
 				E225BD1C233292B800ECDEF4 /* StatusItemManager.swift */,
 				E26172272322968600E396CA /* Assets.xcassets */,
@@ -197,8 +192,7 @@
 				E2F6C9AE232DEA1800F2975B /* Utils.swift */,
 				E2F6C9B0232E337500F2975B /* OverlayTextField.swift */,
 				E25F8710233222A9007AA958 /* AccessibilityObservables.swift */,
-				E225BD1423322A7700ECDEF4 /* ScrollMode.swift */,
-				E225BD1823325BB400ECDEF4 /* BaseMode.swift */,
+				E225BD2D2334E96B00ECDEF4 /* Command.swift */,
 			);
 			path = "ViMac-Swift";
 			sourceTree = "<group>";
@@ -460,17 +454,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E225BD2E2334E96B00ECDEF4 /* Command.swift in Sources */,
 				E261725A2324EC7100E396CA /* OverlayWindow.swift in Sources */,
 				E2F6C9B1232E337500F2975B /* OverlayTextField.swift in Sources */,
 				E2F6C9AF232DEA1800F2975B /* Utils.swift in Sources */,
 				E25F8711233222A9007AA958 /* AccessibilityObservables.swift in Sources */,
-				E225BD1923325BB400ECDEF4 /* BaseMode.swift in Sources */,
 				E2069700232A52EA001EFDB2 /* AlphabetHints.swift in Sources */,
-				E225BD1523322A7700ECDEF4 /* ScrollMode.swift in Sources */,
 				E225BD25233365C100ECDEF4 /* PreferencesTabViewController.swift in Sources */,
 				E20696F923290D41001EFDB2 /* Log.swift in Sources */,
 				E26172542323D97700E396CA /* BorderView.swift in Sources */,
-				E225BD172332457400ECDEF4 /* HintMode.swift in Sources */,
 				E225BD1D233292B800ECDEF4 /* StatusItemManager.swift in Sources */,
 				E225BD282333700D00ECDEF4 /* PreferencesWindowController.swift in Sources */,
 				E26172242322968500E396CA /* AppDelegate.swift in Sources */,
