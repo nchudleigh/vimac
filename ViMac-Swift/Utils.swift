@@ -19,8 +19,10 @@ class Utils: NSObject {
     // but the coordinate system in macOS starts from bottom-left.
     // https://developer.apple.com/documentation/applicationservices/kaxpositionattribute?language=objc
     static func toOrigin(point: CGPoint, size: CGSize) -> CGPoint {
-        let screenHeight = NSScreen.screens.first?.frame.size.height
-        return CGPoint(x: point.x, y: screenHeight! - size.height - point.y)
+        // cannot use NSScreen.main because the height of the global coordinate system can be larger
+        // see: https://stackoverflow.com/a/45289010/10390454
+        let screenHeight = NSScreen.screens.map { $0.frame.origin.y + $0.frame.height }.max()!
+        return CGPoint(x: point.x, y: screenHeight - size.height - point.y)
     }
     
     static func moveMouse(position: CGPoint) {

@@ -188,10 +188,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         textField.sizeToFit()
         textField.setFrameSize(NSSize(width: 530, height: textField.frame.height))
-        
+
         textField.setFrameOrigin(NSPoint(
-            x: (NSScreen.screens.first!.frame.width / 2) - (textField.frame.width / 2),
-            y: (NSScreen.screens.first!.frame.height / 2) + (textField.frame.height / 2)
+            x: (NSScreen.main!.frame.width / 2) - (textField.frame.width / 2),
+            y: (NSScreen.main!.frame.height / 2) + (textField.frame.height / 2)
         ))
         
         self.overlayWindowController.window?.contentView?.addSubview(textField)
@@ -201,7 +201,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func resizeOverlayWindow() {
-        overlayWindowController.window!.setFrame(NSScreen.screens.first!.frame, display: true, animate: false)
+        overlayWindowController.window!.setFrame(NSScreen.main!.frame, display: true, animate: false)
     }
     
     func setHintSelectorMode(command: Command) {
@@ -224,8 +224,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     let text = HintView(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
                     text.initializeHint(hintText: hintStrings[index], typed: "")
                     let positionRelativeToScreen = Utils.toOrigin(point: positionFlipped, size: text.frame.size)
+                    let positionRelativeToWindow = window.convertPoint(fromScreen: positionRelativeToScreen)
                     text.associatedButton = button
-                    text.frame.origin = positionRelativeToScreen
+                    text.frame.origin = positionRelativeToWindow
                     return text
                 }
                 return nil
