@@ -309,8 +309,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             } else if command == .rightClick {
                 Utils.rightClickMouse(position: centerPosition)
             } else if command == .doubleLeftClick {
-                Utils.leftClickMouse(position: centerPosition)
-                Utils.leftClickMouse(position: centerPosition)
+                Utils.doubleLeftClickMouse(position: centerPosition)
             }
             
             

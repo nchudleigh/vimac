@@ -31,6 +31,20 @@ class Utils: NSObject {
         event2?.post(tap: .cgSessionEventTap)
     }
     
+    static func doubleLeftClickMouse(position: CGPoint) {
+        let event = CGEvent(mouseEventSource: nil, mouseType: .leftMouseDown, mouseCursorPosition: position, mouseButton: .left)
+        event?.post(tap: .cgSessionEventTap)
+        event?.type = .leftMouseUp
+        event?.post(tap: .cgSessionEventTap)
+        
+        event?.setIntegerValueField(.mouseEventClickState, value: 2)
+        
+        event?.type = .leftMouseDown
+        event?.post(tap: .cgSessionEventTap)
+        event?.type = .leftMouseUp
+        event?.post(tap: .cgSessionEventTap)
+    }
+    
     static func rightClickMouse(position: CGPoint) {
         let event = CGEvent(mouseEventSource: nil, mouseType: .rightMouseDown, mouseCursorPosition: position, mouseButton: .right)
         let event2 = CGEvent(mouseEventSource: nil, mouseType: .rightMouseUp, mouseCursorPosition: position, mouseButton: .right)
