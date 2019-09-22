@@ -739,10 +739,10 @@
             </objects>
             <point key="canvasLocation" x="-757" y="-33"/>
         </scene>
-        <!--Scroll Mode-->
+        <!--General-->
         <scene sceneID="xFM-46-YiN">
             <objects>
-                <viewController title="Scroll Mode" storyboardIdentifier="scroll_mode" id="Xcg-2B-Laa" sceneMemberID="viewController">
+                <viewController title="General" storyboardIdentifier="scroll_mode" id="Xcg-2B-Laa" sceneMemberID="viewController">
                     <view key="view" id="lIT-PR-R6C">
                         <rect key="frame" x="0.0" y="0.0" width="480" height="270"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -752,17 +752,20 @@
                                 <autoresizingMask key="autoresizingMask"/>
                                 <subviews>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Qo4-fk-AmF">
-                                        <rect key="frame" x="99" y="231" width="124" height="17"/>
+                                        <rect key="frame" x="80" y="226" width="162" height="17"/>
                                         <autoresizingMask key="autoresizingMask"/>
-                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Toggle Scroll Mode:" id="WAN-yn-gNa">
+                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Enter Command Shortcut:" id="WAN-yn-gNa">
                                             <font key="font" usesAppearanceFont="YES"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
-                                    <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="GVY-1h-CEw" customClass="MASShortcutView">
-                                        <rect key="frame" x="229" y="230" width="150" height="20"/>
+                                    <customView identifier="command_shortcut_id" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="GVY-1h-CEw" customClass="MASShortcutView">
+                                        <rect key="frame" x="248" y="223" width="150" height="20"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        <connections>
+                                            <binding destination="Xcg-2B-Laa" name="hidden" keyPath="self.currentWindowController" id="Szc-Qw-DtP"/>
+                                        </connections>
                                     </customView>
                                 </subviews>
                             </visualEffectView>
