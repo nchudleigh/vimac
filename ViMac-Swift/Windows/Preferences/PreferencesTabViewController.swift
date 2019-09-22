@@ -9,8 +9,6 @@
 import Cocoa
 
 class PreferencesTabViewController: NSTabViewController {
-    var currentTabViewController: NSViewController?
-    var currentWindowController: NSWindowController?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -18,12 +16,6 @@ class PreferencesTabViewController: NSTabViewController {
     }
     
     override func viewWillAppear() {
-//        let storyboard = NSStoryboard.init(name: "Main", bundle: nil)
-//        currentWindowController = storyboard.instantiateController(withIdentifier: "PreferencesWindowController") as! NSWindowController
-//        currentTabViewController = storyboard.instantiateController(withIdentifier: "scroll_mode") as! NSViewController
-//        let currentWindowRect = currentWindowController!.window!.frame
-//        let generalSize = NSMakeRect(currentWindowRect.origin.x, currentWindowRect.origin.y, 450, 265)
-//        currentWindowController!.window!.setFrame(generalSize, display: true, animate: true)
     }
     
 }
