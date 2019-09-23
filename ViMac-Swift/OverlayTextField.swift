@@ -10,6 +10,7 @@ import Cocoa
 
 class OverlayTextField: NSTextField {
     var command: Command?
+    weak var overlayTextFieldDelegate: OverlayTextFieldDelegate?
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
@@ -30,4 +31,12 @@ class OverlayTextField: NSTextField {
         
         return responderStatus;
     }
+    
+    override func cancelOperation(_ sender: Any?) {
+        self.overlayTextFieldDelegate?.onEscape()
+    }
+}
+
+protocol OverlayTextFieldDelegate: AnyObject {
+    func onEscape() -> Void
 }
