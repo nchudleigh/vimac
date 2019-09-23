@@ -168,6 +168,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         textField.placeholderString = "Enter Command"
         textField.isEditable = true
         textField.delegate = self
+        textField.overlayTextFieldDelegate = self
         textField.tag = AppDelegate.NORMAL_MODE_TEXT_FIELD_TAG
         
         textField.font = NSFont.systemFont(ofSize: NSFont.systemFontSize)
@@ -243,6 +244,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         selectorTextField.isHidden = true
         selectorTextField.tag = AppDelegate.HINT_SELECTOR_TEXT_FIELD_TAG
         selectorTextField.command = command
+        selectorTextField.overlayTextFieldDelegate = self
         window.contentView?.addSubview(selectorTextField)
         self.overlayWindowController.showWindow(nil)
         window.makeKeyAndOrderFront(nil)
@@ -375,5 +377,11 @@ extension AppDelegate : NSTextFieldDelegate {
         default:
             return
         }
+    }
+}
+
+extension AppDelegate : OverlayTextFieldDelegate {
+    func onEscape() {
+        self.hideOverlays()
     }
 }
