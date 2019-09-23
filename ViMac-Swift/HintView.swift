@@ -46,7 +46,7 @@ class HintView: NSTextField {
         self.layer?.borderColor = HintView.borderColor.cgColor
         self.layer?.borderWidth = 1
         self.layer?.cornerRadius = 5
-        self.font = NSFont.boldSystemFont(ofSize: NSFont.systemFontSize)
+        self.font = NSFont.boldSystemFont(ofSize: 12)
         
         self.sizeToFit()
     }
