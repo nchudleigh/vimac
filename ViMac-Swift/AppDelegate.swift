@@ -215,7 +215,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         self.resizeOverlayWindow()
 
-        let pressableElements = Utils.traverseUIElementForPressables(rootElement: applicationWindow)
+        let pressableElementsOptional = Utils.traverseUIElementForPressables(rootElement: applicationWindow)
+        guard let pressableElements = pressableElementsOptional else {
+            print("traversal failed")
+            self.hideOverlays()
+            return
+        }
+        
         let hintStrings = AlphabetHints().hintStrings(linkCount: pressableElements.count)
 
         let hintViews: [HintView] = pressableElements

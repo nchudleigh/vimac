@@ -58,8 +58,18 @@ class Utils: NSObject {
         event2?.post(tap: .cgSessionEventTap)
     }
     
-    static func traverseUIElementForPressables(rootElement: UIElement) -> [UIElement] {
-        let windowFrame: NSRect = (try! rootElement.attribute(.frame))!
+    static func traverseUIElementForPressables(rootElement: UIElement) -> [UIElement]? {
+        let windowFrameOptional: NSRect? = {
+            do {
+                return try rootElement.attribute(.frame)
+            } catch {
+                return nil
+            }
+        }()
+        
+        guard let windowFrame = windowFrameOptional else {
+            return nil
+        }
         
         var elements = [UIElement]()
         func fn(element: UIElement, level: Int) -> Void {
