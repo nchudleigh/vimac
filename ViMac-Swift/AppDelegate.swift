@@ -366,9 +366,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 Utils.rightClickMouse(position: centerPosition)
             } else if command == .doubleLeftClick {
                 Utils.doubleLeftClickMouse(position: centerPosition)
+            } else if command == .move {
+                Utils.moveMouse(position: centerPosition)
             }
-            
-            
             return
         }
         
@@ -394,6 +394,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             return Command.doubleLeftClick
         case "rce":
             return Command.rightClick
+        case "me":
+            return Command.move
         default:
             return nil
         }
