@@ -256,11 +256,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             window.contentView!.addSubview(view)
         }
         
-        let selectorTextField = OverlayTextField(frame: NSRect(x: 0, y: 0, width: 50, height: 50))
+        let selectorTextField = OverlayTextField(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
         selectorTextField.stringValue = ""
         selectorTextField.isEditable = true
         selectorTextField.delegate = self
-        //selectorTextField.isHidden = true
+        selectorTextField.isHidden = true
         selectorTextField.tag = AppDelegate.HINT_SELECTOR_TEXT_FIELD_TAG
         selectorTextField.command = command
         selectorTextField.overlayTextFieldDelegate = self
