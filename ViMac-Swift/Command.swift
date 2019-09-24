@@ -11,5 +11,6 @@ import Cocoa
 enum Command { case
     leftClick,
     rightClick,
-    doubleLeftClick
+    doubleLeftClick,
+    move
 }
