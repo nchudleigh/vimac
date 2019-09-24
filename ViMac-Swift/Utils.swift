@@ -89,10 +89,23 @@ class Utils: NSObject {
                 }
             }()
             
-            // ignore subcomponents of a scrollbar
             if let role = roleOptional {
+                // ignore subcomponents of a scrollbar
                 if role == .scrollBar {
                     return
+                }
+                
+                // ignore rows that are out of window frame
+                // doing this improves traversal speed significantly because we do not look at
+                // children elements that most likely are out of frame
+                if role == .row {
+                    if let position = positionOptional {
+                        if (!windowFrame.contains(position)) {
+                            return
+                        }
+                    } else {
+                        return
+                    }
                 }
             }
             
