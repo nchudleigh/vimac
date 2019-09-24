@@ -16,6 +16,7 @@ class HintView: NSTextField {
     static let typedHintColor = NSColor(red: 212 / 255, green: 172 / 255, blue: 58 / 255, alpha: 1)
     
     var associatedButton: UIElement?
+    var zIndex: Int?
     
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
@@ -46,7 +47,7 @@ class HintView: NSTextField {
         self.layer?.borderColor = HintView.borderColor.cgColor
         self.layer?.borderWidth = 1
         self.layer?.cornerRadius = 5
-        self.font = NSFont.boldSystemFont(ofSize: NSFont.systemFontSize)
+        self.font = NSFont.boldSystemFont(ofSize: 10)
         
         self.sizeToFit()
     }

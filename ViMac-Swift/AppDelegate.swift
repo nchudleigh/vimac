@@ -156,8 +156,20 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func hideOverlays() {
         print("hiding overlays")
         self.overlayWindowController.close()
+        self.removeSubviews()
+    }
+    
+    func removeSubviews() {
         self.overlayWindowController.window?.contentView?.subviews.forEach({ view in
             view.removeFromSuperview()
+        })
+    }
+    
+    func removeHints() {
+        self.overlayWindowController.window?.contentView?.subviews.forEach({ view in
+            if view is HintView {
+                view.removeFromSuperview()
+            }
         })
     }
     
@@ -215,7 +227,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         self.resizeOverlayWindow()
 
-        let pressableElements = Utils.traverseUIElementForPressables(rootElement: applicationWindow)
+        let pressableElementsOptional = Utils.traverseUIElementForPressables(rootElement: applicationWindow)
+        guard let pressableElements = pressableElementsOptional else {
+            print("traversal failed")
+            self.hideOverlays()
+            return
+        }
+        
         let hintStrings = AlphabetHints().hintStrings(linkCount: pressableElements.count)
 
         let hintViews: [HintView] = pressableElements
@@ -228,6 +246,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     let positionRelativeToWindow = window.convertPoint(fromScreen: positionRelativeToScreen)
                     text.associatedButton = button
                     text.frame.origin = positionRelativeToWindow
+                    text.zIndex = index
                     return text
                 }
                 return nil
@@ -237,11 +256,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             window.contentView!.addSubview(view)
         }
         
-        let selectorTextField = OverlayTextField(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
+        let selectorTextField = OverlayTextField(frame: NSRect(x: 0, y: 0, width: 50, height: 50))
         selectorTextField.stringValue = ""
         selectorTextField.isEditable = true
         selectorTextField.delegate = self
-        selectorTextField.isHidden = true
+        //selectorTextField.isHidden = true
         selectorTextField.tag = AppDelegate.HINT_SELECTOR_TEXT_FIELD_TAG
         selectorTextField.command = command
         selectorTextField.overlayTextFieldDelegate = self
@@ -269,6 +288,24 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
     
+    // randomly rotate hints
+    // ideally we group them into clusters of intersecting hints and rotate within those clusters
+    // but this is just a quick fast hack
+    func rotateHints() {
+        guard let window = self.overlayWindowController.window,
+            let hintViews = window.contentView?.subviews.filter ({ $0 is HintView }) as! [HintView]? else {
+                self.hideOverlays()
+                return
+        }
+        
+        self.removeHints()
+        let shuffledHintViews = hintViews.shuffled()
+        for (index, hintView) in shuffledHintViews.enumerated() {
+            hintView.zIndex = index
+            window.contentView?.addSubview(hintView)
+        }
+    }
+    
     func onHintSelectorTextChange(textField: OverlayTextField) {
         let typed = textField.stringValue
         guard let window = self.overlayWindowController.window,
@@ -278,6 +315,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             self.hideOverlays()
             return
         }
+        
+        if let lastCharacter = typed.last {
+            if lastCharacter == " " {
+                textField.stringValue = textField.stringValue.trimmingCharacters(in: .whitespacesAndNewlines)
+                self.rotateHints()
+                return
+            }
+        }
+        
         let matchingHints = hintViews.filter { hintView in
             return hintView.stringValue.starts(with: typed.uppercased())
         }
