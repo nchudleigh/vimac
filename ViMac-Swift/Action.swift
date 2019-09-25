@@ -8,7 +8,7 @@
 
 import Cocoa
 
-enum Command { case
+enum Action { case
     leftClick,
     rightClick,
     doubleLeftClick,

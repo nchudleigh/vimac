@@ -9,7 +9,7 @@
 import Cocoa
 
 class OverlayTextField: NSTextField {
-    var command: Command?
+    var command: Action?
     weak var overlayTextFieldDelegate: OverlayTextFieldDelegate?
     
     required init?(coder: NSCoder) {

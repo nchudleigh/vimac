@@ -217,7 +217,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         overlayWindowController.window!.setFrame(NSScreen.main!.frame, display: true, animate: false)
     }
     
-    func setHintSelectorMode(command: Command) {
+    func setHintSelectorMode(command: Action) {
         guard let applicationWindow = try! self.windowSubject.value(),
             let window = self.overlayWindowController.window else {
             print("Failed to set Hint Selector")
@@ -227,16 +227,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         self.resizeOverlayWindow()
 
-        let pressableElementsOptional = Utils.traverseUIElementForPressables(rootElement: applicationWindow)
-        guard let pressableElements = pressableElementsOptional else {
+        let elementsOptional = Utils.traverseUIElementForPressables(rootElement: applicationWindow)
+        let menuBarItems = Utils.traverseForMenuBarItems(windowElement: applicationWindow)
+        guard let elements = elementsOptional else {
             print("traversal failed")
             self.hideOverlays()
             return
         }
         
-        let hintStrings = AlphabetHints().hintStrings(linkCount: pressableElements.count)
+        let allElements = elements + menuBarItems
+        
+        let hintStrings = AlphabetHints().hintStrings(linkCount: allElements.count)
 
-        let hintViews: [HintView] = pressableElements
+        let hintViews: [HintView] = allElements
             .enumerated()
             .map { (index, button) in
                 if let positionFlipped: CGPoint = try! button.attribute(.position) {
@@ -385,17 +388,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         self.setHintSelectorMode(command: command)
     }
     
-    func parseInput(input: String) -> Command? {
+    func parseInput(input: String) -> Action? {
         let inputTrimmed = input.trimmingCharacters(in: .whitespacesAndNewlines)
         switch inputTrimmed {
         case "ce":
-            return Command.leftClick
+            return Action.leftClick
         case "dce":
-            return Command.doubleLeftClick
+            return Action.doubleLeftClick
         case "rce":
-            return Command.rightClick
+            return Action.rightClick
         case "me":
-            return Command.move
+            return Action.move
         default:
             return nil
         }
