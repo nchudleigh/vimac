@@ -65,16 +65,16 @@
 		E225BD2D2334E96B00ECDEF4 /* Action.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Action.swift; sourceTree = "<group>"; };
 		E225BD312337763E00ECDEF4 /* PreferencesGeneralViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesGeneralViewController.swift; sourceTree = "<group>"; };
 		E25F8710233222A9007AA958 /* AccessibilityObservables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessibilityObservables.swift; sourceTree = "<group>"; };
-		E26172202322968500E396CA /* ViMac-Swift.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ViMac-Swift.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		E26172202322968500E396CA /* Vimac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Vimac.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E26172232322968500E396CA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E26172272322968600E396CA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E261722A2322968700E396CA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		E261722C2322968700E396CA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E261722D2322968700E396CA /* ViMac_Swift.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ViMac_Swift.entitlements; sourceTree = "<group>"; };
-		E26172322322968700E396CA /* ViMac-SwiftTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "ViMac-SwiftTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		E26172322322968700E396CA /* VimacTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VimacTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E26172362322968700E396CA /* ViMac_SwiftTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViMac_SwiftTests.swift; sourceTree = "<group>"; };
 		E26172382322968700E396CA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		E261723D2322968700E396CA /* ViMac-SwiftUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "ViMac-SwiftUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		E261723D2322968700E396CA /* VimacUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VimacUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E26172412322968700E396CA /* ViMac_SwiftUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViMac_SwiftUITests.swift; sourceTree = "<group>"; };
 		E26172432322968700E396CA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E26172532323D97700E396CA /* BorderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BorderView.swift; sourceTree = "<group>"; };
@@ -169,9 +169,9 @@
 		E26172212322968500E396CA /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				E26172202322968500E396CA /* ViMac-Swift.app */,
-				E26172322322968700E396CA /* ViMac-SwiftTests.xctest */,
-				E261723D2322968700E396CA /* ViMac-SwiftUITests.xctest */,
+				E26172202322968500E396CA /* Vimac.app */,
+				E26172322322968700E396CA /* VimacTests.xctest */,
+				E261723D2322968700E396CA /* VimacUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -221,9 +221,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		E261721F2322968500E396CA /* ViMac-Swift */ = {
+		E261721F2322968500E396CA /* Vimac */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = E26172462322968700E396CA /* Build configuration list for PBXNativeTarget "ViMac-Swift" */;
+			buildConfigurationList = E26172462322968700E396CA /* Build configuration list for PBXNativeTarget "Vimac" */;
 			buildPhases = (
 				C866A9206DEAC8C4FB4F7614 /* [CP] Check Pods Manifest.lock */,
 				E261721C2322968500E396CA /* Sources */,
@@ -236,14 +236,14 @@
 			);
 			dependencies = (
 			);
-			name = "ViMac-Swift";
+			name = Vimac;
 			productName = "ViMac-Swift";
-			productReference = E26172202322968500E396CA /* ViMac-Swift.app */;
+			productReference = E26172202322968500E396CA /* Vimac.app */;
 			productType = "com.apple.product-type.application";
 		};
-		E26172312322968700E396CA /* ViMac-SwiftTests */ = {
+		E26172312322968700E396CA /* VimacTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = E26172492322968700E396CA /* Build configuration list for PBXNativeTarget "ViMac-SwiftTests" */;
+			buildConfigurationList = E26172492322968700E396CA /* Build configuration list for PBXNativeTarget "VimacTests" */;
 			buildPhases = (
 				3C4D217A48C92E5ED6CFCFCE /* [CP] Check Pods Manifest.lock */,
 				E261722E2322968700E396CA /* Sources */,
@@ -255,14 +255,14 @@
 			dependencies = (
 				E26172342322968700E396CA /* PBXTargetDependency */,
 			);
-			name = "ViMac-SwiftTests";
+			name = VimacTests;
 			productName = "ViMac-SwiftTests";
-			productReference = E26172322322968700E396CA /* ViMac-SwiftTests.xctest */;
+			productReference = E26172322322968700E396CA /* VimacTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		E261723C2322968700E396CA /* ViMac-SwiftUITests */ = {
+		E261723C2322968700E396CA /* VimacUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = E261724C2322968700E396CA /* Build configuration list for PBXNativeTarget "ViMac-SwiftUITests" */;
+			buildConfigurationList = E261724C2322968700E396CA /* Build configuration list for PBXNativeTarget "VimacUITests" */;
 			buildPhases = (
 				354056FB8495D479A001573E /* [CP] Check Pods Manifest.lock */,
 				E26172392322968700E396CA /* Sources */,
@@ -274,9 +274,9 @@
 			dependencies = (
 				E261723F2322968700E396CA /* PBXTargetDependency */,
 			);
-			name = "ViMac-SwiftUITests";
+			name = VimacUITests;
 			productName = "ViMac-SwiftUITests";
-			productReference = E261723D2322968700E396CA /* ViMac-SwiftUITests.xctest */;
+			productReference = E261723D2322968700E396CA /* VimacUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -302,7 +302,7 @@
 					};
 				};
 			};
-			buildConfigurationList = E261721B2322968500E396CA /* Build configuration list for PBXProject "ViMac-Swift" */;
+			buildConfigurationList = E261721B2322968500E396CA /* Build configuration list for PBXProject "Vimac" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -315,9 +315,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				E261721F2322968500E396CA /* ViMac-Swift */,
-				E26172312322968700E396CA /* ViMac-SwiftTests */,
-				E261723C2322968700E396CA /* ViMac-SwiftUITests */,
+				E261721F2322968500E396CA /* Vimac */,
+				E26172312322968700E396CA /* VimacTests */,
+				E261723C2322968700E396CA /* VimacUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -495,12 +495,12 @@
 /* Begin PBXTargetDependency section */
 		E26172342322968700E396CA /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = E261721F2322968500E396CA /* ViMac-Swift */;
+			target = E261721F2322968500E396CA /* Vimac */;
 			targetProxy = E26172332322968700E396CA /* PBXContainerItemProxy */;
 		};
 		E261723F2322968700E396CA /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = E261721F2322968500E396CA /* ViMac-Swift */;
+			target = E261721F2322968500E396CA /* Vimac */;
 			targetProxy = E261723E2322968700E396CA /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -645,7 +645,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "dexterleng.ViMac-Swift";
+				PRODUCT_BUNDLE_IDENTIFIER = dexterleng.vimac;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 			};
@@ -664,7 +664,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "dexterleng.ViMac-Swift";
+				PRODUCT_BUNDLE_IDENTIFIER = dexterleng.vimac;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 			};
@@ -687,7 +687,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "dexterleng.ViMac-SwiftTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ViMac-Swift.app/Contents/MacOS/ViMac-Swift";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Vimac.app/Contents/MacOS/Vimac";
 			};
 			name = Debug;
 		};
@@ -708,7 +708,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "dexterleng.ViMac-SwiftTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ViMac-Swift.app/Contents/MacOS/ViMac-Swift";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Vimac.app/Contents/MacOS/Vimac";
 			};
 			name = Release;
 		};
@@ -755,7 +755,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		E261721B2322968500E396CA /* Build configuration list for PBXProject "ViMac-Swift" */ = {
+		E261721B2322968500E396CA /* Build configuration list for PBXProject "Vimac" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E26172442322968700E396CA /* Debug */,
@@ -764,7 +764,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		E26172462322968700E396CA /* Build configuration list for PBXNativeTarget "ViMac-Swift" */ = {
+		E26172462322968700E396CA /* Build configuration list for PBXNativeTarget "Vimac" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E26172472322968700E396CA /* Debug */,
@@ -773,7 +773,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		E26172492322968700E396CA /* Build configuration list for PBXNativeTarget "ViMac-SwiftTests" */ = {
+		E26172492322968700E396CA /* Build configuration list for PBXNativeTarget "VimacTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E261724A2322968700E396CA /* Debug */,
@@ -782,7 +782,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		E261724C2322968700E396CA /* Build configuration list for PBXNativeTarget "ViMac-SwiftUITests" */ = {
+		E261724C2322968700E396CA /* Build configuration list for PBXNativeTarget "VimacUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E261724D2322968700E396CA /* Debug */,
