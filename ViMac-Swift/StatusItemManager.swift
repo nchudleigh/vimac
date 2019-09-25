@@ -7,6 +7,7 @@
 //
 
 import Cocoa
+import Sparkle
 
 class StatusItemManager: NSMenu, NSMenuDelegate {
     static let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
@@ -26,6 +27,7 @@ class StatusItemManager: NSMenu, NSMenuDelegate {
         if let menu = StatusItemManager.statusItem.menu {
             menu.removeAllItems()
             menu.addItem(withTitle: "Preferences", action: #selector(preferencesClick), keyEquivalent: "").target = self
+            menu.addItem(withTitle: "Check for updates", action: #selector(checkForUpdatesClick), keyEquivalent: "").target = self
             menu.addItem(NSMenuItem.separator())
             menu.addItem(withTitle: "Quit", action: #selector(quitClick), keyEquivalent: "").target = self
         }
@@ -37,6 +39,10 @@ class StatusItemManager: NSMenu, NSMenuDelegate {
         NSApp.activate(ignoringOtherApps: true)
         controller?.showWindow(nil)
         controller?.window?.makeKeyAndOrderFront(nil)
+    }
+    
+    @objc func checkForUpdatesClick() {
+        SUUpdater.shared()?.checkForUpdates(nil)
     }
     
     @objc func quitClick() {

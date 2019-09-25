@@ -11,6 +11,7 @@ import AXSwift
 import RxSwift
 import MASShortcut
 import os
+import Sparkle
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
@@ -108,6 +109,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             NSRunningApplication.current.terminate()
             return
         }
+        
+        SUUpdater.shared()?.delegate = self
+        SUUpdater.shared()?.sendsSystemProfile = true
+        SUUpdater.shared()?.checkForUpdatesInBackground()
 
         self.compositeDisposable.insert(applicationNotificationObservable
             .observeOn(MainScheduler.instance)
@@ -407,6 +412,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationWillTerminate(_ aNotification: Notification) {
         self.compositeDisposable.dispose()
     }
+}
+
+extension AppDelegate : SUUpdaterDelegate {
 }
 
 extension AppDelegate : NSTextFieldDelegate {
