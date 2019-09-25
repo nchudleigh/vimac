@@ -11,6 +11,7 @@ target 'ViMac-Swift' do
   pod 'RxSwift', '~> 5'
   pod 'RxCocoa', '~> 5'
   pod 'MASShortcut'
+  pod 'Sparkle'
 
   target 'ViMac-SwiftTests' do
     inherit! :search_paths
