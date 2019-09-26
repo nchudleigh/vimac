@@ -113,6 +113,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         SUUpdater.shared()?.delegate = self
         SUUpdater.shared()?.sendsSystemProfile = true
         SUUpdater.shared()?.checkForUpdatesInBackground()
+        
+        self.compositeDisposable.insert(applicationObservable
+            .observeOn(MainScheduler.instance)
+            .subscribe(onNext: { app in
+                os_log("Current frontmost application: %@", log: Log.accessibility, String(describing: app))
+            })
+        )
 
         self.compositeDisposable.insert(applicationNotificationObservable
             .observeOn(MainScheduler.instance)
@@ -222,8 +229,24 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         overlayWindowController.window!.setFrame(NSScreen.main!.frame, display: true, animate: false)
     }
     
+    func getCurrentApplicationWindowManually() -> UIElement? {
+        guard let nsApplication = NSWorkspace.shared.frontmostApplication else {
+            return nil
+        }
+        
+        return {
+            do {
+                return try Application.init(nsApplication)?.attribute(.focusedWindow)
+            } catch {
+                return nil
+            }
+        }()
+    }
+    
     func setHintSelectorMode(command: Action) {
-        guard let applicationWindow = try! self.windowSubject.value(),
+        // if windowSubject does not have the current window, retrieve the current window directly
+        // This fixes a bug where opening an application with Vimac causes windowSubject value to be nil
+        guard let applicationWindow = (try! self.windowSubject.value()) ?? self.getCurrentApplicationWindowManually(),
             let window = self.overlayWindowController.window else {
             print("Failed to set Hint Selector")
             self.hideOverlays()

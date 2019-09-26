@@ -20,24 +20,32 @@ class AccessibilityObservables: NSObject {
     }
     
     static func createApplicationObservable() -> Observable<Application?> {
-        return Observable.create { observer in
-            let center = NSWorkspace.shared.notificationCenter
-            center.addObserver(forName: NSWorkspace.didDeactivateApplicationNotification, object: nil, queue: nil) { notification in
-                if let nsApplication = NSWorkspace.shared.frontmostApplication,
-                    let application = Application.init(nsApplication) {
-                    os_log("Current frontmost application: %@", log: Log.accessibility, String(describing: application))
-                    observer.on(.next(application))
-                } else {
-                    os_log("Current frontmost application: nil", log: Log.accessibility)
-                    observer.on(.next(nil))
-                }
+        let nsApplicationObservable: Observable<NSRunningApplication?> = Observable.create { observer in
+            func onApplicationChange() -> Void {
+                observer.on(.next(NSWorkspace.shared.frontmostApplication))
             }
+            
+            let center = NSWorkspace.shared.notificationCenter
+            center.addObserver(forName: NSWorkspace.didActivateApplicationNotification, object: nil, queue: nil) { notification in
+                onApplicationChange()
+            }
+            center.addObserver(forName: NSWorkspace.didDeactivateApplicationNotification, object: nil, queue: nil) { notification in
+                onApplicationChange()
+            }
+            
             let cancel = Disposables.create {
                 center.removeObserver(self)
                 os_log("Removed application observer", log: Log.accessibility)
             }
             
             return cancel
+        }.distinctUntilChanged()
+        return nsApplicationObservable
+            .map { nsAppOptional in
+                guard let nsApp = nsAppOptional else {
+                    return nil
+                }
+                return Application.init(nsApp)
         }
     }
     
