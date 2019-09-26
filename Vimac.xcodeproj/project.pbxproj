@@ -28,6 +28,7 @@
 		E2F6C9AD232DE89F00F2975B /* HintView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2F6C9AC232DE89F00F2975B /* HintView.swift */; };
 		E2F6C9AF232DEA1800F2975B /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2F6C9AE232DEA1800F2975B /* Utils.swift */; };
 		E2F6C9B1232E337500F2975B /* OverlayTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2F6C9B0232E337500F2975B /* OverlayTextField.swift */; };
+		E2FB1B3D233CCE10009B04D3 /* KeyPosition.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2FB1B3B233CCE10009B04D3 /* KeyPosition.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -82,6 +83,7 @@
 		E2F6C9AC232DE89F00F2975B /* HintView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HintView.swift; sourceTree = "<group>"; };
 		E2F6C9AE232DEA1800F2975B /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		E2F6C9B0232E337500F2975B /* OverlayTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayTextField.swift; sourceTree = "<group>"; };
+		E2FB1B3B233CCE10009B04D3 /* KeyPosition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyPosition.swift; sourceTree = "<group>"; };
 		EA6A7F7F788AC590C0151C42 /* Pods_ViMac_SwiftUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ViMac_SwiftUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -196,6 +198,7 @@
 				E2F6C9B0232E337500F2975B /* OverlayTextField.swift */,
 				E25F8710233222A9007AA958 /* AccessibilityObservables.swift */,
 				E225BD2D2334E96B00ECDEF4 /* Action.swift */,
+				E2FB1B3B233CCE10009B04D3 /* KeyPosition.swift */,
 			);
 			path = "ViMac-Swift";
 			sourceTree = "<group>";
@@ -462,6 +465,7 @@
 				E2F6C9B1232E337500F2975B /* OverlayTextField.swift in Sources */,
 				E2F6C9AF232DEA1800F2975B /* Utils.swift in Sources */,
 				E25F8711233222A9007AA958 /* AccessibilityObservables.swift in Sources */,
+				E2FB1B3D233CCE10009B04D3 /* KeyPosition.swift in Sources */,
 				E2069700232A52EA001EFDB2 /* AlphabetHints.swift in Sources */,
 				E225BD25233365C100ECDEF4 /* PreferencesTabViewController.swift in Sources */,
 				E20696F923290D41001EFDB2 /* Log.swift in Sources */,

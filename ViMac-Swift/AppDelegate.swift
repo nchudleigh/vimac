@@ -291,7 +291,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         selectorTextField.stringValue = ""
         selectorTextField.isEditable = true
         selectorTextField.delegate = self
-        selectorTextField.isHidden = true
+        // selectorTextField.isHidden = true
         selectorTextField.tag = AppDelegate.HINT_SELECTOR_TEXT_FIELD_TAG
         selectorTextField.command = command
         selectorTextField.overlayTextFieldDelegate = self
@@ -299,6 +299,29 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         self.overlayWindowController.showWindow(nil)
         window.makeKeyAndOrderFront(nil)
         selectorTextField.becomeFirstResponder()
+    }
+    
+    let scrollModeDisposable = CompositeDisposable()
+    
+    func setScrollMode() {
+        let selectorTextField = OverlayTextField(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
+        selectorTextField.stringValue = ""
+        selectorTextField.isEditable = true
+        selectorTextField.delegate = self
+        selectorTextField.isHidden = true
+        selectorTextField.tag = 69
+        selectorTextField.overlayTextFieldDelegate = self
+        self.overlayWindowController.window?.contentView?.addSubview(selectorTextField)
+        
+        self.overlayWindowController.showWindow(nil)
+        self.overlayWindowController.window?.makeKeyAndOrderFront(nil)
+        selectorTextField.becomeFirstResponder()
+
+        scrollModeDisposable.insert(selectorTextField.observeCharacterEvent(character: "d")
+            .observeOn(MainScheduler.instance)
+            .subscribe(onNext: { keyAction in
+                
+            }))
     }
     
     func updateHints(typed: String) {
@@ -413,6 +436,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         guard let command = commandOptional else {
             return
         }
+        if command == .scroll {
+            self.setScrollMode()
+            return
+        }
         self.setHintSelectorMode(command: command)
     }
     
@@ -427,6 +454,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             return Action.rightClick
         case "me":
             return Action.move
+        case "s":
+            return Action.scroll
         default:
             return nil
         }

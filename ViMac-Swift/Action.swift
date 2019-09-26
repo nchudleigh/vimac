@@ -12,5 +12,6 @@ enum Action { case
     leftClick,
     rightClick,
     doubleLeftClick,
-    move
+    move,
+    scroll
 }
