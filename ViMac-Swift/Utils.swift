@@ -27,35 +27,45 @@ class Utils: NSObject {
     
     static func moveMouse(position: CGPoint) {
         let moveEvent = CGEvent(mouseEventSource: nil, mouseType: .mouseMoved, mouseCursorPosition: position, mouseButton: .left)
-        moveEvent?.post(tap: .cgSessionEventTap)
+        moveEvent?.post(tap: .cghidEventTap)
     }
     
     static func leftClickMouse(position: CGPoint) {
         let event = CGEvent(mouseEventSource: nil, mouseType: .leftMouseDown, mouseCursorPosition: position, mouseButton: .left)
         let event2 = CGEvent(mouseEventSource: nil, mouseType: .leftMouseUp, mouseCursorPosition: position, mouseButton: .left)
-        event?.post(tap: .cgSessionEventTap)
-        event2?.post(tap: .cgSessionEventTap)
+        // for some reason you need to do this for some application to recognize the click
+        // see: https://stackoverflow.com/a/2420366/10390454
+        event?.setIntegerValueField(.mouseEventClickState, value: 1)
+        event2?.setIntegerValueField(.mouseEventClickState, value: 1)
+        event?.post(tap: .cghidEventTap)
+        event2?.post(tap: .cghidEventTap)
     }
     
     static func doubleLeftClickMouse(position: CGPoint) {
         let event = CGEvent(mouseEventSource: nil, mouseType: .leftMouseDown, mouseCursorPosition: position, mouseButton: .left)
-        event?.post(tap: .cgSessionEventTap)
+        event?.setIntegerValueField(.mouseEventClickState, value: 1)
+        
+        event?.post(tap: .cghidEventTap)
         event?.type = .leftMouseUp
-        event?.post(tap: .cgSessionEventTap)
+        event?.post(tap: .cghidEventTap)
         
         event?.setIntegerValueField(.mouseEventClickState, value: 2)
         
         event?.type = .leftMouseDown
-        event?.post(tap: .cgSessionEventTap)
+        event?.post(tap: .cghidEventTap)
         event?.type = .leftMouseUp
-        event?.post(tap: .cgSessionEventTap)
+        event?.post(tap: .cghidEventTap)
     }
     
     static func rightClickMouse(position: CGPoint) {
         let event = CGEvent(mouseEventSource: nil, mouseType: .rightMouseDown, mouseCursorPosition: position, mouseButton: .right)
+        event?.setIntegerValueField(.mouseEventClickState, value: 1)
+        
         let event2 = CGEvent(mouseEventSource: nil, mouseType: .rightMouseUp, mouseCursorPosition: position, mouseButton: .right)
-        event?.post(tap: .cgSessionEventTap)
-        event2?.post(tap: .cgSessionEventTap)
+        event2?.setIntegerValueField(.mouseEventClickState, value: 1)
+        
+        event?.post(tap: .cghidEventTap)
+        event2?.post(tap: .cghidEventTap)
     }
     
     static func traverseUIElementForPressables(rootElement: UIElement) -> [UIElement]? {
