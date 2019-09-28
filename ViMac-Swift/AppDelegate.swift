@@ -319,22 +319,22 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         selectorTextField.becomeFirstResponder()
         
         scrollModeDisposable?.insert(
-            AccessibilityObservables.scrollObservable(textField: selectorTextField, character: "j", yAxis: -4, xAxis: 0, frequencyMilliseconds: 5)
+            AccessibilityObservables.scrollObservable(textField: selectorTextField, character: "j", yAxis: -20, xAxis: 0, frequencyMilliseconds: 20)
                 .subscribe()
         )
         
         scrollModeDisposable?.insert(
-            AccessibilityObservables.scrollObservable(textField: selectorTextField, character: "k", yAxis: 4, xAxis: 0, frequencyMilliseconds: 5)
+            AccessibilityObservables.scrollObservable(textField: selectorTextField, character: "k", yAxis: 20, xAxis: 0, frequencyMilliseconds: 20)
                 .subscribe()
         )
         
         scrollModeDisposable?.insert(
-            AccessibilityObservables.scrollObservable(textField: selectorTextField, character: "h", yAxis: 0, xAxis: 4, frequencyMilliseconds: 5)
+            AccessibilityObservables.scrollObservable(textField: selectorTextField, character: "h", yAxis: 0, xAxis: 20, frequencyMilliseconds: 20)
                 .subscribe()
         )
         
         scrollModeDisposable?.insert(
-            AccessibilityObservables.scrollObservable(textField: selectorTextField, character: "l", yAxis: 0, xAxis: -4, frequencyMilliseconds: 5)
+            AccessibilityObservables.scrollObservable(textField: selectorTextField, character: "l", yAxis: 0, xAxis: -20, frequencyMilliseconds: 20)
                 .subscribe()
         )
     }
