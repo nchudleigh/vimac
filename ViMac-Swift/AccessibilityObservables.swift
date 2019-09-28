@@ -94,6 +94,17 @@ class AccessibilityObservables: NSObject {
                     return Observable.just(Void())
                 }
 
+                // this event signifies the start of a trackpad scroll
+                // if an application did not receive this event, the scroll events below will not work
+                // the application only needs to receive this event once.
+                let event = CGEvent.init(scrollWheelEvent2Source: nil, units: .pixel, wheelCount: 1, wheel1: 0, wheel2: 0, wheel3: 0)!
+                event.setIntegerValueField(.scrollWheelEventIsContinuous, value: 1)
+                event.setIntegerValueField(.scrollWheelEventMomentumPhase, value: 0)
+                event.setIntegerValueField(.scrollWheelEventScrollPhase, value: 128)
+                event.setIntegerValueField(.scrollWheelEventPointDeltaAxis1, value: 0)
+                event.setIntegerValueField(.scrollWheelEventPointDeltaAxis2, value: 0)
+                event.post(tap: .cghidEventTap)
+
                 return Observable<Int>.interval(.milliseconds(frequencyMilliseconds), scheduler: MainScheduler.instance)
                     .map({ _ in Void() })
                     .do(onNext: { _ in
