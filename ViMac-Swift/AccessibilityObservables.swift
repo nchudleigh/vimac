@@ -86,4 +86,25 @@ class AccessibilityObservables: NSObject {
                 }
         }
     }
+    
+    static func scrollObservable(textField: OverlayTextField, character: Character, yAxis: Int64, xAxis: Int64, frequencyMilliseconds: Int) -> Observable<Void> {
+        return textField.observeCharacterEvent(character: character)
+            .flatMapLatest({ keyAction -> Observable<Void>in
+                if keyAction.keyPosition == .keyUp {
+                    return Observable.just(Void())
+                }
+
+                return Observable<Int>.interval(.milliseconds(frequencyMilliseconds), scheduler: MainScheduler.instance)
+                    .map({ _ in Void() })
+                    .do(onNext: { _ in
+                        let event = CGEvent.init(scrollWheelEvent2Source: nil, units: .pixel, wheelCount: 1, wheel1: 0, wheel2: 0, wheel3: 0)!
+                        event.setIntegerValueField(.scrollWheelEventIsContinuous, value: 1)
+                        event.setIntegerValueField(.scrollWheelEventMomentumPhase, value: 0)
+                        event.setIntegerValueField(.scrollWheelEventScrollPhase, value: 2)
+                        event.setIntegerValueField(.scrollWheelEventPointDeltaAxis1, value: yAxis)
+                        event.setIntegerValueField(.scrollWheelEventPointDeltaAxis2, value: xAxis)
+                        event.post(tap: .cghidEventTap)
+                    })
+            })
+    }
 }

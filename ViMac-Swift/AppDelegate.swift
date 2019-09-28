@@ -317,43 +317,22 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         selectorTextField.becomeFirstResponder()
         
         scrollModeDisposable?.insert(
-            selectorTextField.observeCharacterEvent(character: "j")
-                .flatMapLatest({ keyAction -> Observable<Void>in
-                    if keyAction.keyPosition == .keyUp {
-                        return Observable.just(Void())
-                    }
-                    
-                    let event = CGEvent.init(scrollWheelEvent2Source: nil, units: .pixel, wheelCount: 1, wheel1: 0, wheel2: 0, wheel3: 0)!
-                    event.setIntegerValueField(.scrollWheelEventIsContinuous, value: 1)
-                    event.setIntegerValueField(.scrollWheelEventMomentumPhase, value: 0)
-                    event.setIntegerValueField(.scrollWheelEventScrollPhase, value: 128)
-                    event.setIntegerValueField(.scrollWheelEventPointDeltaAxis1, value: 0)
-                    event.setIntegerValueField(.scrollWheelEventPointDeltaAxis2, value: 0)
-                    event.post(tap: .cghidEventTap)
-                    
-                    let event2 = CGEvent.init(scrollWheelEvent2Source: nil, units: .pixel, wheelCount: 1, wheel1: 0, wheel2: 0, wheel3: 0)!
-                    event2.setIntegerValueField(.scrollWheelEventIsContinuous, value: 1)
-                    event2.setIntegerValueField(.scrollWheelEventMomentumPhase, value: 0)
-                    event2.setIntegerValueField(.scrollWheelEventScrollPhase, value: 1)
-                    event2.setIntegerValueField(.scrollWheelEventPointDeltaAxis1, value: -1)
-                    event2.setIntegerValueField(.scrollWheelEventPointDeltaAxis2, value: 0)
-                    event2.post(tap: .cghidEventTap)
-                    
-                    return Observable<Int>.interval(.milliseconds(5), scheduler: MainScheduler.instance)
-                        .map({ _ in Void() })
-                        .do(onNext: { _ in
-                            let yPixels = Int64(-2)
-                            let xPixels = Int64(0)
-                            let event = CGEvent.init(scrollWheelEvent2Source: nil, units: .pixel, wheelCount: 1, wheel1: 0, wheel2: 0, wheel3: 0)!
-                            event.setIntegerValueField(.scrollWheelEventIsContinuous, value: 1)
-                            event.setIntegerValueField(.scrollWheelEventMomentumPhase, value: 0)
-                            event.setIntegerValueField(.scrollWheelEventScrollPhase, value: 2)
-                            event.setIntegerValueField(.scrollWheelEventPointDeltaAxis1, value: yPixels)
-                            event.setIntegerValueField(.scrollWheelEventPointDeltaAxis2, value: xPixels)
-                            event.post(tap: .cghidEventTap)
-                        })
-                        
-                })
+            AccessibilityObservables.scrollObservable(textField: selectorTextField, character: "j", yAxis: -4, xAxis: 0, frequencyMilliseconds: 5)
+                .subscribe()
+        )
+        
+        scrollModeDisposable?.insert(
+            AccessibilityObservables.scrollObservable(textField: selectorTextField, character: "k", yAxis: 4, xAxis: 0, frequencyMilliseconds: 5)
+                .subscribe()
+        )
+        
+        scrollModeDisposable?.insert(
+            AccessibilityObservables.scrollObservable(textField: selectorTextField, character: "h", yAxis: 0, xAxis: 4, frequencyMilliseconds: 5)
+                .subscribe()
+        )
+        
+        scrollModeDisposable?.insert(
+            AccessibilityObservables.scrollObservable(textField: selectorTextField, character: "l", yAxis: 0, xAxis: -4, frequencyMilliseconds: 5)
                 .subscribe()
         )
     }
