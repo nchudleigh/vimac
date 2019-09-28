@@ -83,9 +83,9 @@ class Utils: NSObject {
         
         var elements = [UIElement]()
         func fn(element: UIElement, level: Int) -> Void {
-            let roleOptional: Role? = {
+            let roleOptional: String? = {
                 do {
-                    return try element.role()
+                    return try element.attribute(.role)
                 } catch {
                     return nil
                 }
@@ -101,14 +101,14 @@ class Utils: NSObject {
             
             if let role = roleOptional {
                 // ignore subcomponents of a scrollbar
-                if role == .scrollBar {
+                if role == Role.scrollBar.rawValue {
                     return
                 }
                 
                 // ignore rows that are out of window frame
                 // doing this improves traversal speed significantly because we do not look at
                 // children elements that most likely are out of frame
-                if role == .row {
+                if role == Role.row.rawValue || role == "AXPage" {
                     if let position = positionOptional {
                         if (!windowFrame.contains(position)) {
                             return
@@ -118,7 +118,7 @@ class Utils: NSObject {
                     }
                 }
             }
-            
+
             if let position = positionOptional {
                 if (windowFrame.contains(position)) {
                     elements.append(element)
