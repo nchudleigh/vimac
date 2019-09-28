@@ -66,7 +66,6 @@ class OverlayTextField: NSTextField {
     static func getKeyEventObservable(isFirstResponderSubject: BehaviorSubject<Bool>) -> Observable<KeyAction> {
         return isFirstResponderSubject
             .flatMapLatest({ isFirstResponder -> Observable<KeyAction?> in
-                print(isFirstResponder)
                 if !isFirstResponder {
                     return Observable.just(nil)
                 }

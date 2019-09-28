@@ -301,7 +301,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         selectorTextField.becomeFirstResponder()
     }
     
-    let scrollModeDisposable = CompositeDisposable()
+    var scrollModeDisposable: CompositeDisposable? = CompositeDisposable()
     
     func setScrollMode() {
         let selectorTextField = OverlayTextField(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
@@ -316,12 +316,43 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         self.overlayWindowController.showWindow(nil)
         self.overlayWindowController.window?.makeKeyAndOrderFront(nil)
         selectorTextField.becomeFirstResponder()
-
-        scrollModeDisposable.insert(selectorTextField.observeCharacterEvent(character: "d")
-            .observeOn(MainScheduler.instance)
-            .subscribe(onNext: { keyAction in
+        
+        
+        self.scrollModeDisposable?.insert(selectorTextField
+            .observeCharacterEvent(character: "j")
+            .filter({ $0.keyPosition == .keyDown })
+            .do(onNext: { _ in
+                let event = CGEvent.init(scrollWheelEvent2Source: nil, units: .pixel, wheelCount: 1, wheel1: 0, wheel2: 0, wheel3: 0)!
+                event.setIntegerValueField(.scrollWheelEventIsContinuous, value: 1)
+                event.setIntegerValueField(.scrollWheelEventMomentumPhase, value: 0)
+                event.setIntegerValueField(.scrollWheelEventScrollPhase, value: 128)
+                event.setIntegerValueField(.scrollWheelEventPointDeltaAxis1, value: 0)
+                event.setIntegerValueField(.scrollWheelEventPointDeltaAxis2, value: 0)
+                event.post(tap: .cghidEventTap)
                 
-            }))
+                let event2 = CGEvent.init(scrollWheelEvent2Source: nil, units: .pixel, wheelCount: 1, wheel1: 0, wheel2: 0, wheel3: 0)!
+                event2.setIntegerValueField(.scrollWheelEventIsContinuous, value: 1)
+                event2.setIntegerValueField(.scrollWheelEventMomentumPhase, value: 0)
+                event2.setIntegerValueField(.scrollWheelEventScrollPhase, value: 1)
+                event2.setIntegerValueField(.scrollWheelEventPointDeltaAxis1, value: -1)
+                event2.setIntegerValueField(.scrollWheelEventPointDeltaAxis2, value: 0)
+                event2.post(tap: .cghidEventTap)
+            })
+            .flatMap({ keyAction -> Observable<Int> in
+                return Observable<Int>.interval(.milliseconds(5), scheduler: MainScheduler.instance)
+            })
+            .subscribe(onNext: { _ in
+                let yPixels = Int64(-2)
+                let xPixels = Int64(0)
+                let event = CGEvent.init(scrollWheelEvent2Source: nil, units: .pixel, wheelCount: 1, wheel1: 0, wheel2: 0, wheel3: 0)!
+                event.setIntegerValueField(.scrollWheelEventIsContinuous, value: 1)
+                event.setIntegerValueField(.scrollWheelEventMomentumPhase, value: 0)
+                event.setIntegerValueField(.scrollWheelEventScrollPhase, value: 2)
+                event.setIntegerValueField(.scrollWheelEventPointDeltaAxis1, value: yPixels)
+                event.setIntegerValueField(.scrollWheelEventPointDeltaAxis2, value: xPixels)
+                event.post(tap: .cghidEventTap)
+            })
+        )
     }
     
     func updateHints(typed: String) {
