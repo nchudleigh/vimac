@@ -18,6 +18,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     static let NORMAL_MODE_TEXT_FIELD_TAG = 1
     static let HINT_SELECTOR_TEXT_FIELD_TAG = 2
+    static let SCROLL_MODE_SELECTOR_TAG = 3
     
     let applicationObservable: Observable<Application?>
     let applicationNotificationObservable: Observable<AccessibilityObservables.AppNotificationAppPair>
@@ -27,6 +28,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let normalShortcutObservable: Observable<Void>
     
     var compositeDisposable: CompositeDisposable
+    var scrollModeDisposable: CompositeDisposable? = CompositeDisposable()
     
     let overlayWindowController: NSWindowController
 
@@ -169,6 +171,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         print("hiding overlays")
         self.overlayWindowController.close()
         self.removeSubviews()
+        self.scrollModeDisposable?.dispose()
+        self.scrollModeDisposable = CompositeDisposable()
     }
     
     func removeSubviews() {
@@ -291,7 +295,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         selectorTextField.stringValue = ""
         selectorTextField.isEditable = true
         selectorTextField.delegate = self
-        // selectorTextField.isHidden = true
+         selectorTextField.isHidden = true
         selectorTextField.tag = AppDelegate.HINT_SELECTOR_TEXT_FIELD_TAG
         selectorTextField.command = command
         selectorTextField.overlayTextFieldDelegate = self
@@ -301,15 +305,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         selectorTextField.becomeFirstResponder()
     }
     
-    var scrollModeDisposable: CompositeDisposable? = CompositeDisposable()
-    
     func setScrollMode() {
         let selectorTextField = OverlayTextField(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
         selectorTextField.stringValue = ""
         selectorTextField.isEditable = true
         selectorTextField.delegate = self
         selectorTextField.isHidden = true
-        selectorTextField.tag = 69
+        selectorTextField.tag = AppDelegate.SCROLL_MODE_SELECTOR_TAG
         selectorTextField.overlayTextFieldDelegate = self
         self.overlayWindowController.window?.contentView?.addSubview(selectorTextField)
         self.overlayWindowController.showWindow(nil)
