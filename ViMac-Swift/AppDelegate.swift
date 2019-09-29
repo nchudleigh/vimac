@@ -18,15 +18,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     static let NORMAL_MODE_TEXT_FIELD_TAG = 1
     static let HINT_SELECTOR_TEXT_FIELD_TAG = 2
+    static let SCROLL_MODE_SELECTOR_TAG = 3
     
     let applicationObservable: Observable<Application?>
     let applicationNotificationObservable: Observable<AccessibilityObservables.AppNotificationAppPair>
     let windowObservable: Observable<UIElement?>
     let windowSubject: BehaviorSubject<UIElement?>
-
     let normalShortcutObservable: Observable<Void>
     
     var compositeDisposable: CompositeDisposable
+    var scrollModeDisposable: CompositeDisposable? = CompositeDisposable()
     
     let overlayWindowController: NSWindowController
 
@@ -35,6 +36,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     override init() {
         let storyboard = NSStoryboard.init(name: "Main", bundle: nil)
         overlayWindowController = storyboard.instantiateController(withIdentifier: "overlayWindowControllerID") as! NSWindowController
+        
+        Utils.registerDefaults()
         
         applicationObservable = AccessibilityObservables.createApplicationObservable().share()
         applicationNotificationObservable = AccessibilityObservables.createApplicationNotificationObservable(applicationObservable: applicationObservable, notifications: AppDelegate.windowEvents + [AXNotification.focusedWindowChanged]).share()
@@ -169,6 +172,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         print("hiding overlays")
         self.overlayWindowController.close()
         self.removeSubviews()
+        self.scrollModeDisposable?.dispose()
+        self.scrollModeDisposable = CompositeDisposable()
     }
     
     func removeSubviews() {
@@ -176,7 +181,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             view.removeFromSuperview()
         })
     }
-    
+
     func removeHints() {
         self.overlayWindowController.window?.contentView?.subviews.forEach({ view in
             if view is HintView {
@@ -291,7 +296,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         selectorTextField.stringValue = ""
         selectorTextField.isEditable = true
         selectorTextField.delegate = self
-        selectorTextField.isHidden = true
+         selectorTextField.isHidden = true
         selectorTextField.tag = AppDelegate.HINT_SELECTOR_TEXT_FIELD_TAG
         selectorTextField.command = command
         selectorTextField.overlayTextFieldDelegate = self
@@ -299,6 +304,42 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         self.overlayWindowController.showWindow(nil)
         window.makeKeyAndOrderFront(nil)
         selectorTextField.becomeFirstResponder()
+    }
+    
+    func setScrollMode() {
+        let selectorTextField = OverlayTextField(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
+        selectorTextField.stringValue = ""
+        selectorTextField.isEditable = true
+        selectorTextField.delegate = self
+        selectorTextField.isHidden = true
+        selectorTextField.tag = AppDelegate.SCROLL_MODE_SELECTOR_TAG
+        selectorTextField.overlayTextFieldDelegate = self
+        self.overlayWindowController.window?.contentView?.addSubview(selectorTextField)
+        self.overlayWindowController.showWindow(nil)
+        self.overlayWindowController.window?.makeKeyAndOrderFront(nil)
+        selectorTextField.becomeFirstResponder()
+        
+        let scrollSensitivity = Int64(UserDefaults.standard.integer(forKey: Utils.scrollSensitivityKey))
+        
+        scrollModeDisposable?.insert(
+            AccessibilityObservables.scrollObservable(textField: selectorTextField, character: "j", yAxis: -1 * scrollSensitivity, xAxis: 0, frequencyMilliseconds: 20)
+                .subscribe()
+        )
+        
+        scrollModeDisposable?.insert(
+            AccessibilityObservables.scrollObservable(textField: selectorTextField, character: "k", yAxis: scrollSensitivity, xAxis: 0, frequencyMilliseconds: 20)
+                .subscribe()
+        )
+        
+        scrollModeDisposable?.insert(
+            AccessibilityObservables.scrollObservable(textField: selectorTextField, character: "h", yAxis: 0, xAxis: scrollSensitivity, frequencyMilliseconds: 20)
+                .subscribe()
+        )
+        
+        scrollModeDisposable?.insert(
+            AccessibilityObservables.scrollObservable(textField: selectorTextField, character: "l", yAxis: 0, xAxis: -1 * scrollSensitivity, frequencyMilliseconds: 20)
+                .subscribe()
+        )
     }
     
     func updateHints(typed: String) {
@@ -413,6 +454,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         guard let command = commandOptional else {
             return
         }
+        if command == .scroll {
+            self.setScrollMode()
+            return
+        }
         self.setHintSelectorMode(command: command)
     }
     
@@ -427,6 +472,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             return Action.rightClick
         case "me":
             return Action.move
+        case "s":
+            return Action.scroll
         default:
             return nil
         }

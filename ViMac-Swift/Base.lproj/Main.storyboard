@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="14868" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14490.70"/>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14868"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -674,10 +675,10 @@
                         <outlet property="delegate" destination="Voe-Tx-rLC" id="PrD-fu-P6m"/>
                     </connections>
                 </application>
-                <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="ViMac_Swift" customModuleProvider="target"/>
+                <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="Vimac" customModuleProvider="target"/>
                 <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
                 <customObject id="Ady-hI-5gd" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
-                <customObject id="XaW-Fn-b3C" customClass="StatusItemManager" customModule="ViMac_Swift" customModuleProvider="target"/>
+                <customObject id="XaW-Fn-b3C" customClass="StatusItemManager" customModule="Vimac" customModuleProvider="target"/>
             </objects>
             <point key="canvasLocation" x="62" y="-82"/>
         </scene>
@@ -685,7 +686,7 @@
         <scene sceneID="79a-OA-79s">
             <objects>
                 <windowController storyboardIdentifier="overlayWindowControllerID" id="8mH-dK-Dlx" sceneMemberID="viewController">
-                    <window key="window" title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" hasShadow="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="qOo-UR-Afh" customClass="OverlayWindow" customModule="ViMac_Swift" customModuleProvider="target">
+                    <window key="window" title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" hasShadow="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="qOo-UR-Afh" customClass="OverlayWindow" customModule="Vimac" customModuleProvider="target">
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
                         <rect key="contentRect" x="294" y="313" width="480" height="360"/>
                         <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
@@ -735,7 +736,7 @@
         <!--General-->
         <scene sceneID="xFM-46-YiN">
             <objects>
-                <viewController title="General" storyboardIdentifier="general" id="Xcg-2B-Laa" customClass="PreferencesGeneralViewController" customModule="ViMac_Swift" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController title="General" storyboardIdentifier="general" id="Xcg-2B-Laa" customClass="PreferencesGeneralViewController" customModule="Vimac" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="lIT-PR-R6C">
                         <rect key="frame" x="0.0" y="0.0" width="480" height="270"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -757,11 +758,29 @@
                                         <rect key="frame" x="248" y="223" width="150" height="20"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     </customView>
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Ese-Ar-PoE">
+                                        <rect key="frame" x="82" y="174" width="108" height="16"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Scroll Sensitivity:" id="UHk-Ov-Y6x">
+                                            <font key="font" metaFont="system"/>
+                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                    </textField>
+                                    <slider verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qsi-fh-6tB">
+                                        <rect key="frame" x="246" y="170" width="154" height="25"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        <sliderCell key="cell" state="on" alignment="left" maxValue="100" doubleValue="50" tickMarkPosition="below" numberOfTickMarks="10" sliderType="linear" id="fc4-Ma-cfA"/>
+                                        <connections>
+                                            <action selector="sliderChanged:" target="Xcg-2B-Laa" id="xyO-va-L1f"/>
+                                        </connections>
+                                    </slider>
                                 </subviews>
                             </visualEffectView>
                         </subviews>
                     </view>
                     <connections>
+                        <outlet property="scrollSensitivitySlider" destination="qsi-fh-6tB" id="LH4-GR-DcN"/>
                         <outlet property="shortcutView" destination="GVY-1h-CEw" id="f04-fx-2CB"/>
                     </connections>
                 </viewController>
