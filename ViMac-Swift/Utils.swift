@@ -13,6 +13,13 @@ import MASShortcut
 class Utils: NSObject {
     static let defaultCommandShortcut = MASShortcut.init(keyCode: kVK_Space, modifierFlags: [.command, .shift])
     static let commandShortcutKey = "CommandShortcut"
+    static let scrollSensitivityKey = "ScrollSensitivity"
+    
+    static func registerDefaults() {
+        UserDefaults.standard.register(defaults: [
+            Utils.scrollSensitivityKey: 20
+        ])
+    }
     
     // This function returns the position of the point after the y-axis is flipped.
     // We need this because accessing the position of a AXUIElement gives us the position from top-left,

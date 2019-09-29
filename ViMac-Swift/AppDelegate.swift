@@ -24,7 +24,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let applicationNotificationObservable: Observable<AccessibilityObservables.AppNotificationAppPair>
     let windowObservable: Observable<UIElement?>
     let windowSubject: BehaviorSubject<UIElement?>
-
     let normalShortcutObservable: Observable<Void>
     
     var compositeDisposable: CompositeDisposable
@@ -37,6 +36,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     override init() {
         let storyboard = NSStoryboard.init(name: "Main", bundle: nil)
         overlayWindowController = storyboard.instantiateController(withIdentifier: "overlayWindowControllerID") as! NSWindowController
+        
+        Utils.registerDefaults()
         
         applicationObservable = AccessibilityObservables.createApplicationObservable().share()
         applicationNotificationObservable = AccessibilityObservables.createApplicationNotificationObservable(applicationObservable: applicationObservable, notifications: AppDelegate.windowEvents + [AXNotification.focusedWindowChanged]).share()
@@ -318,23 +319,25 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         self.overlayWindowController.window?.makeKeyAndOrderFront(nil)
         selectorTextField.becomeFirstResponder()
         
+        let scrollSensitivity = Int64(UserDefaults.standard.integer(forKey: Utils.scrollSensitivityKey))
+        
         scrollModeDisposable?.insert(
-            AccessibilityObservables.scrollObservable(textField: selectorTextField, character: "j", yAxis: -20, xAxis: 0, frequencyMilliseconds: 20)
+            AccessibilityObservables.scrollObservable(textField: selectorTextField, character: "j", yAxis: -1 * scrollSensitivity, xAxis: 0, frequencyMilliseconds: 20)
                 .subscribe()
         )
         
         scrollModeDisposable?.insert(
-            AccessibilityObservables.scrollObservable(textField: selectorTextField, character: "k", yAxis: 20, xAxis: 0, frequencyMilliseconds: 20)
+            AccessibilityObservables.scrollObservable(textField: selectorTextField, character: "k", yAxis: scrollSensitivity, xAxis: 0, frequencyMilliseconds: 20)
                 .subscribe()
         )
         
         scrollModeDisposable?.insert(
-            AccessibilityObservables.scrollObservable(textField: selectorTextField, character: "h", yAxis: 0, xAxis: 20, frequencyMilliseconds: 20)
+            AccessibilityObservables.scrollObservable(textField: selectorTextField, character: "h", yAxis: 0, xAxis: scrollSensitivity, frequencyMilliseconds: 20)
                 .subscribe()
         )
         
         scrollModeDisposable?.insert(
-            AccessibilityObservables.scrollObservable(textField: selectorTextField, character: "l", yAxis: 0, xAxis: -20, frequencyMilliseconds: 20)
+            AccessibilityObservables.scrollObservable(textField: selectorTextField, character: "l", yAxis: 0, xAxis: -1 * scrollSensitivity, frequencyMilliseconds: 20)
                 .subscribe()
         )
     }

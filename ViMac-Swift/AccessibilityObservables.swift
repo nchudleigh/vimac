@@ -101,7 +101,6 @@ class AccessibilityObservables: NSObject {
                     event.setIntegerValueField(.scrollWheelEventPointDeltaAxis1, value: 0)
                     event.setIntegerValueField(.scrollWheelEventPointDeltaAxis2, value: 0)
                     event.post(tap: .cghidEventTap)
-                    print("release")
                     return Observable.just(Void())
                 }
 
