@@ -138,7 +138,7 @@ class Utils: NSObject {
 
             if let position = positionOptional,
                 let role = roleOptional {
-                let blacklistedRoles = ["AXUnknown", "AXStaticText", "AXToolbar", "AXCell"]
+                let blacklistedRoles = ["AXUnknown", "AXStaticText", "AXToolbar", "AXCell", "AXWindow"]
                 let isGroupRole = role.hasSuffix("Group")
                 let isBlacklisted = blacklistedRoles.contains(role)
                 if (windowFrame.contains(position) && !isGroupRole && !isBlacklisted) {
