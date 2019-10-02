@@ -97,10 +97,18 @@ class Utils: NSObject {
                     return nil
                 }
             }()
-            
-            let frameOptional: NSRect? = {
+
+            let positionOptional: NSPoint? = {
                 do {
-                    return try element.attribute(.frame)
+                    return try element.attribute(.position)
+                } catch {
+                    return nil
+                }
+            }()
+            
+            let sizeOptional: NSSize? = {
+                do {
+                    return try element.attribute(.size)
                 } catch {
                     return nil
                 }
@@ -116,7 +124,9 @@ class Utils: NSObject {
                 // doing this improves traversal speed significantly because we do not look at
                 // children elements that most likely are out of frame
                 if role == Role.row.rawValue || role == "AXPage" {
-                    if let frame = frameOptional {
+                    if let position = positionOptional,
+                        let size = sizeOptional {
+                        let frame = NSRect(origin: position, size: size)
                         if (!windowFrame.intersects(frame)) {
                             return
                         }
@@ -126,8 +136,8 @@ class Utils: NSObject {
                 }
             }
 
-            if let frame = frameOptional {
-                if (windowFrame.contains(frame.origin)) {
+            if let position = positionOptional {
+                if (windowFrame.contains(position)) {
                     elements.append(element)
                 }
             }
