@@ -137,7 +137,8 @@ class Utils: NSObject {
             }
 
             if let position = positionOptional {
-                if (windowFrame.contains(position)) {
+                let isGroupRole = roleOptional?.hasSuffix("Group") ?? false
+                if (windowFrame.contains(position) && !isGroupRole) {
                     elements.append(element)
                 }
             }
