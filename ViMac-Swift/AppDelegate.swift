@@ -275,7 +275,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let hintViews: [HintView] = allElements
             .enumerated()
             .map { (index, button) in
-                if let positionFlipped: CGPoint = try! button.attribute(.position) {
+                let positionFlippedOptional: NSPoint? = {
+                    do {
+                        return try button.attribute(.position)
+                    } catch {
+                        return nil
+                    }
+                }()
+                
+                if let positionFlipped = positionFlippedOptional {
                     let text = HintView(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
                     text.initializeHint(hintText: hintStrings[index], typed: "")
                     let positionRelativeToScreen = Utils.toOrigin(point: positionFlipped, size: text.frame.size)

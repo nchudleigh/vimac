@@ -136,8 +136,12 @@ class Utils: NSObject {
                 }
             }
 
-            if let position = positionOptional {
-                if (windowFrame.contains(position)) {
+            if let position = positionOptional,
+                let role = roleOptional {
+                let blacklistedRoles = ["AXUnknown", "AXStaticText", "AXToolbar", "AXCell", "AXWindow", "AXScrollArea"]
+                let isGroupRole = role.hasSuffix("Group")
+                let isBlacklisted = blacklistedRoles.contains(role)
+                if (windowFrame.contains(position) && !isGroupRole && !isBlacklisted) {
                     elements.append(element)
                 }
             }
