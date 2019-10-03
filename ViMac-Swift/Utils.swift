@@ -189,4 +189,25 @@ class Utils: NSObject {
         }
         return menuBarItems
     }
+    
+    static func mapArgRoleToAXRole(arg: ElementSelectorArg) -> [Role] {
+        if arg == .button {
+            return [Role.button, Role.menuButton, Role.radioButton, Role.popUpButton, Role.checkBox]
+        }
+        
+        if arg == .group {
+            return [Role.group, Role.tabGroup, Role.radioGroup, Role.splitGroup]
+        }
+        
+        if arg == .disclosureTriangle {
+            return [Role.disclosureTriangle]
+        }
+        
+        if arg == .row {
+            return [Role.row]
+        }
+        
+        
+        return []
+    }
 }

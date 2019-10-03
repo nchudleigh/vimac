@@ -10,7 +10,7 @@ import Cocoa
 import RxSwift
 
 class OverlayTextField: NSTextField {
-    var command: Action?
+    var cursorAction: CursorAction?
     weak var overlayTextFieldDelegate: OverlayTextFieldDelegate?
     var isFirstResponderSubject: BehaviorSubject<Bool>?
     var keyEventObservable: Observable<KeyAction>?
