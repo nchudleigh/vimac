@@ -190,6 +190,44 @@ class Utils: NSObject {
         return menuBarItems
     }
     
+    static func traverseUIElementForScrollAreas(rootElement: UIElement) -> [UIElement] {
+        var elements = [UIElement]()
+        func fn(element: UIElement, level: Int) -> Void {
+            let roleOptional: String? = {
+                do {
+                    return try element.attribute(.role)
+                } catch {
+                    return nil
+                }
+            }()
+            
+            if let role = roleOptional {
+                if role == Role.scrollArea.rawValue {
+                    elements.append(element)
+                    return
+                }
+            }
+
+            let children: [AXUIElement] = {
+                do {
+                    let childrenOptional = try element.attribute(Attribute.children) as [AXUIElement]?;
+                    guard let children = childrenOptional else {
+                        return []
+                    }
+                    return children
+                } catch {
+                    return []
+                }
+            }()
+            
+            children.forEach { child in
+                fn(element: UIElement(child), level: level + 1)
+            }
+        }
+        fn(element: rootElement, level: 1)
+        return elements
+    }
+    
     static func mapArgRoleToAXRole(arg: ElementSelectorArg) -> [Role] {
         if arg == .button {
             return [Role.button, Role.menuButton, Role.radioButton, Role.popUpButton, Role.checkBox]
