@@ -248,7 +248,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }()
     }
     
-    func setHintSelectorMode(cursorAction: CursorAction, cursorSelector: CursorSelector, elementSelectorArgsOptional: [ElementSelectorArg]?) {
+    func setHintSelectorMode(cursorAction: CursorAction, cursorSelector: CursorSelector, allowedRoles: [Role]?) {
         // if windowSubject does not have the current window, retrieve the current window directly
         // This fixes a bug where opening an application with Vimac causes windowSubject value to be nil
         guard let applicationWindow = (try! self.windowSubject.value()) ?? self.getCurrentApplicationWindowManually(),
@@ -269,22 +269,24 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
         
         var allElements = elements + menuBarItems
-        
-        if let elementSelectorArgs = elementSelectorArgsOptional {
-            let roles = elementSelectorArgs.flatMap({ Utils.mapArgToRoleString(arg: $0) })
-            let rolesString = roles.map({ $0.rawValue })
-            let rolesStringSet = Set(rolesString)
-            allElements = allElements
-                .filter({ element in
-                    do {
-                        guard let elementRole: String = try element.attribute(.role) else {
+
+        if let allowedRoles = allowedRoles {
+            if allowedRoles.count > 0 {
+                let rolesString = allowedRoles.map({ $0.rawValue })
+                let rolesStringSet = Set(rolesString)
+                print(rolesStringSet)
+                allElements = allElements
+                    .filter({ element in
+                        do {
+                            guard let elementRole: String = try element.attribute(.role) else {
+                                return false
+                            }
+                            return rolesStringSet.contains(elementRole)
+                        } catch {
                             return false
                         }
-                        return rolesStringSet.contains(elementRole)
-                    } catch {
-                        return false
-                    }
-                })
+                    })
+            }
         }
         
         let hintStrings = AlphabetHints().hintStrings(linkCount: allElements.count)
@@ -484,68 +486,58 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         var cursorActionOptional: CursorAction?
         var cursorSelectorOptional: CursorSelector?
-        var elementSelectorArgs: [ElementSelectorArg]?
         
         if trimmedInput.starts(with: "ce") {
             cursorActionOptional = .leftClick
             cursorSelectorOptional = .element
-            
-            let inputSplit = trimmedInput.split(separator: " ")
-            if inputSplit.count == 2 {
-                let argString = inputSplit.last!
-                elementSelectorArgs = argString.split(separator: ";")
-                    .map({ ElementSelectorArg(rawValue: String($0)) })
-                    .compactMap({ $0 })
-            }
         }
-        
         else if trimmedInput.starts(with: "rce") {
             cursorActionOptional = .rightClick
             cursorSelectorOptional = .element
-            
-            let inputSplit = trimmedInput.split(separator: " ")
-            if inputSplit.count == 2 {
-                let argString = inputSplit.last!
-                elementSelectorArgs = argString.split(separator: ";")
-                    .map({ ElementSelectorArg(rawValue: String($0)) })
-                    .compactMap({ $0 })
-            }
         }
-        
         else if trimmedInput.starts(with: "dce") {
             cursorActionOptional = .doubleLeftClick
             cursorSelectorOptional = .element
-            
-            let inputSplit = trimmedInput.split(separator: " ")
-            if inputSplit.count == 2 {
-                let argString = inputSplit.last!
-                elementSelectorArgs = argString.split(separator: ";")
-                    .map({ ElementSelectorArg(rawValue: String($0)) })
-                    .compactMap({ $0 })
-            }
         }
-        
+        else if trimmedInput.starts(with: "me") {
+            cursorActionOptional = .move
+            cursorSelectorOptional = .element
+        }
         else if trimmedInput.starts(with: "ch") {
             cursorActionOptional = .leftClick
             cursorSelectorOptional = .here
         }
-        
         else if trimmedInput.starts(with: "rch") {
             cursorActionOptional = .rightClick
             cursorSelectorOptional = .here
         }
-        
         else if trimmedInput.starts(with: "dch") {
             cursorActionOptional = .doubleLeftClick
             cursorSelectorOptional = .here
         }
-        
+
         guard let cursorAction = cursorActionOptional,
             let cursorSelector = cursorSelectorOptional else {
                 return
         }
         
-        self.setHintSelectorMode(cursorAction: cursorAction, cursorSelector: cursorSelector, elementSelectorArgsOptional: elementSelectorArgs)
+        if cursorSelector != .element {
+            return
+        }
+        
+        var allowedRoles = [Role]()
+        let inputSplit = trimmedInput.split(separator: " ")
+        if inputSplit.count > 1 {
+            let args = inputSplit.dropFirst(1)
+                .flatMap({ $0.split(separator: ";") })
+                .map({ String($0) })
+            allowedRoles = args
+                .map({ ElementSelectorArg(rawValue: String($0)) })
+                .compactMap({ $0 })
+                .flatMap({ Utils.mapArgRoleToAXRole(arg: $0) })
+        }
+        
+        self.setHintSelectorMode(cursorAction: cursorAction, cursorSelector: cursorSelector, allowedRoles: allowedRoles)
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {

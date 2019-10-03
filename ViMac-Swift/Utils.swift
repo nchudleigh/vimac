@@ -190,7 +190,7 @@ class Utils: NSObject {
         return menuBarItems
     }
     
-    static func mapArgToRoleString(arg: ElementSelectorArg) -> [Role] {
+    static func mapArgRoleToAXRole(arg: ElementSelectorArg) -> [Role] {
         if arg == .button {
             return [Role.button, Role.menuButton, Role.radioButton, Role.popUpButton, Role.checkBox]
         }
