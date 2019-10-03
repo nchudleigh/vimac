@@ -87,7 +87,7 @@ class AccessibilityObservables: NSObject {
         }
     }
     
-    static func scrollObservable(textField: OverlayTextField, character: Character, yAxis: Int64, xAxis: Int64, frequencyMilliseconds: Int) -> Observable<Void> {
+    static func scrollObservableSmooth(textField: OverlayTextField, character: Character, yAxis: Int64, xAxis: Int64, frequencyMilliseconds: Int) -> Observable<Void> {
         return textField.observeCharacterEvent(character: character)
             .flatMapLatest({ keyAction -> Observable<Void>in
                 if keyAction.keyPosition == .keyUp {
@@ -135,6 +135,23 @@ class AccessibilityObservables: NSObject {
                         event.setIntegerValueField(.scrollWheelEventPointDeltaAxis1, value: yAxis)
                         event.setIntegerValueField(.scrollWheelEventPointDeltaAxis2, value: xAxis)
                         event.post(tap: .cghidEventTap)
+                    })
+            })
+    }
+    
+    static func scrollObservableChunky(textField: OverlayTextField, character: Character, yAxis: Int32, xAxis: Int32, frequencyMilliseconds: Int) -> Observable<Void> {
+        return textField.observeCharacterEvent(character: character)
+            .flatMapLatest({ keyAction -> Observable<Void>in
+                if keyAction.keyPosition == .keyUp {
+                    return Observable.just(Void())
+                }
+
+                return Observable<Int>.interval(.milliseconds(frequencyMilliseconds), scheduler: MainScheduler.instance)
+                    .startWith(1)
+                    .map({ _ in Void() })
+                    .do(onNext: { _ in
+                        let event = CGEvent.init(scrollWheelEvent2Source: nil, units: .pixel, wheelCount: 1, wheel1: yAxis, wheel2: xAxis, wheel3: 0)
+                        event?.post(tap: .cghidEventTap)
                     })
             })
     }
