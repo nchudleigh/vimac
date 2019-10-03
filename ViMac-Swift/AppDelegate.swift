@@ -369,7 +369,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             }
         }
         let halfScrollAreaHeight = scrollAreaHeight / 2
-        print(scrollAreaHeight)
         
         let scrollSensitivity = Int64(UserDefaults.standard.integer(forKey: Utils.scrollSensitivityKey))
         
