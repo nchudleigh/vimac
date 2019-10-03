@@ -248,7 +248,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }()
     }
     
-    func setHintSelectorMode(command: Action) {
+    func setHintSelectorMode(cursorAction: CursorAction, cursorSelector: CursorSelector, elementSelectorArgsOptional: [ElementSelectorArg]?) {
         // if windowSubject does not have the current window, retrieve the current window directly
         // This fixes a bug where opening an application with Vimac causes windowSubject value to be nil
         guard let applicationWindow = (try! self.windowSubject.value()) ?? self.getCurrentApplicationWindowManually(),
@@ -268,13 +268,30 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             return
         }
         
-        let allElements = elements + menuBarItems
+        var allElements = elements + menuBarItems
+        
+        if let elementSelectorArgs = elementSelectorArgsOptional {
+            let roles = elementSelectorArgs.flatMap({ Utils.mapArgToRoleString(arg: $0) })
+            let rolesString = roles.map({ $0.rawValue })
+            let rolesStringSet = Set(rolesString)
+            allElements = allElements
+                .filter({ element in
+                    do {
+                        guard let elementRole: String = try element.attribute(.role) else {
+                            return false
+                        }
+                        return rolesStringSet.contains(elementRole)
+                    } catch {
+                        return false
+                    }
+                })
+        }
         
         let hintStrings = AlphabetHints().hintStrings(linkCount: allElements.count)
 
         let hintViews: [HintView] = allElements
             .enumerated()
-            .map { (index, button) in
+            .map ({ (index, button) in
                 let positionFlippedOptional: NSPoint? = {
                     do {
                         return try button.attribute(.position)
@@ -293,8 +310,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     text.zIndex = index
                     return text
                 }
-                return nil
-            }.compactMap({ $0 })
+                return nil })
+            .compactMap({ $0 })
         
         hintViews.forEach { view in
             window.contentView!.addSubview(view)
@@ -306,7 +323,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         selectorTextField.delegate = self
          selectorTextField.isHidden = true
         selectorTextField.tag = AppDelegate.HINT_SELECTOR_TEXT_FIELD_TAG
-        selectorTextField.command = command
+        selectorTextField.cursorAction = cursorAction
         selectorTextField.overlayTextFieldDelegate = self
         window.contentView?.addSubview(selectorTextField)
         self.overlayWindowController.showWindow(nil)
@@ -390,7 +407,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let typed = textField.stringValue
         guard let window = self.overlayWindowController.window,
             let hintViews = window.contentView?.subviews.filter ({ $0 is HintView }) as! [HintView]?,
-            let command = textField.command else {
+            let action = textField.cursorAction else {
             print("Failed to update hints.")
             self.hideOverlays()
             return
@@ -434,19 +451,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             print("Matching hint found. Performing command and exiting Hint Mode.")
             self.hideOverlays()
             
-            guard let command = textField.command else {
-                print("Couldn't find text field's associated command")
+            guard let cursorAction = textField.cursorAction else {
+                print("Couldn't find text field's associated action")
                 return
             }
             
             Utils.moveMouse(position: centerPosition)
-            if command == .leftClick {
+            if action == .leftClick {
                 Utils.leftClickMouse(position: centerPosition)
-            } else if command == .rightClick {
+            } else if action == .rightClick {
                 Utils.rightClickMouse(position: centerPosition)
-            } else if command == .doubleLeftClick {
+            } else if action == .doubleLeftClick {
                 Utils.doubleLeftClickMouse(position: centerPosition)
-            } else if command == .move {
+            } else if action == .move {
                 Utils.moveMouse(position: centerPosition)
             }
             return
@@ -458,33 +475,77 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     func onInputSubmitted(input: String) {
         self.hideOverlays()
-        let commandOptional = parseInput(input: input)
-        guard let command = commandOptional else {
-            return
-        }
-        if command == .scroll {
+        let trimmedInput = input.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        if trimmedInput == "s" {
             self.setScrollMode()
             return
         }
-        self.setHintSelectorMode(command: command)
-    }
-    
-    func parseInput(input: String) -> Action? {
-        let inputTrimmed = input.trimmingCharacters(in: .whitespacesAndNewlines)
-        switch inputTrimmed {
-        case "ce":
-            return Action.leftClick
-        case "dce":
-            return Action.doubleLeftClick
-        case "rce":
-            return Action.rightClick
-        case "me":
-            return Action.move
-        case "s":
-            return Action.scroll
-        default:
-            return nil
+        
+        var cursorActionOptional: CursorAction?
+        var cursorSelectorOptional: CursorSelector?
+        var elementSelectorArgs: [ElementSelectorArg]?
+        
+        if trimmedInput.starts(with: "ce") {
+            cursorActionOptional = .leftClick
+            cursorSelectorOptional = .element
+            
+            let inputSplit = trimmedInput.split(separator: " ")
+            if inputSplit.count == 2 {
+                let argString = inputSplit.last!
+                elementSelectorArgs = argString.split(separator: ";")
+                    .map({ ElementSelectorArg(rawValue: String($0)) })
+                    .compactMap({ $0 })
+            }
         }
+        
+        else if trimmedInput.starts(with: "rce") {
+            cursorActionOptional = .rightClick
+            cursorSelectorOptional = .element
+            
+            let inputSplit = trimmedInput.split(separator: " ")
+            if inputSplit.count == 2 {
+                let argString = inputSplit.last!
+                elementSelectorArgs = argString.split(separator: ";")
+                    .map({ ElementSelectorArg(rawValue: String($0)) })
+                    .compactMap({ $0 })
+            }
+        }
+        
+        else if trimmedInput.starts(with: "dce") {
+            cursorActionOptional = .doubleLeftClick
+            cursorSelectorOptional = .element
+            
+            let inputSplit = trimmedInput.split(separator: " ")
+            if inputSplit.count == 2 {
+                let argString = inputSplit.last!
+                elementSelectorArgs = argString.split(separator: ";")
+                    .map({ ElementSelectorArg(rawValue: String($0)) })
+                    .compactMap({ $0 })
+            }
+        }
+        
+        else if trimmedInput.starts(with: "ch") {
+            cursorActionOptional = .leftClick
+            cursorSelectorOptional = .here
+        }
+        
+        else if trimmedInput.starts(with: "rch") {
+            cursorActionOptional = .rightClick
+            cursorSelectorOptional = .here
+        }
+        
+        else if trimmedInput.starts(with: "dch") {
+            cursorActionOptional = .doubleLeftClick
+            cursorSelectorOptional = .here
+        }
+        
+        guard let cursorAction = cursorActionOptional,
+            let cursorSelector = cursorSelectorOptional else {
+                return
+        }
+        
+        self.setHintSelectorMode(cursorAction: cursorAction, cursorSelector: cursorSelector, elementSelectorArgsOptional: elementSelectorArgs)
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {
