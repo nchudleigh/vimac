@@ -1,5 +1,3 @@
-//
-//  Utils.swift
 //  ViMac-Swift
 //
 //  Created by Huawei Matebook X Pro on 15/9/19.
@@ -143,7 +141,7 @@ class Utils: NSObject {
             // 2. element does not have a parent scroll area, but if it does it must be in it's frame
             if let position = positionOptional,
                 let role = roleOptional {
-                let blacklistedRoles = ["AXUnknown", "AXStaticText", "AXToolbar", "AXCell", "AXWindow", "AXScrollArea", "AXSplitter", "AXList"]
+                let blacklistedRoles = ["AXUnknown", "AXToolbar", "AXCell", "AXWindow", "AXScrollArea", "AXSplitter", "AXList"]
                 //let isGroupRole = role.hasSuffix("Group")
                 let isBlacklisted = blacklistedRoles.contains(role)
                 if (!isBlacklisted) {
@@ -259,7 +257,18 @@ class Utils: NSObject {
         if arg == .row {
             return [Role.row]
         }
+	
+        if arg == .image {
+            return [Role.image]
+        }
         
+        if arg == .text {
+            return [Role.textField, Role.textArea, Role.staticText]
+        }
+        
+        if arg == .link {
+            return [Role.link]
+        }
         
         return []
     }

@@ -25,4 +25,7 @@ enum ElementSelectorArg: String {
     case disclosureTriangle = "dt"
     case group = "grp"
     case row = "r"
+    case image = "i"
+    case text = "t"
+    case link = "l"
 }
