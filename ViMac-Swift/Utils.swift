@@ -75,21 +75,9 @@ class Utils: NSObject {
         event2?.post(tap: .cghidEventTap)
     }
     
-    static func traverseUIElementForPressables(rootElement: UIElement) -> [UIElement]? {
-        let windowFrameOptional: NSRect? = {
-            do {
-                return try rootElement.attribute(.frame)
-            } catch {
-                return nil
-            }
-        }()
-        
-        guard let windowFrame = windowFrameOptional else {
-            return nil
-        }
-        
+    static func traverseUIElementForPressables(rootElement: UIElement) -> [UIElement] {
         var elements = [UIElement]()
-        func fn(element: UIElement, level: Int) -> Void {
+        func fn(element: UIElement, parentScrollAreaFrame: NSRect?, level: Int) -> Void {
             let roleOptional: String? = {
                 do {
                     return try element.attribute(.role)
@@ -114,21 +102,35 @@ class Utils: NSObject {
                 }
             }()
             
+            var newScrollAreaFrame: NSRect? = nil
+            var isScrollArea = false
+            
             if let role = roleOptional {
                 // ignore subcomponents of a scrollbar
                 if role == Role.scrollBar.rawValue {
                     return
                 }
                 
-                // ignore rows that are out of window frame
+                if role == Role.scrollArea.rawValue {
+                    isScrollArea = true
+                    if let position = positionOptional,
+                        let size = sizeOptional {
+                        let frame = NSRect(origin: position, size: size)
+                        newScrollAreaFrame = frame
+                    }
+                }
+                
+                // ignore rows that are out of parent scroll area's frame
                 // doing this improves traversal speed significantly because we do not look at
                 // children elements that most likely are out of frame
                 if role == Role.row.rawValue || role == "AXPage" {
                     if let position = positionOptional,
                         let size = sizeOptional {
                         let frame = NSRect(origin: position, size: size)
-                        if (!windowFrame.intersects(frame)) {
-                            return
+                        if let scrollAreaFrame = parentScrollAreaFrame {
+                            if (!scrollAreaFrame.intersects(frame)) {
+                                return
+                            }
                         }
                     } else {
                         return
@@ -136,13 +138,22 @@ class Utils: NSObject {
                 }
             }
 
+            // append to allowed elements list if
+            // 1. element's role is not blacklisted
+            // 2. element does not have a parent scroll area, but if it does it must be in it's frame
             if let position = positionOptional,
                 let role = roleOptional {
                 let blacklistedRoles = ["AXUnknown", "AXStaticText", "AXToolbar", "AXCell", "AXWindow", "AXScrollArea", "AXSplitter", "AXList"]
                 //let isGroupRole = role.hasSuffix("Group")
                 let isBlacklisted = blacklistedRoles.contains(role)
-                if (windowFrame.contains(position) && !isBlacklisted) {
-                    elements.append(element)
+                if (!isBlacklisted) {
+                    if let parentScrollAreaFrame = parentScrollAreaFrame {
+                        if parentScrollAreaFrame.contains(position) {
+                            elements.append(element)
+                        }
+                    } else {
+                        elements.append(element)
+                    }
                 }
             }
             
@@ -158,11 +169,15 @@ class Utils: NSObject {
                 }
             }()
             
-            children.forEach { child in
-                fn(element: UIElement(child), level: level + 1)
+            for child in children {
+                if isScrollArea {
+                    fn(element: UIElement(child), parentScrollAreaFrame: newScrollAreaFrame, level: level + 1)
+                } else {
+                    fn(element: UIElement(child), parentScrollAreaFrame: parentScrollAreaFrame, level: level + 1)
+                }
             }
         }
-        fn(element: rootElement, level: 1)
+        fn(element: rootElement, parentScrollAreaFrame: nil, level: 1)
         return elements
     }
     
