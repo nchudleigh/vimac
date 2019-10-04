@@ -34,9 +34,10 @@ class HintView: NSTextField {
             let typedRange = NSMakeRange(0, typed.count)
             attr.addAttributes([NSAttributedString.Key.foregroundColor : HintView.typedHintColor], range: typedRange)
         }
+        self.stringValue = hintText
         self.attributedStringValue = attr
+        self.allowsEditingTextAttributes = true
         
-        //self.stringValue = hintText
         self.wantsLayer = true
         self.isBordered = true
         self.drawsBackground = true
@@ -50,5 +51,17 @@ class HintView: NSTextField {
         self.font = NSFont.boldSystemFont(ofSize: 10)
         
         self.sizeToFit()
+    }
+    
+    func updateTypedText(typed: String) {
+        let hintText = self.attributedStringValue.string
+        let attr = NSMutableAttributedString(string: hintText)
+        let range = NSMakeRange(0, hintText.count)
+        attr.addAttributes([NSAttributedString.Key.foregroundColor : HintView.untypedHintColor], range: range)
+        if hintText.lowercased().starts(with: typed.lowercased()) {
+            let typedRange = NSMakeRange(0, typed.count)
+            attr.addAttributes([NSAttributedString.Key.foregroundColor : HintView.typedHintColor], range: typedRange)
+        }
+        self.attributedStringValue = attr
     }
 }

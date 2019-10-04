@@ -327,7 +327,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         selectorTextField.stringValue = ""
         selectorTextField.isEditable = true
         selectorTextField.delegate = self
-         selectorTextField.isHidden = true
+        // for some reason setting the text field to hidden breaks hint updating after the first hint update.
+        // selectorTextField.isHidden = true
         selectorTextField.tag = AppDelegate.HINT_SELECTOR_TEXT_FIELD_TAG
         selectorTextField.cursorAction = cursorAction
         selectorTextField.overlayTextFieldDelegate = self
@@ -488,12 +489,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         hintViews.forEach { hintView in
-            hintView.removeFromSuperview()
+            hintView.isHidden = true
             if hintView.stringValue.starts(with: typed.uppercased()) {
-                let newHintView = HintView(frame: hintView.frame)
-                newHintView.initializeHint(hintText: hintView.stringValue, typed: typed.uppercased())
-                newHintView.associatedButton = hintView.associatedButton
-                window.contentView!.addSubview(newHintView)
+                hintView.updateTypedText(typed: typed)
+                hintView.isHidden = false
             }
         }
     }
