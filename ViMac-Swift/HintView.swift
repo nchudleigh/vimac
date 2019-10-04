@@ -36,7 +36,6 @@ class HintView: NSTextField {
         }
         self.stringValue = hintText
         self.attributedStringValue = attr
-        self.allowsEditingTextAttributes = true
         
         self.wantsLayer = true
         self.isBordered = true
