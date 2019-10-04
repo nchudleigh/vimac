@@ -260,13 +260,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         self.resizeOverlayWindow()
 
-        let elementsOptional = Utils.traverseUIElementForPressables(rootElement: applicationWindow)
+        let elements = Utils.traverseUIElementForPressables(rootElement: applicationWindow)
         let menuBarItems = Utils.traverseForMenuBarItems(windowElement: applicationWindow)
-        guard let elements = elementsOptional else {
-            print("traversal failed")
-            self.hideOverlays()
-            return
-        }
         
         var allElements = elements + menuBarItems
 
