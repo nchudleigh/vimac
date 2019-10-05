@@ -7,9 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		94EE5CB18FE45029549851E5 /* Pods_ViMac_SwiftUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA6A7F7F788AC590C0151C42 /* Pods_ViMac_SwiftUITests.framework */; };
-		A748E07DD920884D134567B3 /* Pods_ViMac_SwiftTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DE3D9CDCF08A5858FDCD7376 /* Pods_ViMac_SwiftTests.framework */; };
-		D8C125B0719D3A268AC30B29 /* Pods_ViMac_Swift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 76C3AC6022115352D333CBFC /* Pods_ViMac_Swift.framework */; };
+		2DC3D29517A52F4D8F0CC229 /* Pods_VimacTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C1A83D21AFC86DC85BA4172A /* Pods_VimacTests.framework */; };
+		6FE3DB03F7AD9AF0EA109234 /* Pods_Vimac.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A054C7EE102CDBE8D0751BEE /* Pods_Vimac.framework */; };
 		E20696F923290D41001EFDB2 /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20696F823290D41001EFDB2 /* Log.swift */; };
 		E2069700232A52EA001EFDB2 /* AlphabetHints.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20696FF232A52EA001EFDB2 /* AlphabetHints.swift */; };
 		E225BD1D233292B800ECDEF4 /* StatusItemManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E225BD1C233292B800ECDEF4 /* StatusItemManager.swift */; };
@@ -29,6 +28,7 @@
 		E2F6C9AF232DEA1800F2975B /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2F6C9AE232DEA1800F2975B /* Utils.swift */; };
 		E2F6C9B1232E337500F2975B /* OverlayTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2F6C9B0232E337500F2975B /* OverlayTextField.swift */; };
 		E2FB1B3D233CCE10009B04D3 /* KeyPosition.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2FB1B3B233CCE10009B04D3 /* KeyPosition.swift */; };
+		F7C4E3B403CD422C02822BE3 /* Pods_VimacUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 54CBCAEAE5A7AAB1D8A8EC5B /* Pods_VimacUITests.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,14 +49,21 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		200558B148697A57774A9D99 /* Pods-VimacTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VimacTests.debug.xcconfig"; path = "Target Support Files/Pods-VimacTests/Pods-VimacTests.debug.xcconfig"; sourceTree = "<group>"; };
+		32C9339A3618E890CA20DD05 /* Pods-Vimac.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Vimac.release.xcconfig"; path = "Target Support Files/Pods-Vimac/Pods-Vimac.release.xcconfig"; sourceTree = "<group>"; };
+		45BF03691C616F9AD506F764 /* Pods-VimacTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VimacTests.release.xcconfig"; path = "Target Support Files/Pods-VimacTests/Pods-VimacTests.release.xcconfig"; sourceTree = "<group>"; };
+		54CBCAEAE5A7AAB1D8A8EC5B /* Pods_VimacUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_VimacUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		57F0F140E6ADB5F3FB11F798 /* Pods-VimacUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VimacUITests.debug.xcconfig"; path = "Target Support Files/Pods-VimacUITests/Pods-VimacUITests.debug.xcconfig"; sourceTree = "<group>"; };
 		5DC3CEB06C80EC1BDFD397FB /* Pods-ViMac-SwiftTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ViMac-SwiftTests.release.xcconfig"; path = "Target Support Files/Pods-ViMac-SwiftTests/Pods-ViMac-SwiftTests.release.xcconfig"; sourceTree = "<group>"; };
-		76C3AC6022115352D333CBFC /* Pods_ViMac_Swift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ViMac_Swift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7F0BD852533E38CD69AB5F0B /* Pods-ViMac-SwiftUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ViMac-SwiftUITests.debug.xcconfig"; path = "Target Support Files/Pods-ViMac-SwiftUITests/Pods-ViMac-SwiftUITests.debug.xcconfig"; sourceTree = "<group>"; };
+		A054C7EE102CDBE8D0751BEE /* Pods_Vimac.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Vimac.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		A632464851C6DD9E67714F3C /* Pods-VimacUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VimacUITests.release.xcconfig"; path = "Target Support Files/Pods-VimacUITests/Pods-VimacUITests.release.xcconfig"; sourceTree = "<group>"; };
 		B28B5A13832960194C1DC834 /* Pods-ViMac-SwiftUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ViMac-SwiftUITests.release.xcconfig"; path = "Target Support Files/Pods-ViMac-SwiftUITests/Pods-ViMac-SwiftUITests.release.xcconfig"; sourceTree = "<group>"; };
 		B30FF7C31BF019D692EE897C /* Pods-ViMac-Swift.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ViMac-Swift.debug.xcconfig"; path = "Target Support Files/Pods-ViMac-Swift/Pods-ViMac-Swift.debug.xcconfig"; sourceTree = "<group>"; };
+		B877ABCFA9D1468A026E7D28 /* Pods-Vimac.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Vimac.debug.xcconfig"; path = "Target Support Files/Pods-Vimac/Pods-Vimac.debug.xcconfig"; sourceTree = "<group>"; };
 		B9677058C37D4B6985948CB2 /* Pods-ViMac-Swift.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ViMac-Swift.release.xcconfig"; path = "Target Support Files/Pods-ViMac-Swift/Pods-ViMac-Swift.release.xcconfig"; sourceTree = "<group>"; };
 		BC08535C76EBCBC974B09397 /* Pods-ViMac-SwiftTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ViMac-SwiftTests.debug.xcconfig"; path = "Target Support Files/Pods-ViMac-SwiftTests/Pods-ViMac-SwiftTests.debug.xcconfig"; sourceTree = "<group>"; };
-		DE3D9CDCF08A5858FDCD7376 /* Pods_ViMac_SwiftTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ViMac_SwiftTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C1A83D21AFC86DC85BA4172A /* Pods_VimacTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_VimacTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E20696F823290D41001EFDB2 /* Log.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Log.swift; sourceTree = "<group>"; };
 		E20696FC232A0021001EFDB2 /* VimacBridgingHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VimacBridgingHeader.h; sourceTree = "<group>"; };
 		E20696FF232A52EA001EFDB2 /* AlphabetHints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlphabetHints.swift; sourceTree = "<group>"; };
@@ -84,7 +91,6 @@
 		E2F6C9AE232DEA1800F2975B /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		E2F6C9B0232E337500F2975B /* OverlayTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayTextField.swift; sourceTree = "<group>"; };
 		E2FB1B3B233CCE10009B04D3 /* KeyPosition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyPosition.swift; sourceTree = "<group>"; };
-		EA6A7F7F788AC590C0151C42 /* Pods_ViMac_SwiftUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ViMac_SwiftUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -92,7 +98,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D8C125B0719D3A268AC30B29 /* Pods_ViMac_Swift.framework in Frameworks */,
+				6FE3DB03F7AD9AF0EA109234 /* Pods_Vimac.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -100,7 +106,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A748E07DD920884D134567B3 /* Pods_ViMac_SwiftTests.framework in Frameworks */,
+				2DC3D29517A52F4D8F0CC229 /* Pods_VimacTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -108,7 +114,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				94EE5CB18FE45029549851E5 /* Pods_ViMac_SwiftUITests.framework in Frameworks */,
+				F7C4E3B403CD422C02822BE3 /* Pods_VimacUITests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -124,6 +130,12 @@
 				5DC3CEB06C80EC1BDFD397FB /* Pods-ViMac-SwiftTests.release.xcconfig */,
 				7F0BD852533E38CD69AB5F0B /* Pods-ViMac-SwiftUITests.debug.xcconfig */,
 				B28B5A13832960194C1DC834 /* Pods-ViMac-SwiftUITests.release.xcconfig */,
+				B877ABCFA9D1468A026E7D28 /* Pods-Vimac.debug.xcconfig */,
+				32C9339A3618E890CA20DD05 /* Pods-Vimac.release.xcconfig */,
+				200558B148697A57774A9D99 /* Pods-VimacTests.debug.xcconfig */,
+				45BF03691C616F9AD506F764 /* Pods-VimacTests.release.xcconfig */,
+				57F0F140E6ADB5F3FB11F798 /* Pods-VimacUITests.debug.xcconfig */,
+				A632464851C6DD9E67714F3C /* Pods-VimacUITests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -131,9 +143,9 @@
 		7C24038EA562327EBACD7587 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				76C3AC6022115352D333CBFC /* Pods_ViMac_Swift.framework */,
-				DE3D9CDCF08A5858FDCD7376 /* Pods_ViMac_SwiftTests.framework */,
-				EA6A7F7F788AC590C0151C42 /* Pods_ViMac_SwiftUITests.framework */,
+				A054C7EE102CDBE8D0751BEE /* Pods_Vimac.framework */,
+				C1A83D21AFC86DC85BA4172A /* Pods_VimacTests.framework */,
+				54CBCAEAE5A7AAB1D8A8EC5B /* Pods_VimacUITests.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -367,7 +379,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-ViMac-SwiftUITests-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-VimacUITests-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -389,7 +401,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-ViMac-SwiftTests-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-VimacTests-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -411,7 +423,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-ViMac-Swift-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-Vimac-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -442,15 +454,15 @@
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ViMac-Swift/Pods-ViMac-Swift-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-Vimac/Pods-Vimac-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ViMac-Swift/Pods-ViMac-Swift-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-Vimac/Pods-Vimac-frameworks-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ViMac-Swift/Pods-ViMac-Swift-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Vimac/Pods-Vimac-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -638,7 +650,7 @@
 		};
 		E26172472322968700E396CA /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = B30FF7C31BF019D692EE897C /* Pods-ViMac-Swift.debug.xcconfig */;
+			baseConfigurationReference = B877ABCFA9D1468A026E7D28 /* Pods-Vimac.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = "ViMac-Swift/ViMac_Swift.entitlements";
@@ -657,7 +669,7 @@
 		};
 		E26172482322968700E396CA /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = B9677058C37D4B6985948CB2 /* Pods-ViMac-Swift.release.xcconfig */;
+			baseConfigurationReference = 32C9339A3618E890CA20DD05 /* Pods-Vimac.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = "ViMac-Swift/ViMac_Swift.entitlements";
@@ -676,7 +688,7 @@
 		};
 		E261724A2322968700E396CA /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = BC08535C76EBCBC974B09397 /* Pods-ViMac-SwiftTests.debug.xcconfig */;
+			baseConfigurationReference = 200558B148697A57774A9D99 /* Pods-VimacTests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -697,7 +709,7 @@
 		};
 		E261724B2322968700E396CA /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 5DC3CEB06C80EC1BDFD397FB /* Pods-ViMac-SwiftTests.release.xcconfig */;
+			baseConfigurationReference = 45BF03691C616F9AD506F764 /* Pods-VimacTests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -718,7 +730,7 @@
 		};
 		E261724D2322968700E396CA /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7F0BD852533E38CD69AB5F0B /* Pods-ViMac-SwiftUITests.debug.xcconfig */;
+			baseConfigurationReference = 57F0F140E6ADB5F3FB11F798 /* Pods-VimacUITests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
@@ -738,7 +750,7 @@
 		};
 		E261724E2322968700E396CA /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = B28B5A13832960194C1DC834 /* Pods-ViMac-SwiftUITests.release.xcconfig */;
+			baseConfigurationReference = A632464851C6DD9E67714F3C /* Pods-VimacUITests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
