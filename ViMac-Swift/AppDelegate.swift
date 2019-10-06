@@ -477,11 +477,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 buttonPositionOptional = try button.attribute(.position)
                 buttonSizeOptional = try button.attribute(.size)
             } catch {
+                self.hideOverlays()
                 return
             }
             
             guard let buttonPosition = buttonPositionOptional,
                 let buttonSize = buttonSizeOptional else {
+                    self.hideOverlays()
                     return
             }
             
