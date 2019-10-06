@@ -121,7 +121,7 @@ class Utils: NSObject {
                 // ignore rows that are out of parent scroll area's frame
                 // doing this improves traversal speed significantly because we do not look at
                 // children elements that most likely are out of frame
-                if role == Role.row.rawValue || role == "AXPage" {
+                if role == Role.row.rawValue || role == "AXPage" || role == Role.group.rawValue {
                     if let position = positionOptional,
                         let size = sizeOptional {
                         let frame = NSRect(origin: position, size: size)
