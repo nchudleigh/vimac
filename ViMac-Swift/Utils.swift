@@ -138,15 +138,18 @@ class Utils: NSObject {
 
             // append to allowed elements list if
             // 1. element's role is not blacklisted
-            // 2. element does not have a parent scroll area, but if it does it must be in it's frame
+            // 2. element does not have a parent scroll area, but if it does both frames must intersect
             if let position = positionOptional,
+                let size = sizeOptional,
                 let role = roleOptional {
+                let frame = NSRect(origin: position, size: size)
                 let blacklistedRoles = ["AXUnknown", "AXToolbar", "AXCell", "AXWindow", "AXScrollArea", "AXSplitter", "AXList"]
+                
                 //let isGroupRole = role.hasSuffix("Group")
                 let isBlacklisted = blacklistedRoles.contains(role)
                 if (!isBlacklisted) {
                     if let parentScrollAreaFrame = parentScrollAreaFrame {
-                        if parentScrollAreaFrame.contains(position) {
+                        if parentScrollAreaFrame.intersects(frame) {
                             elements.append(element)
                         }
                     } else {
