@@ -183,7 +183,7 @@ class Utils: NSObject {
         var menuBarItems = [UIElement]()
         let applicationOptional: UIElement? = {
             do {
-                return try! windowElement.attribute(.parent)
+                return try windowElement.attribute(.parent)
             } catch {
                 return nil
             }

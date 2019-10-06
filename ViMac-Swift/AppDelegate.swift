@@ -470,10 +470,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 self.hideOverlays()
                 return
             }
-            
-            guard let buttonPosition: NSPoint = try! button.attribute(.position),
-                let buttonSize: NSSize = try! button.attribute(.size) else {
+
+            var buttonPositionOptional: NSPoint?
+            var buttonSizeOptional: NSSize?
+            do {
+                buttonPositionOptional = try button.attribute(.position)
+                buttonSizeOptional = try button.attribute(.size)
+            } catch {
                 return
+            }
+            
+            guard let buttonPosition = buttonPositionOptional,
+                let buttonSize = buttonSizeOptional else {
+                    return
             }
             
             let centerPositionX = buttonPosition.x + (buttonSize.width / 2)
