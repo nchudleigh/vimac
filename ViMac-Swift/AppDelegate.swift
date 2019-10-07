@@ -351,6 +351,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     return false
                 }
             })
+            .filter({ element in
+                do {
+                    return try element.attributeIsSettable(.focused)
+                } catch {
+                    return false
+                }
+            })
         
         let hintStrings = AlphabetHints().hintStrings(linkCount: elements.count)
 
@@ -621,7 +628,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             do {
                 try element.setAttribute(.focused, value: true)
             } catch {
-                
             }
             return
         }
