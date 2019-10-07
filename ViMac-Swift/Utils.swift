@@ -269,4 +269,17 @@ class Utils: NSObject {
         
         return []
     }
+    
+    static func setAccessibilityAttributes(app: UIElement) {
+        do {
+            try app.setAttribute("AXEnhancedUserInterface", value: true)
+        } catch {
+
+        }
+        do {
+            try app.setAttribute("AXManualAccessibility", value: true)
+        } catch {
+
+        }
+    }
 }

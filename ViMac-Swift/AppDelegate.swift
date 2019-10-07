@@ -120,8 +120,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         self.compositeDisposable.insert(applicationObservable
             .observeOn(MainScheduler.instance)
-            .subscribe(onNext: { app in
-                os_log("Current frontmost application: %@", log: Log.accessibility, String(describing: app))
+            .subscribe(onNext: { appOptional in
+                os_log("Current frontmost application: %@", log: Log.accessibility, String(describing: appOptional))
+                if let app = appOptional {
+                    Utils.setAccessibilityAttributes(app: app)
+                }
             })
         )
 
@@ -240,9 +243,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             return nil
         }
         
+        let appOptional = Application.init(nsApplication)
+        if let app = appOptional {
+            Utils.setAccessibilityAttributes(app: app)
+        }
+        
         return {
             do {
-                return try Application.init(nsApplication)?.attribute(.focusedWindow)
+                return try appOptional?.attribute(.focusedWindow)
             } catch {
                 return nil
             }
