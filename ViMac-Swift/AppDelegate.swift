@@ -19,6 +19,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     static let NORMAL_MODE_TEXT_FIELD_TAG = 1
     static let HINT_SELECTOR_TEXT_FIELD_TAG = 2
     static let SCROLL_MODE_SELECTOR_TAG = 3
+    static let FOCUS_SELECTOR_TAG = 4
     
     let applicationObservable: Observable<Application?>
     let applicationNotificationObservable: Observable<AccessibilityObservables.AppNotificationAppPair>
@@ -262,21 +263,21 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         let elements = Utils.traverseUIElementForPressables(rootElement: applicationWindow)
         let menuBarItems = Utils.traverseForMenuBarItems(windowElement: applicationWindow)
-        
         var allElements = elements + menuBarItems
 
+        let blacklistedRoles = Set(["AXUnknown", "AXToolbar", "AXCell", "AXWindow", "AXScrollArea", "AXSplitter", "AXList"])
+        
         if let allowedRoles = allowedRoles {
             if allowedRoles.count > 0 {
                 let rolesString = allowedRoles.map({ $0.rawValue })
                 let rolesStringSet = Set(rolesString)
-                print(rolesStringSet)
                 allElements = allElements
                     .filter({ element in
                         do {
                             guard let elementRole: String = try element.attribute(.role) else {
                                 return false
                             }
-                            return rolesStringSet.contains(elementRole)
+                            return !blacklistedRoles.contains(elementRole) && rolesStringSet.contains(elementRole)
                         } catch {
                             return false
                         }
@@ -314,13 +315,79 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             window.contentView!.addSubview(view)
         }
         
-        let selectorTextField = OverlayTextField(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
+        let selectorTextField = CursorActionSelectorTextField(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
         selectorTextField.stringValue = ""
         selectorTextField.isEditable = true
         selectorTextField.delegate = self
          selectorTextField.isHidden = true
         selectorTextField.tag = AppDelegate.HINT_SELECTOR_TEXT_FIELD_TAG
         selectorTextField.cursorAction = cursorAction
+        selectorTextField.overlayTextFieldDelegate = self
+        window.contentView?.addSubview(selectorTextField)
+        self.overlayWindowController.showWindow(nil)
+        window.makeKeyAndOrderFront(nil)
+        selectorTextField.becomeFirstResponder()
+    }
+    
+    func setFocusMode() {
+        guard let applicationWindow = (try! self.windowSubject.value()) ?? self.getCurrentApplicationWindowManually(),
+            let window = self.overlayWindowController.window else {
+            print("Failed to set Hint Selector")
+            self.hideOverlays()
+            return
+        }
+        
+        self.resizeOverlayWindow()
+
+        let elements = Utils.traverseUIElementForPressables(rootElement: applicationWindow)
+            .filter({ element in
+                do {
+                    let roleOptional: String? = try element.attribute(.role)
+                    guard let role = roleOptional else {
+                        return false
+                    }
+                    return role == Role.textArea.rawValue || role == Role.textField.rawValue
+                } catch {
+                    return false
+                }
+            })
+        
+        let hintStrings = AlphabetHints().hintStrings(linkCount: elements.count)
+
+        let hintViews: [HintView] = elements
+            .enumerated()
+            .map ({ (index, button) in
+                let positionFlippedOptional: NSPoint? = {
+                    do {
+                        return try button.attribute(.position)
+                    } catch {
+                        return nil
+                    }
+                }()
+                
+                if let positionFlipped = positionFlippedOptional {
+                    let text = HintView(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
+                    text.initializeHint(hintText: hintStrings[index], typed: "")
+                    let positionRelativeToScreen = Utils.toOrigin(point: positionFlipped, size: text.frame.size)
+                    let positionRelativeToWindow = window.convertPoint(fromScreen: positionRelativeToScreen)
+                    text.associatedButton = button
+                    text.frame.origin = positionRelativeToWindow
+                    text.zIndex = index
+                    return text
+                }
+                return nil })
+            .compactMap({ $0 })
+        
+        hintViews.forEach { view in
+            window.contentView!.addSubview(view)
+        }
+        
+        let selectorTextField = FocusSelectorTextField(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
+        selectorTextField.stringValue = ""
+        selectorTextField.isEditable = true
+        selectorTextField.delegate = self
+         selectorTextField.isHidden = true
+        selectorTextField.tag = AppDelegate.FOCUS_SELECTOR_TAG
         selectorTextField.overlayTextFieldDelegate = self
         window.contentView?.addSubview(selectorTextField)
         self.overlayWindowController.showWindow(nil)
@@ -434,7 +501,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
     
-    func onHintSelectorTextChange(textField: OverlayTextField) {
+    func onHintSelectorTextChange(textField: CursorActionSelectorTextField) {
         let typed = textField.stringValue
         guard let window = self.overlayWindowController.window,
             let hintViews = window.contentView?.subviews.filter ({ $0 is HintView }) as! [HintView]?,
@@ -514,6 +581,56 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // update hints to reflect new typed text
         self.updateHints(typed: typed)
     }
+
+    func onFocusSelectorTextChange(textField: FocusSelectorTextField) {
+        let typed = textField.stringValue
+        print(typed)
+        guard let window = self.overlayWindowController.window,
+            let hintViews = window.contentView?.subviews.filter ({ $0 is HintView }) as! [HintView]? else {
+            print("Failed to update hints.")
+            self.hideOverlays()
+            return
+        }
+        
+        if let lastCharacter = typed.last {
+            if lastCharacter == " " {
+                textField.stringValue = textField.stringValue.trimmingCharacters(in: .whitespacesAndNewlines)
+                self.rotateHints()
+                return
+            }
+        }
+        
+        let matchingHints = hintViews.filter { hintView in
+            return hintView.stringValue.starts(with: typed.uppercased())
+        }
+        
+        if matchingHints.count == 0 && typed.count > 0 {
+            print("No matching hints. Exiting Hint Mode")
+            self.hideOverlays()
+            return
+        }
+        
+        if matchingHints.count == 1 {
+            self.hideOverlays()
+            let matchingHint = matchingHints.first!
+            let elementOptional = matchingHint.associatedButton
+            guard let element = elementOptional else {
+                print("Couldn't find HintView's associated element. Exiting.")
+                return
+            }
+
+            do {
+                try element.setAttribute(.focused, value: true)
+            } catch {
+                
+            }
+            return
+        }
+        
+        // update hints to reflect new typed text
+        self.updateHints(typed: typed)
+    }
+    
     
     func onInputSubmitted(input: String) {
         self.hideOverlays()
@@ -522,6 +639,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if trimmedInput == "s" {
             self.setScrollMode()
             return
+        }
+        
+        if trimmedInput == "f" {
+            self.setFocusMode()
         }
         
         var cursorActionOptional: CursorAction?
@@ -603,7 +724,9 @@ extension AppDelegate : NSTextFieldDelegate {
 
         switch textField.tag {
         case AppDelegate.HINT_SELECTOR_TEXT_FIELD_TAG:
-            self.onHintSelectorTextChange(textField: textField as! OverlayTextField)
+            self.onHintSelectorTextChange(textField: textField as! CursorActionSelectorTextField)
+        case AppDelegate.FOCUS_SELECTOR_TAG:
+            self.onFocusSelectorTextChange(textField: textField as! FocusSelectorTextField)
         default:
             return
         }

@@ -143,18 +143,12 @@ class Utils: NSObject {
                 let size = sizeOptional,
                 let role = roleOptional {
                 let frame = NSRect(origin: position, size: size)
-                let blacklistedRoles = ["AXUnknown", "AXToolbar", "AXCell", "AXWindow", "AXScrollArea", "AXSplitter", "AXList"]
-                
-                //let isGroupRole = role.hasSuffix("Group")
-                let isBlacklisted = blacklistedRoles.contains(role)
-                if (!isBlacklisted) {
-                    if let parentScrollAreaFrame = parentScrollAreaFrame {
-                        if parentScrollAreaFrame.intersects(frame) {
-                            elements.append(element)
-                        }
-                    } else {
+                if let parentScrollAreaFrame = parentScrollAreaFrame {
+                    if parentScrollAreaFrame.intersects(frame) {
                         elements.append(element)
                     }
+                } else {
+                    elements.append(element)
                 }
             }
             
