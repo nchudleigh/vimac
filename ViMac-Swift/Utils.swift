@@ -270,6 +270,10 @@ class Utils: NSObject {
         return []
     }
     
+    // For performance reasons Chromium only makes the webview accessible when there it detects voiceover through the `AXEnhancedUserInterface` attribute on the Chrome application itself:
+    // http://dev.chromium.org/developers/design-documents/accessibility
+    // Similarly, electron uses `AXManualAccessibility`:
+    // https://electronjs.org/docs/tutorial/accessibility#assistive-technology
     static func setAccessibilityAttributes(app: UIElement) {
         do {
             try app.setAttribute("AXEnhancedUserInterface", value: true)
