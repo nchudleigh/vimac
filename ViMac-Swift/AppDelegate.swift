@@ -584,7 +584,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func onFocusSelectorTextChange(textField: FocusSelectorTextField) {
         let typed = textField.stringValue
-        print(typed)
         guard let window = self.overlayWindowController.window,
             let hintViews = window.contentView?.subviews.filter ({ $0 is HintView }) as! [HintView]? else {
             print("Failed to update hints.")
