@@ -10,7 +10,6 @@ import Cocoa
 import RxSwift
 
 class OverlayTextField: NSTextField {
-    var cursorAction: CursorAction?
     weak var overlayTextFieldDelegate: OverlayTextFieldDelegate?
     var isFirstResponderSubject: BehaviorSubject<Bool>?
     var keyEventObservable: Observable<KeyAction>?
@@ -104,6 +103,14 @@ class OverlayTextField: NSTextField {
     func getDistinctKeyEventObservable() {
         
     }
+}
+
+class CursorActionSelectorTextField : OverlayTextField {
+    var cursorAction: CursorAction?
+}
+
+class FocusSelectorTextField : OverlayTextField {
+    
 }
 
 protocol OverlayTextFieldDelegate: AnyObject {
