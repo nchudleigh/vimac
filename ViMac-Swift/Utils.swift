@@ -152,6 +152,14 @@ class Utils: NSObject {
     }
     
     static func getAttributes(element: UIElement) -> Observable<(String?, NSPoint?, NSSize?)> {
+        return Observable.zip(
+            getElementRole(element: element),
+            getElementPosition(element: element),
+            getElementSize(element: element)
+        )
+    }
+    
+    static func getElementRole(element: UIElement) -> Observable<String?> {
         return Observable.create({ observer in
             DispatchQueue.global().async {
                 let roleOptional: String? = {
@@ -161,7 +169,16 @@ class Utils: NSObject {
                         return nil
                     }
                 }()
-
+                observer.onNext(roleOptional)
+                observer.onCompleted()
+            }
+            return Disposables.create()
+        })
+    }
+    
+    static func getElementPosition(element: UIElement) -> Observable<NSPoint?> {
+        return Observable.create({ observer in
+            DispatchQueue.global().async {
                 let positionOptional: NSPoint? = {
                     do {
                         return try element.attribute(.position)
@@ -169,7 +186,16 @@ class Utils: NSObject {
                         return nil
                     }
                 }()
-                
+                observer.onNext(positionOptional)
+                observer.onCompleted()
+            }
+            return Disposables.create()
+        })
+    }
+    
+    static func getElementSize(element: UIElement) -> Observable<NSSize?> {
+        return Observable.create({ observer in
+            DispatchQueue.global().async {
                 let sizeOptional: NSSize? = {
                     do {
                         return try element.attribute(.size)
@@ -177,7 +203,7 @@ class Utils: NSObject {
                         return nil
                     }
                 }()
-                observer.onNext((roleOptional, positionOptional, sizeOptional))
+                observer.onNext(sizeOptional)
                 observer.onCompleted()
             }
             return Disposables.create()

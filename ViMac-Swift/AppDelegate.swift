@@ -292,7 +292,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 //                    })
 //            }
 //        }
-
         elements.toArray()
             .observeOn(MainScheduler.instance)
             .subscribe(onSuccess: { elements in
