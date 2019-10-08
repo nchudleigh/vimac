@@ -143,7 +143,7 @@ class Utils: NSObject {
                         
                         return Observable.merge([
                             includeElement ? Observable.just(element) : Observable.empty(),
-                            Observable.concat(
+                            Observable.merge(
                                 children.map({ getUIElementChildrenRecursive(element: $0, parentScrollAreaFrame: psaf) })
                             )
                         ])
