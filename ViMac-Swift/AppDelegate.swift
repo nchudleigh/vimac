@@ -257,7 +257,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }()
     }
     
-    func setHintSelectorMode(cursorAction: CursorAction, cursorSelector: CursorSelector, allowedRoles: [Role]?) {
+    func setHintSelectorMode(cursorAction: CursorAction, cursorSelector: CursorSelector, allowedRoles: [Role]) {
         // if windowSubject does not have the current window, retrieve the current window directly
         // This fixes a bug where opening an application with Vimac causes windowSubject value to be nil
         guard let applicationWindow = (try! self.windowSubject.value()) ?? self.getCurrentApplicationWindowManually(),
@@ -269,73 +269,76 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         self.resizeOverlayWindow()
 
-        let elements = Utils.traverseUIElementForPressables(rootElement: applicationWindow)
-        let menuBarItems = Utils.traverseForMenuBarItems(windowElement: applicationWindow)
-        var allElements = elements + menuBarItems
-
         let blacklistedRoles = Set(["AXUnknown", "AXToolbar", "AXCell", "AXWindow", "AXScrollArea", "AXSplitter", "AXList"])
-        
-        if let allowedRoles = allowedRoles {
-            if allowedRoles.count > 0 {
-                let rolesString = allowedRoles.map({ $0.rawValue })
-                let rolesStringSet = Set(rolesString)
-                allElements = allElements
-                    .filter({ element in
-                        do {
-                            guard let elementRole: String = try element.attribute(.role) else {
-                                return false
-                            }
-                            return !blacklistedRoles.contains(elementRole) && rolesStringSet.contains(elementRole)
-                        } catch {
-                            return false
-                        }
-                    })
-            }
-        }
-        
-        let hintStrings = AlphabetHints().hintStrings(linkCount: allElements.count)
+        let allowedRolesString = Set(allowedRoles.map({ $0.rawValue }))
 
-        let hintViews: [HintView] = allElements
-            .enumerated()
-            .map ({ (index, button) in
-                let positionFlippedOptional: NSPoint? = {
-                    do {
-                        return try button.attribute(.position)
-                    } catch {
-                        return nil
+        var elements = Utils.getUIElementChildrenRecursive(element: applicationWindow, parentScrollAreaFrame: nil)
+        if allowedRoles.count > 0 {
+            elements = elements.filter({ element in
+                do {
+                    guard let elementRole: String = try element.attribute(.role) else {
+                        return false
                     }
-                }()
-                
-                if let positionFlipped = positionFlippedOptional {
-                    let text = HintView(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
-                    text.initializeHint(hintText: hintStrings[index], typed: "")
-                    let positionRelativeToScreen = Utils.toOrigin(point: positionFlipped, size: text.frame.size)
-                    let positionRelativeToWindow = window.convertPoint(fromScreen: positionRelativeToScreen)
-                    text.associatedButton = button
-                    text.frame.origin = positionRelativeToWindow
-                    text.zIndex = index
-                    return text
+                    return !blacklistedRoles.contains(elementRole) && allowedRolesString.contains(elementRole)
+                } catch {
+                    return false
                 }
-                return nil })
-            .compactMap({ $0 })
-        
-        hintViews.forEach { view in
-            window.contentView!.addSubview(view)
+            })
         }
         
-        let selectorTextField = CursorActionSelectorTextField(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
-        selectorTextField.stringValue = ""
-        selectorTextField.isEditable = true
-        selectorTextField.delegate = self
-        // for some reason setting the text field to hidden breaks hint updating after the first hint update.
-        // selectorTextField.isHidden = true
-        selectorTextField.tag = AppDelegate.HINT_SELECTOR_TEXT_FIELD_TAG
-        selectorTextField.cursorAction = cursorAction
-        selectorTextField.overlayTextFieldDelegate = self
-        window.contentView?.addSubview(selectorTextField)
-        self.overlayWindowController.showWindow(nil)
-        window.makeKeyAndOrderFront(nil)
-        selectorTextField.becomeFirstResponder()
+        let menuBarElements = Utils.traverseForMenuBarItems(windowElement: applicationWindow)
+        
+        let allElements = Observable.merge(elements, menuBarElements)
+        
+        self.compositeDisposable.insert(
+            allElements.toArray()
+            .observeOn(MainScheduler.instance)
+            .subscribe(onSuccess: { elements in
+                let hintStrings = AlphabetHints().hintStrings(linkCount: elements.count)
+
+                let hintViews: [HintView] = elements
+                    .enumerated()
+                    .map ({ (index, button) in
+                        let positionFlippedOptional: NSPoint? = {
+                            do {
+                                return try button.attribute(.position)
+                            } catch {
+                                return nil
+                            }
+                        }()
+
+                        if let positionFlipped = positionFlippedOptional {
+                            let text = HintView(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
+                            text.initializeHint(hintText: hintStrings[index], typed: "")
+                            let positionRelativeToScreen = Utils.toOrigin(point: positionFlipped, size: text.frame.size)
+                            let positionRelativeToWindow = window.convertPoint(fromScreen: positionRelativeToScreen)
+                            text.associatedButton = button
+                            text.frame.origin = positionRelativeToWindow
+                            text.zIndex = index
+                            return text
+                        }
+                        return nil })
+                    .compactMap({ $0 })
+
+                hintViews.forEach { view in
+                    window.contentView!.addSubview(view)
+                }
+
+                let selectorTextField = CursorActionSelectorTextField(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
+                selectorTextField.stringValue = ""
+                selectorTextField.isEditable = true
+                selectorTextField.delegate = self
+                // for some reason setting the text field to hidden breaks hint updating after the first hint update.
+                // selectorTextField.isHidden = true
+                selectorTextField.tag = AppDelegate.HINT_SELECTOR_TEXT_FIELD_TAG
+                selectorTextField.cursorAction = cursorAction
+                selectorTextField.overlayTextFieldDelegate = self
+                window.contentView?.addSubview(selectorTextField)
+                self.overlayWindowController.showWindow(nil)
+                window.makeKeyAndOrderFront(nil)
+                selectorTextField.becomeFirstResponder()
+            })
+        )
     }
     
     func setFocusMode() {
@@ -345,10 +348,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             self.hideOverlays()
             return
         }
-        
+
         self.resizeOverlayWindow()
 
-        let elements = Utils.traverseUIElementForPressables(rootElement: applicationWindow)
+        let elementObservable = Utils.getUIElementChildrenRecursive(element: applicationWindow, parentScrollAreaFrame: nil)
             .filter({ element in
                 do {
                     let roleOptional: String? = try element.attribute(.role)
@@ -367,48 +370,54 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     return false
                 }
             })
-        
-        let hintStrings = AlphabetHints().hintStrings(linkCount: elements.count)
 
-        let hintViews: [HintView] = elements
-            .enumerated()
-            .map ({ (index, button) in
-                let positionFlippedOptional: NSPoint? = {
-                    do {
-                        return try button.attribute(.position)
-                    } catch {
-                        return nil
-                    }
-                }()
-                
-                if let positionFlipped = positionFlippedOptional {
-                    let text = HintView(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
-                    text.initializeHint(hintText: hintStrings[index], typed: "")
-                    let positionRelativeToScreen = Utils.toOrigin(point: positionFlipped, size: text.frame.size)
-                    let positionRelativeToWindow = window.convertPoint(fromScreen: positionRelativeToScreen)
-                    text.associatedButton = button
-                    text.frame.origin = positionRelativeToWindow
-                    text.zIndex = index
-                    return text
+        self.compositeDisposable.insert(elementObservable
+            .toArray()
+            .observeOn(MainScheduler.instance)
+            .subscribe(onSuccess: { elements in
+                let hintStrings = AlphabetHints().hintStrings(linkCount: elements.count)
+
+                let hintViews: [HintView] = elements
+                    .enumerated()
+                    .map ({ (index, button) in
+                        let positionFlippedOptional: NSPoint? = {
+                            do {
+                                return try button.attribute(.position)
+                            } catch {
+                                return nil
+                            }
+                        }()
+
+                        if let positionFlipped = positionFlippedOptional {
+                            let text = HintView(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
+                            text.initializeHint(hintText: hintStrings[index], typed: "")
+                            let positionRelativeToScreen = Utils.toOrigin(point: positionFlipped, size: text.frame.size)
+                            let positionRelativeToWindow = window.convertPoint(fromScreen: positionRelativeToScreen)
+                            text.associatedButton = button
+                            text.frame.origin = positionRelativeToWindow
+                            text.zIndex = index
+                            return text
+                        }
+                        return nil })
+                    .compactMap({ $0 })
+
+                hintViews.forEach { view in
+                    window.contentView!.addSubview(view)
                 }
-                return nil })
-            .compactMap({ $0 })
-        
-        hintViews.forEach { view in
-            window.contentView!.addSubview(view)
-        }
-        
-        let selectorTextField = FocusSelectorTextField(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
-        selectorTextField.stringValue = ""
-        selectorTextField.isEditable = true
-        selectorTextField.delegate = self
-         selectorTextField.isHidden = true
-        selectorTextField.tag = AppDelegate.FOCUS_SELECTOR_TAG
-        selectorTextField.overlayTextFieldDelegate = self
-        window.contentView?.addSubview(selectorTextField)
-        self.overlayWindowController.showWindow(nil)
-        window.makeKeyAndOrderFront(nil)
-        selectorTextField.becomeFirstResponder()
+
+                let selectorTextField = FocusSelectorTextField(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
+                selectorTextField.stringValue = ""
+                selectorTextField.isEditable = true
+                selectorTextField.delegate = self
+                 selectorTextField.isHidden = true
+                selectorTextField.tag = AppDelegate.FOCUS_SELECTOR_TAG
+                selectorTextField.overlayTextFieldDelegate = self
+                window.contentView?.addSubview(selectorTextField)
+                self.overlayWindowController.showWindow(nil)
+                window.makeKeyAndOrderFront(nil)
+                selectorTextField.becomeFirstResponder()
+            })
+        )
     }
     
     func setScrollMode() {
