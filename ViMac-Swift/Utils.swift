@@ -78,7 +78,7 @@ class Utils: NSObject {
         return getAttributes(element: element)
             .flatMap({ attributes -> Observable<UIElement> in
                 let (roleOptional, positionOptional, sizeOptional) = attributes
-                
+
                 var newScrollAreaFrame: NSRect? = nil
                 var isScrollArea = false
                 
@@ -153,57 +153,23 @@ class Utils: NSObject {
     
     static func getAttributes(element: UIElement) -> Observable<(String?, NSPoint?, NSSize?)> {
         return Observable.zip(
-            getElementRole(element: element),
-            getElementPosition(element: element),
-            getElementSize(element: element)
+            getElementAttribute(element: element, attribute: .role),
+            getElementAttribute(element: element, attribute: .position),
+            getElementAttribute(element: element, attribute: .size)
         )
     }
     
-    static func getElementRole(element: UIElement) -> Observable<String?> {
+    static func getElementAttribute<T>(element: UIElement, attribute: Attribute) -> Observable<T?> {
         return Observable.create({ observer in
             DispatchQueue.global().async {
-                let roleOptional: String? = {
+                let value: T? = {
                     do {
-                        return try element.attribute(.role)
+                        return try element.attribute(attribute)
                     } catch {
                         return nil
                     }
                 }()
-                observer.onNext(roleOptional)
-                observer.onCompleted()
-            }
-            return Disposables.create()
-        })
-    }
-    
-    static func getElementPosition(element: UIElement) -> Observable<NSPoint?> {
-        return Observable.create({ observer in
-            DispatchQueue.global().async {
-                let positionOptional: NSPoint? = {
-                    do {
-                        return try element.attribute(.position)
-                    } catch {
-                        return nil
-                    }
-                }()
-                observer.onNext(positionOptional)
-                observer.onCompleted()
-            }
-            return Disposables.create()
-        })
-    }
-    
-    static func getElementSize(element: UIElement) -> Observable<NSSize?> {
-        return Observable.create({ observer in
-            DispatchQueue.global().async {
-                let sizeOptional: NSSize? = {
-                    do {
-                        return try element.attribute(.size)
-                    } catch {
-                        return nil
-                    }
-                }()
-                observer.onNext(sizeOptional)
+                observer.onNext(value)
                 observer.onCompleted()
             }
             return Disposables.create()
