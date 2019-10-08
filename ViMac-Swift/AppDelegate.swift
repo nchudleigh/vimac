@@ -257,7 +257,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }()
     }
     
-    func setHintSelectorMode(cursorAction: CursorAction, cursorSelector: CursorSelector, allowedRoles: [Role]?) {
+    func setHintSelectorMode(cursorAction: CursorAction, cursorSelector: CursorSelector, allowedRoles: [Role]) {
         // if windowSubject does not have the current window, retrieve the current window directly
         // This fixes a bug where opening an application with Vimac causes windowSubject value to be nil
         guard let applicationWindow = (try! self.windowSubject.value()) ?? self.getCurrentApplicationWindowManually(),
@@ -269,29 +269,25 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         self.resizeOverlayWindow()
 
-        let elements = Utils.getUIElementChildrenRecursive(element: applicationWindow, parentScrollAreaFrame: nil)
-//        let menuBarItems = Utils.traverseForMenuBarItems(windowElement: applicationWindow)
-//        var allElements = elements + menuBarItems
+        let blacklistedRoles = Set(["AXUnknown", "AXToolbar", "AXCell", "AXWindow", "AXScrollArea", "AXSplitter", "AXList"])
+        let allowedRolesString = Set(allowedRoles.map({ $0.rawValue }))
 
-//        let blacklistedRoles = Set(["AXUnknown", "AXToolbar", "AXCell", "AXWindow", "AXScrollArea", "AXSplitter", "AXList"])
-//
-//        if let allowedRoles = allowedRoles {
-//            if allowedRoles.count > 0 {
-//                let rolesString = allowedRoles.map({ $0.rawValue })
-//                let rolesStringSet = Set(rolesString)
-//                allElements = allElements
-//                    .filter({ element in
-//                        do {
-//                            guard let elementRole: String = try element.attribute(.role) else {
-//                                return false
-//                            }
-//                            return !blacklistedRoles.contains(elementRole) && rolesStringSet.contains(elementRole)
-//                        } catch {
-//                            return false
-//                        }
-//                    })
-//            }
-//        }
+        var elements = Utils.getUIElementChildrenRecursive(element: applicationWindow, parentScrollAreaFrame: nil)
+        if allowedRoles.count > 0 {
+            elements = elements.filter({ element in
+                do {
+                    guard let elementRole: String = try element.attribute(.role) else {
+                        return false
+                    }
+                    return !blacklistedRoles.contains(elementRole) && allowedRolesString.contains(elementRole)
+                } catch {
+                    return false
+                }
+            })
+        }
+        
+        //let menuBarItems = Utils.traverseForMenuBarItems(windowElement: applicationWindow)
+        
         elements.toArray()
             .observeOn(MainScheduler.instance)
             .subscribe(onSuccess: { elements in
