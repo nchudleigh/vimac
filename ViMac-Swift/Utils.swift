@@ -197,28 +197,19 @@ class Utils: NSObject {
         })
     }
     
-    static func traverseForMenuBarItems(windowElement: UIElement) -> [UIElement] {
-        var menuBarItems = [UIElement]()
-        let applicationOptional: UIElement? = {
-            do {
-                return try windowElement.attribute(.parent)
-            } catch {
-                return nil
-            }
-        }()
-        
-        if let application = applicationOptional {
-            do {
-                let menuBar: UIElement? = try application.attribute(.menuBar)
-                let menuBarChildrenNative: [AXUIElement]? = try menuBar?.attribute(.children)
-                let menuBarChildrenOptional = menuBarChildrenNative?.map { UIElement($0) }
-                if let menuBarChildren = menuBarChildrenOptional {
-                    menuBarItems.append(contentsOf: menuBarChildren)
-                }
-            } catch {
-            }
-        }
-        return menuBarItems
+    static func traverseForMenuBarItems(windowElement: UIElement) -> Observable<UIElement> {
+        let application: Observable<UIElement> = getElementAttribute(element: windowElement, attribute: .parent).compactMap({ $0 })
+        return application
+            .flatMap({ app -> Observable<UIElement> in
+                let menuBarObservable: Observable<UIElement?> = getElementAttribute(element: app, attribute: .menuBar)
+                return menuBarObservable.compactMap({ $0 })
+            })
+            .flatMap({ menuBar -> Observable<[UIElement]> in
+                return getChildren(element: menuBar)
+            })
+            .flatMap({ children -> Observable<UIElement> in
+                return Observable.from(children)
+            })
     }
     
     static func traverseUIElementForScrollAreas(rootElement: UIElement) -> [UIElement] {

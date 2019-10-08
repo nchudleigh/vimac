@@ -286,9 +286,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             })
         }
         
-        //let menuBarItems = Utils.traverseForMenuBarItems(windowElement: applicationWindow)
+        let menuBarElements = Utils.traverseForMenuBarItems(windowElement: applicationWindow)
         
-        elements.toArray()
+        let allElements = Observable.merge(elements, menuBarElements)
+        
+        allElements.toArray()
             .observeOn(MainScheduler.instance)
             .subscribe(onSuccess: { elements in
                 let hintStrings = AlphabetHints().hintStrings(linkCount: elements.count)
