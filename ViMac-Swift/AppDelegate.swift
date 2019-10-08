@@ -290,7 +290,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         let allElements = Observable.merge(elements, menuBarElements)
         
-        allElements.toArray()
+        self.compositeDisposable.insert(
+            allElements.toArray()
             .observeOn(MainScheduler.instance)
             .subscribe(onSuccess: { elements in
                 let hintStrings = AlphabetHints().hintStrings(linkCount: elements.count)
@@ -337,6 +338,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 window.makeKeyAndOrderFront(nil)
                 selectorTextField.becomeFirstResponder()
             })
+        )
     }
     
     func setFocusMode() {
