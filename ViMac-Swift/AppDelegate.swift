@@ -18,8 +18,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     static let NORMAL_MODE_TEXT_FIELD_TAG = 1
     static let HINT_SELECTOR_TEXT_FIELD_TAG = 2
-    static let SCROLL_MODE_SELECTOR_TAG = 3
-    static let FOCUS_SELECTOR_TAG = 4
+    static let SCROLL_MODE_TAG = 3
+    static let SCROLL_SELECTOR_TAG = 4
+    static let FOCUS_SELECTOR_TAG = 5
     
     let applicationObservable: Observable<Application?>
     let applicationNotificationObservable: Observable<AccessibilityObservables.AppNotificationAppPair>
@@ -341,6 +342,62 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         )
     }
     
+    func setScrollSelectorMode() {
+        guard let applicationWindow = (try! self.windowSubject.value()) ?? self.getCurrentApplicationWindowManually(),
+            let window = self.overlayWindowController.window else {
+            print("Failed to set Hint Selector")
+            self.hideOverlays()
+            return
+        }
+        
+        self.resizeOverlayWindow()
+
+        var scrollAreas = Utils.traverseUIElementForScrollAreas(rootElement: applicationWindow)
+        
+        let hintStrings = AlphabetHints().hintStrings(linkCount: scrollAreas.count)
+
+        let hintViews: [HintView] = scrollAreas
+            .enumerated()
+            .map ({ (index, button) in
+                let positionFlippedOptional: NSPoint? = {
+                    do {
+                        return try button.attribute(.position)
+                    } catch {
+                        return nil
+                    }
+                }()
+
+                if let positionFlipped = positionFlippedOptional {
+                    let text = HintView(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
+                    text.initializeHint(hintText: hintStrings[index], typed: "")
+                    let positionRelativeToScreen = Utils.toOrigin(point: positionFlipped, size: text.frame.size)
+                    let positionRelativeToWindow = window.convertPoint(fromScreen: positionRelativeToScreen)
+                    text.associatedButton = button
+                    text.frame.origin = positionRelativeToWindow
+                    text.zIndex = index
+                    return text
+                }
+                return nil })
+            .compactMap({ $0 })
+
+        hintViews.forEach { view in
+            window.contentView!.addSubview(view)
+        }
+
+        let selectorTextField = ScrollSelectorTextField(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
+        selectorTextField.stringValue = ""
+        selectorTextField.isEditable = true
+        selectorTextField.delegate = self
+        // for some reason setting the text field to hidden breaks hint updating after the first hint update.
+        // selectorTextField.isHidden = true
+        selectorTextField.tag = AppDelegate.SCROLL_SELECTOR_TAG
+        selectorTextField.overlayTextFieldDelegate = self
+        window.contentView?.addSubview(selectorTextField)
+        self.overlayWindowController.showWindow(nil)
+        window.makeKeyAndOrderFront(nil)
+        selectorTextField.becomeFirstResponder()
+    }
+    
     func setFocusMode() {
         guard let applicationWindow = (try! self.windowSubject.value()) ?? self.getCurrentApplicationWindowManually(),
             let window = self.overlayWindowController.window else {
@@ -421,12 +478,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func setScrollMode() {
+        self.resizeOverlayWindow()
+        
         let selectorTextField = OverlayTextField(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
         selectorTextField.stringValue = ""
         selectorTextField.isEditable = true
         selectorTextField.delegate = self
         selectorTextField.isHidden = true
-        selectorTextField.tag = AppDelegate.SCROLL_MODE_SELECTOR_TAG
+        selectorTextField.tag = AppDelegate.SCROLL_MODE_TAG
         selectorTextField.overlayTextFieldDelegate = self
         self.overlayWindowController.window?.contentView?.addSubview(selectorTextField)
         self.overlayWindowController.showWindow(nil)
@@ -522,6 +581,74 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             hintView.zIndex = index
             window.contentView?.addSubview(hintView)
         }
+    }
+    
+    func onScrollSelectorTextChange(textField: ScrollSelectorTextField) {
+        let typed = textField.stringValue
+        guard let window = self.overlayWindowController.window,
+            let hintViews = window.contentView?.subviews.filter ({ $0 is HintView }) as! [HintView]? else {
+            print("Failed to update hints.")
+            self.hideOverlays()
+            return
+        }
+        
+        if let lastCharacter = typed.last {
+            if lastCharacter == " " {
+                textField.stringValue = textField.stringValue.trimmingCharacters(in: .whitespacesAndNewlines)
+                self.rotateHints()
+                return
+            }
+        }
+        
+        let matchingHints = hintViews.filter { hintView in
+            return hintView.stringValue.starts(with: typed.uppercased())
+        }
+        
+        if matchingHints.count == 0 && typed.count > 0 {
+            print("No matching hints. Exiting Hint Mode")
+            self.hideOverlays()
+            return
+        }
+        
+        if matchingHints.count == 1 {
+            let matchingHint = matchingHints.first!
+            let buttonOptional = matchingHint.associatedButton
+            guard let button = buttonOptional else {
+                print("Couldn't find HintView's associated button. Exiting.")
+                self.hideOverlays()
+                return
+            }
+
+            var buttonPositionOptional: NSPoint?
+            var buttonSizeOptional: NSSize?
+            do {
+                buttonPositionOptional = try button.attribute(.position)
+                buttonSizeOptional = try button.attribute(.size)
+            } catch {
+                self.hideOverlays()
+                return
+            }
+            
+            guard let buttonPosition = buttonPositionOptional,
+                let buttonSize = buttonSizeOptional else {
+                    self.hideOverlays()
+                    return
+            }
+            
+            // move mouse to bottom-left position
+            let positionX = buttonPosition.x + 4
+            let positionY = buttonPosition.y + buttonSize.height - 4
+            let position = NSPoint(x: positionX, y: positionY)
+
+            self.removeSubviews()
+            
+            Utils.moveMouse(position: position)
+            self.setScrollMode()
+            return
+        }
+        
+        // update hints to reflect new typed text
+        self.updateHints(typed: typed)
     }
     
     func onHintSelectorTextChange(textField: CursorActionSelectorTextField) {
@@ -657,13 +784,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         self.hideOverlays()
         let trimmedInput = input.trimmingCharacters(in: .whitespacesAndNewlines)
 
-        if trimmedInput == "s" {
+        if trimmedInput == "s" || trimmedInput == "ss" {
+            self.setScrollSelectorMode()
+            return
+        }
+        
+        if trimmedInput == "sh" {
             self.setScrollMode()
             return
         }
         
         if trimmedInput == "f" {
             self.setFocusMode()
+            return
         }
         
         var cursorActionOptional: CursorAction?
@@ -748,6 +881,8 @@ extension AppDelegate : NSTextFieldDelegate {
             self.onHintSelectorTextChange(textField: textField as! CursorActionSelectorTextField)
         case AppDelegate.FOCUS_SELECTOR_TAG:
             self.onFocusSelectorTextChange(textField: textField as! FocusSelectorTextField)
+        case AppDelegate.SCROLL_SELECTOR_TAG:
+            self.onScrollSelectorTextChange(textField: textField as! ScrollSelectorTextField)
         default:
             return
         }
