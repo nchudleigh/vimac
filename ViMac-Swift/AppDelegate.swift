@@ -635,13 +635,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     return
             }
             
-            let centerPositionX = buttonPosition.x + (buttonSize.width / 2)
-            let centerPositionY = buttonPosition.y + (buttonSize.height / 2)
-            let centerPosition = NSPoint(x: centerPositionX, y: centerPositionY)
+            // move mouse to bottom-left position
+            let positionX = buttonPosition.x + 4
+            let positionY = buttonPosition.y + buttonSize.height - 4
+            let position = NSPoint(x: positionX, y: positionY)
 
             self.removeSubviews()
             
-            Utils.moveMouse(position: centerPosition)
+            Utils.moveMouse(position: position)
             self.setScrollMode()
             return
         }
