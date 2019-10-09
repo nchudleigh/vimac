@@ -298,4 +298,23 @@ class Utils: NSObject {
 
         }
     }
+    
+    static func getCurrentApplicationWindowManually() -> UIElement? {
+        guard let nsApplication = NSWorkspace.shared.frontmostApplication else {
+            return nil
+        }
+        
+        let appOptional = Application.init(nsApplication)
+        if let app = appOptional {
+            Utils.setAccessibilityAttributes(app: app)
+        }
+        
+        return {
+            do {
+                return try appOptional?.attribute(.focusedWindow)
+            } catch {
+                return nil
+            }
+        }()
+    }
 }

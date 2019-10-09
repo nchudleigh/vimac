@@ -31,13 +31,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var compositeDisposable: CompositeDisposable
     var scrollModeDisposable: CompositeDisposable? = CompositeDisposable()
     
-    let overlayWindowController: NSWindowController
+    let modeCoordinator: ModeCoordinator
+    let overlayWindowController: OverlayWindowController
 
     static let windowEvents: [AXNotification] = [.windowMiniaturized, .windowMoved, .windowResized]
     
     override init() {
         let storyboard = NSStoryboard.init(name: "Main", bundle: nil)
-        overlayWindowController = storyboard.instantiateController(withIdentifier: "overlayWindowControllerID") as! NSWindowController
+        overlayWindowController = storyboard.instantiateController(withIdentifier: "overlayWindowControllerID") as! OverlayWindowController
+        modeCoordinator = ModeCoordinator(windowController: overlayWindowController)
         
         Utils.registerDefaults()
         
@@ -161,8 +163,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             })
             .observeOn(MainScheduler.instance)
             .subscribe(onNext: { window in
-                self.hideOverlays()
-                self.setNormalMode()
+                self.modeCoordinator.setNormalMode()
             })
         )
     }
