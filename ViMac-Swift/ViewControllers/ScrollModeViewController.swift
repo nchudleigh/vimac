@@ -14,11 +14,13 @@ class ScrollModeViewController: ModeViewController, NSTextFieldDelegate {
     let scrollModeDisposable = CompositeDisposable()
     
     override func viewDidLoad() {
+        super.viewDidLoad()
         textField.stringValue = ""
         textField.isEditable = true
         textField.delegate = self
-        textField.isHidden = true
+        //textField.isHidden = true
         textField.overlayTextFieldDelegate = self
+        self.view.addSubview(textField)
         
         // get scroll area mouse is hovering over for D U scrolling,
         // which are relative to scroll area height.

@@ -17,6 +17,7 @@ class CursorModeViewController: ModeViewController, NSTextFieldDelegate {
     let textField = CursorActionSelectorTextField(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
     
     override func viewDidLoad() {
+        super.viewDidLoad()
         guard let cursorAction = self.cursorAction,
             let cursorSelector = self.cursorSelector,
             let allowedRoles = self.allowedRoles,
