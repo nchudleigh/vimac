@@ -52,6 +52,7 @@ class NormalModeViewController: ModeViewController, NSTextFieldDelegate {
         let trimmedInput = input.trimmingCharacters(in: .whitespacesAndNewlines)
 
         if trimmedInput == "s" || trimmedInput == "ss" {
+            self.modeCoordinator?.setScrollSelectorMode()
             return
         }
         

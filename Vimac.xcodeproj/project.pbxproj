@@ -30,6 +30,7 @@
 		E2C2956E234DEB53001A38D6 /* FocusModeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2C2956D234DEB53001A38D6 /* FocusModeViewController.swift */; };
 		E2C29571234E19E4001A38D6 /* CursorModeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2C29570234E19E4001A38D6 /* CursorModeViewController.swift */; };
 		E2C29573234E2E8B001A38D6 /* ScrollModeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2C29572234E2E8B001A38D6 /* ScrollModeViewController.swift */; };
+		E2C29575234E36EA001A38D6 /* ScrollSelectorModeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2C29574234E36EA001A38D6 /* ScrollSelectorModeViewController.swift */; };
 		E2F6C9A3232CE37E00F2975B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E26172292322968700E396CA /* Main.storyboard */; };
 		E2F6C9AD232DE89F00F2975B /* HintView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2F6C9AC232DE89F00F2975B /* HintView.swift */; };
 		E2F6C9AF232DEA1800F2975B /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2F6C9AE232DEA1800F2975B /* Utils.swift */; };
@@ -101,6 +102,7 @@
 		E2C2956D234DEB53001A38D6 /* FocusModeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusModeViewController.swift; sourceTree = "<group>"; };
 		E2C29570234E19E4001A38D6 /* CursorModeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CursorModeViewController.swift; sourceTree = "<group>"; };
 		E2C29572234E2E8B001A38D6 /* ScrollModeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollModeViewController.swift; sourceTree = "<group>"; };
+		E2C29574234E36EA001A38D6 /* ScrollSelectorModeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollSelectorModeViewController.swift; sourceTree = "<group>"; };
 		E2F6C9AC232DE89F00F2975B /* HintView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HintView.swift; sourceTree = "<group>"; };
 		E2F6C9AE232DEA1800F2975B /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		E2F6C9B0232E337500F2975B /* OverlayTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayTextField.swift; sourceTree = "<group>"; };
@@ -258,6 +260,7 @@
 				E2C29563234DD8A3001A38D6 /* NormalModeViewController.swift */,
 				E2C29570234E19E4001A38D6 /* CursorModeViewController.swift */,
 				E2C29572234E2E8B001A38D6 /* ScrollModeViewController.swift */,
+				E2C29574234E36EA001A38D6 /* ScrollSelectorModeViewController.swift */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -522,6 +525,7 @@
 				E225BD282333700D00ECDEF4 /* PreferencesWindowController.swift in Sources */,
 				E2C29564234DD8A3001A38D6 /* NormalModeViewController.swift in Sources */,
 				E26172242322968500E396CA /* AppDelegate.swift in Sources */,
+				E2C29575234E36EA001A38D6 /* ScrollSelectorModeViewController.swift in Sources */,
 				E2F6C9AD232DE89F00F2975B /* HintView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
