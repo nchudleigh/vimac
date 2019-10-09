@@ -99,10 +99,12 @@ class NormalModeViewController: ModeViewController, NSTextFieldDelegate {
 
         guard let cursorAction = cursorActionOptional,
             let cursorSelector = cursorSelectorOptional else {
+                self.modeCoordinator?.exitMode()
                 return
         }
         
         if cursorSelector != .element {
+            self.modeCoordinator?.exitMode()
             return
         }
         
