@@ -28,6 +28,7 @@
 		E2C29566234DE09C001A38D6 /* ModeCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2C29565234DE09C001A38D6 /* ModeCoordinator.swift */; };
 		E2C29568234DE51F001A38D6 /* ModeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2C29567234DE51F001A38D6 /* ModeViewController.swift */; };
 		E2C2956E234DEB53001A38D6 /* FocusModeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2C2956D234DEB53001A38D6 /* FocusModeViewController.swift */; };
+		E2C29571234E19E4001A38D6 /* CursorModeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2C29570234E19E4001A38D6 /* CursorModeViewController.swift */; };
 		E2F6C9A3232CE37E00F2975B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E26172292322968700E396CA /* Main.storyboard */; };
 		E2F6C9AD232DE89F00F2975B /* HintView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2F6C9AC232DE89F00F2975B /* HintView.swift */; };
 		E2F6C9AF232DEA1800F2975B /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2F6C9AE232DEA1800F2975B /* Utils.swift */; };
@@ -97,6 +98,7 @@
 		E2C29565234DE09C001A38D6 /* ModeCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModeCoordinator.swift; sourceTree = "<group>"; };
 		E2C29567234DE51F001A38D6 /* ModeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModeViewController.swift; sourceTree = "<group>"; };
 		E2C2956D234DEB53001A38D6 /* FocusModeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusModeViewController.swift; sourceTree = "<group>"; };
+		E2C29570234E19E4001A38D6 /* CursorModeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CursorModeViewController.swift; sourceTree = "<group>"; };
 		E2F6C9AC232DE89F00F2975B /* HintView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HintView.swift; sourceTree = "<group>"; };
 		E2F6C9AE232DEA1800F2975B /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		E2F6C9B0232E337500F2975B /* OverlayTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayTextField.swift; sourceTree = "<group>"; };
@@ -203,12 +205,12 @@
 		E26172222322968500E396CA /* ViMac-Swift */ = {
 			isa = PBXGroup;
 			children = (
+				E2C2956F234E0A32001A38D6 /* ViewControllers */,
 				E225BD1E233354AD00ECDEF4 /* Windows */,
 				E26172232322968500E396CA /* AppDelegate.swift */,
 				E225BD1C233292B800ECDEF4 /* StatusItemManager.swift */,
 				E26172272322968600E396CA /* Assets.xcassets */,
 				E26172292322968700E396CA /* Main.storyboard */,
-				E2C29563234DD8A3001A38D6 /* NormalModeViewController.swift */,
 				E2C29561234DD7F8001A38D6 /* OverlayWindowController.swift */,
 				E261722C2322968700E396CA /* Info.plist */,
 				E261722D2322968700E396CA /* ViMac_Swift.entitlements */,
@@ -224,8 +226,6 @@
 				E225BD2D2334E96B00ECDEF4 /* Action.swift */,
 				E2FB1B3B233CCE10009B04D3 /* KeyPosition.swift */,
 				E2C29565234DE09C001A38D6 /* ModeCoordinator.swift */,
-				E2C29567234DE51F001A38D6 /* ModeViewController.swift */,
-				E2C2956D234DEB53001A38D6 /* FocusModeViewController.swift */,
 			);
 			path = "ViMac-Swift";
 			sourceTree = "<group>";
@@ -246,6 +246,17 @@
 				E26172432322968700E396CA /* Info.plist */,
 			);
 			path = "ViMac-SwiftUITests";
+			sourceTree = "<group>";
+		};
+		E2C2956F234E0A32001A38D6 /* ViewControllers */ = {
+			isa = PBXGroup;
+			children = (
+				E2C2956D234DEB53001A38D6 /* FocusModeViewController.swift */,
+				E2C29567234DE51F001A38D6 /* ModeViewController.swift */,
+				E2C29563234DD8A3001A38D6 /* NormalModeViewController.swift */,
+				E2C29570234E19E4001A38D6 /* CursorModeViewController.swift */,
+			);
+			path = ViewControllers;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -490,6 +501,7 @@
 				E225BD2E2334E96B00ECDEF4 /* Action.swift in Sources */,
 				E261725A2324EC7100E396CA /* OverlayWindow.swift in Sources */,
 				E2F6C9B1232E337500F2975B /* OverlayTextField.swift in Sources */,
+				E2C29571234E19E4001A38D6 /* CursorModeViewController.swift in Sources */,
 				E2F6C9AF232DEA1800F2975B /* Utils.swift in Sources */,
 				E2C29568234DE51F001A38D6 /* ModeViewController.swift in Sources */,
 				E25F8711233222A9007AA958 /* AccessibilityObservables.swift in Sources */,

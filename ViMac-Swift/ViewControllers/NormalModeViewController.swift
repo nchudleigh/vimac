@@ -118,7 +118,7 @@ class NormalModeViewController: ModeViewController, NSTextFieldDelegate {
                 .flatMap({ Utils.mapArgRoleToAXRole(arg: $0) })
         }
         
-        self.modeCoordinator?.setHintSelectorMode(cursorAction: cursorAction, cursorSelector: cursorSelector, allowedRoles: allowedRoles)
+        self.modeCoordinator?.setCursorMode(cursorAction: cursorAction, cursorSelector: cursorSelector, allowedRoles: allowedRoles)
     }
     
     func control(_ control: NSControl, textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
