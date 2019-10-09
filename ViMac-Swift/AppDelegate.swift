@@ -161,13 +161,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             })
             .observeOn(MainScheduler.instance)
             .subscribe(onNext: { window in
-                let isOverlayEmpty = self.overlayWindowController.window?.contentView?.subviews.count == 0
                 self.hideOverlays()
-                
-                if !isOverlayEmpty {
-                    return
-                }
-                
                 self.setNormalMode()
             })
         )
