@@ -190,46 +190,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         })
     }
     
-    func setNormalMode() {
-        self.resizeOverlayWindow()
-        let textField = OverlayTextField(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
-        textField.stringValue = ""
-        textField.placeholderString = "Enter Command"
-        textField.isEditable = true
-        textField.delegate = self
-        textField.overlayTextFieldDelegate = self
-        textField.tag = AppDelegate.NORMAL_MODE_TEXT_FIELD_TAG
-        
-        textField.font = NSFont.systemFont(ofSize: NSFont.systemFontSize)
-        
-        textField.wantsLayer = true
-        textField.layer?.borderColor = NSColor.gray.cgColor
-        textField.layer?.borderWidth = 2
-        textField.layer?.cornerRadius = 3
-        textField.layer?.backgroundColor = NSColor.white.cgColor
-        textField.focusRingType = .none
-        // need this otherwise the background color is ignored
-        textField.appearance = NSAppearance(named: NSAppearance.Name.aqua)
-        textField.drawsBackground = true
-        textField.backgroundColor = NSColor.white
-        textField.textColor = NSColor.black
-        textField.bezelStyle = .roundedBezel
-        textField.cell?.usesSingleLineMode = true
-        
-        textField.sizeToFit()
-        textField.setFrameSize(NSSize(width: 530, height: textField.frame.height))
-
-        textField.setFrameOrigin(NSPoint(
-            x: (NSScreen.main!.frame.width / 2) - (textField.frame.width / 2),
-            y: (NSScreen.main!.frame.height / 2) + (textField.frame.height / 2)
-        ))
-        
-        self.overlayWindowController.window?.contentView?.addSubview(textField)
-        self.overlayWindowController.showWindow(nil)
-        self.overlayWindowController.window?.makeKeyAndOrderFront(nil)
-        textField.becomeFirstResponder()
-    }
-    
     func resizeOverlayWindow() {
         overlayWindowController.window!.setFrame(NSScreen.main!.frame, display: true, animate: false)
     }
@@ -251,90 +211,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 return nil
             }
         }()
-    }
-    
-    func setHintSelectorMode(cursorAction: CursorAction, cursorSelector: CursorSelector, allowedRoles: [Role]) {
-        // if windowSubject does not have the current window, retrieve the current window directly
-        // This fixes a bug where opening an application with Vimac causes windowSubject value to be nil
-        guard let applicationWindow = (try! self.windowSubject.value()) ?? self.getCurrentApplicationWindowManually(),
-            let window = self.overlayWindowController.window else {
-            print("Failed to set Hint Selector")
-            self.hideOverlays()
-            return
-        }
-        
-        self.resizeOverlayWindow()
-
-        let blacklistedRoles = Set(["AXUnknown", "AXToolbar", "AXCell", "AXWindow", "AXScrollArea", "AXSplitter", "AXList"])
-        let allowedRolesString = Set(allowedRoles.map({ $0.rawValue }))
-
-        var elements = Utils.getUIElementChildrenRecursive(element: applicationWindow, parentScrollAreaFrame: nil)
-        if allowedRoles.count > 0 {
-            elements = elements.filter({ element in
-                do {
-                    guard let elementRole: String = try element.attribute(.role) else {
-                        return false
-                    }
-                    return !blacklistedRoles.contains(elementRole) && allowedRolesString.contains(elementRole)
-                } catch {
-                    return false
-                }
-            })
-        }
-        
-        let menuBarElements = Utils.traverseForMenuBarItems(windowElement: applicationWindow)
-        
-        let allElements = Observable.merge(elements, menuBarElements)
-        
-        self.compositeDisposable.insert(
-            allElements.toArray()
-            .observeOn(MainScheduler.instance)
-            .subscribe(onSuccess: { elements in
-                let hintStrings = AlphabetHints().hintStrings(linkCount: elements.count)
-
-                let hintViews: [HintView] = elements
-                    .enumerated()
-                    .map ({ (index, button) in
-                        let positionFlippedOptional: NSPoint? = {
-                            do {
-                                return try button.attribute(.position)
-                            } catch {
-                                return nil
-                            }
-                        }()
-
-                        if let positionFlipped = positionFlippedOptional {
-                            let text = HintView(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
-                            text.initializeHint(hintText: hintStrings[index], typed: "")
-                            let positionRelativeToScreen = Utils.toOrigin(point: positionFlipped, size: text.frame.size)
-                            let positionRelativeToWindow = window.convertPoint(fromScreen: positionRelativeToScreen)
-                            text.associatedButton = button
-                            text.frame.origin = positionRelativeToWindow
-                            text.zIndex = index
-                            return text
-                        }
-                        return nil })
-                    .compactMap({ $0 })
-
-                hintViews.forEach { view in
-                    window.contentView!.addSubview(view)
-                }
-
-                let selectorTextField = CursorActionSelectorTextField(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
-                selectorTextField.stringValue = ""
-                selectorTextField.isEditable = true
-                selectorTextField.delegate = self
-                // for some reason setting the text field to hidden breaks hint updating after the first hint update.
-                // selectorTextField.isHidden = true
-                selectorTextField.tag = AppDelegate.HINT_SELECTOR_TEXT_FIELD_TAG
-                selectorTextField.cursorAction = cursorAction
-                selectorTextField.overlayTextFieldDelegate = self
-                window.contentView?.addSubview(selectorTextField)
-                self.overlayWindowController.showWindow(nil)
-                window.makeKeyAndOrderFront(nil)
-                selectorTextField.becomeFirstResponder()
-            })
-        )
     }
     
     func setScrollSelectorMode() {
@@ -386,90 +262,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // for some reason setting the text field to hidden breaks hint updating after the first hint update.
         // selectorTextField.isHidden = true
         selectorTextField.tag = AppDelegate.SCROLL_SELECTOR_TAG
-        selectorTextField.overlayTextFieldDelegate = self
+        //selectorTextField.overlayTextFieldDelegate = self
         window.contentView?.addSubview(selectorTextField)
         self.overlayWindowController.showWindow(nil)
         window.makeKeyAndOrderFront(nil)
         selectorTextField.becomeFirstResponder()
-    }
-    
-    func setFocusMode() {
-        guard let applicationWindow = (try! self.windowSubject.value()) ?? self.getCurrentApplicationWindowManually(),
-            let window = self.overlayWindowController.window else {
-            print("Failed to set Hint Selector")
-            self.hideOverlays()
-            return
-        }
-
-        self.resizeOverlayWindow()
-
-        let elementObservable = Utils.getUIElementChildrenRecursive(element: applicationWindow, parentScrollAreaFrame: nil)
-            .filter({ element in
-                do {
-                    let roleOptional: String? = try element.attribute(.role)
-                    guard let role = roleOptional else {
-                        return false
-                    }
-                    return role == Role.textArea.rawValue || role == Role.textField.rawValue
-                } catch {
-                    return false
-                }
-            })
-            .filter({ element in
-                do {
-                    return try element.attributeIsSettable(.focused)
-                } catch {
-                    return false
-                }
-            })
-
-        self.compositeDisposable.insert(elementObservable
-            .toArray()
-            .observeOn(MainScheduler.instance)
-            .subscribe(onSuccess: { elements in
-                let hintStrings = AlphabetHints().hintStrings(linkCount: elements.count)
-
-                let hintViews: [HintView] = elements
-                    .enumerated()
-                    .map ({ (index, button) in
-                        let positionFlippedOptional: NSPoint? = {
-                            do {
-                                return try button.attribute(.position)
-                            } catch {
-                                return nil
-                            }
-                        }()
-
-                        if let positionFlipped = positionFlippedOptional {
-                            let text = HintView(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
-                            text.initializeHint(hintText: hintStrings[index], typed: "")
-                            let positionRelativeToScreen = Utils.toOrigin(point: positionFlipped, size: text.frame.size)
-                            let positionRelativeToWindow = window.convertPoint(fromScreen: positionRelativeToScreen)
-                            text.associatedButton = button
-                            text.frame.origin = positionRelativeToWindow
-                            text.zIndex = index
-                            return text
-                        }
-                        return nil })
-                    .compactMap({ $0 })
-
-                hintViews.forEach { view in
-                    window.contentView!.addSubview(view)
-                }
-
-                let selectorTextField = FocusSelectorTextField(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
-                selectorTextField.stringValue = ""
-                selectorTextField.isEditable = true
-                selectorTextField.delegate = self
-                 selectorTextField.isHidden = true
-                selectorTextField.tag = AppDelegate.FOCUS_SELECTOR_TAG
-                selectorTextField.overlayTextFieldDelegate = self
-                window.contentView?.addSubview(selectorTextField)
-                self.overlayWindowController.showWindow(nil)
-                window.makeKeyAndOrderFront(nil)
-                selectorTextField.becomeFirstResponder()
-            })
-        )
     }
     
     func setScrollMode() {
@@ -481,7 +278,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         selectorTextField.delegate = self
         selectorTextField.isHidden = true
         selectorTextField.tag = AppDelegate.SCROLL_MODE_TAG
-        selectorTextField.overlayTextFieldDelegate = self
+        //selectorTextField.overlayTextFieldDelegate = self
         self.overlayWindowController.window?.contentView?.addSubview(selectorTextField)
         self.overlayWindowController.showWindow(nil)
         self.overlayWindowController.window?.makeKeyAndOrderFront(nil)
@@ -773,82 +570,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // update hints to reflect new typed text
         self.updateHints(typed: typed)
     }
-    
-    
-    func onInputSubmitted(input: String) {
-        self.hideOverlays()
-        let trimmedInput = input.trimmingCharacters(in: .whitespacesAndNewlines)
-
-        if trimmedInput == "s" || trimmedInput == "ss" {
-            self.setScrollSelectorMode()
-            return
-        }
-        
-        if trimmedInput == "sh" {
-            self.setScrollMode()
-            return
-        }
-        
-        if trimmedInput == "f" {
-            self.setFocusMode()
-            return
-        }
-        
-        var cursorActionOptional: CursorAction?
-        var cursorSelectorOptional: CursorSelector?
-        
-        if trimmedInput.starts(with: "ce") {
-            cursorActionOptional = .leftClick
-            cursorSelectorOptional = .element
-        }
-        else if trimmedInput.starts(with: "rce") {
-            cursorActionOptional = .rightClick
-            cursorSelectorOptional = .element
-        }
-        else if trimmedInput.starts(with: "dce") {
-            cursorActionOptional = .doubleLeftClick
-            cursorSelectorOptional = .element
-        }
-        else if trimmedInput.starts(with: "me") {
-            cursorActionOptional = .move
-            cursorSelectorOptional = .element
-        }
-        else if trimmedInput.starts(with: "ch") {
-            cursorActionOptional = .leftClick
-            cursorSelectorOptional = .here
-        }
-        else if trimmedInput.starts(with: "rch") {
-            cursorActionOptional = .rightClick
-            cursorSelectorOptional = .here
-        }
-        else if trimmedInput.starts(with: "dch") {
-            cursorActionOptional = .doubleLeftClick
-            cursorSelectorOptional = .here
-        }
-
-        guard let cursorAction = cursorActionOptional,
-            let cursorSelector = cursorSelectorOptional else {
-                return
-        }
-        
-        if cursorSelector != .element {
-            return
-        }
-        
-        var allowedRoles = [Role]()
-        let inputSplit = trimmedInput.split(separator: " ")
-        if inputSplit.count > 1 {
-            let args = inputSplit.dropFirst(1)
-                .flatMap({ $0.split(separator: ";") })
-                .map({ String($0) })
-            allowedRoles = args
-                .map({ ElementSelectorArg(rawValue: String($0)) })
-                .compactMap({ $0 })
-                .flatMap({ Utils.mapArgRoleToAXRole(arg: $0) })
-        }
-        
-        self.setHintSelectorMode(cursorAction: cursorAction, cursorSelector: cursorSelector, allowedRoles: allowedRoles)
-    }
 
     func applicationWillTerminate(_ aNotification: Notification) {
         self.compositeDisposable.dispose()
@@ -859,14 +580,6 @@ extension AppDelegate : SUUpdaterDelegate {
 }
 
 extension AppDelegate : NSTextFieldDelegate {
-    func control(_ control: NSControl, textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
-        if control.tag == AppDelegate.NORMAL_MODE_TEXT_FIELD_TAG {
-            if commandSelector == #selector(NSResponder.insertNewline(_:)) {
-                self.onInputSubmitted(input: textView.string)
-            }
-        }
-        return false
-    }
     
     func controlTextDidChange(_ obj: Notification) {
         let textField = obj.object as! NSTextField
@@ -881,11 +594,5 @@ extension AppDelegate : NSTextFieldDelegate {
         default:
             return
         }
-    }
-}
-
-extension AppDelegate : OverlayTextFieldDelegate {
-    func onEscape() {
-        self.hideOverlays()
     }
 }

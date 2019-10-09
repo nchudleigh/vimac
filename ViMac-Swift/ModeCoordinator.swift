@@ -119,7 +119,9 @@ class ModeCoordinator : Coordinator {
     }
     
     func setScrollMode() {
-        
+        let vc = ScrollModeViewController.init()
+        self.setViewController(vc: vc)
+        vc.textField.becomeFirstResponder()
     }
     
     func setCursorMode(cursorAction: CursorAction, cursorSelector: CursorSelector, allowedRoles: [Role]) {
