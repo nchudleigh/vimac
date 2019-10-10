@@ -42,8 +42,8 @@ class OverlayTextField: NSTextField {
         // default behaviour causes all text to be selected, so when the user types all text is erased
         // this fixes the behaviour
         // https://stackoverflow.com/a/32380549/10390454
-        let selectionRange = self.currentEditor()!.selectedRange
-        self.currentEditor()?.selectedRange = NSMakeRange(selectionRange.length, 0);
+        //let selectionRange = self.currentEditor()!.selectedRange
+        //self.currentEditor()?.selectedRange = NSMakeRange(selectionRange.length, 0);
         return responderStatus;
     }
     
