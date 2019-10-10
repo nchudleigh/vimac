@@ -166,7 +166,8 @@ class ModeCoordinator : Coordinator {
     }
     
     func setCursorMode(cursorAction: CursorAction, cursorSelector: CursorSelector, allowedRoles: [Role]) {
-        guard let applicationWindow = activeWindow ?? Utils.getCurrentApplicationWindowManually() else {
+        guard let applicationWindow = activeWindow ?? Utils.getCurrentApplicationWindowManually(),
+            let window = self.windowController.window else {
             self.exitMode()
             return
         }
@@ -191,47 +192,13 @@ class ModeCoordinator : Coordinator {
         let menuBarElements = Utils.traverseForMenuBarItems(windowElement: applicationWindow)
         
         let allElements = Observable.merge(elements, menuBarElements)
-        
-        allElements.toArray()
-            .observeOn(MainScheduler.instance)
-            .subscribe(onSuccess: { [weak self] elements in
-                guard let window = self?.windowController.window else {
-                    return
-                }
-                
-                let hintStrings = AlphabetHints().hintStrings(linkCount: elements.count)
 
-                let hintViews: [HintView] = elements
-                    .enumerated()
-                    .map ({ (index, button) in
-                        let positionFlippedOptional: NSPoint? = {
-                            do {
-                                return try button.attribute(.position)
-                            } catch {
-                                return nil
-                            }
-                        }()
+        let vc = CursorModeViewController.init()
+        vc.elements = allElements
+        vc.allowedRoles = allowedRoles
+        vc.cursorSelector = cursorSelector
+        vc.cursorAction = cursorAction
+        self.setViewController(vc: vc)
 
-                        if let positionFlipped = positionFlippedOptional {
-                            let text = HintView(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
-                            text.initializeHint(hintText: hintStrings[index], typed: "")
-                            let positionRelativeToScreen = Utils.toOrigin(point: positionFlipped, size: text.frame.size)
-                            let positionRelativeToWindow = window.convertPoint(fromScreen: positionRelativeToScreen)
-                            text.associatedButton = button
-                            text.frame.origin = positionRelativeToWindow
-                            text.zIndex = index
-                            return text
-                        }
-                        return nil })
-                    .compactMap({ $0 })
-
-                let vc = CursorModeViewController.init()
-                vc.hintViews = hintViews
-                vc.allowedRoles = allowedRoles
-                vc.cursorSelector = cursorSelector
-                vc.cursorAction = cursorAction
-                self?.setViewController(vc: vc)
-                vc.textField.becomeFirstResponder()
-        })
     }
 }

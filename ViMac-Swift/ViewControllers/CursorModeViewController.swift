@@ -8,20 +8,23 @@
 
 import Cocoa
 import AXSwift
+import RxSwift
 
 class CursorModeViewController: ModeViewController, NSTextFieldDelegate {
     var cursorAction: CursorAction?
     var cursorSelector: CursorSelector?
     var allowedRoles: [Role]?
-    var hintViews: [HintView]?
+    var elements: Observable<UIElement>?
     let textField = CursorActionSelectorTextField(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
+    var hintViews: [HintView]?
+    let compositeDisposable = CompositeDisposable()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         guard let cursorAction = self.cursorAction,
             let cursorSelector = self.cursorSelector,
             let allowedRoles = self.allowedRoles,
-            let hintViews = self.hintViews else {
+            let elements = self.elements else {
                 self.modeCoordinator?.exitMode()
                 return
         }
@@ -34,9 +37,47 @@ class CursorModeViewController: ModeViewController, NSTextFieldDelegate {
         textField.overlayTextFieldDelegate = self
         self.view.addSubview(textField)
         
-        for hintView in hintViews {
-            self.view.addSubview(hintView)
-        }
+        self.compositeDisposable.insert(
+            elements.toArray()
+                .observeOn(MainScheduler.instance)
+                .subscribe(
+                onSuccess: { elements in
+                    let hintStrings = AlphabetHints().hintStrings(linkCount: elements.count)
+
+                    let hintViews: [HintView] = elements
+                        .enumerated()
+                        .map ({ (index, button) in
+                            let positionFlippedOptional: NSPoint? = {
+                                do {
+                                    return try button.attribute(.position)
+                                } catch {
+                                    return nil
+                                }
+                            }()
+
+                            if let positionFlipped = positionFlippedOptional {
+                                let text = HintView(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
+                                text.initializeHint(hintText: hintStrings[index], typed: "")
+                                let positionRelativeToScreen = Utils.toOrigin(point: positionFlipped, size: text.frame.size)
+                                let positionRelativeToWindow = self.view.convertFromLayer(positionRelativeToScreen)
+                                text.associatedButton = button
+                                text.frame.origin = positionRelativeToWindow
+                                text.zIndex = index
+                                return text
+                            }
+                            return nil })
+                        .compactMap({ $0 })
+                    
+                    self.hintViews = hintViews
+
+                    for hintView in hintViews {
+                        self.view.addSubview(hintView)
+                    }
+                    self.textField.becomeFirstResponder()
+                }, onError: { error in
+                    print(error)
+                })
+        )
     }
     
     func updateHints(typed: String) {
@@ -147,5 +188,9 @@ class CursorModeViewController: ModeViewController, NSTextFieldDelegate {
         
         // update hints to reflect new typed text
         self.updateHints(typed: typed)
+    }
+    
+    override func viewDidDisappear() {
+        self.compositeDisposable.dispose()
     }
 }
