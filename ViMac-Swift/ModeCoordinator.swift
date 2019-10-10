@@ -76,46 +76,10 @@ class ModeCoordinator : Coordinator {
                     return false
                 }
             })
-
-        elementObservable
-            .toArray()
-            .observeOn(MainScheduler.instance)
-            .subscribe(onSuccess: { [weak self] elements in
-                guard let window = self?.windowController.window else {
-                    return
-                }
-                
-                let hintStrings = AlphabetHints().hintStrings(linkCount: elements.count)
-
-                let hintViews: [HintView] = elements
-                    .enumerated()
-                    .map ({ (index, button) in
-                        let positionFlippedOptional: NSPoint? = {
-                            do {
-                                return try button.attribute(.position)
-                            } catch {
-                                return nil
-                            }
-                        }()
-
-                        if let positionFlipped = positionFlippedOptional {
-                            let text = HintView(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
-                            text.initializeHint(hintText: hintStrings[index], typed: "")
-                            let positionRelativeToScreen = Utils.toOrigin(point: positionFlipped, size: text.frame.size)
-                            let positionRelativeToWindow = window.convertPoint(fromScreen: positionRelativeToScreen)
-                            text.associatedButton = button
-                            text.frame.origin = positionRelativeToWindow
-                            text.zIndex = index
-                            return text
-                        }
-                        return nil })
-                    .compactMap({ $0 })
-                
-                let vc = FocusModeViewController.init()
-                vc.hintViews = hintViews
-                self?.setViewController(vc: vc)
-                vc.textField.becomeFirstResponder()
-        })
+        
+        let vc = FocusModeViewController.init()
+        vc.elements = elementObservable
+        self.setViewController(vc: vc)
     }
     
     func setScrollSelectorMode() {
@@ -199,6 +163,5 @@ class ModeCoordinator : Coordinator {
         vc.cursorSelector = cursorSelector
         vc.cursorAction = cursorAction
         self.setViewController(vc: vc)
-
     }
 }

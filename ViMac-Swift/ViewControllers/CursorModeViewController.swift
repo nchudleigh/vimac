@@ -191,6 +191,7 @@ class CursorModeViewController: ModeViewController, NSTextFieldDelegate {
     }
     
     override func viewDidDisappear() {
+        super.viewDidDisappear()
         self.compositeDisposable.dispose()
     }
 }
