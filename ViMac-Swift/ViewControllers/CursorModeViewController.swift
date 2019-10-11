@@ -59,7 +59,7 @@ class CursorModeViewController: ModeViewController, NSTextFieldDelegate {
                                 let text = HintView(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
                                 text.initializeHint(hintText: hintStrings[index], typed: "")
                                 let positionRelativeToScreen = Utils.toOrigin(point: positionFlipped, size: text.frame.size)
-                                let positionRelativeToWindow = self.view.convertFromLayer(positionRelativeToScreen)
+                                let positionRelativeToWindow = self.modeCoordinator!.windowController.window!.convertPoint(fromScreen: positionRelativeToScreen)
                                 text.associatedButton = button
                                 text.frame.origin = positionRelativeToWindow
                                 text.zIndex = index
