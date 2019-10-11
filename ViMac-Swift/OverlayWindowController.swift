@@ -16,6 +16,5 @@ class OverlayWindowController: NSWindowController {
     
     func fitScreen() {
         self.window?.setFrame(NSScreen.main!.frame, display: true, animate: false)
-        self.window?.contentView?.frame = NSScreen.main!.frame
     }
 }
