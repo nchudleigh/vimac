@@ -12,6 +12,7 @@ target 'Vimac' do
   pod 'RxCocoa', '~> 5'
   pod 'MASShortcut'
   pod 'Sparkle'
+  pod 'GoogleReporter'
 
   target 'VimacTests' do
     inherit! :search_paths

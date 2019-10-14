@@ -12,6 +12,7 @@ import RxSwift
 import MASShortcut
 import os
 import Sparkle
+import GoogleReporter
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
@@ -115,6 +116,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         SUUpdater.shared()?.sendsSystemProfile = true
         SUUpdater.shared()?.checkForUpdatesInBackground()
         
+        GoogleReporter.shared.configure(withTrackerId: "UA-113155988-4")
+        GoogleReporter.shared.session(start: true)
+        
         self.compositeDisposable.insert(applicationObservable
             .observeOn(MainScheduler.instance)
             .subscribe(onNext: { appOptional in
@@ -163,6 +167,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {
+        GoogleReporter.shared.session(start: false)
         self.compositeDisposable.dispose()
     }
 }
