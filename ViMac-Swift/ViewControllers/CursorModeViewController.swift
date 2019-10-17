@@ -38,25 +38,19 @@ class CursorModeViewController: ModeViewController, NSTextFieldDelegate {
         textField.overlayTextFieldDelegate = self
         self.view.addSubview(textField)
         
-        let distinctNSEventObservable = textField.nsEventObservable!
-            .distinctUntilChanged({ (k1, k2) -> Bool in
-                return k1.type == k2.type && k1.characters == k2.characters
-            })
-            .share()
-        
-        let escapeKeyDownObservable = distinctNSEventObservable.filter({ event in
+        let escapeKeyDownObservable = textField.distinctNSEventObservable.filter({ event in
             return event.keyCode == kVK_Escape && event.type == .keyDown
         })
         
-        let deleteKeyDownObservable = distinctNSEventObservable.filter({ event in
+        let deleteKeyDownObservable = textField.distinctNSEventObservable.filter({ event in
             return event.keyCode == kVK_Delete && event.type == .keyDown
         })
         
-        let spaceKeyDownObservable = distinctNSEventObservable.filter({ event in
+        let spaceKeyDownObservable = textField.distinctNSEventObservable.filter({ event in
             return event.keyCode == kVK_Space && event.type == .keyDown
         })
         
-        let alphabetKeyDownObservable = distinctNSEventObservable
+        let alphabetKeyDownObservable = textField.distinctNSEventObservable
             .filter({ event in
                 guard let character = event.characters?.first else {
                     return false

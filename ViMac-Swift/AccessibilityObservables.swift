@@ -88,64 +88,68 @@ class AccessibilityObservables: NSObject {
     }
     
     static func scrollObservableSmooth(textField: OverlayTextField, character: Character, yAxis: Int64, xAxis: Int64, frequencyMilliseconds: Int) -> Observable<Void> {
-        return textField.observeCharacterEvent(character: character)
-            .flatMapLatest({ keyAction -> Observable<Void>in
-                if keyAction.keyPosition == .keyUp {
+        return textField.distinctNSEventObservable
+            .filter({ $0.type == .keyUp || $0.type == .keyDown })
+            .filter({ $0.characters?.first == character })
+            .flatMapLatest({ event -> Observable<Void> in
+                if event.type == .keyUp {
                     // trackpad "release" event
                     // this prevents us from scrolling against the "rubber band" at the end of a scroll area
                     // unfortunately it causes the scroll to "glide" at the end, which may not be desirable
-                    let event = CGEvent.init(scrollWheelEvent2Source: nil, units: .pixel, wheelCount: 1, wheel1: 0, wheel2: 0, wheel3: 0)!
-                    event.setIntegerValueField(.scrollWheelEventIsContinuous, value: 1)
-                    event.setIntegerValueField(.scrollWheelEventMomentumPhase, value: 0)
-                    event.setDoubleValueField(.scrollWheelEventScrollPhase, value: 4)
-                    event.setIntegerValueField(.scrollWheelEventPointDeltaAxis1, value: 0)
-                    event.setIntegerValueField(.scrollWheelEventPointDeltaAxis2, value: 0)
-                    event.post(tap: .cghidEventTap)
+                    let scrollEventPhase4 = CGEvent.init(scrollWheelEvent2Source: nil, units: .pixel, wheelCount: 1, wheel1: 0, wheel2: 0, wheel3: 0)!
+                    scrollEventPhase4.setIntegerValueField(.scrollWheelEventIsContinuous, value: 1)
+                    scrollEventPhase4.setIntegerValueField(.scrollWheelEventMomentumPhase, value: 0)
+                    scrollEventPhase4.setDoubleValueField(.scrollWheelEventScrollPhase, value: 4)
+                    scrollEventPhase4.setIntegerValueField(.scrollWheelEventPointDeltaAxis1, value: 0)
+                    scrollEventPhase4.setIntegerValueField(.scrollWheelEventPointDeltaAxis2, value: 0)
+                    scrollEventPhase4.post(tap: .cghidEventTap)
                     return Observable.just(Void())
                 }
+                
 
                 // this scroll phase 128 signifies the start of a trackpad scroll
                 // if an application did not receive this event, the scroll events below will not work
                 // the application only needs to receive this event once.
-                let event = CGEvent.init(scrollWheelEvent2Source: nil, units: .pixel, wheelCount: 1, wheel1: 0, wheel2: 0, wheel3: 0)!
-                event.setIntegerValueField(.scrollWheelEventIsContinuous, value: 1)
-                event.setIntegerValueField(.scrollWheelEventMomentumPhase, value: 0)
-                event.setIntegerValueField(.scrollWheelEventScrollPhase, value: 128)
-                event.setIntegerValueField(.scrollWheelEventPointDeltaAxis1, value: 0)
-                event.setIntegerValueField(.scrollWheelEventPointDeltaAxis2, value: 0)
-                event.post(tap: .cghidEventTap)
+                let scrollEventPhase128 = CGEvent.init(scrollWheelEvent2Source: nil, units: .pixel, wheelCount: 1, wheel1: 0, wheel2: 0, wheel3: 0)!
+                scrollEventPhase128.setIntegerValueField(.scrollWheelEventIsContinuous, value: 1)
+                scrollEventPhase128.setIntegerValueField(.scrollWheelEventMomentumPhase, value: 0)
+                scrollEventPhase128.setIntegerValueField(.scrollWheelEventScrollPhase, value: 128)
+                scrollEventPhase128.setIntegerValueField(.scrollWheelEventPointDeltaAxis1, value: 0)
+                scrollEventPhase128.setIntegerValueField(.scrollWheelEventPointDeltaAxis2, value: 0)
+                scrollEventPhase128.post(tap: .cghidEventTap)
                 
                 // this event is the second event emitted.
                 // if not present the final event (scroll phase 4) will not be allowed to emit (hence rubber banding will not work)
-                let event2 = CGEvent.init(scrollWheelEvent2Source: nil, units: .pixel, wheelCount: 1, wheel1: 0, wheel2: 0, wheel3: 0)!
-                event2.setIntegerValueField(.scrollWheelEventIsContinuous, value: 1)
-                event2.setIntegerValueField(.scrollWheelEventMomentumPhase, value: 0)
-                event2.setIntegerValueField(.scrollWheelEventScrollPhase, value: 1)
-                event2.setIntegerValueField(.scrollWheelEventPointDeltaAxis1, value: yAxis)
-                event2.setIntegerValueField(.scrollWheelEventPointDeltaAxis2, value: xAxis)
-                event2.post(tap: .cghidEventTap)
+                let scrollEventPhase1 = CGEvent.init(scrollWheelEvent2Source: nil, units: .pixel, wheelCount: 1, wheel1: 0, wheel2: 0, wheel3: 0)!
+                scrollEventPhase1.setIntegerValueField(.scrollWheelEventIsContinuous, value: 1)
+                scrollEventPhase1.setIntegerValueField(.scrollWheelEventMomentumPhase, value: 0)
+                scrollEventPhase1.setIntegerValueField(.scrollWheelEventScrollPhase, value: 1)
+                scrollEventPhase1.setIntegerValueField(.scrollWheelEventPointDeltaAxis1, value: yAxis)
+                scrollEventPhase1.setIntegerValueField(.scrollWheelEventPointDeltaAxis2, value: xAxis)
+                scrollEventPhase1.post(tap: .cghidEventTap)
 
                 return Observable<Int>.interval(.milliseconds(frequencyMilliseconds), scheduler: MainScheduler.instance)
                     .map({ _ in Void() })
                     .do(onNext: { _ in
-                        let event = CGEvent.init(scrollWheelEvent2Source: nil, units: .pixel, wheelCount: 1, wheel1: 0, wheel2: 0, wheel3: 0)!
-                        event.setIntegerValueField(.scrollWheelEventIsContinuous, value: 1)
-                        event.setIntegerValueField(.scrollWheelEventMomentumPhase, value: 0)
-                        event.setIntegerValueField(.scrollWheelEventScrollPhase, value: 2)
-                        event.setIntegerValueField(.scrollWheelEventPointDeltaAxis1, value: yAxis)
-                        event.setIntegerValueField(.scrollWheelEventPointDeltaAxis2, value: xAxis)
-                        event.post(tap: .cghidEventTap)
+                        let scrollEventPhase2 = CGEvent.init(scrollWheelEvent2Source: nil, units: .pixel, wheelCount: 1, wheel1: 0, wheel2: 0, wheel3: 0)!
+                        scrollEventPhase2.setIntegerValueField(.scrollWheelEventIsContinuous, value: 1)
+                        scrollEventPhase2.setIntegerValueField(.scrollWheelEventMomentumPhase, value: 0)
+                        scrollEventPhase2.setIntegerValueField(.scrollWheelEventScrollPhase, value: 2)
+                        scrollEventPhase2.setIntegerValueField(.scrollWheelEventPointDeltaAxis1, value: yAxis)
+                        scrollEventPhase2.setIntegerValueField(.scrollWheelEventPointDeltaAxis2, value: xAxis)
+                        scrollEventPhase2.post(tap: .cghidEventTap)
                     })
             })
     }
     
     static func scrollObservableChunky(textField: OverlayTextField, character: Character, yAxis: Int32, xAxis: Int32, frequencyMilliseconds: Int) -> Observable<Void> {
-        return textField.observeCharacterEvent(character: character)
-            .flatMapLatest({ keyAction -> Observable<Void>in
-                if keyAction.keyPosition == .keyUp {
+        textField.distinctNSEventObservable
+            .filter({ $0.type == .keyUp || $0.type == .keyDown })
+            .filter({ $0.characters?.first == character })
+            .flatMapLatest({ event -> Observable<Void> in
+                if event.type == .keyUp {
                     return Observable.just(Void())
                 }
-
                 return Observable<Int>.interval(.milliseconds(frequencyMilliseconds), scheduler: MainScheduler.instance)
                     .startWith(1)
                     .map({ _ in Void() })

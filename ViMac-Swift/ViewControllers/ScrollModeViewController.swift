@@ -44,7 +44,7 @@ class ScrollModeViewController: ModeViewController, NSTextFieldDelegate {
                 }
             }
         }
-        
+
         let halfScrollAreaHeight = scrollAreaHeight / 2
         
         let scrollSensitivity = Int64(UserDefaults.standard.integer(forKey: Utils.scrollSensitivityKey))

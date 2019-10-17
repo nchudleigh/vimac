@@ -11,34 +11,31 @@ import RxSwift
 
 class OverlayTextField: NSTextField {
     weak var overlayTextFieldDelegate: OverlayTextFieldDelegate?
-    var isFirstResponderSubject: BehaviorSubject<Bool>?
-    var keyEventObservable: Observable<KeyAction>?
-    var keyEventObservableDistinct: Observable<KeyAction>?
-    var nsEventObservable: Observable<NSEvent>?
-
+    let isFirstResponderSubject: BehaviorSubject<Bool>
+    let nsEventObservable: Observable<NSEvent>
+    let distinctNSEventObservable: Observable<NSEvent>
+    
     required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        setup()
+        fatalError()
     }
     
     override init(frame frameRect: NSRect) {
-        super.init(frame: frameRect)
-        setup()
-    }
-    
-    func setup() {
         self.isFirstResponderSubject = BehaviorSubject(value: false)
-        self.keyEventObservable = OverlayTextField.getKeyEventObservable(isFirstResponderSubject: isFirstResponderSubject!).share()
-        self.keyEventObservableDistinct = keyEventObservable!
+        self.nsEventObservable = OverlayTextField
+            .getNSEventObservable(isFirstResponderSubject: isFirstResponderSubject)
+
+        
+        self.distinctNSEventObservable = nsEventObservable
             .distinctUntilChanged({ (k1, k2) -> Bool in
-                return k1.keyPosition == k2.keyPosition && k1.character == k2.character
-            }).share()
-        self.nsEventObservable = OverlayTextField.getNSEventObservable(isFirstResponderSubject: isFirstResponderSubject!).share()
+                return k1.type == k2.type && k1.characters == k2.characters
+            })
+            .share()
+        super.init(frame: frameRect)
     }
 
     override func becomeFirstResponder() -> Bool {
         let responderStatus = super.becomeFirstResponder();
-        self.isFirstResponderSubject?.onNext(true)
+        self.isFirstResponderSubject.onNext(true)
         
         // default behaviour causes all text to be selected, so when the user types all text is erased
         // this fixes the behaviour
@@ -49,7 +46,7 @@ class OverlayTextField: NSTextField {
     }
     
     override func resignFirstResponder() -> Bool {
-        self.isFirstResponderSubject!.onNext(false)
+        self.isFirstResponderSubject.onNext(false)
         let result = super.resignFirstResponder()
         return result
     }
@@ -57,50 +54,7 @@ class OverlayTextField: NSTextField {
     override func cancelOperation(_ sender: Any?) {
         self.overlayTextFieldDelegate?.onEscape()
     }
-    
-    func observeCharacterEvent(character: Character) -> Observable<KeyAction> {
-        return self.keyEventObservableDistinct!
-            .filter({ $0.character == character })
-    }
-    
-    static func getKeyEventObservable(isFirstResponderSubject: BehaviorSubject<Bool>) -> Observable<KeyAction> {
-        return isFirstResponderSubject
-            .flatMapLatest({ isFirstResponder -> Observable<KeyAction?> in
-                if !isFirstResponder {
-                    return Observable.just(nil)
-                }
-                
-                return Observable.create({ observer in
-                    let keyDownMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown, handler: { event -> NSEvent? in
-                        let characters = event.characters
-                        guard let typedCharacter: Character = characters?.first else {
-                            return event
-                        }
-                        let keyAction = KeyAction(keyPosition: .keyDown, character: typedCharacter, modiferFlags: event.modifierFlags)
-                        observer.onNext(keyAction)
-                        return event
-                    })
-                    
-                    let keyUpMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyUp, handler: { event -> NSEvent? in
-                        let characters = event.characters
-                        guard let typedCharacter: Character = characters?.first else {
-                            return event
-                        }
-                        let keyAction = KeyAction(keyPosition: .keyUp, character: typedCharacter, modiferFlags: event.modifierFlags)
-                        observer.onNext(keyAction)
-                        return event
-                    })
-                    
-                    let cancel = Disposables.create {
-                        NSEvent.removeMonitor(keyDownMonitor)
-                        NSEvent.removeMonitor(keyUpMonitor)
-                    }
-                    return cancel
-                })
-            })
-            .compactMap({ $0 })
-    }
-    
+
     static func getNSEventObservable(isFirstResponderSubject: BehaviorSubject<Bool>) -> Observable<NSEvent> {
         return isFirstResponderSubject
             .flatMapLatest({ isFirstResponder -> Observable<NSEvent> in
@@ -109,29 +63,19 @@ class OverlayTextField: NSTextField {
                 }
                 
                 return Observable.create({ observer in
-                    let keyDownMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown, handler: { event -> NSEvent? in
+                    let keyMonitor = NSEvent.addLocalMonitorForEvents(matching: NSEvent.EventTypeMask.keyDown.union(.keyUp), handler: { event -> NSEvent? in
                         observer.onNext(event)
                         // return nil to prevent the event from being dispatched
                         // this removes the "doot doot" sound when typing with CMD / CTRL held down
                         return nil
                     })
                     
-                    let keyUpMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyUp, handler: { event -> NSEvent? in
-                        observer.onNext(event)
-                        return nil
-                    })
-                    
                     let cancel = Disposables.create {
-                        NSEvent.removeMonitor(keyDownMonitor)
-                        NSEvent.removeMonitor(keyUpMonitor)
+                        NSEvent.removeMonitor(keyMonitor)
                     }
                     return cancel
                 })
             })
-    }
-    
-    func getDistinctKeyEventObservable() {
-        
     }
 }
 
