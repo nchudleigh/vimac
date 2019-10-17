@@ -114,7 +114,6 @@ class CursorModeViewController: ModeViewController, NSTextFieldDelegate {
                         let centerPosition = NSPoint(x: centerPositionX, y: centerPositionY)
             
                         Utils.moveMouse(position: centerPosition)
-                        var actionOptional: CursorAction? = nil
                         
                         if (event.modifierFlags.rawValue & NSEvent.ModifierFlags.shift.rawValue == NSEvent.ModifierFlags.shift.rawValue) {
                             Utils.rightClickMouse(position: centerPosition)
