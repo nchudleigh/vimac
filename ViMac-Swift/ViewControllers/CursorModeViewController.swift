@@ -115,24 +115,15 @@ class CursorModeViewController: ModeViewController, NSTextFieldDelegate {
             
                         Utils.moveMouse(position: centerPosition)
                         var actionOptional: CursorAction? = nil
-
-                        switch (event.modifierFlags.rawValue) {
-                            // no modifiers
-                            case 256:
-                                Utils.leftClickMouse(position: centerPosition)
-                            // holding shift
-                            case 131330:
-                                Utils.rightClickMouse(position: centerPosition)
-                            // holding option
-                            case 524576:
-                                break
-                            // holding command
-                            case 1048840:
-                                Utils.doubleLeftClickMouse(position: centerPosition)
-                            default:
-                                break
+                        
+                        if (event.modifierFlags.rawValue & NSEvent.ModifierFlags.shift.rawValue == NSEvent.ModifierFlags.shift.rawValue) {
+                            Utils.rightClickMouse(position: centerPosition)
+                        } else if (event.modifierFlags.rawValue & NSEvent.ModifierFlags.command.rawValue == NSEvent.ModifierFlags.command.rawValue) {
+                            Utils.doubleLeftClickMouse(position: centerPosition)
+                        } else if (event.modifierFlags.rawValue & NSEvent.ModifierFlags.option.rawValue == NSEvent.ModifierFlags.option.rawValue) {
+                        } else {
+                            Utils.leftClickMouse(position: centerPosition)
                         }
-
                         vc.modeCoordinator?.exitMode()
                         return
                     }
