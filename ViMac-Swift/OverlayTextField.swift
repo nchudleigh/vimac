@@ -14,7 +14,7 @@ class OverlayTextField: NSTextField {
     var isFirstResponderSubject: BehaviorSubject<Bool>?
     var keyEventObservable: Observable<KeyAction>?
     var keyEventObservableDistinct: Observable<KeyAction>?
-    
+    var nsEventObservable: Observable<NSEvent>?
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
@@ -33,6 +33,7 @@ class OverlayTextField: NSTextField {
             .distinctUntilChanged({ (k1, k2) -> Bool in
                 return k1.keyPosition == k2.keyPosition && k1.character == k2.character
             }).share()
+        self.nsEventObservable = OverlayTextField.getNSEventObservable(isFirstResponderSubject: isFirstResponderSubject!).share()
     }
 
     override func becomeFirstResponder() -> Bool {
@@ -75,7 +76,7 @@ class OverlayTextField: NSTextField {
                         guard let typedCharacter: Character = characters?.first else {
                             return event
                         }
-                        let keyAction = KeyAction(keyPosition: .keyDown, character: typedCharacter)
+                        let keyAction = KeyAction(keyPosition: .keyDown, character: typedCharacter, modiferFlags: event.modifierFlags)
                         observer.onNext(keyAction)
                         return event
                     })
@@ -85,7 +86,7 @@ class OverlayTextField: NSTextField {
                         guard let typedCharacter: Character = characters?.first else {
                             return event
                         }
-                        let keyAction = KeyAction(keyPosition: .keyUp, character: typedCharacter)
+                        let keyAction = KeyAction(keyPosition: .keyUp, character: typedCharacter, modiferFlags: event.modifierFlags)
                         observer.onNext(keyAction)
                         return event
                     })
@@ -98,6 +99,35 @@ class OverlayTextField: NSTextField {
                 })
             })
             .compactMap({ $0 })
+    }
+    
+    static func getNSEventObservable(isFirstResponderSubject: BehaviorSubject<Bool>) -> Observable<NSEvent> {
+        return isFirstResponderSubject
+            .flatMapLatest({ isFirstResponder -> Observable<NSEvent> in
+                if !isFirstResponder {
+                    return Observable.empty()
+                }
+                
+                return Observable.create({ observer in
+                    let keyDownMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown, handler: { event -> NSEvent? in
+                        observer.onNext(event)
+                        // return nil to prevent the event from being dispatched
+                        // this removes the "doot doot" sound when typing with CMD / CTRL held down
+                        return nil
+                    })
+                    
+                    let keyUpMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyUp, handler: { event -> NSEvent? in
+                        observer.onNext(event)
+                        return nil
+                    })
+                    
+                    let cancel = Disposables.create {
+                        NSEvent.removeMonitor(keyDownMonitor)
+                        NSEvent.removeMonitor(keyUpMonitor)
+                    }
+                    return cancel
+                })
+            })
     }
     
     func getDistinctKeyEventObservable() {
