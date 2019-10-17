@@ -12,25 +12,23 @@ import RxSwift
 import Carbon.HIToolbox
 
 class CursorModeViewController: ModeViewController, NSTextFieldDelegate {
-    var cursorAction: CursorAction?
-    var cursorSelector: CursorSelector?
-    var allowedRoles: [Role]?
-    var elements: Observable<UIElement>?
+    let elements: Observable<UIElement>
     let textField = CursorActionSelectorTextField(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
     var hintViews: [HintView]?
     let compositeDisposable = CompositeDisposable()
     var characterStack: [Character] = [Character]()
-    
 
+    init(elements: Observable<UIElement>) {
+        self.elements = elements
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError()
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        guard let cursorAction = self.cursorAction,
-            let cursorSelector = self.cursorSelector,
-            let allowedRoles = self.allowedRoles,
-            let elements = self.elements else {
-                self.modeCoordinator?.exitMode()
-                return
-        }
 
         textField.stringValue = ""
         textField.isEditable = true
@@ -74,14 +72,14 @@ class CursorModeViewController: ModeViewController, NSTextFieldDelegate {
                         let character = event.characters?.first else {
                         return
                     }
-                    
+
                     vc.characterStack.append(character)
                     let typed = String(vc.characterStack)
             
                     let matchingHints = vc.hintViews!.filter { hintView in
                         return hintView.stringValue.starts(with: typed.uppercased())
                     }
-            
+
                     if matchingHints.count == 0 && typed.count > 0 {
                         vc.modeCoordinator?.exitMode()
                         return
