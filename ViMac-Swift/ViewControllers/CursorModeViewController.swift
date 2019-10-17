@@ -9,6 +9,7 @@
 import Cocoa
 import AXSwift
 import RxSwift
+import Carbon.HIToolbox
 
 class CursorModeViewController: ModeViewController, NSTextFieldDelegate {
     var cursorAction: CursorAction?
@@ -39,59 +40,43 @@ class CursorModeViewController: ModeViewController, NSTextFieldDelegate {
         textField.overlayTextFieldDelegate = self
         self.view.addSubview(textField)
         
-        let keyActionObservable = textField.nsEventObservable!
-            .flatMapLatest({ event -> Observable<KeyAction> in
-                let characterOptional: Character? = event.charactersIgnoringModifiers?.first
-                
-                var keyPositionOptional: KeyPosition? = nil
-                switch (event.type) {
-                case .keyDown:
-                    keyPositionOptional = .keyDown
-                case .keyUp:
-                    keyPositionOptional = .keyUp
-                default:
-                    break
-                }
-
-                guard let character = characterOptional,
-                    let keyPosition = keyPositionOptional else {
-                        return Observable.empty()
-                }
-                
-                return Observable.just(
-                    KeyAction(keyPosition: keyPosition, character: character, modiferFlags: event.modifierFlags)
-                )
-            })
+        let distinctNSEventObservable = textField.nsEventObservable!
             .distinctUntilChanged({ (k1, k2) -> Bool in
-                return k1.keyPosition == k2.keyPosition && k1.character == k2.character
+                return k1.type == k2.type && k1.characters == k2.characters
             })
             .share()
         
-        let escapeKeyDownObservable = keyActionObservable.filter({ keyAction in
-            return keyAction.character == "\u{1B}" && keyAction.keyPosition == .keyDown
+        let escapeKeyDownObservable = distinctNSEventObservable.filter({ event in
+            return event.keyCode == kVK_Escape && event.type == .keyDown
         })
         
-        let alphabetKeyDownObservable = keyActionObservable
-            .filter({ keyAction in
-                return keyAction.character.isLetter && keyAction.keyPosition == .keyDown
+        let deleteKeyDownObservable = distinctNSEventObservable.filter({ event in
+            return event.keyCode == kVK_Delete && event.type == .keyDown
+        })
+        
+        let spaceKeyDownObservable = distinctNSEventObservable.filter({ event in
+            return event.keyCode == kVK_Space && event.type == .keyDown
+        })
+        
+        let alphabetKeyDownObservable = distinctNSEventObservable
+            .filter({ event in
+                guard let character = event.characters?.first else {
+                    return false
+                }
+                return character.isLetter && event.type == .keyDown
             })
         
         self.compositeDisposable.insert(
             alphabetKeyDownObservable
                 .observeOn(MainScheduler.instance)
-                .subscribe(onNext: { [weak self] keyAction in
-                    guard let vc = self else {
+                .subscribe(onNext: { [weak self] event in
+                    guard let vc = self,
+                        let character = event.characters?.first else {
                         return
                     }
-                    vc.characterStack.append(keyAction.character)
+                    
+                    vc.characterStack.append(character)
                     let typed = String(vc.characterStack)
-                    if let lastCharacter = typed.last {
-                        if lastCharacter == " " {
-                            vc.characterStack.popLast()
-                            vc.rotateHints()
-                            return
-                        }
-                    }
             
                     let matchingHints = vc.hintViews!.filter { hintView in
                         return hintView.stringValue.starts(with: typed.uppercased())
@@ -133,7 +118,7 @@ class CursorModeViewController: ModeViewController, NSTextFieldDelegate {
                         Utils.moveMouse(position: centerPosition)
                         var actionOptional: CursorAction? = nil
 
-                        switch (keyAction.modiferFlags.rawValue) {
+                        switch (event.modifierFlags.rawValue) {
                             // no modifiers
                             case 256:
                                 Utils.leftClickMouse(position: centerPosition)
@@ -149,8 +134,7 @@ class CursorModeViewController: ModeViewController, NSTextFieldDelegate {
                             default:
                                 break
                         }
-                                        
-            
+
                         vc.modeCoordinator?.exitMode()
                         return
                     }
@@ -166,6 +150,28 @@ class CursorModeViewController: ModeViewController, NSTextFieldDelegate {
                 .subscribe(onNext: { [weak self] _ in
                     self?.onEscape()
         }))
+        
+        self.compositeDisposable.insert(
+            deleteKeyDownObservable
+                .observeOn(MainScheduler.instance)
+                .subscribe(onNext: { [weak self] _ in
+                    guard let vc = self else {
+                        return
+                    }
+                    vc.characterStack.popLast()
+                    vc.updateHints(typed: String(vc.characterStack))
+        }))
+        
+        self.compositeDisposable.insert(
+            spaceKeyDownObservable
+                .observeOn(MainScheduler.instance)
+                .subscribe(onNext: { [weak self] _ in
+                    guard let vc = self else {
+                        return
+                    }
+                    vc.rotateHints()
+        }))
+        
         
         self.compositeDisposable.insert(
             elements.toArray()
@@ -245,81 +251,7 @@ class CursorModeViewController: ModeViewController, NSTextFieldDelegate {
         }
         self.hintViews = shuffledHintViews
     }
-    
-//    func controlTextDidChange(_ obj: Notification) {
-//        let typed = textField.stringValue
-//        guard let cursorAction = self.cursorAction,
-//            let cursorSelector = self.cursorSelector,
-//            let allowedRoles = self.allowedRoles,
-//            let hintViews = self.hintViews else {
-//                self.modeCoordinator?.exitMode()
-//                return
-//        }
-//
-//        if let lastCharacter = typed.last {
-//            if lastCharacter == " " {
-//                textField.stringValue = textField.stringValue.trimmingCharacters(in: .whitespacesAndNewlines)
-//                self.rotateHints()
-//                return
-//            }
-//        }
-//
-//        let matchingHints = hintViews.filter { hintView in
-//            return hintView.stringValue.starts(with: typed.uppercased())
-//        }
-//
-//        if matchingHints.count == 0 && typed.count > 0 {
-//            self.modeCoordinator?.exitMode()
-//            return
-//        }
-//
-//        if matchingHints.count == 1 {
-//            let matchingHint = matchingHints.first!
-//            let buttonOptional = matchingHint.associatedButton
-//            guard let button = buttonOptional else {
-//                self.modeCoordinator?.exitMode()
-//                return
-//            }
-//
-//            var buttonPositionOptional: NSPoint?
-//            var buttonSizeOptional: NSSize?
-//            do {
-//                buttonPositionOptional = try button.attribute(.position)
-//                buttonSizeOptional = try button.attribute(.size)
-//            } catch {
-//                self.modeCoordinator?.exitMode()
-//                return
-//            }
-//
-//            guard let buttonPosition = buttonPositionOptional,
-//                let buttonSize = buttonSizeOptional else {
-//                    self.modeCoordinator?.exitMode()
-//                    return
-//            }
-//
-//            let centerPositionX = buttonPosition.x + (buttonSize.width / 2)
-//            let centerPositionY = buttonPosition.y + (buttonSize.height / 2)
-//            let centerPosition = NSPoint(x: centerPositionX, y: centerPositionY)
-//
-//            Utils.moveMouse(position: centerPosition)
-//            if cursorAction == .leftClick {
-//                Utils.leftClickMouse(position: centerPosition)
-//            } else if cursorAction == .rightClick {
-//                Utils.rightClickMouse(position: centerPosition)
-//            } else if cursorAction == .doubleLeftClick {
-//                Utils.doubleLeftClickMouse(position: centerPosition)
-//            } else if cursorAction == .move {
-//                Utils.moveMouse(position: centerPosition)
-//            }
-//
-//            self.modeCoordinator?.exitMode()
-//            return
-//        }
-//
-//        // update hints to reflect new typed text
-//        self.updateHints(typed: typed)
-//    }
-    
+
     override func viewDidDisappear() {
         super.viewDidDisappear()
         self.compositeDisposable.dispose()
