@@ -129,39 +129,16 @@ class ModeCoordinator : Coordinator {
         vc.textField.becomeFirstResponder()
     }
     
-    func setCursorMode(cursorAction: CursorAction, cursorSelector: CursorSelector, allowedRoles: [Role]) {
+    func setCursorMode() {
         guard let applicationWindow = activeWindow ?? Utils.getCurrentApplicationWindowManually(),
             let window = self.windowController.window else {
             self.exitMode()
             return
         }
-
-        let blacklistedRoles = Set(["AXUnknown", "AXToolbar", "AXCell", "AXWindow", "AXScrollArea", "AXSplitter", "AXList"])
-        let allowedRolesString = Set(allowedRoles.map({ $0.rawValue }))
-
-        var elements = Utils.getUIElementChildrenRecursive(element: applicationWindow, parentScrollAreaFrame: nil)
-        if allowedRoles.count > 0 {
-            elements = elements.filter({ element in
-                do {
-                    guard let elementRole: String = try element.attribute(.role) else {
-                        return false
-                    }
-                    return !blacklistedRoles.contains(elementRole) && allowedRolesString.contains(elementRole)
-                } catch {
-                    return false
-                }
-            })
-        }
-        
+        var windowElements = Utils.getUIElementChildrenRecursive(element: applicationWindow, parentScrollAreaFrame: nil)
         let menuBarElements = Utils.traverseForMenuBarItems(windowElement: applicationWindow)
-        
-        let allElements = Observable.merge(elements, menuBarElements)
-
-        let vc = CursorModeViewController.init()
-        vc.elements = allElements
-        vc.allowedRoles = allowedRoles
-        vc.cursorSelector = cursorSelector
-        vc.cursorAction = cursorAction
+        let allElements = Observable.merge(windowElements, menuBarElements)
+        let vc = CursorModeViewController.init(elements: allElements)
         self.setViewController(vc: vc)
     }
 }

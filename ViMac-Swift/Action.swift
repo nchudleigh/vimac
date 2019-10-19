@@ -8,18 +8,6 @@
 
 import Cocoa
 
-enum CursorAction: String {
-    case leftClick = "c"
-    case rightClick = "rc"
-    case doubleLeftClick = "dc"
-    case move = "m"
-}
-
-enum CursorSelector: String {
-    case element = "e"
-    case here = "h"
-}
-
 enum ElementSelectorArg: String {
     case button = "b"
     case disclosureTriangle = "dt"

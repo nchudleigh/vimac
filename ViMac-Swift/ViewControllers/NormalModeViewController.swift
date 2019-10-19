@@ -66,62 +66,12 @@ class NormalModeViewController: ModeViewController, NSTextFieldDelegate {
             return
         }
         
-        var cursorActionOptional: CursorAction?
-        var cursorSelectorOptional: CursorSelector?
-        
-        if trimmedInput.starts(with: "ce") {
-            cursorActionOptional = .leftClick
-            cursorSelectorOptional = .element
-        }
-        else if trimmedInput.starts(with: "rce") {
-            cursorActionOptional = .rightClick
-            cursorSelectorOptional = .element
-        }
-        else if trimmedInput.starts(with: "dce") {
-            cursorActionOptional = .doubleLeftClick
-            cursorSelectorOptional = .element
-        }
-        else if trimmedInput.starts(with: "me") {
-            cursorActionOptional = .move
-            cursorSelectorOptional = .element
-        }
-        else if trimmedInput.starts(with: "ch") {
-            cursorActionOptional = .leftClick
-            cursorSelectorOptional = .here
-        }
-        else if trimmedInput.starts(with: "rch") {
-            cursorActionOptional = .rightClick
-            cursorSelectorOptional = .here
-        }
-        else if trimmedInput.starts(with: "dch") {
-            cursorActionOptional = .doubleLeftClick
-            cursorSelectorOptional = .here
-        }
-
-        guard let cursorAction = cursorActionOptional,
-            let cursorSelector = cursorSelectorOptional else {
-                self.modeCoordinator?.exitMode()
-                return
-        }
-        
-        if cursorSelector != .element {
-            self.modeCoordinator?.exitMode()
+        if trimmedInput.starts(with: "e") {
+            self.modeCoordinator?.setCursorMode()
             return
         }
         
-        var allowedRoles = [Role]()
-        let inputSplit = trimmedInput.split(separator: " ")
-        if inputSplit.count > 1 {
-            let args = inputSplit.dropFirst(1)
-                .flatMap({ $0.split(separator: ";") })
-                .map({ String($0) })
-            allowedRoles = args
-                .map({ ElementSelectorArg(rawValue: String($0)) })
-                .compactMap({ $0 })
-                .flatMap({ Utils.mapArgRoleToAXRole(arg: $0) })
-        }
-        
-        self.modeCoordinator?.setCursorMode(cursorAction: cursorAction, cursorSelector: cursorSelector, allowedRoles: allowedRoles)
+        self.modeCoordinator?.exitMode()
     }
     
     func control(_ control: NSControl, textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
