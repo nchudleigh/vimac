@@ -13,7 +13,7 @@ import AXSwift
 class FocusModeViewController: ModeViewController, NSTextFieldDelegate {
     var elements: Observable<UIElement>?
     var hintViews: [HintView]?
-    let textField = FocusSelectorTextField(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
+    let textField = OverlayTextField(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
     let compositeDisposable = CompositeDisposable()
     
     override func viewDidLoad() {

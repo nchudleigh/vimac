@@ -79,18 +79,6 @@ class OverlayTextField: NSTextField {
     }
 }
 
-class CursorActionSelectorTextField : OverlayTextField {
-    var cursorAction: CursorAction?
-}
-
-class FocusSelectorTextField : OverlayTextField {
-    
-}
-
-class ScrollSelectorTextField : OverlayTextField {
-    
-}
-
 protocol OverlayTextFieldDelegate: AnyObject {
     func onEscape() -> Void
 }

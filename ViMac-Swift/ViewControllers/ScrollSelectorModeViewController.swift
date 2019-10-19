@@ -10,7 +10,7 @@ import Cocoa
 
 class ScrollSelectorModeViewController: ModeViewController, NSTextFieldDelegate {
     var hintViews: [HintView]?
-    let textField = ScrollSelectorTextField(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
+    let textField = OverlayTextField(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
     
     override func viewDidLoad() {
         super.viewDidLoad()
