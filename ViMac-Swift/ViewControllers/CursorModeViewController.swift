@@ -113,7 +113,7 @@ class CursorModeViewController: ModeViewController, NSTextFieldDelegate {
                             Utils.rightClickMouse(position: centerPosition)
                         } else if (event.modifierFlags.rawValue & NSEvent.ModifierFlags.command.rawValue == NSEvent.ModifierFlags.command.rawValue) {
                             Utils.doubleLeftClickMouse(position: centerPosition)
-                        } else if (event.modifierFlags.rawValue & NSEvent.ModifierFlags.option.rawValue == NSEvent.ModifierFlags.option.rawValue) {
+                        } else if (event.modifierFlags.rawValue & NSEvent.ModifierFlags.control.rawValue == NSEvent.ModifierFlags.control.rawValue) {
                         } else {
                             Utils.leftClickMouse(position: centerPosition)
                         }
