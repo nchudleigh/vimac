@@ -52,7 +52,7 @@ class CursorModeViewController: ModeViewController, NSTextFieldDelegate {
         
         let alphabetKeyDownObservable = textField.distinctNSEventObservable
             .filter({ event in
-                guard let character = event.characters?.first else {
+                guard let character = event.charactersIgnoringModifiers?.first else {
                     return false
                 }
                 return character.isLetter && event.type == .keyDown
@@ -63,7 +63,7 @@ class CursorModeViewController: ModeViewController, NSTextFieldDelegate {
                 .observeOn(MainScheduler.instance)
                 .subscribe(onNext: { [weak self] event in
                     guard let vc = self,
-                        let character = event.characters?.first else {
+                        let character = event.charactersIgnoringModifiers?.first else {
                         return
                     }
 
