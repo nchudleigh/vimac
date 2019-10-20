@@ -17,9 +17,10 @@ class CursorModeViewController: ModeViewController, NSTextFieldDelegate {
     var hintViews: [HintView]?
     let compositeDisposable = CompositeDisposable()
     var characterStack: [Character] = [Character]()
+    let elementFilters: [ElementFilter.Type] = [NoFilter.self, HasActionsFilter.self, FocusableFilter.self, GroupFilter.self]
 
     init(elements: Observable<UIElement>) {
-        self.elements = elements
+        self.elements = elements.share()
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -49,6 +50,10 @@ class CursorModeViewController: ModeViewController, NSTextFieldDelegate {
         let spaceKeyDownObservable = textField.distinctNSEventObservable.filter({ event in
             return event.keyCode == kVK_Space && event.type == .keyDown
         })
+        
+        let tabKeyDownObservable = textField.distinctNSEventObservable.filter({ event in
+            return event.keyCode == kVK_Tab && event.type == .keyDown
+        }).share()
         
         let alphabetKeyDownObservable = textField.distinctNSEventObservable
             .filter({ event in
@@ -153,6 +158,58 @@ class CursorModeViewController: ModeViewController, NSTextFieldDelegate {
                     }
                     vc.rotateHints()
         }))
+
+        self.compositeDisposable.insert(
+            tabKeyDownObservable.enumerated()
+                .withLatestFrom(elements.toArray(), resultSelector: { (a, elements) in
+                    return (a.index + 1, elements)
+                })
+                .subscribe(onNext: { [weak self] (tabCount, elements) in
+                    guard let vc = self else {
+                        return
+                    }
+                    // cycle through the filters
+                    let filter = vc.elementFilters[tabCount % vc.elementFilters.count]
+                    print(filter)
+                    let filteredElements = elements.filter({ filter.filterPredicate(element: $0) })
+                    let hintStrings = AlphabetHints().hintStrings(linkCount: filteredElements.count)
+                    let hintViews: [HintView] = filteredElements
+                        .enumerated()
+                        .map ({ (index, button) in
+                            let positionFlippedOptional: NSPoint? = {
+                                do {
+                                    return try button.attribute(.position)
+                                } catch {
+                                    return nil
+                                }
+                            }()
+
+                            if let positionFlipped = positionFlippedOptional {
+                                let text = HintView(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
+                                text.initializeHint(hintText: hintStrings[index], typed: "")
+                                let positionRelativeToScreen = Utils.toOrigin(point: positionFlipped, size: text.frame.size)
+                                let positionRelativeToWindow = vc.modeCoordinator!.windowController.window!.convertPoint(fromScreen: positionRelativeToScreen)
+                                text.associatedButton = button
+                                text.frame.origin = positionRelativeToWindow
+                                text.zIndex = index
+                                return text
+                            }
+                            return nil })
+                        .compactMap({ $0 })
+
+                    
+                    for existingHintView in vc.hintViews ?? [] {
+                        existingHintView.removeFromSuperview()
+                    }
+                    
+                    vc.hintViews = hintViews
+                    for hintView in hintViews {
+                        vc.view.addSubview(hintView)
+                    }
+                    
+                    vc.characterStack.removeAll()
+            })
+        )
         
         
         self.compositeDisposable.insert(

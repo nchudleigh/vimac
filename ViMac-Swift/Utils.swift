@@ -250,38 +250,6 @@ class Utils: NSObject {
         return elements
     }
     
-    static func mapArgRoleToAXRole(arg: ElementSelectorArg) -> [Role] {
-        if arg == .button {
-            return [Role.button, Role.menuButton, Role.radioButton, Role.popUpButton, Role.checkBox]
-        }
-        
-        if arg == .group {
-            return [Role.group, Role.tabGroup, Role.radioGroup, Role.splitGroup]
-        }
-        
-        if arg == .disclosureTriangle {
-            return [Role.disclosureTriangle]
-        }
-        
-        if arg == .row {
-            return [Role.row]
-        }
-	
-        if arg == .image {
-            return [Role.image]
-        }
-        
-        if arg == .text {
-            return [Role.textField, Role.textArea, Role.staticText]
-        }
-        
-        if arg == .link {
-            return [Role.link]
-        }
-        
-        return []
-    }
-    
     // For performance reasons Chromium only makes the webview accessible when there it detects voiceover through the `AXEnhancedUserInterface` attribute on the Chrome application itself:
     // http://dev.chromium.org/developers/design-documents/accessibility
     // Similarly, electron uses `AXManualAccessibility`:
