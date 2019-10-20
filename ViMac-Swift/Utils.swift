@@ -11,7 +11,9 @@ import RxSwift
 
 class Utils: NSObject {
     static let defaultHintShortcut = MASShortcut.init(keyCode: kVK_Space, modifierFlags: [.command, .shift])
+    static let defaultScrollShortcut = MASShortcut.init(keyCode: kVK_ANSI_S, modifierFlags: [.command, .shift])
     static let hintModeShortcutKey = "HintModeShortcut"
+    static let scrollModeShortcutKey = "ScrollModeShortcut"
     static let scrollSensitivityKey = "ScrollSensitivity"
     
     static func registerDefaults() {

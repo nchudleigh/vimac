@@ -22,6 +22,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let windowObservable: Observable<UIElement?>
     let windowSubject: BehaviorSubject<UIElement?>
     let hintModeShortcutObservable: Observable<Void>
+    let scrollModeShortcutObservable: Observable<Void>
     
     var compositeDisposable: CompositeDisposable
     var scrollModeDisposable: CompositeDisposable? = CompositeDisposable()
@@ -99,6 +100,20 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             return Disposables.create()
         }
         
+        scrollModeShortcutObservable = Observable.create { observer in
+            let tempView = MASShortcutView.init()
+            tempView.associatedUserDefaultsKey = Utils.scrollModeShortcutKey
+            if tempView.shortcutValue == nil {
+                tempView.shortcutValue = Utils.defaultScrollShortcut
+            }
+            
+            MASShortcutBinder.shared()
+                .bindShortcut(withDefaultsKey: Utils.scrollModeShortcutKey, toAction: {
+                    observer.onNext(Void())
+                })
+            return Disposables.create()
+        }
+        
         self.compositeDisposable = CompositeDisposable()
         
         super.init()
@@ -162,6 +177,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             .observeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak self] window in
                 self?.modeCoordinator.setHintMode()
+            })
+        )
+        
+        self.compositeDisposable.insert(scrollModeShortcutObservable
+            .withLatestFrom(windowNoNilObservable, resultSelector: { _, window in
+                return window
+            })
+            .observeOn(MainScheduler.instance)
+            .subscribe(onNext: { [weak self] window in
+                self?.modeCoordinator.setScrollSelectorMode()
             })
         )
     }
