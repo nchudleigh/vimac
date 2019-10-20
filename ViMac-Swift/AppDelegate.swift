@@ -161,7 +161,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             })
             .observeOn(MainScheduler.instance)
             .subscribe(onNext: { window in
-                self.modeCoordinator.setNormalMode()
+                //self.modeCoordinator.setNormalMode()
             })
         )
     }

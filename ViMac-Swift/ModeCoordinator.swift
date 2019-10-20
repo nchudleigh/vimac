@@ -45,12 +45,6 @@ class ModeCoordinator : Coordinator {
         self.windowController.window?.makeKeyAndOrderFront(nil)
     }
     
-    func setNormalMode() {
-        let vc = NormalModeViewController.init()
-        self.setViewController(vc: vc)
-        vc.textField.becomeFirstResponder()
-    }
-    
     func setFocusMode() {
         guard let applicationWindow = activeWindow ?? Utils.getCurrentApplicationWindowManually() else {
             self.exitMode()
