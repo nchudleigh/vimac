@@ -170,7 +170,6 @@ class CursorModeViewController: ModeViewController, NSTextFieldDelegate {
                     }
                     // cycle through the filters
                     let filter = vc.elementFilters[tabCount % vc.elementFilters.count]
-                    print(filter)
                     let filteredElements = elements.filter({ filter.filterPredicate(element: $0) })
                     let hintStrings = AlphabetHints().hintStrings(linkCount: filteredElements.count)
                     let hintViews: [HintView] = filteredElements
