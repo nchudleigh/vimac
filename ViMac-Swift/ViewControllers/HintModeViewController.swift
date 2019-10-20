@@ -1,5 +1,5 @@
 //
-//  CursorModeViewController.swift
+//  HintModeViewController.swift
 //  Vimac
 //
 //  Created by Huawei Matebook X Pro on 9/10/19.
@@ -11,7 +11,7 @@ import AXSwift
 import RxSwift
 import Carbon.HIToolbox
 
-class CursorModeViewController: ModeViewController, NSTextFieldDelegate {
+class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     let elements: Observable<UIElement>
     let textField = OverlayTextField(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
     var hintViews: [HintView]?

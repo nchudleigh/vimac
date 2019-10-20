@@ -19,7 +19,7 @@ class PreferencesGeneralViewController: NSViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        shortcutView.associatedUserDefaultsKey = Utils.commandShortcutKey
+        shortcutView.associatedUserDefaultsKey = Utils.hintModeShortcutKey
     }
     @IBAction func sliderChanged(_ sender: Any) {
         UserDefaults.standard.set(scrollSensitivitySlider.integerValue, forKey: Utils.scrollSensitivityKey)

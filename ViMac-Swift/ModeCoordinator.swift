@@ -123,7 +123,7 @@ class ModeCoordinator : Coordinator {
         vc.textField.becomeFirstResponder()
     }
     
-    func setCursorMode() {
+    func setHintMode() {
         guard let applicationWindow = activeWindow ?? Utils.getCurrentApplicationWindowManually(),
             let window = self.windowController.window else {
             self.exitMode()
@@ -132,7 +132,7 @@ class ModeCoordinator : Coordinator {
         var windowElements = Utils.getUIElementChildrenRecursive(element: applicationWindow, parentScrollAreaFrame: nil)
         let menuBarElements = Utils.traverseForMenuBarItems(windowElement: applicationWindow)
         let allElements = Observable.merge(windowElements, menuBarElements)
-        let vc = CursorModeViewController.init(elements: allElements)
+        let vc = HintModeViewController.init(elements: allElements)
         self.setViewController(vc: vc)
     }
 }

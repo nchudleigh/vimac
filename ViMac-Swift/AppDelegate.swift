@@ -21,7 +21,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let applicationNotificationObservable: Observable<AccessibilityObservables.AppNotificationAppPair>
     let windowObservable: Observable<UIElement?>
     let windowSubject: BehaviorSubject<UIElement?>
-    let normalShortcutObservable: Observable<Void>
+    let hintModeShortcutObservable: Observable<Void>
     
     var compositeDisposable: CompositeDisposable
     var scrollModeDisposable: CompositeDisposable? = CompositeDisposable()
@@ -85,15 +85,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         windowObservable = Observable.merge([windowFromApplicationNotificationObservable, initialWindowFromApplicationObservable])
         windowSubject = BehaviorSubject(value: nil)
 
-        normalShortcutObservable = Observable.create { observer in
+        hintModeShortcutObservable = Observable.create { observer in
             let tempView = MASShortcutView.init()
-            tempView.associatedUserDefaultsKey = Utils.commandShortcutKey
+            tempView.associatedUserDefaultsKey = Utils.hintModeShortcutKey
             if tempView.shortcutValue == nil {
-                tempView.shortcutValue = Utils.defaultCommandShortcut
+                tempView.shortcutValue = Utils.defaultHintShortcut
             }
             
             MASShortcutBinder.shared()
-                .bindShortcut(withDefaultsKey: Utils.commandShortcutKey, toAction: {
+                .bindShortcut(withDefaultsKey: Utils.hintModeShortcutKey, toAction: {
                     observer.onNext(Void())
                 })
             return Disposables.create()
@@ -155,13 +155,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         let windowNoNilObservable = windowObservable.compactMap { $0 }
         
-        self.compositeDisposable.insert(normalShortcutObservable
+        self.compositeDisposable.insert(hintModeShortcutObservable
             .withLatestFrom(windowNoNilObservable, resultSelector: { _, window in
                 return window
             })
             .observeOn(MainScheduler.instance)
-            .subscribe(onNext: { window in
-                //self.modeCoordinator.setNormalMode()
+            .subscribe(onNext: { [weak self] window in
+                self?.modeCoordinator.setHintMode()
             })
         )
     }

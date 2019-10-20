@@ -732,7 +732,7 @@
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Qo4-fk-AmF">
                                         <rect key="frame" x="80" y="226" width="162" height="17"/>
                                         <autoresizingMask key="autoresizingMask"/>
-                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Enter Command Shortcut:" id="WAN-yn-gNa">
+                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Hint Mode Shortcut:" id="WAN-yn-gNa">
                                             <font key="font" usesAppearanceFont="YES"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>

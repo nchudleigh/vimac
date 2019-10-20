@@ -10,8 +10,8 @@ import MASShortcut
 import RxSwift
 
 class Utils: NSObject {
-    static let defaultCommandShortcut = MASShortcut.init(keyCode: kVK_Space, modifierFlags: [.command, .shift])
-    static let commandShortcutKey = "CommandShortcut"
+    static let defaultHintShortcut = MASShortcut.init(keyCode: kVK_Space, modifierFlags: [.command, .shift])
+    static let hintModeShortcutKey = "HintModeShortcut"
     static let scrollSensitivityKey = "ScrollSensitivity"
     
     static func registerDefaults() {
