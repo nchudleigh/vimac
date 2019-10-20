@@ -11,15 +11,17 @@ import MASShortcut
 
 class PreferencesGeneralViewController: NSViewController {
     @IBOutlet weak var scrollSensitivitySlider: NSSlider!
-    @IBOutlet weak var shortcutView: MASShortcutView!
-    
+    @IBOutlet weak var hintModeShortcut: MASShortcutView!
+    @IBOutlet weak var scrollModeShortcut: MASShortcutView!
+
     override func viewWillAppear() {
         scrollSensitivitySlider.integerValue = UserDefaults.standard.integer(forKey: Utils.scrollSensitivityKey)
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        shortcutView.associatedUserDefaultsKey = Utils.commandShortcutKey
+        hintModeShortcut.associatedUserDefaultsKey = Utils.hintModeShortcutKey
+        scrollModeShortcut.associatedUserDefaultsKey = Utils.scrollModeShortcutKey
     }
     @IBAction func sliderChanged(_ sender: Any) {
         UserDefaults.standard.set(scrollSensitivitySlider.integerValue, forKey: Utils.scrollSensitivityKey)

@@ -732,7 +732,16 @@
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Qo4-fk-AmF">
                                         <rect key="frame" x="80" y="226" width="162" height="17"/>
                                         <autoresizingMask key="autoresizingMask"/>
-                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Enter Command Shortcut:" id="WAN-yn-gNa">
+                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Hint Mode Shortcut:" id="WAN-yn-gNa">
+                                            <font key="font" usesAppearanceFont="YES"/>
+                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                    </textField>
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Hh2-Sd-fim">
+                                        <rect key="frame" x="80" y="182" width="162" height="17"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Scroll Mode Shortcut:" id="So4-5v-yXv">
                                             <font key="font" usesAppearanceFont="YES"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -743,7 +752,7 @@
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     </customView>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Ese-Ar-PoE">
-                                        <rect key="frame" x="82" y="174" width="108" height="16"/>
+                                        <rect key="frame" x="80" y="136" width="108" height="16"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <textFieldCell key="cell" lineBreakMode="clipping" title="Scroll Sensitivity:" id="UHk-Ov-Y6x">
                                             <font key="font" metaFont="system"/>
@@ -752,18 +761,24 @@
                                         </textFieldCell>
                                     </textField>
                                     <slider verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qsi-fh-6tB">
-                                        <rect key="frame" x="246" y="170" width="154" height="25"/>
+                                        <rect key="frame" x="246" y="132" width="154" height="25"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <sliderCell key="cell" state="on" alignment="left" maxValue="100" doubleValue="50" tickMarkPosition="below" numberOfTickMarks="10" sliderType="linear" id="fc4-Ma-cfA"/>
                                         <connections>
                                             <action selector="sliderChanged:" target="Xcg-2B-Laa" id="xyO-va-L1f"/>
                                         </connections>
                                     </slider>
+                                    <customView identifier="scroll_mode_shortcut_id" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fag-sb-bSF" customClass="MASShortcutView">
+                                        <rect key="frame" x="248" y="181" width="150" height="20"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                    </customView>
                                 </subviews>
                             </visualEffectView>
                         </subviews>
                     </view>
                     <connections>
+                        <outlet property="hintModeShortcut" destination="GVY-1h-CEw" id="LgU-Fq-XCE"/>
+                        <outlet property="scrollModeShortcut" destination="fag-sb-bSF" id="dYJ-c4-AQV"/>
                         <outlet property="scrollSensitivitySlider" destination="qsi-fh-6tB" id="LH4-GR-DcN"/>
                         <outlet property="shortcutView" destination="GVY-1h-CEw" id="f04-fx-2CB"/>
                     </connections>
