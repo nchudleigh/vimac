@@ -45,6 +45,12 @@ class Utils: NSObject {
         // see: https://stackoverflow.com/a/2420366/10390454
         event?.setIntegerValueField(.mouseEventClickState, value: 1)
         event2?.setIntegerValueField(.mouseEventClickState, value: 1)
+        // explicitly set flags because clicking while holding a modifier key can alter it's behaviour
+        // e.g. CTRL + left click -> right click,
+        // Shift + right click -> Nothing in Finder
+        // this matters because modifier keys are used to trigger different click types in Hint Mode.
+        event?.flags = .init()
+        event2?.flags = .init()
         event?.post(tap: .cghidEventTap)
         event2?.post(tap: .cghidEventTap)
     }
@@ -52,6 +58,7 @@ class Utils: NSObject {
     static func doubleLeftClickMouse(position: CGPoint) {
         let event = CGEvent(mouseEventSource: nil, mouseType: .leftMouseDown, mouseCursorPosition: position, mouseButton: .left)
         event?.setIntegerValueField(.mouseEventClickState, value: 1)
+        event?.flags = .init()
         
         event?.post(tap: .cghidEventTap)
         event?.type = .leftMouseUp
@@ -68,9 +75,11 @@ class Utils: NSObject {
     static func rightClickMouse(position: CGPoint) {
         let event = CGEvent(mouseEventSource: nil, mouseType: .rightMouseDown, mouseCursorPosition: position, mouseButton: .right)
         event?.setIntegerValueField(.mouseEventClickState, value: 1)
+        event?.flags = .init()
         
         let event2 = CGEvent(mouseEventSource: nil, mouseType: .rightMouseUp, mouseCursorPosition: position, mouseButton: .right)
         event2?.setIntegerValueField(.mouseEventClickState, value: 1)
+        event2?.flags = .init()
         
         event?.post(tap: .cghidEventTap)
         event2?.post(tap: .cghidEventTap)
