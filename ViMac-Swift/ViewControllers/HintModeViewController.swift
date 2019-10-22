@@ -17,7 +17,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     var hintViews: [HintView]?
     let compositeDisposable = CompositeDisposable()
     var characterStack: [Character] = [Character]()
-    let elementFilters: [ElementFilter.Type] = [NoFilter.self, HasActionsFilter.self, FocusableFilter.self, GroupFilter.self]
+    let elementFilters: [ElementFilter.Type] = [NoFilter.self, HasActionsFilter.self]
 
     init(elements: Observable<UIElement>) {
         self.elements = elements.share()
