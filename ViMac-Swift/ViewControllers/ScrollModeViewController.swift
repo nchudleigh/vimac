@@ -8,6 +8,7 @@
 
 import Cocoa
 import RxSwift
+import Carbon.HIToolbox
 
 class ScrollModeViewController: ModeViewController, NSTextFieldDelegate {
     let textField = OverlayTextField(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
@@ -48,6 +49,17 @@ class ScrollModeViewController: ModeViewController, NSTextFieldDelegate {
         let halfScrollAreaHeight = scrollAreaHeight / 2
         
         let scrollSensitivity = Int64(UserDefaults.standard.integer(forKey: Utils.scrollSensitivityKey))
+        
+        let escapeKeyDownObservable = textField.distinctNSEventObservable.filter({ event in
+            return event.keyCode == kVK_Escape && event.type == .keyDown
+        });
+        
+        self.scrollModeDisposable.insert(
+            escapeKeyDownObservable
+                .observeOn(MainScheduler.instance)
+                .subscribe(onNext: { [weak self] _ in
+                    self?.onEscape()
+        }))
         
         scrollModeDisposable.insert(
             AccessibilityObservables.scrollObservableSmooth(textField: textField, character: "j", yAxis: -1 * scrollSensitivity, xAxis: 0, frequencyMilliseconds: 20)
