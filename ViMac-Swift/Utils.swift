@@ -265,12 +265,13 @@ class Utils: NSObject {
     // http://dev.chromium.org/developers/design-documents/accessibility
     // Similarly, electron uses `AXManualAccessibility`:
     // https://electronjs.org/docs/tutorial/accessibility#assistive-technology
+    // AXEnhancedUserInterface breaks window managers, so it's removed for now.
     static func setAccessibilityAttributes(app: UIElement) {
-        do {
-            try app.setAttribute("AXEnhancedUserInterface", value: true)
-        } catch {
-
-        }
+//        do {
+//            try app.setAttribute("AXEnhancedUserInterface", value: true)
+//        } catch {
+//
+//        }
         do {
             try app.setAttribute("AXManualAccessibility", value: true)
         } catch {
