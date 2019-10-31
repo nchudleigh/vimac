@@ -163,11 +163,38 @@ class Utils: NSObject {
     }
     
     static func getAttributes(element: UIElement) -> Observable<(String?, NSPoint?, NSSize?)> {
-        return Observable.zip(
-            getElementAttribute(element: element, attribute: .role),
-            getElementAttribute(element: element, attribute: .position),
-            getElementAttribute(element: element, attribute: .size)
-        )
+        return getMultipleElementAttribute(element: element, attributes: [.role, .position, .size])
+            .map({ valuesOptional in
+                guard let values = valuesOptional else {
+                    return nil
+                }
+                do {
+                    let role = values[0] as! String?
+                    let position = values[1] as! NSPoint?
+                    let size = values[2] as! NSSize?
+                    return (role, position, size)
+                } catch {
+
+                }
+                return nil
+            })
+            .compactMap({ $0 })
+    }
+    
+    static func getMultipleElementAttribute(element: UIElement, attributes: [Attribute]) -> Observable<[Any?]?> {
+        return Observable.create({ observer in
+            DispatchQueue.global().async {
+                do {
+                    let valueByAttribute = try element.getMultipleAttributes(attributes)
+                    let values = attributes.map({ valueByAttribute[$0] })
+                    observer.onNext(values)
+                } catch {
+                    observer.onNext(nil)
+                }
+                observer.onCompleted()
+            }
+            return Disposables.create()
+        })
     }
     
     static func getElementAttribute<T>(element: UIElement, attribute: Attribute) -> Observable<T?> {
