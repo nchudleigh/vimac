@@ -88,7 +88,7 @@ class Utils: NSObject {
     static func getUIElementChildrenRecursive(element: UIElement, parentScrollAreaFrame: NSRect?) -> Observable<UIElement> {
         return getAttributes(element: element)
             .flatMap({ attributes -> Observable<UIElement> in
-                let (roleOptional, positionOptional, sizeOptional) = attributes
+                let (roleOptional, positionOptional, sizeOptional, children) = attributes
 
                 var newScrollAreaFrame: NSRect? = nil
                 var isScrollArea = false
@@ -146,7 +146,7 @@ class Utils: NSObject {
                 
                 let psaf = isScrollArea ? newScrollAreaFrame : parentScrollAreaFrame
                 
-                return getChildren(element: element)
+                return Observable.just(children)
                     .flatMap({ children -> Observable<UIElement> in
                         if children.count <= 0 {
                             return Observable.just(element)
@@ -162,8 +162,8 @@ class Utils: NSObject {
             })
     }
     
-    static func getAttributes(element: UIElement) -> Observable<(String?, NSPoint?, NSSize?)> {
-        return getMultipleElementAttribute(element: element, attributes: [.role, .position, .size])
+    static func getAttributes(element: UIElement) -> Observable<(String?, NSPoint?, NSSize?, [UIElement])> {
+        return getMultipleElementAttribute(element: element, attributes: [.role, .position, .size, .children])
             .map({ valuesOptional in
                 guard let values = valuesOptional else {
                     return nil
@@ -172,7 +172,8 @@ class Utils: NSObject {
                     let role = values[0] as! String?
                     let position = values[1] as! NSPoint?
                     let size = values[2] as! NSSize?
-                    return (role, position, size)
+                    let children = (values[3] as! [AXUIElement]? ?? []).map({ UIElement($0) })
+                    return (role, position, size, children)
                 } catch {
 
                 }
