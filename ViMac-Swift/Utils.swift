@@ -89,7 +89,7 @@ class Utils: NSObject {
         return getAttributes(element: element)
             .flatMap({ attributes -> Observable<UIElement> in
                 let (roleOptional, positionOptional, sizeOptional, children) = attributes
-
+                
                 var newScrollAreaFrame: NSRect? = nil
                 var isScrollArea = false
                 
@@ -172,7 +172,7 @@ class Utils: NSObject {
                     let role = values[0] as! String?
                     let position = values[1] as! NSPoint?
                     let size = values[2] as! NSSize?
-                    let children = (values[3] as! [AXUIElement]? ?? []).map({ UIElement($0) })
+                    let children = (values[3] as! [AXUIElement]? ?? []).map({ CachedUIElement($0) })
                     return (role, position, size, children)
                 } catch {
 
