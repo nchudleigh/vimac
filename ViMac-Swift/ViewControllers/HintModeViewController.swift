@@ -221,25 +221,36 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
                     let hintViews: [HintView] = elements
                         .enumerated()
                         .map ({ (index, button) in
-                            let positionFlippedOptional: NSPoint? = {
+                            let text = HintView(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
+                            text.initializeHint(hintText: hintStrings[index], typed: "")
+                            
+                            let centerPositionOptional: NSPoint? = {
                                 do {
-                                    return try button.attribute(.position)
+                                    guard let topLeftPositionFlipped: NSPoint = try button.attribute(.position),
+                                        let buttonSize: NSSize = try button.attribute(.size) else {
+                                        return nil
+                                    }
+                                    let topLeftPositionRelativeToScreen = Utils.toOrigin(point: topLeftPositionFlipped, size: text.frame.size)
+                                    guard let topLeftPositionRelativeToWindow = self.modeCoordinator?.windowController.window?.convertPoint(fromScreen: topLeftPositionRelativeToScreen) else {
+                                        return nil
+                                    }
+                                    let x = (topLeftPositionRelativeToWindow.x + (buttonSize.width / 2)) - (text.frame.size.width / 2)
+                                    let y = (topLeftPositionRelativeToWindow.y - (buttonSize.height) / 2) + (text.frame.size.height / 2)
+                                    return NSPoint(x: x, y: y)
                                 } catch {
                                     return nil
                                 }
                             }()
 
-                            if let positionFlipped = positionFlippedOptional {
-                                let text = HintView(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
-                                text.initializeHint(hintText: hintStrings[index], typed: "")
-                                let positionRelativeToScreen = Utils.toOrigin(point: positionFlipped, size: text.frame.size)
-                                let positionRelativeToWindow = self.modeCoordinator!.windowController.window!.convertPoint(fromScreen: positionRelativeToScreen)
-                                text.associatedButton = button
-                                text.frame.origin = positionRelativeToWindow
-                                text.zIndex = index
-                                return text
+                            guard let centerPosition = centerPositionOptional else {
+                                return nil
                             }
-                            return nil })
+
+                            text.associatedButton = button
+                            text.frame.origin = centerPosition
+                            text.zIndex = index
+                            return text
+                        })
                         .compactMap({ $0 })
                     
                     self.hintViews = hintViews
@@ -247,6 +258,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
                     for hintView in hintViews {
                         self.view.addSubview(hintView)
                     }
+                    
                     self.textField.becomeFirstResponder()
                 }, onError: { error in
                     print(error)
