@@ -242,13 +242,15 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
                                 }
                             }()
 
-                            if let centerPosition = centerPositionOptional {
-                                text.associatedButton = button
-                                text.frame.origin = centerPosition
-                                text.zIndex = index
-                                return text
+                            guard let centerPosition = centerPositionOptional else {
+                                return nil
                             }
-                            return nil })
+
+                            text.associatedButton = button
+                            text.frame.origin = centerPosition
+                            text.zIndex = index
+                            return text
+                        })
                         .compactMap({ $0 })
                     
                     self.hintViews = hintViews
