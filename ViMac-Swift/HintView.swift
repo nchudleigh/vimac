@@ -63,4 +63,10 @@ class HintView: NSTextField {
         }
         self.attributedStringValue = attr
     }
+    
+    // the first NSTextField that get's drawn to screen is made active, which changes the
+    // first hint's text color to white. This prevents the hints from being made active.
+    override func becomeFirstResponder() -> Bool {
+        return false
+    }
 }
