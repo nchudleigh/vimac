@@ -28,24 +28,3 @@ class HasActionsFilter : ElementFilter {
         }
     }
 }
-
-class FocusableFilter : ElementFilter {
-    static func filterPredicate(element: UIElement) -> Bool {
-        do {
-            return try element.attributeIsSettable(.focused)
-        } catch {
-            return false
-        }
-    }
-}
-
-class GroupFilter : ElementFilter {
-    static func filterPredicate(element: UIElement) -> Bool {
-        do {
-            let role: String? = try element.attribute(.role)
-            return role?.lowercased().contains("group") ?? false
-        } catch {
-            return false
-        }
-    }
-}
