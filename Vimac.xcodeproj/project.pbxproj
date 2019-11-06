@@ -29,7 +29,6 @@
 		E2C29562234DD7F8001A38D6 /* OverlayWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2C29561234DD7F8001A38D6 /* OverlayWindowController.swift */; };
 		E2C29566234DE09C001A38D6 /* ModeCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2C29565234DE09C001A38D6 /* ModeCoordinator.swift */; };
 		E2C29568234DE51F001A38D6 /* ModeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2C29567234DE51F001A38D6 /* ModeViewController.swift */; };
-		E2C2956E234DEB53001A38D6 /* FocusModeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2C2956D234DEB53001A38D6 /* FocusModeViewController.swift */; };
 		E2C29571234E19E4001A38D6 /* HintModeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2C29570234E19E4001A38D6 /* HintModeViewController.swift */; };
 		E2C29573234E2E8B001A38D6 /* ScrollModeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2C29572234E2E8B001A38D6 /* ScrollModeViewController.swift */; };
 		E2C29575234E36EA001A38D6 /* ScrollSelectorModeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2C29574234E36EA001A38D6 /* ScrollSelectorModeViewController.swift */; };
@@ -102,7 +101,6 @@
 		E2C29561234DD7F8001A38D6 /* OverlayWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayWindowController.swift; sourceTree = "<group>"; };
 		E2C29565234DE09C001A38D6 /* ModeCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModeCoordinator.swift; sourceTree = "<group>"; };
 		E2C29567234DE51F001A38D6 /* ModeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModeViewController.swift; sourceTree = "<group>"; };
-		E2C2956D234DEB53001A38D6 /* FocusModeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusModeViewController.swift; sourceTree = "<group>"; };
 		E2C29570234E19E4001A38D6 /* HintModeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HintModeViewController.swift; sourceTree = "<group>"; };
 		E2C29572234E2E8B001A38D6 /* ScrollModeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollModeViewController.swift; sourceTree = "<group>"; };
 		E2C29574234E36EA001A38D6 /* ScrollSelectorModeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollSelectorModeViewController.swift; sourceTree = "<group>"; };
@@ -259,7 +257,6 @@
 		E2C2956F234E0A32001A38D6 /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
-				E2C2956D234DEB53001A38D6 /* FocusModeViewController.swift */,
 				E2C29567234DE51F001A38D6 /* ModeViewController.swift */,
 				E2C29570234E19E4001A38D6 /* HintModeViewController.swift */,
 				E2C29572234E2E8B001A38D6 /* ScrollModeViewController.swift */,
@@ -523,7 +520,6 @@
 				E2069700232A52EA001EFDB2 /* AlphabetHints.swift in Sources */,
 				E225BD25233365C100ECDEF4 /* PreferencesTabViewController.swift in Sources */,
 				E20696F923290D41001EFDB2 /* Log.swift in Sources */,
-				E2C2956E234DEB53001A38D6 /* FocusModeViewController.swift in Sources */,
 				E26172542323D97700E396CA /* BorderView.swift in Sources */,
 				E225BD1D233292B800ECDEF4 /* StatusItemManager.swift in Sources */,
 				E225BD322337763E00ECDEF4 /* PreferencesGeneralViewController.swift in Sources */,

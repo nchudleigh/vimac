@@ -11,14 +11,11 @@ import AXSwift
 import RxSwift
 
 protocol Coordinator {
-    var childCoordinators: [ModeCoordinator] { get set }
     var windowController: OverlayWindowController { get set }
 }
 
 class ModeCoordinator : Coordinator {
-    var childCoordinators = [ModeCoordinator]()
     var windowController: OverlayWindowController
-    var activeWindow: UIElement? = nil
     
     init(windowController: OverlayWindowController) {
         self.windowController = windowController
@@ -26,7 +23,6 @@ class ModeCoordinator : Coordinator {
     
     func setCurrentWindow(window: UIElement?) {
         self.exitMode()
-        self.activeWindow = window
     }
     
     func exitMode() {
@@ -44,40 +40,9 @@ class ModeCoordinator : Coordinator {
         self.windowController.showWindow(nil)
         self.windowController.window?.makeKeyAndOrderFront(nil)
     }
-    
-    func setFocusMode() {
-        guard let applicationWindow = activeWindow ?? Utils.getCurrentApplicationWindowManually() else {
-            self.exitMode()
-            return
-        }
-        
-        let elementObservable = Utils.getUIElementChildrenRecursive(element: applicationWindow, parentScrollAreaFrame: nil)
-            .filter({ element in
-                do {
-                    let roleOptional: String? = try element.attribute(.role)
-                    guard let role = roleOptional else {
-                        return false
-                    }
-                    return role == Role.textArea.rawValue || role == Role.textField.rawValue
-                } catch {
-                    return false
-                }
-            })
-            .filter({ element in
-                do {
-                    return try element.attributeIsSettable(.focused)
-                } catch {
-                    return false
-                }
-            })
-        
-        let vc = FocusModeViewController.init()
-        vc.elements = elementObservable
-        self.setViewController(vc: vc)
-    }
-    
+
     func setScrollSelectorMode() {
-        guard let applicationWindow = activeWindow ?? Utils.getCurrentApplicationWindowManually(),
+        guard let applicationWindow = Utils.getCurrentApplicationWindowManually(),
             let window = self.windowController.window else {
             self.exitMode()
             return
@@ -124,7 +89,7 @@ class ModeCoordinator : Coordinator {
     }
     
     func setHintMode() {
-        guard let applicationWindow = activeWindow ?? Utils.getCurrentApplicationWindowManually(),
+        guard let applicationWindow = Utils.getCurrentApplicationWindowManually(),
             let window = self.windowController.window else {
             self.exitMode()
             return
