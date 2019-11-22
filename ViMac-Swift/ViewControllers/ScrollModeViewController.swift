@@ -49,6 +49,10 @@ class ScrollModeViewController: ModeViewController, NSTextFieldDelegate {
         let halfScrollAreaHeight = scrollAreaHeight / 2
         
         let scrollSensitivity = Int64(UserDefaults.standard.integer(forKey: Utils.scrollSensitivityKey))
+        let isVerticalScrollReversed = UserDefaults.standard.bool(forKey: Utils.isVerticalScrollReversedKey)
+        let isHorizontalScrollReversed = UserDefaults.standard.bool(forKey: Utils.isHorizontalScrollReversedKey)
+        let verticalScrollMultiplier = Int64(isVerticalScrollReversed ? -1 : 1)
+        let horizontalScrollMultiplier = Int64(isHorizontalScrollReversed ? -1 : 1)
         
         let escapeKeyDownObservable = textField.distinctNSEventObservable.filter({ event in
             return event.keyCode == kVK_Escape && event.type == .keyDown
@@ -62,22 +66,22 @@ class ScrollModeViewController: ModeViewController, NSTextFieldDelegate {
         }))
         
         scrollModeDisposable.insert(
-            AccessibilityObservables.scrollObservableSmooth(textField: textField, character: "j", yAxis: -1 * scrollSensitivity, xAxis: 0, frequencyMilliseconds: 20)
+            AccessibilityObservables.scrollObservableSmooth(textField: textField, character: "j", yAxis: -1 * verticalScrollMultiplier * scrollSensitivity, xAxis: 0, frequencyMilliseconds: 20)
                 .subscribe()
         )
         
         scrollModeDisposable.insert(
-            AccessibilityObservables.scrollObservableSmooth(textField: textField, character: "k", yAxis: scrollSensitivity, xAxis: 0, frequencyMilliseconds: 20)
+            AccessibilityObservables.scrollObservableSmooth(textField: textField, character: "k", yAxis: verticalScrollMultiplier * scrollSensitivity, xAxis: 0, frequencyMilliseconds: 20)
                 .subscribe()
         )
         
         scrollModeDisposable.insert(
-            AccessibilityObservables.scrollObservableSmooth(textField: textField, character: "h", yAxis: 0, xAxis: scrollSensitivity, frequencyMilliseconds: 20)
+            AccessibilityObservables.scrollObservableSmooth(textField: textField, character: "h", yAxis: 0, xAxis: horizontalScrollMultiplier * scrollSensitivity, frequencyMilliseconds: 20)
                 .subscribe()
         )
         
         scrollModeDisposable.insert(
-            AccessibilityObservables.scrollObservableSmooth(textField: textField, character: "l", yAxis: 0, xAxis: -1 * scrollSensitivity, frequencyMilliseconds: 20)
+            AccessibilityObservables.scrollObservableSmooth(textField: textField, character: "l", yAxis: 0, xAxis: -1 * horizontalScrollMultiplier *  scrollSensitivity, frequencyMilliseconds: 20)
                 .subscribe()
         )
         
