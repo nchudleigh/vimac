@@ -112,6 +112,10 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
                         let centerPositionY = buttonPosition.y + (buttonSize.height / 2)
                         let centerPosition = NSPoint(x: centerPositionX, y: centerPositionY)
             
+                        // close the window before performing click(s)
+                        // Chrome's bookmark bar doesn't let you right click if Chrome is not the active window
+                        vc.modeCoordinator?.exitMode()
+                        
                         Utils.moveMouse(position: centerPosition)
                         
                         if (event.modifierFlags.rawValue & NSEvent.ModifierFlags.shift.rawValue == NSEvent.ModifierFlags.shift.rawValue) {
@@ -122,7 +126,6 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
                         } else {
                             Utils.leftClickMouse(position: centerPosition)
                         }
-                        vc.modeCoordinator?.exitMode()
                         return
                     }
             
