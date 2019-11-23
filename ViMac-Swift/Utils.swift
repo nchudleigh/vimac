@@ -15,10 +15,14 @@ class Utils: NSObject {
     static let hintModeShortcutKey = "HintModeShortcut"
     static let scrollModeShortcutKey = "ScrollModeShortcut"
     static let scrollSensitivityKey = "ScrollSensitivity"
+    static let isVerticalScrollReversedKey = "IsVerticalScrollReversed"
+    static let isHorizontalScrollReversedKey = "IsHorizontalScrollReversed"
     
     static func registerDefaults() {
         UserDefaults.standard.register(defaults: [
-            Utils.scrollSensitivityKey: 20
+            Utils.scrollSensitivityKey: 20,
+            Utils.isVerticalScrollReversedKey: false,
+            Utils.isHorizontalScrollReversedKey: false,
         ])
     }
     
