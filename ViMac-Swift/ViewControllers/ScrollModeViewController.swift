@@ -46,13 +46,13 @@ class ScrollModeViewController: ModeViewController, NSTextFieldDelegate {
             }
         }
 
-        let halfScrollAreaHeight = scrollAreaHeight / 2
+        let halfScrollAreaHeight = Int(floor(scrollAreaHeight / 2))
         
-        let scrollSensitivity = Int64(UserDefaults.standard.integer(forKey: Utils.scrollSensitivityKey))
+        let scrollSensitivity = UserDefaults.standard.integer(forKey: Utils.scrollSensitivityKey)
         let isVerticalScrollReversed = UserDefaults.standard.bool(forKey: Utils.isVerticalScrollReversedKey)
         let isHorizontalScrollReversed = UserDefaults.standard.bool(forKey: Utils.isHorizontalScrollReversedKey)
-        let verticalScrollMultiplier = Int64(isVerticalScrollReversed ? -1 : 1)
-        let horizontalScrollMultiplier = Int64(isHorizontalScrollReversed ? -1 : 1)
+        let verticalScrollMultiplier = isVerticalScrollReversed ? -1 : 1
+        let horizontalScrollMultiplier = isHorizontalScrollReversed ? -1 : 1
         
         let escapeKeyDownObservable = textField.distinctNSEventObservable.filter({ event in
             return event.keyCode == kVK_Escape && event.type == .keyDown
@@ -66,32 +66,61 @@ class ScrollModeViewController: ModeViewController, NSTextFieldDelegate {
         }))
         
         scrollModeDisposable.insert(
-            AccessibilityObservables.scrollObservableSmooth(textField: textField, character: "j", yAxis: -1 * verticalScrollMultiplier * scrollSensitivity, xAxis: 0, frequencyMilliseconds: 20)
+            AccessibilityObservables.scrollObservableSmooth(
+                textField: textField,
+                character: "j",
+                yAxis: Int64(-1 * verticalScrollMultiplier * scrollSensitivity),
+                xAxis: 0,
+                frequencyMilliseconds: 20)
                 .subscribe()
         )
         
         scrollModeDisposable.insert(
-            AccessibilityObservables.scrollObservableSmooth(textField: textField, character: "k", yAxis: verticalScrollMultiplier * scrollSensitivity, xAxis: 0, frequencyMilliseconds: 20)
+            AccessibilityObservables.scrollObservableSmooth(
+                textField: textField,
+                character: "k",
+                yAxis: Int64(verticalScrollMultiplier * scrollSensitivity),
+                xAxis: 0,
+                frequencyMilliseconds: 20)
                 .subscribe()
         )
         
         scrollModeDisposable.insert(
-            AccessibilityObservables.scrollObservableSmooth(textField: textField, character: "h", yAxis: 0, xAxis: horizontalScrollMultiplier * scrollSensitivity, frequencyMilliseconds: 20)
+            AccessibilityObservables.scrollObservableSmooth(
+                textField: textField,
+                character: "h",
+                yAxis: 0,
+                xAxis: Int64(horizontalScrollMultiplier * scrollSensitivity),
+                frequencyMilliseconds: 20)
                 .subscribe()
         )
         
         scrollModeDisposable.insert(
-            AccessibilityObservables.scrollObservableSmooth(textField: textField, character: "l", yAxis: 0, xAxis: -1 * horizontalScrollMultiplier *  scrollSensitivity, frequencyMilliseconds: 20)
+            AccessibilityObservables.scrollObservableSmooth(
+                textField: textField,
+                character: "l",
+                yAxis: 0,
+                xAxis: Int64(-1 * horizontalScrollMultiplier * scrollSensitivity),
+                frequencyMilliseconds: 20)
                 .subscribe()
         )
         
         scrollModeDisposable.insert(
-            AccessibilityObservables.scrollObservableChunky(textField: textField, character: "d", yAxis: Int32(-1 * halfScrollAreaHeight), xAxis: 0, frequencyMilliseconds: 200)
+            AccessibilityObservables.scrollObservableChunky(
+                textField: textField,
+                character: "d",
+                yAxis: Int32(verticalScrollMultiplier * -1 * halfScrollAreaHeight),
+                xAxis: 0, frequencyMilliseconds: 200)
                 .subscribe()
         )
         
         scrollModeDisposable.insert(
-            AccessibilityObservables.scrollObservableChunky(textField: textField, character: "u", yAxis: Int32(halfScrollAreaHeight), xAxis: 0, frequencyMilliseconds: 200)
+            AccessibilityObservables.scrollObservableChunky(
+                textField: textField,
+                character: "u",
+                yAxis: Int32(verticalScrollMultiplier * halfScrollAreaHeight),
+                xAxis: 0,
+                frequencyMilliseconds: 200)
                 .subscribe()
         )
     }
