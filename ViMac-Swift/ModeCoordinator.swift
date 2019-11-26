@@ -48,7 +48,7 @@ class ModeCoordinator : Coordinator {
             return
         }
         
-        var scrollAreas = Utils.traverseUIElementForScrollAreas(rootElement: applicationWindow)
+        let scrollAreas = Utils.traverseUIElementForScrollAreas(rootElement: applicationWindow)
         
         let hintStrings = AlphabetHints().hintStrings(linkCount: scrollAreas.count)
 
@@ -70,7 +70,6 @@ class ModeCoordinator : Coordinator {
                     let positionRelativeToWindow = window.convertPoint(fromScreen: positionRelativeToScreen)
                     text.associatedButton = button
                     text.frame.origin = positionRelativeToWindow
-                    text.zIndex = index
                     return text
                 }
                 return nil })

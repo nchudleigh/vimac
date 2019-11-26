@@ -193,7 +193,6 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
                                 let positionRelativeToWindow = vc.modeCoordinator!.windowController.window!.convertPoint(fromScreen: positionRelativeToScreen)
                                 text.associatedButton = button
                                 text.frame.origin = positionRelativeToWindow
-                                text.zIndex = index
                                 return text
                             }
                             return nil })
@@ -251,7 +250,6 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
 
                             text.associatedButton = button
                             text.frame.origin = centerPosition
-                            text.zIndex = index
                             return text
                         })
                         .compactMap({ $0 })
@@ -298,8 +296,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
         }
         
         let shuffledHintViews = hintViews.shuffled()
-        for (index, hintView) in shuffledHintViews.enumerated() {
-            hintView.zIndex = index
+        for hintView in shuffledHintViews {
             self.view.addSubview(hintView)
         }
         self.hintViews = shuffledHintViews

@@ -62,8 +62,7 @@ class ScrollSelectorModeViewController: ModeViewController, NSTextFieldDelegate 
         }
         
         let shuffledHintViews = hintViews.shuffled()
-        for (index, hintView) in shuffledHintViews.enumerated() {
-            hintView.zIndex = index
+        for hintView in shuffledHintViews {
             self.view.addSubview(hintView)
         }
         self.hintViews = shuffledHintViews
