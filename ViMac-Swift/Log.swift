@@ -2,7 +2,7 @@
 //  Log.swift
 //  ViMac-Swift
 //
-//  Created by Huawei Matebook X Pro on 11/9/19.
+//  Created by Dexter Leng on 11/9/19.
 //  Copyright © 2019 Dexter Leng. All rights reserved.
 //
 

@@ -2,7 +2,7 @@
 //  ViMac_SwiftTests.swift
 //  ViMac-SwiftTests
 //
-//  Created by Huawei Matebook X Pro on 6/9/19.
+//  Created by Dexter Leng on 6/9/19.
 //  Copyright © 2019 Dexter Leng. All rights reserved.
 //
 
