@@ -2,7 +2,7 @@
 //  HintModeViewController.swift
 //  Vimac
 //
-//  Created by Huawei Matebook X Pro on 9/10/19.
+//  Created by Dexter Leng on 9/10/19.
 //  Copyright © 2019 Dexter Leng. All rights reserved.
 //
 
@@ -86,7 +86,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
             
                     if matchingHints.count == 1 {
                         let matchingHint = matchingHints.first!
-                        let buttonOptional = matchingHint.associatedButton
+                        let buttonOptional = matchingHint.associatedElement
                         guard let button = buttonOptional else {
                             vc.modeCoordinator?.exitMode()
                             return
@@ -191,9 +191,8 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
                                 text.initializeHint(hintText: hintStrings[index], typed: "")
                                 let positionRelativeToScreen = Utils.toOrigin(point: positionFlipped, size: text.frame.size)
                                 let positionRelativeToWindow = vc.modeCoordinator!.windowController.window!.convertPoint(fromScreen: positionRelativeToScreen)
-                                text.associatedButton = button
+                                text.associatedElement = button
                                 text.frame.origin = positionRelativeToWindow
-                                text.zIndex = index
                                 return text
                             }
                             return nil })
@@ -249,9 +248,8 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
                                 return nil
                             }
 
-                            text.associatedButton = button
+                            text.associatedElement = button
                             text.frame.origin = centerPosition
-                            text.zIndex = index
                             return text
                         })
                         .compactMap({ $0 })
@@ -298,8 +296,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
         }
         
         let shuffledHintViews = hintViews.shuffled()
-        for (index, hintView) in shuffledHintViews.enumerated() {
-            hintView.zIndex = index
+        for hintView in shuffledHintViews {
             self.view.addSubview(hintView)
         }
         self.hintViews = shuffledHintViews

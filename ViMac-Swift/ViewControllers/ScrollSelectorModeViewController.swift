@@ -2,7 +2,7 @@
 //  ScrollSelectorModeViewController.swift
 //  Vimac
 //
-//  Created by Huawei Matebook X Pro on 9/10/19.
+//  Created by Dexter Leng on 9/10/19.
 //  Copyright © 2019 Dexter Leng. All rights reserved.
 //
 
@@ -62,8 +62,7 @@ class ScrollSelectorModeViewController: ModeViewController, NSTextFieldDelegate 
         }
         
         let shuffledHintViews = hintViews.shuffled()
-        for (index, hintView) in shuffledHintViews.enumerated() {
-            hintView.zIndex = index
+        for hintView in shuffledHintViews {
             self.view.addSubview(hintView)
         }
         self.hintViews = shuffledHintViews
@@ -95,7 +94,7 @@ class ScrollSelectorModeViewController: ModeViewController, NSTextFieldDelegate 
         
         if matchingHints.count == 1 {
             let matchingHint = matchingHints.first!
-            let buttonOptional = matchingHint.associatedButton
+            let buttonOptional = matchingHint.associatedElement
             guard let button = buttonOptional else {
                 self.modeCoordinator?.exitMode()
                 return

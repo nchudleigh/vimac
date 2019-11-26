@@ -2,7 +2,7 @@
 //  HintView.swift
 //  ViMac-Swift
 //
-//  Created by Huawei Matebook X Pro on 15/9/19.
+//  Created by Dexter Leng on 15/9/19.
 //  Copyright © 2019 Dexter Leng. All rights reserved.
 //
 
@@ -15,8 +15,7 @@ class HintView: NSTextField {
     static let untypedHintColor = NSColor.black
     static let typedHintColor = NSColor(red: 212 / 255, green: 172 / 255, blue: 58 / 255, alpha: 1)
     
-    var associatedButton: UIElement?
-    var zIndex: Int?
+    var associatedElement: UIElement?
     
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)

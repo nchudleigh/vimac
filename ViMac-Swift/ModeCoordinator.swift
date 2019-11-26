@@ -2,7 +2,7 @@
 //  ModeCoordinator.swift
 //  Vimac
 //
-//  Created by Huawei Matebook X Pro on 9/10/19.
+//  Created by Dexter Leng on 9/10/19.
 //  Copyright © 2019 Dexter Leng. All rights reserved.
 //
 
@@ -48,7 +48,7 @@ class ModeCoordinator : Coordinator {
             return
         }
         
-        var scrollAreas = Utils.traverseUIElementForScrollAreas(rootElement: applicationWindow)
+        let scrollAreas = Utils.traverseUIElementForScrollAreas(rootElement: applicationWindow)
         
         let hintStrings = AlphabetHints().hintStrings(linkCount: scrollAreas.count)
 
@@ -68,9 +68,8 @@ class ModeCoordinator : Coordinator {
                     text.initializeHint(hintText: hintStrings[index], typed: "")
                     let positionRelativeToScreen = Utils.toOrigin(point: positionFlipped, size: text.frame.size)
                     let positionRelativeToWindow = window.convertPoint(fromScreen: positionRelativeToScreen)
-                    text.associatedButton = button
+                    text.associatedElement = button
                     text.frame.origin = positionRelativeToWindow
-                    text.zIndex = index
                     return text
                 }
                 return nil })
