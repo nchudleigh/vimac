@@ -86,7 +86,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
             
                     if matchingHints.count == 1 {
                         let matchingHint = matchingHints.first!
-                        let buttonOptional = matchingHint.associatedButton
+                        let buttonOptional = matchingHint.associatedElement
                         guard let button = buttonOptional else {
                             vc.modeCoordinator?.exitMode()
                             return
@@ -191,7 +191,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
                                 text.initializeHint(hintText: hintStrings[index], typed: "")
                                 let positionRelativeToScreen = Utils.toOrigin(point: positionFlipped, size: text.frame.size)
                                 let positionRelativeToWindow = vc.modeCoordinator!.windowController.window!.convertPoint(fromScreen: positionRelativeToScreen)
-                                text.associatedButton = button
+                                text.associatedElement = button
                                 text.frame.origin = positionRelativeToWindow
                                 return text
                             }
@@ -248,7 +248,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
                                 return nil
                             }
 
-                            text.associatedButton = button
+                            text.associatedElement = button
                             text.frame.origin = centerPosition
                             return text
                         })

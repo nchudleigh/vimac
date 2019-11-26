@@ -68,7 +68,7 @@ class ModeCoordinator : Coordinator {
                     text.initializeHint(hintText: hintStrings[index], typed: "")
                     let positionRelativeToScreen = Utils.toOrigin(point: positionFlipped, size: text.frame.size)
                     let positionRelativeToWindow = window.convertPoint(fromScreen: positionRelativeToScreen)
-                    text.associatedButton = button
+                    text.associatedElement = button
                     text.frame.origin = positionRelativeToWindow
                     return text
                 }

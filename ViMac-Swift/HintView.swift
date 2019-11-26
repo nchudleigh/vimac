@@ -15,7 +15,7 @@ class HintView: NSTextField {
     static let untypedHintColor = NSColor.black
     static let typedHintColor = NSColor(red: 212 / 255, green: 172 / 255, blue: 58 / 255, alpha: 1)
     
-    var associatedButton: UIElement?
+    var associatedElement: UIElement?
     
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)

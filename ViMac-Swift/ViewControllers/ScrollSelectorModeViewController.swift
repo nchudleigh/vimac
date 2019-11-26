@@ -94,7 +94,7 @@ class ScrollSelectorModeViewController: ModeViewController, NSTextFieldDelegate 
         
         if matchingHints.count == 1 {
             let matchingHint = matchingHints.first!
-            let buttonOptional = matchingHint.associatedButton
+            let buttonOptional = matchingHint.associatedElement
             guard let button = buttonOptional else {
                 self.modeCoordinator?.exitMode()
                 return
