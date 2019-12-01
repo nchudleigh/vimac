@@ -9,10 +9,49 @@
 import Cocoa
 import RxSwift
 import Carbon.HIToolbox
+import AXSwift
 
 class ScrollModeViewController: ModeViewController, NSTextFieldDelegate {
     let textField = OverlayTextField(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
-    let scrollModeDisposable = CompositeDisposable()
+    var compositeDisposable: CompositeDisposable?
+    var tabKeyDisposable: Disposable?
+    var currentScrollAreaIndex = 0
+    let scrollAreas = getScrollAreasByDescendingArea()
+
+    static func getScrollAreasByDescendingArea() -> [CachedUIElement] {
+        guard let applicationWindow = Utils.getCurrentApplicationWindowManually() else {
+            return []
+        }
+        
+        let cachedApplicationWindow = CachedUIElement.init(applicationWindow.element)
+        
+        var scrollAreas = [CachedUIElement]()
+        func fn(element: CachedUIElement) -> Void {
+            _ = try? element.getMultipleAttributes([.role, .position, .size, .children])
+
+            let roleOptional: String? = try? element.attribute(.role);
+            
+            if let role = roleOptional {
+                if role == Role.scrollArea.rawValue {
+                    scrollAreas.append(element)
+                    return
+                }
+            }
+
+            let children = (try? element.attribute(Attribute.children) as [AXUIElement]?) ?? [];
+
+            for child in children {
+                fn(element: CachedUIElement(child))
+            }
+        }
+        fn(element: cachedApplicationWindow)
+        let scrollAreasDescendingArea = scrollAreas.sorted(by: { (scrollAreaA, scrollAreaB) in
+            let sizeA: NSSize = (try? scrollAreaA.attribute(.size)) ?? .zero;
+            let sizeB: NSSize = (try? scrollAreaB.attribute(.size)) ?? .zero;
+            return (sizeA.width * sizeA.height) > (sizeB.width * sizeB.height)
+        })
+        return scrollAreasDescendingArea
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -23,30 +62,50 @@ class ScrollModeViewController: ModeViewController, NSTextFieldDelegate {
         textField.overlayTextFieldDelegate = self
         self.view.addSubview(textField)
         
-        // get scroll area mouse is hovering over for D U scrolling,
-        // which are relative to scroll area height.
-        var scrollAreaHeight: CGFloat = 0
-        if let applicationWindow = Utils.getCurrentApplicationWindowManually() {
-            let scrollAreas = Utils.traverseUIElementForScrollAreas(rootElement: applicationWindow)
-            if scrollAreas.count > 0 {
-                let mouseLocation = NSEvent.mouseLocation
-                for scrollArea in scrollAreas {
-                    do {
-                        if let position: NSPoint = try scrollArea.attribute(.position),
-                            let size: NSSize = try scrollArea.attribute(.size) {
-                            let frame = NSRect(origin: Utils.toOrigin(point: position, size: size), size: size)
-                            if frame.contains(mouseLocation) {
-                                scrollAreaHeight = size.height
-                                break
-                            }
-                        }
-                    } catch {
-                    }
-                }
-            }
+        
+        if self.scrollAreas.count == 0 {
+            self.modeCoordinator?.exitMode()
+            return
         }
 
-        let halfScrollAreaHeight = Int(floor(scrollAreaHeight / 2))
+        self.compositeDisposable = self.setActiveScrollArea(index: self.currentScrollAreaIndex)
+        
+        let tabKeyDownObservable = textField.distinctNSEventObservable.filter({ event in
+            return event.keyCode == kVK_Tab && event.type == .keyDown
+        })
+        
+        self.tabKeyDisposable = tabKeyDownObservable
+            .observeOn(MainScheduler.instance)
+            .subscribe(onNext: { [weak self] event in
+                self?.compositeDisposable?.dispose()
+                self?.compositeDisposable = self?.cycleActiveScrollArea()
+            })
+    }
+    
+    func cycleActiveScrollArea() -> CompositeDisposable? {
+        self.currentScrollAreaIndex = (self.currentScrollAreaIndex + 1) % self.scrollAreas.count
+        return self.setActiveScrollArea(index: self.currentScrollAreaIndex)
+    }
+    
+    func setActiveScrollArea(index: Int) -> CompositeDisposable? {
+        if index < 0 || index >= scrollAreas.count {
+            return nil
+        }
+        let scrollArea = scrollAreas[index]
+        let scrollAreaSizeOptional: NSSize? = try? scrollArea.attribute(.size)
+        let scrollAreaPositionOptional: NSPoint? = try? scrollArea.attribute(.position)
+        guard let scrollAreaSize = scrollAreaSizeOptional,
+            let scrollAreaPosition = scrollAreaPositionOptional else {
+            self.modeCoordinator?.exitMode()
+            return nil
+        }
+
+        moveMouseToScrollAreaBottomLeft(scrollAreaPosition: scrollAreaPosition, scrollAreaSize: scrollAreaSize)
+        return setupScrollObservers(scrollAreaSize: scrollAreaSize, scrollAreaPosition: scrollAreaPosition)
+    }
+    
+    func setupScrollObservers(scrollAreaSize: NSSize, scrollAreaPosition: NSPoint) -> CompositeDisposable {
+        let disposable = CompositeDisposable()
         
         let scrollSensitivity = UserDefaults.standard.integer(forKey: Utils.scrollSensitivityKey)
         let isVerticalScrollReversed = UserDefaults.standard.bool(forKey: Utils.isVerticalScrollReversedKey)
@@ -58,14 +117,14 @@ class ScrollModeViewController: ModeViewController, NSTextFieldDelegate {
             return event.keyCode == kVK_Escape && event.type == .keyDown
         });
         
-        self.scrollModeDisposable.insert(
+        disposable.insert(
             escapeKeyDownObservable
                 .observeOn(MainScheduler.instance)
                 .subscribe(onNext: { [weak self] _ in
                     self?.onEscape()
         }))
         
-        scrollModeDisposable.insert(
+        disposable.insert(
             AccessibilityObservables.scrollObservableSmooth(
                 textField: textField,
                 character: "j",
@@ -75,7 +134,7 @@ class ScrollModeViewController: ModeViewController, NSTextFieldDelegate {
                 .subscribe()
         )
         
-        scrollModeDisposable.insert(
+        disposable.insert(
             AccessibilityObservables.scrollObservableSmooth(
                 textField: textField,
                 character: "k",
@@ -85,7 +144,7 @@ class ScrollModeViewController: ModeViewController, NSTextFieldDelegate {
                 .subscribe()
         )
         
-        scrollModeDisposable.insert(
+        disposable.insert(
             AccessibilityObservables.scrollObservableSmooth(
                 textField: textField,
                 character: "h",
@@ -95,7 +154,7 @@ class ScrollModeViewController: ModeViewController, NSTextFieldDelegate {
                 .subscribe()
         )
         
-        scrollModeDisposable.insert(
+        disposable.insert(
             AccessibilityObservables.scrollObservableSmooth(
                 textField: textField,
                 character: "l",
@@ -105,7 +164,9 @@ class ScrollModeViewController: ModeViewController, NSTextFieldDelegate {
                 .subscribe()
         )
         
-        scrollModeDisposable.insert(
+        let halfScrollAreaHeight = Int(scrollAreaSize.height / 2)
+        
+        disposable.insert(
             AccessibilityObservables.scrollObservableChunky(
                 textField: textField,
                 character: "d",
@@ -114,7 +175,7 @@ class ScrollModeViewController: ModeViewController, NSTextFieldDelegate {
                 .subscribe()
         )
         
-        scrollModeDisposable.insert(
+        disposable.insert(
             AccessibilityObservables.scrollObservableChunky(
                 textField: textField,
                 character: "u",
@@ -123,9 +184,19 @@ class ScrollModeViewController: ModeViewController, NSTextFieldDelegate {
                 frequencyMilliseconds: 200)
                 .subscribe()
         )
+        
+        return disposable
+    }
+    
+    func moveMouseToScrollAreaBottomLeft(scrollAreaPosition: NSPoint, scrollAreaSize: NSSize) {
+        let positionX = scrollAreaPosition.x + 4
+        let positionY = scrollAreaPosition.y + scrollAreaSize.height - 4
+        let position = NSPoint(x: positionX, y: positionY)
+        Utils.moveMouse(position: position)
     }
     
     override func viewDidDisappear() {
-        self.scrollModeDisposable.dispose()
+        self.tabKeyDisposable?.dispose()
+        self.compositeDisposable?.dispose()
     }
 }

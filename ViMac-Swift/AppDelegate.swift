@@ -182,7 +182,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             })
             .observeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak self] window in
-                self?.modeCoordinator.setScrollSelectorMode()
+                self?.modeCoordinator.setScrollMode()
             })
         )
     }
