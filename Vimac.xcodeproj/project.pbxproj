@@ -16,6 +16,7 @@
 		E225BD25233365C100ECDEF4 /* PreferencesTabViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E225BD23233365C100ECDEF4 /* PreferencesTabViewController.swift */; };
 		E225BD282333700D00ECDEF4 /* PreferencesWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E225BD272333700D00ECDEF4 /* PreferencesWindowController.swift */; };
 		E225BD322337763E00ECDEF4 /* PreferencesGeneralViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E225BD312337763E00ECDEF4 /* PreferencesGeneralViewController.swift */; };
+		E245F9B123941AE8009CA9C6 /* BorderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E245F9B023941AE8009CA9C6 /* BorderView.swift */; };
 		E25F8711233222A9007AA958 /* AccessibilityObservables.swift in Sources */ = {isa = PBXBuildFile; fileRef = E25F8710233222A9007AA958 /* AccessibilityObservables.swift */; };
 		E26172242322968500E396CA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26172232322968500E396CA /* AppDelegate.swift */; };
 		E26172282322968600E396CA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E26172272322968600E396CA /* Assets.xcassets */; };
@@ -69,6 +70,7 @@
 		E225BD23233365C100ECDEF4 /* PreferencesTabViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesTabViewController.swift; sourceTree = "<group>"; };
 		E225BD272333700D00ECDEF4 /* PreferencesWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesWindowController.swift; sourceTree = "<group>"; };
 		E225BD312337763E00ECDEF4 /* PreferencesGeneralViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesGeneralViewController.swift; sourceTree = "<group>"; };
+		E245F9B023941AE8009CA9C6 /* BorderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BorderView.swift; sourceTree = "<group>"; };
 		E25F8710233222A9007AA958 /* AccessibilityObservables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessibilityObservables.swift; sourceTree = "<group>"; };
 		E26172202322968500E396CA /* Vimac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Vimac.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E26172232322968500E396CA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -212,6 +214,7 @@
 				E2C29565234DE09C001A38D6 /* ModeCoordinator.swift */,
 				E27AC911235B5A4200CC62D1 /* HintFilter.swift */,
 				E268A029236D8F6F00EE08CB /* CachedUIElement.swift */,
+				E245F9B023941AE8009CA9C6 /* BorderView.swift */,
 			);
 			path = "ViMac-Swift";
 			sourceTree = "<group>";
@@ -492,6 +495,7 @@
 				E268A02A236D8F6F00EE08CB /* CachedUIElement.swift in Sources */,
 				E27AC912235B5A4200CC62D1 /* HintFilter.swift in Sources */,
 				E2C29568234DE51F001A38D6 /* ModeViewController.swift in Sources */,
+				E245F9B123941AE8009CA9C6 /* BorderView.swift in Sources */,
 				E25F8711233222A9007AA958 /* AccessibilityObservables.swift in Sources */,
 				E2C29566234DE09C001A38D6 /* ModeCoordinator.swift in Sources */,
 				E2C29562234DD7F8001A38D6 /* OverlayWindowController.swift in Sources */,

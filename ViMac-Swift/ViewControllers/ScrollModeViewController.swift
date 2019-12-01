@@ -13,6 +13,7 @@ import AXSwift
 
 class ScrollModeViewController: ModeViewController, NSTextFieldDelegate {
     let textField = OverlayTextField(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
+    let borderView = BorderView();
     var compositeDisposable: CompositeDisposable?
     var tabKeyDisposable: Disposable?
     var currentScrollAreaIndex = 0
@@ -58,9 +59,9 @@ class ScrollModeViewController: ModeViewController, NSTextFieldDelegate {
         textField.stringValue = ""
         textField.isEditable = true
         textField.delegate = self
-        //textField.isHidden = true
         textField.overlayTextFieldDelegate = self
         self.view.addSubview(textField)
+        self.view.addSubview(borderView)
         
         
         if self.scrollAreas.count == 0 {
@@ -100,8 +101,17 @@ class ScrollModeViewController: ModeViewController, NSTextFieldDelegate {
             return nil
         }
 
+        resizeBorderViewToFitScrollArea(scrollAreaSize: scrollAreaSize, scrollAreaPosition: scrollAreaPosition)
         moveMouseToScrollAreaBottomLeft(scrollAreaPosition: scrollAreaPosition, scrollAreaSize: scrollAreaSize)
         return setupScrollObservers(scrollAreaSize: scrollAreaSize, scrollAreaPosition: scrollAreaPosition)
+    }
+    
+    func resizeBorderViewToFitScrollArea(scrollAreaSize: NSSize, scrollAreaPosition: NSPoint) {
+        let topLeftPositionRelativeToScreen = Utils.toOrigin(point: scrollAreaPosition, size: scrollAreaSize)
+        guard let topLeftPositionRelativeToWindow = self.modeCoordinator?.windowController.window?.convertPoint(fromScreen: topLeftPositionRelativeToScreen) else {
+            return
+        }
+        self.borderView.frame = NSRect(origin: topLeftPositionRelativeToWindow, size: scrollAreaSize)
     }
     
     func setupScrollObservers(scrollAreaSize: NSSize, scrollAreaPosition: NSPoint) -> CompositeDisposable {
