@@ -91,48 +91,40 @@ class Utils: NSObject {
         return getAttributes(element: element)
             .flatMap({ attributes -> Observable<UIElement> in
                 let (roleOptional, positionOptional, sizeOptional, children) = attributes
+                guard let role = roleOptional,
+                    let position = positionOptional,
+                    let size = sizeOptional else {
+                        return Observable.empty()
+                }
                 
                 var newParentContainerFrame: NSRect?
                 
-                if let role = roleOptional {
-                    // ignore subcomponents of a scrollbar
-                    if role == Role.scrollBar.rawValue {
+                // ignore subcomponents of a scrollbar
+                if role == Role.scrollBar.rawValue {
+                    return Observable.empty()
+                }
+                
+                if role == Role.scrollArea.rawValue {
+                    newParentContainerFrame = NSRect(origin: position, size: size)
+                }
+                
+                // ignore rows that are out of parent scroll area's frame
+                // doing this improves traversal speed significantly because we do not look at
+                // children elements that most likely are out of frame
+                if role == Role.row.rawValue || role == "AXPage" || role == Role.group.rawValue {
+                    let frame = NSRect(origin: position, size: size)
+                    if (!parentContainerFrame.intersects(frame)) {
                         return Observable.empty()
-                    }
-                    
-                    if role == Role.scrollArea.rawValue {
-                        if let position = positionOptional,
-                            let size = sizeOptional {
-                            newParentContainerFrame = NSRect(origin: position, size: size)
-                        }
-                    }
-                    
-                    // ignore rows that are out of parent scroll area's frame
-                    // doing this improves traversal speed significantly because we do not look at
-                    // children elements that most likely are out of frame
-                    if role == Role.row.rawValue || role == "AXPage" || role == Role.group.rawValue {
-                        if let position = positionOptional,
-                            let size = sizeOptional {
-                            let frame = NSRect(origin: position, size: size)
-                            if (!parentContainerFrame.intersects(frame)) {
-                                return Observable.empty()
-                            }
-                        } else {
-                            return Observable.empty()
-                        }
                     }
                 }
                 
-                var includeElement = false
                 // append to allowed elements list if element's frame intersect with it's parent container's frame.
-                if let position = positionOptional,
-                    let size = sizeOptional,
-                    let role = roleOptional {
-                        let frame = NSRect(origin: position, size: size)
-                        if parentContainerFrame.intersects(frame) {
-                            includeElement = true
-                        }
-                    }
+                let frame = NSRect(origin: position, size: size)
+                let includeElement = parentContainerFrame.intersects(frame)
+                
+                if !includeElement {
+                    return Observable.empty()
+                }
                 
                 return Observable.just(children)
                     .flatMap({ children -> Observable<UIElement> in
@@ -141,7 +133,7 @@ class Utils: NSObject {
                         }
                         
                         return Observable.merge([
-                            includeElement ? Observable.just(element) : Observable.empty(),
+                            Observable.just(element),
                             Observable.merge(
                                 children.map({ getUIElementChildrenRecursive(element: $0, parentContainerFrame: newParentContainerFrame ?? parentContainerFrame) })
                             )
