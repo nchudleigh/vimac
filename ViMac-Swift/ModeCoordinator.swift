@@ -53,7 +53,15 @@ class ModeCoordinator : Coordinator {
             self.exitMode()
             return
         }
-        var windowElements = Utils.getUIElementChildrenRecursive(element: applicationWindow, parentScrollAreaFrame: nil)
+        
+        guard let windowSize: NSSize = try? applicationWindow.attribute(.size),
+            let windowPosition: NSPoint = try? applicationWindow.attribute(.position) else {
+                self.exitMode()
+                return
+        }
+        
+        let windowFrame = NSRect(origin: windowPosition, size: windowSize)
+        var windowElements = Utils.getUIElementChildrenRecursive(element: applicationWindow, parentContainerFrame: windowFrame)
         let menuBarElements = Utils.traverseForMenuBarItems(windowElement: applicationWindow)
         let allElements = Observable.merge(windowElements, menuBarElements)
         let vc = HintModeViewController.init(elements: allElements)

@@ -87,13 +87,12 @@ class Utils: NSObject {
         event2?.post(tap: .cghidEventTap)
     }
     
-    static func getUIElementChildrenRecursive(element: UIElement, parentScrollAreaFrame: NSRect?) -> Observable<UIElement> {
+    static func getUIElementChildrenRecursive(element: UIElement, parentContainerFrame: NSRect) -> Observable<UIElement> {
         return getAttributes(element: element)
             .flatMap({ attributes -> Observable<UIElement> in
                 let (roleOptional, positionOptional, sizeOptional, children) = attributes
                 
-                var newScrollAreaFrame: NSRect? = nil
-                var isScrollArea = false
+                var newParentContainerFrame: NSRect?
                 
                 if let role = roleOptional {
                     // ignore subcomponents of a scrollbar
@@ -102,11 +101,9 @@ class Utils: NSObject {
                     }
                     
                     if role == Role.scrollArea.rawValue {
-                        isScrollArea = true
                         if let position = positionOptional,
                             let size = sizeOptional {
-                            let frame = NSRect(origin: position, size: size)
-                            newScrollAreaFrame = frame
+                            newParentContainerFrame = NSRect(origin: position, size: size)
                         }
                     }
                     
@@ -117,36 +114,25 @@ class Utils: NSObject {
                         if let position = positionOptional,
                             let size = sizeOptional {
                             let frame = NSRect(origin: position, size: size)
-                            if let scrollAreaFrame = parentScrollAreaFrame {
-                                if (!scrollAreaFrame.intersects(frame)) {
-                                    return Observable.empty()
-                                }
+                            if (!parentContainerFrame.intersects(frame)) {
+                                return Observable.empty()
                             }
                         } else {
                             return Observable.empty()
                         }
                     }
                 }
-
-                var includeElement = false
                 
-                // append to allowed elements list if
-                // 1. element's role is not blacklisted
-                // 2. element does not have a parent scroll area, but if it does both frames must intersect
+                var includeElement = false
+                // append to allowed elements list if element's frame intersect with it's parent container's frame.
                 if let position = positionOptional,
                     let size = sizeOptional,
                     let role = roleOptional {
-                    let frame = NSRect(origin: position, size: size)
-                    if let parentScrollAreaFrame = parentScrollAreaFrame {
-                        if parentScrollAreaFrame.intersects(frame) {
+                        let frame = NSRect(origin: position, size: size)
+                        if parentContainerFrame.intersects(frame) {
                             includeElement = true
                         }
-                    } else {
-                        includeElement = true
                     }
-                }
-                
-                let psaf = isScrollArea ? newScrollAreaFrame : parentScrollAreaFrame
                 
                 return Observable.just(children)
                     .flatMap({ children -> Observable<UIElement> in
@@ -157,7 +143,7 @@ class Utils: NSObject {
                         return Observable.merge([
                             includeElement ? Observable.just(element) : Observable.empty(),
                             Observable.merge(
-                                children.map({ getUIElementChildrenRecursive(element: $0, parentScrollAreaFrame: psaf) })
+                                children.map({ getUIElementChildrenRecursive(element: $0, parentContainerFrame: newParentContainerFrame ?? parentContainerFrame) })
                             )
                         ])
                     })
