@@ -189,13 +189,7 @@ class Utils: NSObject {
     static func getElementAttribute<T>(element: UIElement, attribute: Attribute) -> Observable<T?> {
         return Observable.create({ observer in
             DispatchQueue.global().async {
-                let value: T? = {
-                    do {
-                        return try element.attribute(attribute)
-                    } catch {
-                        return nil
-                    }
-                }()
+                let value: T? = try? element.attribute(attribute)
                 observer.onNext(value)
                 observer.onCompleted()
             }
@@ -207,15 +201,11 @@ class Utils: NSObject {
         return Observable.create({ observer in
             DispatchQueue.global().async {
                 let children: [UIElement] = {
-                    do {
-                        let childrenOptional = try element.attribute(Attribute.children) as [AXUIElement]?;
-                        guard let children = childrenOptional else {
-                            return []
-                        }
-                        return children.map({ UIElement($0) })
-                    } catch {
+                    let childrenOptional = try? element.attribute(Attribute.children) as [AXUIElement]?;
+                    guard let children = childrenOptional else {
                         return []
                     }
+                    return children.map({ UIElement($0) })
                 }()
                 observer.onNext(children)
                 observer.onCompleted()
@@ -250,11 +240,7 @@ class Utils: NSObject {
 //        } catch {
 //
 //        }
-        do {
-            try app.setAttribute("AXManualAccessibility", value: true)
-        } catch {
-
-        }
+        _ = try? app.setAttribute("AXManualAccessibility", value: true)
     }
     
     static func getCurrentApplicationWindowManually() -> UIElement? {
@@ -267,12 +253,6 @@ class Utils: NSObject {
             Utils.setAccessibilityAttributes(app: app)
         }
         
-        return {
-            do {
-                return try appOptional?.attribute(.focusedWindow)
-            } catch {
-                return nil
-            }
-        }()
+        return try? appOptional?.attribute(.focusedWindow)
     }
 }
