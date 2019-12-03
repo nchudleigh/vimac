@@ -15,7 +15,7 @@ class ScrollModeViewController: ModeViewController, NSTextFieldDelegate {
     let textField = OverlayTextField(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
     let borderView = BorderView();
     var scrollKeysDisposable: Disposable?
-    var tabKeyDisposable: Disposable?
+    var compositeDisposable: CompositeDisposable = CompositeDisposable()
     var currentScrollAreaIndex = 0
     let scrollAreas = getScrollAreasByDescendingArea()
 
@@ -62,12 +62,6 @@ class ScrollModeViewController: ModeViewController, NSTextFieldDelegate {
         textField.overlayTextFieldDelegate = self
         self.view.addSubview(textField)
         self.view.addSubview(borderView)
-        
-        
-        if self.scrollAreas.count == 0 {
-            self.modeCoordinator?.exitMode()
-            return
-        }
 
         self.scrollKeysDisposable = self.setActiveScrollArea(index: self.currentScrollAreaIndex)
         
@@ -75,12 +69,24 @@ class ScrollModeViewController: ModeViewController, NSTextFieldDelegate {
             return event.keyCode == kVK_Tab && event.type == .keyDown
         })
         
-        self.tabKeyDisposable = tabKeyDownObservable
+        let escapeKeyDownObservable = textField.distinctNSEventObservable.filter({ event in
+            return event.keyCode == kVK_Escape && event.type == .keyDown
+        })
+        
+        self.compositeDisposable.insert(tabKeyDownObservable
             .observeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak self] event in
                 self?.scrollKeysDisposable?.dispose()
                 self?.scrollKeysDisposable = self?.cycleActiveScrollArea()
             })
+        )
+        
+        self.compositeDisposable.insert(escapeKeyDownObservable
+            .observeOn(MainScheduler.instance)
+            .subscribe(onNext: { [weak self] event in
+                self?.onEscape()
+            })
+        )
     }
     
     func cycleActiveScrollArea() -> Disposable? {
@@ -187,7 +193,7 @@ class ScrollModeViewController: ModeViewController, NSTextFieldDelegate {
     }
     
     override func viewDidDisappear() {
-        self.tabKeyDisposable?.dispose()
+        self.compositeDisposable.dispose()
         self.scrollKeysDisposable?.dispose()
     }
 }
