@@ -253,44 +253,6 @@ class Utils: NSObject {
             })
     }
     
-    static func traverseUIElementForScrollAreas(rootElement: UIElement) -> [UIElement] {
-        var elements = [UIElement]()
-        func fn(element: UIElement, level: Int) -> Void {
-            let roleOptional: String? = {
-                do {
-                    return try element.attribute(.role)
-                } catch {
-                    return nil
-                }
-            }()
-            
-            if let role = roleOptional {
-                if role == Role.scrollArea.rawValue {
-                    elements.append(element)
-                    return
-                }
-            }
-
-            let children: [AXUIElement] = {
-                do {
-                    let childrenOptional = try element.attribute(Attribute.children) as [AXUIElement]?;
-                    guard let children = childrenOptional else {
-                        return []
-                    }
-                    return children
-                } catch {
-                    return []
-                }
-            }()
-            
-            children.forEach { child in
-                fn(element: UIElement(child), level: level + 1)
-            }
-        }
-        fn(element: rootElement, level: 1)
-        return elements
-    }
-    
     // For performance reasons Chromium only makes the webview accessible when there it detects voiceover through the `AXEnhancedUserInterface` attribute on the Chrome application itself:
     // http://dev.chromium.org/developers/design-documents/accessibility
     // Similarly, electron uses `AXManualAccessibility`:

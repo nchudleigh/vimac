@@ -40,46 +40,6 @@ class ModeCoordinator : Coordinator {
         self.windowController.showWindow(nil)
         self.windowController.window?.makeKeyAndOrderFront(nil)
     }
-
-    func setScrollSelectorMode() {
-        guard let applicationWindow = Utils.getCurrentApplicationWindowManually(),
-            let window = self.windowController.window else {
-            self.exitMode()
-            return
-        }
-        
-        let scrollAreas = Utils.traverseUIElementForScrollAreas(rootElement: applicationWindow)
-        
-        let hintStrings = AlphabetHints().hintStrings(linkCount: scrollAreas.count)
-
-        let hintViews: [HintView] = scrollAreas
-            .enumerated()
-            .map ({ (index, button) in
-                let positionFlippedOptional: NSPoint? = {
-                    do {
-                        return try button.attribute(.position)
-                    } catch {
-                        return nil
-                    }
-                }()
-
-                if let positionFlipped = positionFlippedOptional {
-                    let text = HintView(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
-                    text.initializeHint(hintText: hintStrings[index], typed: "")
-                    let positionRelativeToScreen = Utils.toOrigin(point: positionFlipped, size: text.frame.size)
-                    let positionRelativeToWindow = window.convertPoint(fromScreen: positionRelativeToScreen)
-                    text.associatedElement = button
-                    text.frame.origin = positionRelativeToWindow
-                    return text
-                }
-                return nil })
-            .compactMap({ $0 })
-        
-        let vc = ScrollSelectorModeViewController.init()
-        vc.hintViews = hintViews
-        self.setViewController(vc: vc)
-        vc.textField.becomeFirstResponder()
-    }
     
     func setScrollMode() {
         let vc = ScrollModeViewController.init()
