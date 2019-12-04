@@ -90,7 +90,7 @@ class Utils: NSObject {
     static func getUIElementChildrenRecursive(element: UIElement, parentContainerFrame: NSRect) -> Observable<UIElement> {
         return getAttributes(element: element)
             .flatMap({ attributes -> Observable<UIElement> in
-                let (roleOptional, positionOptional, sizeOptional, children) = attributes
+                let (roleOptional, positionOptional, sizeOptional) = attributes
                 guard let role = roleOptional,
                     let position = positionOptional,
                     let size = sizeOptional else {
@@ -104,18 +104,11 @@ class Utils: NSObject {
                     return Observable.empty()
                 }
                 
-                if role == Role.scrollArea.rawValue {
+                if role == Role.scrollArea.rawValue ||
+                    role == Role.row.rawValue ||
+                    role == "AXPage" ||
+                    role == Role.group.rawValue {
                     newParentContainerFrame = NSRect(origin: position, size: size)
-                }
-                
-                // ignore rows that are out of parent scroll area's frame
-                // doing this improves traversal speed significantly because we do not look at
-                // children elements that most likely are out of frame
-                if role == Role.row.rawValue || role == "AXPage" || role == Role.group.rawValue {
-                    let frame = NSRect(origin: position, size: size)
-                    if (!parentContainerFrame.intersects(frame)) {
-                        return Observable.empty()
-                    }
                 }
                 
                 // append to allowed elements list if element's frame intersect with it's parent container's frame.
@@ -126,7 +119,7 @@ class Utils: NSObject {
                     return Observable.empty()
                 }
                 
-                return Observable.just(children)
+                return getChildren(element: element)
                     .flatMap({ children -> Observable<UIElement> in
                         if children.count <= 0 {
                             return Observable.just(element)
@@ -142,8 +135,8 @@ class Utils: NSObject {
             })
     }
     
-    static func getAttributes(element: UIElement) -> Observable<(String?, NSPoint?, NSSize?, [UIElement])> {
-        return getMultipleElementAttribute(element: element, attributes: [.role, .position, .size, .children])
+    static func getAttributes(element: UIElement) -> Observable<(String?, NSPoint?, NSSize?)> {
+        return getMultipleElementAttribute(element: element, attributes: [.role, .position, .size])
             .map({ valuesOptional in
                 guard let values = valuesOptional else {
                     return nil
@@ -152,8 +145,7 @@ class Utils: NSObject {
                     let role = values[0] as! String?
                     let position = values[1] as! NSPoint?
                     let size = values[2] as! NSSize?
-                    let children = (values[3] as! [AXUIElement]? ?? []).map({ CachedUIElement($0) })
-                    return (role, position, size, children)
+                    return (role, position, size)
                 } catch {
 
                 }
@@ -189,15 +181,15 @@ class Utils: NSObject {
         })
     }
     
-    static func getChildren(element: UIElement) -> Observable<[UIElement]> {
+    static func getChildren(element: UIElement) -> Observable<[CachedUIElement]> {
         return Observable.create({ observer in
             DispatchQueue.global().async {
-                let children: [UIElement] = {
+                let children: [CachedUIElement] = {
                     let childrenOptional = try? element.attribute(Attribute.children) as [AXUIElement]?;
                     guard let children = childrenOptional else {
                         return []
                     }
-                    return children.map({ UIElement($0) })
+                    return children.map({ CachedUIElement($0) })
                 }()
                 observer.onNext(children)
                 observer.onCompleted()
@@ -213,12 +205,13 @@ class Utils: NSObject {
                 let menuBarObservable: Observable<UIElement?> = getElementAttribute(element: app, attribute: .menuBar)
                 return menuBarObservable.compactMap({ $0 })
             })
-            .flatMap({ menuBar -> Observable<[UIElement]> in
+            .flatMap({ menuBar -> Observable<[CachedUIElement]> in
                 return getChildren(element: menuBar)
             })
-            .flatMap({ children -> Observable<UIElement> in
+            .flatMap({ children -> Observable<CachedUIElement> in
                 return Observable.from(children)
             })
+            .map({ UIElement($0.element) })
     }
     
     // For performance reasons Chromium only makes the webview accessible when there it detects voiceover through the `AXEnhancedUserInterface` attribute on the Chrome application itself:
