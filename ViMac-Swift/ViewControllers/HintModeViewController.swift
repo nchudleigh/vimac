@@ -92,15 +92,8 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
                             return
                         }
             
-                        var buttonPositionOptional: NSPoint?
-                        var buttonSizeOptional: NSSize?
-                        do {
-                            buttonPositionOptional = try button.attribute(.position)
-                            buttonSizeOptional = try button.attribute(.size)
-                        } catch {
-                            vc.modeCoordinator?.exitMode()
-                            return
-                        }
+                        let buttonPositionOptional: NSPoint? = try? button.attribute(.position)
+                        let buttonSizeOptional: NSSize? = try? button.attribute(.size)
             
                         guard let buttonPosition = buttonPositionOptional,
                             let buttonSize = buttonSizeOptional else {
@@ -178,13 +171,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
                     let hintViews: [HintView] = filteredElements
                         .enumerated()
                         .map ({ (index, button) in
-                            let positionFlippedOptional: NSPoint? = {
-                                do {
-                                    return try button.attribute(.position)
-                                } catch {
-                                    return nil
-                                }
-                            }()
+                            let positionFlippedOptional: NSPoint? = try? button.attribute(.position)
 
                             if let positionFlipped = positionFlippedOptional {
                                 let text = HintView(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
