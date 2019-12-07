@@ -87,85 +87,56 @@ class Utils: NSObject {
         event2?.post(tap: .cghidEventTap)
     }
     
-    static func getUIElementChildrenRecursive(element: UIElement, parentScrollAreaFrame: NSRect?) -> Observable<UIElement> {
+    static func getUIElementChildrenRecursive(element: UIElement, parentContainerFrame: NSRect) -> Observable<UIElement> {
         return getAttributes(element: element)
             .flatMap({ attributes -> Observable<UIElement> in
-                let (roleOptional, positionOptional, sizeOptional, children) = attributes
-                
-                var newScrollAreaFrame: NSRect? = nil
-                var isScrollArea = false
-                
-                if let role = roleOptional {
-                    // ignore subcomponents of a scrollbar
-                    if role == Role.scrollBar.rawValue {
+                let (roleOptional, positionOptional, sizeOptional) = attributes
+                guard let role = roleOptional,
+                    let position = positionOptional,
+                    let size = sizeOptional else {
                         return Observable.empty()
-                    }
-                    
-                    if role == Role.scrollArea.rawValue {
-                        isScrollArea = true
-                        if let position = positionOptional,
-                            let size = sizeOptional {
-                            let frame = NSRect(origin: position, size: size)
-                            newScrollAreaFrame = frame
-                        }
-                    }
-                    
-                    // ignore rows that are out of parent scroll area's frame
-                    // doing this improves traversal speed significantly because we do not look at
-                    // children elements that most likely are out of frame
-                    if role == Role.row.rawValue || role == "AXPage" || role == Role.group.rawValue {
-                        if let position = positionOptional,
-                            let size = sizeOptional {
-                            let frame = NSRect(origin: position, size: size)
-                            if let scrollAreaFrame = parentScrollAreaFrame {
-                                if (!scrollAreaFrame.intersects(frame)) {
-                                    return Observable.empty()
-                                }
-                            }
-                        } else {
-                            return Observable.empty()
-                        }
-                    }
-                }
-
-                var includeElement = false
-                
-                // append to allowed elements list if
-                // 1. element's role is not blacklisted
-                // 2. element does not have a parent scroll area, but if it does both frames must intersect
-                if let position = positionOptional,
-                    let size = sizeOptional,
-                    let role = roleOptional {
-                    let frame = NSRect(origin: position, size: size)
-                    if let parentScrollAreaFrame = parentScrollAreaFrame {
-                        if parentScrollAreaFrame.intersects(frame) {
-                            includeElement = true
-                        }
-                    } else {
-                        includeElement = true
-                    }
                 }
                 
-                let psaf = isScrollArea ? newScrollAreaFrame : parentScrollAreaFrame
+                var newParentContainerFrame: NSRect?
                 
-                return Observable.just(children)
+                // ignore subcomponents of a scrollbar
+                if role == Role.scrollBar.rawValue {
+                    return Observable.empty()
+                }
+                
+                if role == Role.scrollArea.rawValue ||
+                    role == Role.row.rawValue ||
+                    role == "AXPage" ||
+                    role == Role.group.rawValue {
+                    newParentContainerFrame = NSRect(origin: position, size: size)
+                }
+                
+                // append to allowed elements list if element's frame intersect with it's parent container's frame.
+                let frame = NSRect(origin: position, size: size)
+                let includeElement = parentContainerFrame.intersects(frame)
+                
+                if !includeElement {
+                    return Observable.empty()
+                }
+                
+                return getChildren(element: element)
                     .flatMap({ children -> Observable<UIElement> in
                         if children.count <= 0 {
                             return Observable.just(element)
                         }
                         
                         return Observable.merge([
-                            includeElement ? Observable.just(element) : Observable.empty(),
+                            Observable.just(element),
                             Observable.merge(
-                                children.map({ getUIElementChildrenRecursive(element: $0, parentScrollAreaFrame: psaf) })
+                                children.map({ getUIElementChildrenRecursive(element: $0, parentContainerFrame: newParentContainerFrame ?? parentContainerFrame) })
                             )
                         ])
                     })
             })
     }
     
-    static func getAttributes(element: UIElement) -> Observable<(String?, NSPoint?, NSSize?, [UIElement])> {
-        return getMultipleElementAttribute(element: element, attributes: [.role, .position, .size, .children])
+    static func getAttributes(element: UIElement) -> Observable<(String?, NSPoint?, NSSize?)> {
+        return getMultipleElementAttribute(element: element, attributes: [.role, .position, .size])
             .map({ valuesOptional in
                 guard let values = valuesOptional else {
                     return nil
@@ -174,8 +145,7 @@ class Utils: NSObject {
                     let role = values[0] as! String?
                     let position = values[1] as! NSPoint?
                     let size = values[2] as! NSSize?
-                    let children = (values[3] as! [AXUIElement]? ?? []).map({ CachedUIElement($0) })
-                    return (role, position, size, children)
+                    return (role, position, size)
                 } catch {
 
                 }
@@ -203,13 +173,7 @@ class Utils: NSObject {
     static func getElementAttribute<T>(element: UIElement, attribute: Attribute) -> Observable<T?> {
         return Observable.create({ observer in
             DispatchQueue.global().async {
-                let value: T? = {
-                    do {
-                        return try element.attribute(attribute)
-                    } catch {
-                        return nil
-                    }
-                }()
+                let value: T? = try? element.attribute(attribute)
                 observer.onNext(value)
                 observer.onCompleted()
             }
@@ -217,19 +181,15 @@ class Utils: NSObject {
         })
     }
     
-    static func getChildren(element: UIElement) -> Observable<[UIElement]> {
+    static func getChildren(element: UIElement) -> Observable<[CachedUIElement]> {
         return Observable.create({ observer in
             DispatchQueue.global().async {
-                let children: [UIElement] = {
-                    do {
-                        let childrenOptional = try element.attribute(Attribute.children) as [AXUIElement]?;
-                        guard let children = childrenOptional else {
-                            return []
-                        }
-                        return children.map({ UIElement($0) })
-                    } catch {
+                let children: [CachedUIElement] = {
+                    let childrenOptional = try? element.attribute(Attribute.children) as [AXUIElement]?;
+                    guard let children = childrenOptional else {
                         return []
                     }
+                    return children.map({ CachedUIElement($0) })
                 }()
                 observer.onNext(children)
                 observer.onCompleted()
@@ -245,12 +205,13 @@ class Utils: NSObject {
                 let menuBarObservable: Observable<UIElement?> = getElementAttribute(element: app, attribute: .menuBar)
                 return menuBarObservable.compactMap({ $0 })
             })
-            .flatMap({ menuBar -> Observable<[UIElement]> in
+            .flatMap({ menuBar -> Observable<[CachedUIElement]> in
                 return getChildren(element: menuBar)
             })
-            .flatMap({ children -> Observable<UIElement> in
+            .flatMap({ children -> Observable<CachedUIElement> in
                 return Observable.from(children)
             })
+            .map({ UIElement($0.element) })
     }
     
     // For performance reasons Chromium only makes the webview accessible when there it detects voiceover through the `AXEnhancedUserInterface` attribute on the Chrome application itself:
@@ -264,11 +225,7 @@ class Utils: NSObject {
 //        } catch {
 //
 //        }
-        do {
-            try app.setAttribute("AXManualAccessibility", value: true)
-        } catch {
-
-        }
+        _ = try? app.setAttribute("AXManualAccessibility", value: true)
     }
     
     static func getCurrentApplicationWindowManually() -> UIElement? {
@@ -281,12 +238,6 @@ class Utils: NSObject {
             Utils.setAccessibilityAttributes(app: app)
         }
         
-        return {
-            do {
-                return try appOptional?.attribute(.focusedWindow)
-            } catch {
-                return nil
-            }
-        }()
+        return try? appOptional?.attribute(.focusedWindow)
     }
 }

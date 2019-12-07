@@ -46,13 +46,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 guard let app = appOptional else {
                     return nil
                 }
-                let windowOptional: UIElement? = {
-                    do {
-                        return try app.attribute(Attribute.focusedWindow)
-                    } catch {
-                        return nil
-                    }
-                }()
+                let windowOptional: UIElement? = try? app.attribute(Attribute.focusedWindow)
                 return windowOptional
             }
         
@@ -69,14 +63,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                         return Disposables.create()
                     }
                     
-                    let windowOptional: UIElement? = {
-                        do {
-                            return try app.attribute(Attribute.focusedWindow)
-                        } catch {
-                            return nil
-                        }
-                    }()
-                    
+                    let windowOptional: UIElement? = try? app.attribute(Attribute.focusedWindow)
                     observer.onNext(windowOptional)
                     return Disposables.create()
                 }
