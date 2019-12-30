@@ -127,28 +127,28 @@ class ScrollModeViewController: ModeViewController, NSTextFieldDelegate {
         let verticalScrollMultiplier = isVerticalScrollReversed ? -1 : 1
         let horizontalScrollMultiplier = isHorizontalScrollReversed ? -1 : 1
         
-        let jKeyObservable = AccessibilityObservables.scrollObservableSmooth(
+        let jKeyObservable = ScrollModeViewController.scrollObservableSmooth(
                 textField: textField,
                 character: "j",
                 yAxis: Int64(-1 * verticalScrollMultiplier * scrollSensitivity),
                 xAxis: 0,
                 frequencyMilliseconds: 20)
         
-        let kKeyObservable = AccessibilityObservables.scrollObservableSmooth(
+        let kKeyObservable = ScrollModeViewController.scrollObservableSmooth(
                 textField: textField,
                 character: "k",
                 yAxis: Int64(verticalScrollMultiplier * scrollSensitivity),
                 xAxis: 0,
                 frequencyMilliseconds: 20)
         
-        let hKeyObservable = AccessibilityObservables.scrollObservableSmooth(
+        let hKeyObservable = ScrollModeViewController.scrollObservableSmooth(
                 textField: textField,
                 character: "h",
                 yAxis: 0,
                 xAxis: Int64(horizontalScrollMultiplier * scrollSensitivity),
                 frequencyMilliseconds: 20)
         
-        let lKeyObservable = AccessibilityObservables.scrollObservableSmooth(
+        let lKeyObservable = ScrollModeViewController.scrollObservableSmooth(
                 textField: textField,
                 character: "l",
                 yAxis: 0,
@@ -156,17 +156,46 @@ class ScrollModeViewController: ModeViewController, NSTextFieldDelegate {
                 frequencyMilliseconds: 20)
         
         let halfScrollAreaHeight = Int(scrollAreaSize.height / 2)
+        let halfScrollAreaWidth = Int(scrollAreaSize.width / 2)
         
-        let dKeyObservable = AccessibilityObservables.scrollObservableChunky(
+        let dKeyObservable = ScrollModeViewController.scrollObservableChunky(
                 textField: textField,
                 character: "d",
-                yAxis: Int32(verticalScrollMultiplier * -1 * halfScrollAreaHeight),
+                yAxis: verticalScrollMultiplier * -1 * halfScrollAreaHeight,
                 xAxis: 0, frequencyMilliseconds: 200)
         
-        let uKeyObservable = AccessibilityObservables.scrollObservableChunky(
+        let uKeyObservable = ScrollModeViewController.scrollObservableChunky(
                 textField: textField,
                 character: "u",
-                yAxis: Int32(verticalScrollMultiplier * halfScrollAreaHeight),
+                yAxis: verticalScrollMultiplier * halfScrollAreaHeight,
+                xAxis: 0,
+                frequencyMilliseconds: 200)
+        
+        let shiftHKeyObservable = ScrollModeViewController.scrollObservableChunky(
+                textField: textField,
+                character: "H",
+                yAxis: 0,
+                xAxis: horizontalScrollMultiplier * halfScrollAreaWidth,
+                frequencyMilliseconds: 200)
+        
+        let shiftLKeyObservable = ScrollModeViewController.scrollObservableChunky(
+                textField: textField,
+                character: "L",
+                yAxis: 0,
+                xAxis: -1 * horizontalScrollMultiplier * halfScrollAreaWidth,
+                frequencyMilliseconds: 200)
+        
+        let shiftJKeyObservable = ScrollModeViewController.scrollObservableChunky(
+                textField: textField,
+                character: "J",
+                yAxis: -1 * verticalScrollMultiplier * halfScrollAreaHeight,
+                xAxis: 0,
+                frequencyMilliseconds: 200)
+        
+        let shiftKKeyObservable = ScrollModeViewController.scrollObservableChunky(
+                textField: textField,
+                character: "K",
+                yAxis: verticalScrollMultiplier * halfScrollAreaHeight,
                 xAxis: 0,
                 frequencyMilliseconds: 200)
         
@@ -176,7 +205,11 @@ class ScrollModeViewController: ModeViewController, NSTextFieldDelegate {
             kKeyObservable,
             lKeyObservable,
             dKeyObservable,
-            uKeyObservable
+            uKeyObservable,
+            shiftHKeyObservable,
+            shiftLKeyObservable,
+            shiftJKeyObservable,
+            shiftKKeyObservable
         ).merge()
         .do(onNext: { [weak self] in
             self?.moveMouseToScrollAreaBottomLeft(scrollAreaPosition: scrollAreaPosition, scrollAreaSize: scrollAreaSize)
@@ -195,5 +228,80 @@ class ScrollModeViewController: ModeViewController, NSTextFieldDelegate {
     override func viewDidDisappear() {
         self.compositeDisposable.dispose()
         self.scrollKeysDisposable?.dispose()
+    }
+    
+    static func scrollObservableSmooth(textField: OverlayTextField, character: Character, yAxis: Int64, xAxis: Int64, frequencyMilliseconds: Int) -> Observable<Void> {
+        return textField.distinctNSEventObservable
+            .filter({ $0.type == .keyUp || $0.type == .keyDown })
+            .filter({ $0.characters?.first == character })
+            .flatMapLatest({ event -> Observable<Void> in
+                if event.type == .keyUp {
+                    // trackpad "release" event
+                    // this prevents us from scrolling against the "rubber band" at the end of a scroll area
+                    // unfortunately it causes the scroll to "glide" at the end, which may not be desirable
+                    let scrollEventPhase4 = CGEvent.init(scrollWheelEvent2Source: nil, units: .pixel, wheelCount: 1, wheel1: 0, wheel2: 0, wheel3: 0)!
+                    scrollEventPhase4.setIntegerValueField(.scrollWheelEventIsContinuous, value: 1)
+                    scrollEventPhase4.setIntegerValueField(.scrollWheelEventMomentumPhase, value: 0)
+                    scrollEventPhase4.setDoubleValueField(.scrollWheelEventScrollPhase, value: 4)
+                    scrollEventPhase4.setIntegerValueField(.scrollWheelEventPointDeltaAxis1, value: 0)
+                    scrollEventPhase4.setIntegerValueField(.scrollWheelEventPointDeltaAxis2, value: 0)
+                    scrollEventPhase4.post(tap: .cghidEventTap)
+                    return Observable.just(Void())
+                }
+                
+
+                // this scroll phase 128 signifies the start of a trackpad scroll
+                // if an application did not receive this event, the scroll events below will not work
+                // the application only needs to receive this event once.
+                let scrollEventPhase128 = CGEvent.init(scrollWheelEvent2Source: nil, units: .pixel, wheelCount: 1, wheel1: 0, wheel2: 0, wheel3: 0)!
+                scrollEventPhase128.setIntegerValueField(.scrollWheelEventIsContinuous, value: 1)
+                scrollEventPhase128.setIntegerValueField(.scrollWheelEventMomentumPhase, value: 0)
+                scrollEventPhase128.setIntegerValueField(.scrollWheelEventScrollPhase, value: 128)
+                scrollEventPhase128.setIntegerValueField(.scrollWheelEventPointDeltaAxis1, value: 0)
+                scrollEventPhase128.setIntegerValueField(.scrollWheelEventPointDeltaAxis2, value: 0)
+                scrollEventPhase128.post(tap: .cghidEventTap)
+                
+                // this event is the second event emitted.
+                // if not present the final event (scroll phase 4) will not be allowed to emit (hence rubber banding will not work)
+                let scrollEventPhase1 = CGEvent.init(scrollWheelEvent2Source: nil, units: .pixel, wheelCount: 1, wheel1: 0, wheel2: 0, wheel3: 0)!
+                scrollEventPhase1.setIntegerValueField(.scrollWheelEventIsContinuous, value: 1)
+                scrollEventPhase1.setIntegerValueField(.scrollWheelEventMomentumPhase, value: 0)
+                scrollEventPhase1.setIntegerValueField(.scrollWheelEventScrollPhase, value: 1)
+                scrollEventPhase1.setIntegerValueField(.scrollWheelEventPointDeltaAxis1, value: yAxis)
+                scrollEventPhase1.setIntegerValueField(.scrollWheelEventPointDeltaAxis2, value: xAxis)
+                scrollEventPhase1.post(tap: .cghidEventTap)
+
+                return Observable<Int>.interval(.milliseconds(frequencyMilliseconds), scheduler: MainScheduler.instance)
+                    .map({ _ in Void() })
+                    .do(onNext: { _ in
+                        let scrollEventPhase2 = CGEvent.init(scrollWheelEvent2Source: nil, units: .pixel, wheelCount: 1, wheel1: 0, wheel2: 0, wheel3: 0)!
+                        scrollEventPhase2.setIntegerValueField(.scrollWheelEventIsContinuous, value: 1)
+                        scrollEventPhase2.setIntegerValueField(.scrollWheelEventMomentumPhase, value: 0)
+                        scrollEventPhase2.setIntegerValueField(.scrollWheelEventScrollPhase, value: 2)
+                        scrollEventPhase2.setIntegerValueField(.scrollWheelEventPointDeltaAxis1, value: yAxis)
+                        scrollEventPhase2.setIntegerValueField(.scrollWheelEventPointDeltaAxis2, value: xAxis)
+                        scrollEventPhase2.post(tap: .cghidEventTap)
+                    })
+            })
+    }
+    
+    static func scrollObservableChunky(textField: OverlayTextField, character: Character, yAxis: Int, xAxis: Int, frequencyMilliseconds: Int) -> Observable<Void> {
+        textField.distinctNSEventObservable
+            .filter({ $0.type == .keyUp || $0.type == .keyDown })
+            .filter({ $0.characters?.first == character })
+            .flatMapLatest({ event -> Observable<Void> in
+                if event.type == .keyUp {
+                    return Observable.empty()
+                }
+                return Observable<Int>.interval(.milliseconds(frequencyMilliseconds), scheduler: MainScheduler.instance)
+                    .startWith(1)
+                    .map({ _ in Void() })
+                    .do(onNext: { _ in
+                        let event = CGEvent.init(scrollWheelEvent2Source: nil, units: .pixel, wheelCount: 1, wheel1: 0, wheel2: 0, wheel3: 0)!
+                        event.setIntegerValueField(.scrollWheelEventPointDeltaAxis1, value: Int64(yAxis))
+                        event.setIntegerValueField(.scrollWheelEventPointDeltaAxis2, value: Int64(xAxis))
+                        event.post(tap: .cghidEventTap)
+                    })
+            })
     }
 }
