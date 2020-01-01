@@ -108,7 +108,7 @@ class ScrollModeViewController: ModeViewController, NSTextFieldDelegate {
         }
 
         resizeBorderViewToFitScrollArea(scrollAreaSize: scrollAreaSize, scrollAreaPosition: scrollAreaPosition)
-        moveMouseToScrollAreaBottomLeft(scrollAreaPosition: scrollAreaPosition, scrollAreaSize: scrollAreaSize)
+        moveMouseToScrollAreaCenter(scrollAreaPosition: scrollAreaPosition, scrollAreaSize: scrollAreaSize)
         HideCursorGlobally.hide()
         return setupScrollObservers(scrollAreaSize: scrollAreaSize, scrollAreaPosition: scrollAreaPosition)
     }
@@ -213,13 +213,13 @@ class ScrollModeViewController: ModeViewController, NSTextFieldDelegate {
             shiftKKeyObservable
         ).merge()
         .do(onNext: { [weak self] in
-            self?.moveMouseToScrollAreaBottomLeft(scrollAreaPosition: scrollAreaPosition, scrollAreaSize: scrollAreaSize)
+            self?.moveMouseToScrollAreaCenter(scrollAreaPosition: scrollAreaPosition, scrollAreaSize: scrollAreaSize)
         })
         
         return allScrollObservables.subscribe()
     }
     
-    func moveMouseToScrollAreaBottomLeft(scrollAreaPosition: NSPoint, scrollAreaSize: NSSize) {
+    func moveMouseToScrollAreaCenter(scrollAreaPosition: NSPoint, scrollAreaSize: NSSize) {
         let positionX = scrollAreaPosition.x + (scrollAreaSize.width / 2)
         let positionY = scrollAreaPosition.y + scrollAreaSize.height - (scrollAreaSize.height / 2)
         let position = NSPoint(x: positionX, y: positionY)
