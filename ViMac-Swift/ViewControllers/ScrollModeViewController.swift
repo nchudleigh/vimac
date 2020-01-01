@@ -109,6 +109,7 @@ class ScrollModeViewController: ModeViewController, NSTextFieldDelegate {
 
         resizeBorderViewToFitScrollArea(scrollAreaSize: scrollAreaSize, scrollAreaPosition: scrollAreaPosition)
         moveMouseToScrollAreaBottomLeft(scrollAreaPosition: scrollAreaPosition, scrollAreaSize: scrollAreaSize)
+        HideCursorGlobally.hide()
         return setupScrollObservers(scrollAreaSize: scrollAreaSize, scrollAreaPosition: scrollAreaPosition)
     }
     
@@ -226,6 +227,8 @@ class ScrollModeViewController: ModeViewController, NSTextFieldDelegate {
     }
     
     override func viewDidDisappear() {
+        print("unhide")
+        HideCursorGlobally.unhide()
         self.compositeDisposable.dispose()
         self.scrollKeysDisposable?.dispose()
     }
