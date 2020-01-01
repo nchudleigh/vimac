@@ -220,14 +220,13 @@ class ScrollModeViewController: ModeViewController, NSTextFieldDelegate {
     }
     
     func moveMouseToScrollAreaBottomLeft(scrollAreaPosition: NSPoint, scrollAreaSize: NSSize) {
-        let positionX = scrollAreaPosition.x + 4
-        let positionY = scrollAreaPosition.y + scrollAreaSize.height - 4
+        let positionX = scrollAreaPosition.x + (scrollAreaSize.width / 2)
+        let positionY = scrollAreaPosition.y + scrollAreaSize.height - (scrollAreaSize.height / 2)
         let position = NSPoint(x: positionX, y: positionY)
         Utils.moveMouse(position: position)
     }
     
     override func viewDidDisappear() {
-        print("unhide")
         HideCursorGlobally.unhide()
         self.compositeDisposable.dispose()
         self.scrollKeysDisposable?.dispose()
