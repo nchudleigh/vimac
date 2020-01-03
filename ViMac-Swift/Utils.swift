@@ -135,6 +135,7 @@ class Utils: NSObject {
             })
     }
     
+    // eagerConcat behaves like concat but all the observables are fired simultaneously instead of only after the previous ones are completed.
     static func eagerConcat<T>(observables: [Observable<T>]) -> Observable<T> {
         let taggedWithIndex = observables.enumerated().map({ (index, element) in
             return element.map({ (index, $0) })
