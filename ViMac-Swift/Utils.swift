@@ -125,14 +125,33 @@ class Utils: NSObject {
                             return Observable.just(element)
                         }
                         
-                        return Observable.merge([
+                        return Utils.eagerConcat(observables: [
                             Observable.just(element),
-                            Observable.merge(
+                            Utils.eagerConcat(observables: 
                                 children.map({ getUIElementChildrenRecursive(element: $0, parentContainerFrame: newParentContainerFrame ?? parentContainerFrame) })
                             )
                         ])
                     })
             })
+    }
+    
+    // eagerConcat behaves like concat but all the observables are fired simultaneously instead of only after the previous ones are completed.
+    static func eagerConcat<T>(observables: [Observable<T>]) -> Observable<T> {
+        let taggedWithIndex = observables.enumerated().map({ (index, element) in
+            return element.map({ (index, $0) })
+        })
+        let merged = Observable.merge(taggedWithIndex).toArray().asObservable()
+
+        return merged.flatMapLatest({ o -> Observable<T> in
+            let sortedO = o
+                .sorted(by: { (a, b) in
+                    let (i1, _) = a
+                    let (i2, _) = b
+                    return i1 - i2 < 0
+                })
+                .map({ (i, e) in e })
+            return Observable.from(sortedO)
+        })
     }
     
     static func getAttributes(element: UIElement) -> Observable<(String?, NSPoint?, NSSize?)> {
