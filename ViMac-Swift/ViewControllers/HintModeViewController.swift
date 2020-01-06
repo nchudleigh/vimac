@@ -154,54 +154,60 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
             elements.toArray()
                 .observeOn(MainScheduler.instance)
                 .subscribe(
-                onSuccess: { elements in
-                    let hintStrings = AlphabetHints().hintStrings(linkCount: elements.count)
-
-                    let hintViews: [HintView] = elements
-                        .enumerated()
-                        .map ({ (index, button) in
-                            let text = HintView(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
-                            text.initializeHint(hintText: hintStrings[index], typed: "")
-                            
-                            let centerPositionOptional: NSPoint? = {
-                                do {
-                                    guard let topLeftPositionFlipped: NSPoint = try button.attribute(.position),
-                                        let buttonSize: NSSize = try button.attribute(.size) else {
-                                        return nil
-                                    }
-                                    let topLeftPositionRelativeToScreen = Utils.toOrigin(point: topLeftPositionFlipped, size: text.frame.size)
-                                    guard let topLeftPositionRelativeToWindow = self.modeCoordinator?.windowController.window?.convertPoint(fromScreen: topLeftPositionRelativeToScreen) else {
-                                        return nil
-                                    }
-                                    let x = (topLeftPositionRelativeToWindow.x + (buttonSize.width / 2)) - (text.frame.size.width / 2)
-                                    let y = (topLeftPositionRelativeToWindow.y - (buttonSize.height) / 2) + (text.frame.size.height / 2)
-                                    return NSPoint(x: x, y: y)
-                                } catch {
-                                    return nil
-                                }
-                            }()
-
-                            guard let centerPosition = centerPositionOptional else {
-                                return nil
-                            }
-
-                            text.associatedElement = button
-                            text.frame.origin = centerPosition
-                            return text
-                        })
-                        .compactMap({ $0 })
-                    
-                    self.hintViews = hintViews
-
-                    for hintView in hintViews {
-                        self.view.addSubview(hintView)
-                    }
-                    
-                    self.textField.becomeFirstResponder()
+                onSuccess: { [weak self] elements in
+                    self?.onElementTraversalComplete(elements: elements.filter({
+                        ((try? $0.actionsAsStrings().count) ?? 0) > 0
+                    }))
                 }, onError: { error in
                     print(error)
                 })
         )
+    }
+    
+    func onElementTraversalComplete(elements: [UIElement]) {
+        let hintStrings = AlphabetHints().hintStrings(linkCount: elements.count)
+
+        let hintViews: [HintView] = elements
+            .enumerated()
+            .map ({ (index, button) in
+                let text = HintView(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
+                text.initializeHint(hintText: hintStrings[index], typed: "")
+                
+                let centerPositionOptional: NSPoint? = {
+                    do {
+                        guard let topLeftPositionFlipped: NSPoint = try button.attribute(.position),
+                            let buttonSize: NSSize = try button.attribute(.size) else {
+                            return nil
+                        }
+                        let topLeftPositionRelativeToScreen = Utils.toOrigin(point: topLeftPositionFlipped, size: text.frame.size)
+                        guard let topLeftPositionRelativeToWindow = self.modeCoordinator?.windowController.window?.convertPoint(fromScreen: topLeftPositionRelativeToScreen) else {
+                            return nil
+                        }
+                        let x = (topLeftPositionRelativeToWindow.x + (buttonSize.width / 2)) - (text.frame.size.width / 2)
+                        let y = (topLeftPositionRelativeToWindow.y - (buttonSize.height) / 2) + (text.frame.size.height / 2)
+                        return NSPoint(x: x, y: y)
+                    } catch {
+                        return nil
+                    }
+                }()
+
+                guard let centerPosition = centerPositionOptional else {
+                    return nil
+                }
+
+                text.associatedElement = button
+                text.frame.origin = centerPosition
+                return text
+            })
+            .compactMap({ $0 })
+        
+        self.hintViews = hintViews
+
+        for hintView in hintViews {
+            self.view.addSubview(hintView)
+        }
+        
+        self.textField.becomeFirstResponder()
     }
     
     func updateHints(typed: String) {
