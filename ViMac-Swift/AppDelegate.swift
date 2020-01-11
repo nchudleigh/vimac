@@ -159,7 +159,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             })
             .observeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak self] window in
-                self?.modeCoordinator.setHintMode()
+                if self?.modeCoordinator.windowController.window?.contentViewController?.className == HintModeViewController.className() {
+                    self?.modeCoordinator.exitMode()
+                } else {
+                    self?.modeCoordinator.setHintMode()
+                }
             })
         )
         
@@ -169,7 +173,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             })
             .observeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak self] window in
-                self?.modeCoordinator.setScrollMode()
+                if self?.modeCoordinator.windowController.window?.contentViewController?.className == ScrollModeViewController.className() {
+                    self?.modeCoordinator.exitMode()
+                } else {
+                    self?.modeCoordinator.setScrollMode()
+                }
             })
         )
     }
