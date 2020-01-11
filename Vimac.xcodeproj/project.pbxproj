@@ -489,7 +489,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# osascript grant-accessibility-permission-dev.scpt \n";
+			shellScript = "osascript grant-accessibility-permission-dev.scpt \n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
