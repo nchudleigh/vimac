@@ -26,6 +26,8 @@
 		E268A02A236D8F6F00EE08CB /* CachedUIElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = E268A029236D8F6F00EE08CB /* CachedUIElement.swift */; };
 		E26981B323C99DBB00E46217 /* WelcomeWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26981B223C99DBB00E46217 /* WelcomeWindowController.swift */; };
 		E26981B523C99DF900E46217 /* WelcomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26981B423C99DF900E46217 /* WelcomeViewController.swift */; };
+		E26981B923C9E31600E46217 /* InputSourceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26981B823C9E31600E46217 /* InputSourceManager.swift */; };
+		E26981BB23C9E35D00E46217 /* TISInputSourceExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26981BA23C9E35D00E46217 /* TISInputSourceExtension.swift */; };
 		E28867F0235F54F2001691A5 /* Vimac.icns in Resources */ = {isa = PBXBuildFile; fileRef = E28867EF235F54F1001691A5 /* Vimac.icns */; };
 		E2C29562234DD7F8001A38D6 /* OverlayWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2C29561234DD7F8001A38D6 /* OverlayWindowController.swift */; };
 		E2C29566234DE09C001A38D6 /* ModeCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2C29565234DE09C001A38D6 /* ModeCoordinator.swift */; };
@@ -90,6 +92,8 @@
 		E268A029236D8F6F00EE08CB /* CachedUIElement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CachedUIElement.swift; sourceTree = "<group>"; };
 		E26981B223C99DBB00E46217 /* WelcomeWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeWindowController.swift; sourceTree = "<group>"; };
 		E26981B423C99DF900E46217 /* WelcomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeViewController.swift; sourceTree = "<group>"; };
+		E26981B823C9E31600E46217 /* InputSourceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputSourceManager.swift; sourceTree = "<group>"; };
+		E26981BA23C9E35D00E46217 /* TISInputSourceExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TISInputSourceExtension.swift; sourceTree = "<group>"; };
 		E28867EF235F54F1001691A5 /* Vimac.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Vimac.icns; sourceTree = SOURCE_ROOT; };
 		E2C29561234DD7F8001A38D6 /* OverlayWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayWindowController.swift; sourceTree = "<group>"; };
 		E2C29565234DE09C001A38D6 /* ModeCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModeCoordinator.swift; sourceTree = "<group>"; };
@@ -222,6 +226,8 @@
 				E245F9B023941AE8009CA9C6 /* BorderView.swift */,
 				E2C3221C23BC828C00508B44 /* HideCursorGlobally.h */,
 				E2C3221D23BC828C00508B44 /* HideCursorGlobally.m */,
+				E26981B823C9E31600E46217 /* InputSourceManager.swift */,
+				E26981BA23C9E35D00E46217 /* TISInputSourceExtension.swift */,
 			);
 			path = "ViMac-Swift";
 			sourceTree = "<group>";
@@ -508,6 +514,7 @@
 				E2C3221E23BC828C00508B44 /* HideCursorGlobally.m in Sources */,
 				E2F6C9B1232E337500F2975B /* OverlayTextField.swift in Sources */,
 				E2C29571234E19E4001A38D6 /* HintModeViewController.swift in Sources */,
+				E26981B923C9E31600E46217 /* InputSourceManager.swift in Sources */,
 				E2C29573234E2E8B001A38D6 /* ScrollModeViewController.swift in Sources */,
 				E2F6C9AF232DEA1800F2975B /* Utils.swift in Sources */,
 				E268A02A236D8F6F00EE08CB /* CachedUIElement.swift in Sources */,
@@ -515,6 +522,7 @@
 				E2C29568234DE51F001A38D6 /* ModeViewController.swift in Sources */,
 				E245F9B123941AE8009CA9C6 /* BorderView.swift in Sources */,
 				E25F8711233222A9007AA958 /* AccessibilityObservables.swift in Sources */,
+				E26981BB23C9E35D00E46217 /* TISInputSourceExtension.swift in Sources */,
 				E2C29566234DE09C001A38D6 /* ModeCoordinator.swift in Sources */,
 				E2C29562234DD7F8001A38D6 /* OverlayWindowController.swift in Sources */,
 				E2069700232A52EA001EFDB2 /* AlphabetHints.swift in Sources */,
