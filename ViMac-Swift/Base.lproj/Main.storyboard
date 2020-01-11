@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="14868" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="15702" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14868"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="15702"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -700,6 +700,86 @@
             <point key="canvasLocation" x="1904" y="-628"/>
         </scene>
         <!--Window Controller-->
+        <scene sceneID="F6e-st-0kW">
+            <objects>
+                <windowController storyboardIdentifier="WelcomeWindowController" id="gSs-sH-8Vg" customClass="WelcomeWindowController" customModule="Vimac" customModuleProvider="target" sceneMemberID="viewController">
+                    <window key="window" title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" titleVisibility="hidden" id="xcr-5G-9h6">
+                        <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
+                        <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+                        <rect key="contentRect" x="196" y="240" width="480" height="270"/>
+                        <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+                        <connections>
+                            <outlet property="delegate" destination="gSs-sH-8Vg" id="puP-Y0-6ba"/>
+                        </connections>
+                    </window>
+                    <connections>
+                        <segue destination="WcM-qa-MNw" kind="relationship" relationship="window.shadowedContentViewController" id="KLn-xN-dhh"/>
+                    </connections>
+                </windowController>
+                <customObject id="Q91-66-9Cu" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-500" y="-904"/>
+        </scene>
+        <!--Welcome View Controller-->
+        <scene sceneID="JGw-7w-HTC">
+            <objects>
+                <viewController id="WcM-qa-MNw" customClass="WelcomeViewController" customModule="Vimac" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="nRd-k4-gZW">
+                        <rect key="frame" x="0.0" y="0.0" width="500" height="390"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="RS0-PX-sOW">
+                                <rect key="frame" x="213" y="273" width="75" height="75"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="Vimac" id="ghQ-Wg-m05"/>
+                            </imageView>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Yek-vS-79d">
+                                <rect key="frame" x="208" y="230" width="85" height="35"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Vimac" id="EYA-W2-SE3">
+                                    <font key="font" metaFont="system" size="30"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="GnH-r0-J1z">
+                                <rect key="frame" x="44" y="201" width="412" height="21"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Vimac needs Accessibility permissions to function." id="u8O-Na-BOP">
+                                    <font key="font" metaFont="system" size="18"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Dby-XO-58M">
+                                <rect key="frame" x="178" y="74" width="144" height="32"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
+                                <buttonCell key="cell" type="push" title="Grant Permission" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="enl-pt-6G7">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="onGrantPermissionButtonClick:" target="WcM-qa-MNw" id="k6c-WV-Md2"/>
+                                </connections>
+                            </button>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="yLo-ZK-jNY">
+                                <rect key="frame" x="44" y="124" width="412" height="64"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <textFieldCell key="cell" alignment="left" id="pVZ-1G-n72">
+                                    <font key="font" metaFont="system"/>
+                                    <string key="title">Click on Grant Permission to grant Vimac Accessibility permissions. Note that you will have to uncheck and check Vimac from the list of approved apps after updating Vimac. This window will automatically close after permissions have been granted.</string>
+                                    <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                        </subviews>
+                    </view>
+                </viewController>
+                <customObject id="WeT-A7-YK3" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="71" y="-851"/>
+        </scene>
+        <!--Window Controller-->
         <scene sceneID="mPp-s6-aeO">
             <objects>
                 <windowController storyboardIdentifier="PreferencesWindowController" id="lIH-rt-ykR" sceneMemberID="viewController">
@@ -837,4 +917,7 @@
             <point key="canvasLocation" x="-757" y="456"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="Vimac" width="512" height="512"/>
+    </resources>
 </document>

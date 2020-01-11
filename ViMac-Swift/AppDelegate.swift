@@ -14,7 +14,9 @@ import os
 import Sparkle
 
 @NSApplicationMain
-class AppDelegate: NSObject, NSApplicationDelegate {
+    class AppDelegate: NSObject, NSApplicationDelegate {
+    var welcomeWindowController: NSWindowController?
+    var permissionPollingTimer: Timer?
     
     let applicationObservable: Observable<Application?>
     let applicationNotificationObservable: Observable<AccessibilityObservables.AppNotificationAppPair>
@@ -106,17 +108,43 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        // Check that we have permission
-        guard UIElement.isProcessTrusted(withPrompt: true) else {
-            NSLog("No accessibility API permission, exiting")
-            NSRunningApplication.current.terminate()
+        if self.isAccessibilityPermissionsGranted() {
+            self.checkForUpdatesInBackground()
+            self.setupWindowEventAndShortcutObservables()
             return
         }
         
-        SUUpdater.shared()?.delegate = self
-        SUUpdater.shared()?.sendsSystemProfile = true
-        SUUpdater.shared()?.checkForUpdatesInBackground()
-        
+        showWelcomeWindowController()
+    }
+    
+    func showWelcomeWindowController() {
+        let storyboard = NSStoryboard.init(name: "Main", bundle: nil)
+        welcomeWindowController = storyboard.instantiateController(withIdentifier: "WelcomeWindowController") as! NSWindowController
+        NSApp.activate(ignoringOtherApps: true)
+        welcomeWindowController?.showWindow(nil)
+        welcomeWindowController?.window?.makeKeyAndOrderFront(nil)
+        permissionPollingTimer = Timer.scheduledTimer(
+            timeInterval: 2.0,
+            target: self,
+            selector: #selector(closeWelcomeWindowControllerWhenPermissionGranted),
+            userInfo: nil,
+            repeats: true
+        )
+    }
+    
+    @objc func closeWelcomeWindowControllerWhenPermissionGranted() {
+        if self.isAccessibilityPermissionsGranted() {
+            permissionPollingTimer?.invalidate()
+            permissionPollingTimer = nil
+            welcomeWindowController?.close()
+            welcomeWindowController = nil
+            
+            self.checkForUpdatesInBackground()
+            self.setupWindowEventAndShortcutObservables()
+        }
+    }
+    
+    func setupWindowEventAndShortcutObservables() {
         self.compositeDisposable.insert(applicationObservable
             .observeOn(MainScheduler.instance)
             .subscribe(onNext: { appOptional in
@@ -180,6 +208,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 }
             })
         )
+    }
+    
+    func checkForUpdatesInBackground() {
+        SUUpdater.shared()?.delegate = self
+        SUUpdater.shared()?.sendsSystemProfile = true
+        SUUpdater.shared()?.checkForUpdatesInBackground()
+    }
+    
+    func isAccessibilityPermissionsGranted() -> Bool {
+        return UIElement.isProcessTrusted(withPrompt: false)
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {
