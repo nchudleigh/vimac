@@ -3,6 +3,12 @@
   <p>Vimium for macOS.</p>
 </div>
 
+## Download
+
+You can find releases in [dexterleng/vimac-releases](https://github.com/dexterleng/vimac-releases).
+
+You can find the download link for v0.3.6 [here](https://github.com/dexterleng/vimac-releases/raw/master/vimac-v0.3.6.zip).
+
 ## Building
 
 Add Vimac to the list of Accessibility apps under **System Preferences > Security & Privacy > Accessibility**.
