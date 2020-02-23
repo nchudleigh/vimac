@@ -18,6 +18,7 @@ class ScrollModeViewController: ModeViewController, NSTextFieldDelegate {
     var compositeDisposable: CompositeDisposable = CompositeDisposable()
     var currentScrollAreaIndex = 0
     let scrollAreas = getScrollAreasByDescendingArea()
+    var originalMousePosition: NSPoint?
 
     static func getScrollAreasByDescendingArea() -> [CachedUIElement] {
         guard let applicationWindow = Utils.getCurrentApplicationWindowManually() else {
@@ -56,6 +57,7 @@ class ScrollModeViewController: ModeViewController, NSTextFieldDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         textField.stringValue = ""
         textField.isEditable = true
         textField.delegate = self
@@ -63,6 +65,7 @@ class ScrollModeViewController: ModeViewController, NSTextFieldDelegate {
         self.view.addSubview(textField)
         self.view.addSubview(borderView)
         
+        self.originalMousePosition = NSEvent.mouseLocation
         HideCursorGlobally.hide()
 
         self.scrollKeysDisposable = self.setActiveScrollArea(index: self.currentScrollAreaIndex)
@@ -228,6 +231,9 @@ class ScrollModeViewController: ModeViewController, NSTextFieldDelegate {
     }
     
     override func viewDidDisappear() {
+        if let pos = self.originalMousePosition {
+            Utils.moveMouse(position: Utils.toOrigin(point: pos, size: NSSize.zero))
+        }
         HideCursorGlobally.unhide()
         self.compositeDisposable.dispose()
         self.scrollKeysDisposable?.dispose()
