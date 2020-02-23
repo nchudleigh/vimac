@@ -62,6 +62,8 @@ class ScrollModeViewController: ModeViewController, NSTextFieldDelegate {
         textField.overlayTextFieldDelegate = self
         self.view.addSubview(textField)
         self.view.addSubview(borderView)
+        
+        HideCursorGlobally.hide()
 
         self.scrollKeysDisposable = self.setActiveScrollArea(index: self.currentScrollAreaIndex)
         
@@ -108,7 +110,7 @@ class ScrollModeViewController: ModeViewController, NSTextFieldDelegate {
         }
 
         resizeBorderViewToFitScrollArea(scrollAreaSize: scrollAreaSize, scrollAreaPosition: scrollAreaPosition)
-        moveMouseToScrollAreaBottomLeft(scrollAreaPosition: scrollAreaPosition, scrollAreaSize: scrollAreaSize)
+        moveMouseToScrollAreaCenter(scrollAreaPosition: scrollAreaPosition, scrollAreaSize: scrollAreaSize)
         return setupScrollObservers(scrollAreaSize: scrollAreaSize, scrollAreaPosition: scrollAreaPosition)
     }
     
@@ -212,20 +214,21 @@ class ScrollModeViewController: ModeViewController, NSTextFieldDelegate {
             shiftKKeyObservable
         ).merge()
         .do(onNext: { [weak self] in
-            self?.moveMouseToScrollAreaBottomLeft(scrollAreaPosition: scrollAreaPosition, scrollAreaSize: scrollAreaSize)
+            self?.moveMouseToScrollAreaCenter(scrollAreaPosition: scrollAreaPosition, scrollAreaSize: scrollAreaSize)
         })
         
         return allScrollObservables.subscribe()
     }
     
-    func moveMouseToScrollAreaBottomLeft(scrollAreaPosition: NSPoint, scrollAreaSize: NSSize) {
-        let positionX = scrollAreaPosition.x + 4
-        let positionY = scrollAreaPosition.y + scrollAreaSize.height - 4
+    func moveMouseToScrollAreaCenter(scrollAreaPosition: NSPoint, scrollAreaSize: NSSize) {
+        let positionX = scrollAreaPosition.x + (scrollAreaSize.width / 2)
+        let positionY = scrollAreaPosition.y + scrollAreaSize.height - (scrollAreaSize.height / 2)
         let position = NSPoint(x: positionX, y: positionY)
         Utils.moveMouse(position: position)
     }
     
     override func viewDidDisappear() {
+        HideCursorGlobally.unhide()
         self.compositeDisposable.dispose()
         self.scrollKeysDisposable?.dispose()
     }
