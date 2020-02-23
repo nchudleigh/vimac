@@ -62,6 +62,8 @@ class ScrollModeViewController: ModeViewController, NSTextFieldDelegate {
         textField.overlayTextFieldDelegate = self
         self.view.addSubview(textField)
         self.view.addSubview(borderView)
+        
+        HideCursorGlobally.hide()
 
         self.scrollKeysDisposable = self.setActiveScrollArea(index: self.currentScrollAreaIndex)
         
@@ -109,7 +111,6 @@ class ScrollModeViewController: ModeViewController, NSTextFieldDelegate {
 
         resizeBorderViewToFitScrollArea(scrollAreaSize: scrollAreaSize, scrollAreaPosition: scrollAreaPosition)
         moveMouseToScrollAreaCenter(scrollAreaPosition: scrollAreaPosition, scrollAreaSize: scrollAreaSize)
-        HideCursorGlobally.hide()
         return setupScrollObservers(scrollAreaSize: scrollAreaSize, scrollAreaPosition: scrollAreaPosition)
     }
     
