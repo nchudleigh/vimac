@@ -6,6 +6,7 @@
 //  Copyright © 2019 Dexter Leng. All rights reserved.
 //
 
+import Carbon
 import Cocoa
 import AXSwift
 import RxSwift
@@ -15,10 +16,15 @@ protocol Coordinator {
 }
 
 class ModeCoordinator : Coordinator {
+    var priorKBLayout: InputSource?
+    var forceKBLayout: InputSource?
+    var forceKBLayoutObservation: NSKeyValueObservation?
+    
     var windowController: OverlayWindowController
     
     init(windowController: OverlayWindowController) {
         self.windowController = windowController
+        self.forceKBLayoutObservation = observeForceKBInputSource()
     }
     
     func setCurrentWindow(window: UIElement?) {
@@ -26,10 +32,17 @@ class ModeCoordinator : Coordinator {
     }
     
     func exitMode() {
+        // if there is an active mode, remove its view controller and revert keyboard layout
         if let vc = self.windowController.window?.contentViewController {
             vc.view.removeFromSuperview()
             self.windowController.window?.contentViewController = nil
+            
+            // only reverse keyboard layout if user is forcing layout.
+            if self.forceKBLayout != nil {
+                self.priorKBLayout?.select()
+            }
         }
+
         self.windowController.close()
     }
     
@@ -42,6 +55,11 @@ class ModeCoordinator : Coordinator {
     }
     
     func setScrollMode() {
+        self.priorKBLayout = InputSourceManager.currentInputSource()
+        if let forceKBLayout = self.forceKBLayout {
+            forceKBLayout.select()
+        }
+        
         let vc = ScrollModeViewController.init()
         self.setViewController(vc: vc)
         vc.textField.becomeFirstResponder()
@@ -60,6 +78,11 @@ class ModeCoordinator : Coordinator {
                 return
         }
         
+        self.priorKBLayout = InputSourceManager.currentInputSource()
+        if let forceKBLayout = self.forceKBLayout {
+            forceKBLayout.select()
+        }
+        
         let windowFrame = NSRect(origin: windowPosition, size: windowSize)
         var windowElements = Utils.getUIElementChildrenRecursive(element: applicationWindow, parentContainerFrame: windowFrame)
         let menuBarElements = Utils.traverseForMenuBarItems(windowElement: applicationWindow)
@@ -67,4 +90,30 @@ class ModeCoordinator : Coordinator {
         let vc = HintModeViewController.init(elements: allElements)
         self.setViewController(vc: vc)
     }
+    
+    func observeForceKBInputSource() -> NSKeyValueObservation {
+        let observation = UserDefaults.standard.observe(\.ForceKeyboardLayout, options: [.initial, .new], changeHandler: { [weak self] (a, b) in
+            let id = b.newValue
+            var inputSource: InputSource? = nil
+            if let id = id {
+                inputSource = InputSourceManager.inputSources.first(where: { $0.id == id })
+            }
+            self?.forceKBLayout = inputSource
+        })
+        return observation
+    }
+}
+
+extension UserDefaults
+{
+    @objc dynamic var ForceKeyboardLayout: String?
+    {
+        get {
+            return string(forKey: Utils.forceKeyboardLayoutKey)
+        }
+        set {
+            set(newValue, forKey: Utils.forceKeyboardLayoutKey)
+        }
+    }
+
 }

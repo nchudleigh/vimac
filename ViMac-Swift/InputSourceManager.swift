@@ -56,12 +56,20 @@ class InputSource: Equatable {
 
     func select() {
         TISSelectInputSource(tisInputSource)
-
+        
+        // ABC -> Dvorak does work for some reason
+        // employ same logic as the CJKV case below
+        let nonCJKVAndNonTargetSource = InputSourceManager.inputSources.first(where: { $0.id != self.id && !$0.isCJKV })
+        if let x = nonCJKVAndNonTargetSource, let selectPreviousShortcut = InputSourceManager.getSelectPreviousShortcut() {
+            TISSelectInputSource(x.tisInputSource)
+            InputSourceManager.selectPrevious(shortcut: selectPreviousShortcut)
+        }
+        
         if isCJKV, let selectPreviousShortcut = InputSourceManager.getSelectPreviousShortcut() {
             // Workaround for TIS CJKV layout bug:
-            // when it's CJKV, select nonCJKV input first and then return
+            // when switching to CJKV, select nonCJKV input first and then switch back (by emitting the Select the previous input source shortcut)
             if let nonCJKV = InputSourceManager.nonCJKVSource() {
-                nonCJKV.select()
+                TISSelectInputSource(nonCJKV.tisInputSource)
                 InputSourceManager.selectPrevious(shortcut: selectPreviousShortcut)
             }
         }
@@ -90,14 +98,48 @@ class InputSourceManager {
         let key = CGKeyCode(shortcut.0)
         let flag = CGEventFlags(rawValue: shortcut.1)
 
-        let down = CGEvent(keyboardEventSource: src, virtualKey: key, keyDown: true)!
-        let up = CGEvent(keyboardEventSource: src, virtualKey: key, keyDown: false)!
+        let keyDown = CGEvent(keyboardEventSource: src, virtualKey: key, keyDown: true)!
+        let keyUp = CGEvent(keyboardEventSource: src, virtualKey: key, keyDown: false)!
 
-        down.flags = flag;
-        up.flags = flag;
-
-        down.post(tap: .cghidEventTap)
-        up.post(tap: .cghidEventTap)
+        keyDown.flags = flag;
+        keyUp.flags = flag;
+        
+        let modifierDownEvents = convertCGEventFlagToModifierKeyCodes(flag: flag)
+            .map({ keyCode in
+                return CGEvent(keyboardEventSource: src, virtualKey: UInt16(keyCode), keyDown: true)!
+            })
+        
+        let modifierUpEvents = convertCGEventFlagToModifierKeyCodes(flag: flag)
+            .map({ keyCode in
+                return CGEvent(keyboardEventSource: src, virtualKey: UInt16(keyCode), keyDown: false)!
+            })
+        
+        print(modifierDownEvents)
+        modifierDownEvents.forEach({ down in
+            down.post(tap: .cghidEventTap)
+        })
+        keyDown.post(tap: .cghidEventTap)
+        keyUp.post(tap: .cghidEventTap)
+        modifierUpEvents.forEach({ up in
+            up.post(tap: .cghidEventTap)
+        })
+    }
+    
+    static func convertCGEventFlagToModifierKeyCodes(flag: CGEventFlags) -> [Int] {
+        var modifierKeyCodes = [Int]()
+        if flag.contains(.maskControl) {
+            modifierKeyCodes.append(kVK_Control)
+        }
+        if flag.contains(.maskCommand) {
+            modifierKeyCodes.append(kVK_Command)
+        }
+        if flag.contains(.maskShift) {
+            modifierKeyCodes.append(kVK_Shift)
+        }
+        if flag.contains(.maskAlternate) {
+            modifierKeyCodes.append(kVK_Option)
+        }
+        return modifierKeyCodes
     }
 
     // from read-symbolichotkeys script of Karabiner
@@ -125,6 +167,10 @@ class InputSourceManager {
             (parameters[1] as! NSNumber).intValue,
             (parameters[2] as! NSNumber).uint64Value
         )
+    }
+    
+    static func currentInputSource() -> InputSource {
+        return InputSource(tisInputSource: TISCopyCurrentKeyboardInputSource().takeRetainedValue())
     }
 }
 

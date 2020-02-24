@@ -874,11 +874,24 @@
                                             <action selector="reverseHorizontalScrollChange:" target="Xcg-2B-Laa" id="E0n-UF-lST"/>
                                         </connections>
                                     </button>
+                                    <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8la-Vt-7dy">
+                                        <rect key="frame" x="238" y="17" width="77" height="25"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="5eM-yB-8sU">
+                                            <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                            <menu key="menu" id="MVX-EK-zkk"/>
+                                        </popUpButtonCell>
+                                        <connections>
+                                            <action selector="onForceKeyboardLayoutChange:" target="Xcg-2B-Laa" id="u6T-cn-sai"/>
+                                        </connections>
+                                    </popUpButton>
                                 </subviews>
                             </visualEffectView>
                         </subviews>
                     </view>
                     <connections>
+                        <outlet property="forceKeyboardLayout" destination="8la-Vt-7dy" id="M3a-oG-mDp"/>
                         <outlet property="hintModeShortcut" destination="GVY-1h-CEw" id="LgU-Fq-XCE"/>
                         <outlet property="reverseHorizontalScroll" destination="acu-OO-seP" id="Ook-cR-prZ"/>
                         <outlet property="reverseScroll" destination="Etd-bb-M6g" id="hbs-6Z-ruJ"/>

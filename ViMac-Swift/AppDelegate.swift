@@ -34,6 +34,7 @@ import Sparkle
     static let windowEvents: [AXNotification] = [.windowMiniaturized, .windowMoved, .windowResized]
     
     override init() {
+        InputSourceManager.initialize()
         let storyboard = NSStoryboard.init(name: "Main", bundle: nil)
         overlayWindowController = storyboard.instantiateController(withIdentifier: "overlayWindowControllerID") as! OverlayWindowController
         modeCoordinator = ModeCoordinator(windowController: overlayWindowController)

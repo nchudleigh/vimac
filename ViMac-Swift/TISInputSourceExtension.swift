@@ -41,6 +41,10 @@ extension TISInputSource {
     var isSelectable: Bool {
         return getProperty(kTISPropertyInputSourceIsSelectCapable) as! Bool
     }
+    
+    var isActive: Bool {
+        return getProperty(kTISPropertyInputSourceIsEnabled) as! Bool
+    }
 
     var sourceLanguages: [String] {
         return getProperty(kTISPropertyInputSourceLanguages) as! [String]
