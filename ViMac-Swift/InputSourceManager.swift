@@ -57,12 +57,14 @@ class InputSource: Equatable {
     func select() {
         TISSelectInputSource(tisInputSource)
         
-        // ABC -> Dvorak does work for some reason
-        // employ same logic as the CJKV case below
-        let nonCJKVAndNonTargetSource = InputSourceManager.inputSources.first(where: { $0.id != self.id && !$0.isCJKV })
-        if let x = nonCJKVAndNonTargetSource, let selectPreviousShortcut = InputSourceManager.getSelectPreviousShortcut() {
-            TISSelectInputSource(x.tisInputSource)
-            InputSourceManager.selectPrevious(shortcut: selectPreviousShortcut)
+        
+        if !isCJKV {
+            // employ same logic as the CJKV case below
+            let nonCJKVAndNonTargetSource = InputSourceManager.inputSources.first(where: { $0.id != self.id && !$0.isCJKV })
+            if let x = nonCJKVAndNonTargetSource, let selectPreviousShortcut = InputSourceManager.getSelectPreviousShortcut() {
+                TISSelectInputSource(x.tisInputSource)
+                InputSourceManager.selectPrevious(shortcut: selectPreviousShortcut)
+            }
         }
         
         if isCJKV, let selectPreviousShortcut = InputSourceManager.getSelectPreviousShortcut() {
