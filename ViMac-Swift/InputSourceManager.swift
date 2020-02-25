@@ -115,8 +115,7 @@ class InputSourceManager {
             .map({ keyCode in
                 return CGEvent(keyboardEventSource: src, virtualKey: UInt16(keyCode), keyDown: false)!
             })
-        
-        print(modifierDownEvents)
+
         modifierDownEvents.forEach({ down in
             down.post(tap: .cghidEventTap)
         })
