@@ -234,32 +234,20 @@ class Utils: NSObject {
     }
     
     static func traverseForExtraMenuBarItems() -> Observable<UIElement> {
-        return Observable.create({ observer in
-            DispatchQueue.global().async {
-                let menuBarItems = Application.all()
-                    .map({ app -> CachedUIElement? in
-                        let attributes = try? app.attributes() ?? []
-                        if attributes?.contains(.extrasMenuBar) ?? false {
-                            let menuBarOptional = try? app.attribute(.extrasMenuBar) as UIElement?
-                            guard let menuBar = menuBarOptional else {
-                                return nil
-                            }
-                            return CachedUIElement(menuBar.element)
-                        }
-                        return nil
-                    })
-                    .compactMap({ $0 })
-                    .flatMap({ menuBar -> [UIElement] in
-                        let menuBarItems = try? menuBar.attribute(.children) as [AXUIElement]?
-                        return (menuBarItems ?? []).map({ CachedUIElement($0) })
-                    })
-                for menuBarItem in menuBarItems {
-                    observer.onNext(menuBarItem)
-                }
-                observer.onCompleted()
-            }
-            return Disposables.create()
-        })
+        let menuBars = eagerConcat(observables: Application.all()
+            .map({ app -> Observable<UIElement> in
+                let menuBarOptional: Observable<UIElement?> = getElementAttribute(element: app, attribute: .extrasMenuBar)
+                return menuBarOptional.compactMap({ $0 })
+            })
+        )
+        return menuBars
+            .flatMap({ menuBar -> Observable<[CachedUIElement]> in
+                return getChildren(element: menuBar)
+            })
+            .flatMap({ menuBarItems -> Observable<CachedUIElement> in
+                return Observable.from(menuBarItems)
+            })
+            .map({ UIElement($0.element) })
     }
     
     // For performance reasons Chromium only makes the webview accessible when there it detects voiceover through the `AXEnhancedUserInterface` attribute on the Chrome application itself:
