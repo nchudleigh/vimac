@@ -63,7 +63,9 @@ class ModeCoordinator : Coordinator {
         let windowFrame = NSRect(origin: windowPosition, size: windowSize)
         var windowElements = Utils.getUIElementChildrenRecursive(element: applicationWindow, parentContainerFrame: windowFrame)
         let menuBarElements = Utils.traverseForMenuBarItems(windowElement: applicationWindow)
-        let allElements = Observable.merge(windowElements, menuBarElements)
+        let extraMenuBarElements = Utils.traverseForExtraMenuBarItems()
+        
+        let allElements = Observable.merge(windowElements, menuBarElements, extraMenuBarElements)
         let vc = HintModeViewController.init(elements: allElements)
         self.setViewController(vc: vc)
     }
