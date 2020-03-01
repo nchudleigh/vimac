@@ -28,6 +28,9 @@
 		E26981B523C99DF900E46217 /* WelcomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26981B423C99DF900E46217 /* WelcomeViewController.swift */; };
 		E26981B923C9E31600E46217 /* InputSourceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26981B823C9E31600E46217 /* InputSourceManager.swift */; };
 		E26981BB23C9E35D00E46217 /* TISInputSourceExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26981BA23C9E35D00E46217 /* TISInputSourceExtension.swift */; };
+		E27776E3240B780D00488320 /* LaunchAtLogin.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E27776E2240B780D00488320 /* LaunchAtLogin.framework */; };
+		E27776E4240B780D00488320 /* LaunchAtLogin.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = E27776E2240B780D00488320 /* LaunchAtLogin.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		E27776E8240B784900488320 /* LaunchAtLogin.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = E27776E7240B784900488320 /* LaunchAtLogin.framework.dSYM */; };
 		E28867F0235F54F2001691A5 /* Vimac.icns in Resources */ = {isa = PBXBuildFile; fileRef = E28867EF235F54F1001691A5 /* Vimac.icns */; };
 		E2C29562234DD7F8001A38D6 /* OverlayWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2C29561234DD7F8001A38D6 /* OverlayWindowController.swift */; };
 		E2C29566234DE09C001A38D6 /* ModeCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2C29565234DE09C001A38D6 /* ModeCoordinator.swift */; };
@@ -57,6 +60,30 @@
 			remoteInfo = "ViMac-Swift";
 		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		E27776E5240B780D00488320 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				E27776E4240B780D00488320 /* LaunchAtLogin.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E27776E6240B782800488320 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 16;
+			files = (
+				E27776E8240B784900488320 /* LaunchAtLogin.framework.dSYM in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		5C2149530237D83CD0BBC27E /* Pods-VimacUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VimacUITests.debug.xcconfig"; path = "Target Support Files/Pods-VimacUITests/Pods-VimacUITests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -94,6 +121,8 @@
 		E26981B423C99DF900E46217 /* WelcomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeViewController.swift; sourceTree = "<group>"; };
 		E26981B823C9E31600E46217 /* InputSourceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputSourceManager.swift; sourceTree = "<group>"; };
 		E26981BA23C9E35D00E46217 /* TISInputSourceExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TISInputSourceExtension.swift; sourceTree = "<group>"; };
+		E27776E2240B780D00488320 /* LaunchAtLogin.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = LaunchAtLogin.framework; path = Carthage/Build/Mac/LaunchAtLogin.framework; sourceTree = "<group>"; };
+		E27776E7240B784900488320 /* LaunchAtLogin.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = LaunchAtLogin.framework.dSYM; path = Carthage/Build/Mac/LaunchAtLogin.framework.dSYM; sourceTree = "<group>"; };
 		E28867EF235F54F1001691A5 /* Vimac.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Vimac.icns; sourceTree = SOURCE_ROOT; };
 		E2C29561234DD7F8001A38D6 /* OverlayWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayWindowController.swift; sourceTree = "<group>"; };
 		E2C29565234DE09C001A38D6 /* ModeCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModeCoordinator.swift; sourceTree = "<group>"; };
@@ -113,6 +142,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E27776E3240B780D00488320 /* LaunchAtLogin.framework in Frameworks */,
 				285448C8DFA037E9228938B9 /* Pods_Vimac.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -152,6 +182,7 @@
 		A714F2240DB82D97A12A79E9 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				E27776E2240B780D00488320 /* LaunchAtLogin.framework */,
 				A6BBF07B6655F54781C7A225 /* Pods_Vimac.framework */,
 				E3838C26CF2EE35337E477D6 /* Pods_VimacTests.framework */,
 				85E207A8CB4C294752F7C738 /* Pods_VimacUITests.framework */,
@@ -181,6 +212,7 @@
 		E26172172322968500E396CA = {
 			isa = PBXGroup;
 			children = (
+				E27776E7240B784900488320 /* LaunchAtLogin.framework.dSYM */,
 				E26172222322968500E396CA /* ViMac-Swift */,
 				E26172352322968700E396CA /* ViMac-SwiftTests */,
 				E26172402322968700E396CA /* ViMac-SwiftUITests */,
@@ -282,6 +314,9 @@
 				E20696FA23294E25001EFDB2 /* ShellScript */,
 				E261721E2322968500E396CA /* Resources */,
 				B3CE1D10BB47F45CF7F30714 /* [CP] Embed Pods Frameworks */,
+				E27776E1240B765E00488320 /* ShellScript */,
+				E27776E5240B780D00488320 /* Embed Frameworks */,
+				E27776E6240B782800488320 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -503,6 +538,23 @@
 			shellPath = /bin/sh;
 			shellScript = "osascript grant-accessibility-permission-dev.scpt \n";
 		};
+		E27776E1240B765E00488320 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n\"${PROJECT_DIR}/Carthage/Build/Mac/LaunchAtLogin.framework/Resources/copy-helper.sh\"\n";
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -707,6 +759,10 @@
 				CODE_SIGN_ENTITLEMENTS = "ViMac-Swift/ViMac_Swift.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/Mac",
+				);
 				INFOPLIST_FILE = "ViMac-Swift/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -728,6 +784,10 @@
 				CODE_SIGN_ENTITLEMENTS = "ViMac-Swift/ViMac_Swift.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/Mac",
+				);
 				INFOPLIST_FILE = "ViMac-Swift/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
