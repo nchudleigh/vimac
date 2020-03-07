@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="15702" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="15705" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="15702"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="15705"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -874,11 +874,33 @@
                                             <action selector="reverseHorizontalScrollChange:" target="Xcg-2B-Laa" id="E0n-UF-lST"/>
                                         </connections>
                                     </button>
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="BKQ-9M-LAa">
+                                        <rect key="frame" x="80" y="24" width="148" height="16"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Force Keyboard Layout:" id="Ptf-hf-vNF">
+                                            <font key="font" metaFont="system"/>
+                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                    </textField>
+                                    <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8la-Vt-7dy">
+                                        <rect key="frame" x="251" y="18" width="150" height="25"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="5eM-yB-8sU">
+                                            <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="menu"/>
+                                            <menu key="menu" id="MVX-EK-zkk"/>
+                                        </popUpButtonCell>
+                                        <connections>
+                                            <action selector="onForceKeyboardLayoutChange:" target="Xcg-2B-Laa" id="u6T-cn-sai"/>
+                                        </connections>
+                                    </popUpButton>
                                 </subviews>
                             </visualEffectView>
                         </subviews>
                     </view>
                     <connections>
+                        <outlet property="forceKeyboardLayout" destination="8la-Vt-7dy" id="M3a-oG-mDp"/>
                         <outlet property="hintModeShortcut" destination="GVY-1h-CEw" id="LgU-Fq-XCE"/>
                         <outlet property="reverseHorizontalScroll" destination="acu-OO-seP" id="Ook-cR-prZ"/>
                         <outlet property="reverseScroll" destination="Etd-bb-M6g" id="hbs-6Z-ruJ"/>

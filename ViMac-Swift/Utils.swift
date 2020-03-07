@@ -17,6 +17,7 @@ class Utils: NSObject {
     static let scrollSensitivityKey = "ScrollSensitivity"
     static let isVerticalScrollReversedKey = "IsVerticalScrollReversed"
     static let isHorizontalScrollReversedKey = "IsHorizontalScrollReversed"
+    static let forceKeyboardLayoutKey = "ForceKeyboardLayout"
     
     static func registerDefaults() {
         UserDefaults.standard.register(defaults: [
