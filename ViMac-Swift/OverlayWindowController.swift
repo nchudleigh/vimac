@@ -18,3 +18,4 @@ class OverlayWindowController: NSWindowController {
         self.window?.setFrame(NSScreen.main!.frame, display: true, animate: false)
     }
 }
+    

@@ -12,6 +12,7 @@ import RxSwift
 import MASShortcut
 import os
 import Sparkle
+import LaunchAtLogin
 
 @NSApplicationMain
     class AppDelegate: NSObject, NSApplicationDelegate {
@@ -102,6 +103,8 @@ import Sparkle
                 })
             return Disposables.create()
         }
+        
+        LaunchAtLogin.isEnabled = UserDefaults.standard.bool(forKey: Utils.shouldLaunchOnStartupKey)
         
         self.compositeDisposable = CompositeDisposable()
         

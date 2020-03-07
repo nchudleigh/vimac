@@ -18,12 +18,14 @@ class Utils: NSObject {
     static let isVerticalScrollReversedKey = "IsVerticalScrollReversed"
     static let isHorizontalScrollReversedKey = "IsHorizontalScrollReversed"
     static let forceKeyboardLayoutKey = "ForceKeyboardLayout"
+    static let shouldLaunchOnStartupKey = "ShouldLaunchOnStartupKey"
     
     static func registerDefaults() {
         UserDefaults.standard.register(defaults: [
             Utils.scrollSensitivityKey: 20,
             Utils.isVerticalScrollReversedKey: false,
             Utils.isHorizontalScrollReversedKey: false,
+            Utils.shouldLaunchOnStartupKey: false
         ])
     }
     

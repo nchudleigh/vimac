@@ -8,6 +8,7 @@
 
 import Cocoa
 import MASShortcut
+import LaunchAtLogin
 
 class PreferencesGeneralViewController: NSViewController {
     @IBOutlet weak var scrollSensitivitySlider: NSSlider!
@@ -17,6 +18,7 @@ class PreferencesGeneralViewController: NSViewController {
     @IBOutlet weak var reverseHorizontalScroll: NSButton!
     @IBOutlet weak var forceKeyboardLayout: NSPopUpButton!
     let inputSources = InputSourceManager.inputSources
+    @IBOutlet weak var shouldLaunchOnStartup: NSButton!
     
     override func viewWillAppear() {
         scrollSensitivitySlider.integerValue = UserDefaults.standard.integer(forKey: Utils.scrollSensitivityKey)
@@ -49,6 +51,7 @@ class PreferencesGeneralViewController: NSViewController {
             }
             
         }
+        shouldLaunchOnStartup.state = UserDefaults.standard.bool(forKey: Utils.shouldLaunchOnStartupKey) ? .on : .off
     }
     
     override func viewDidLoad() {
@@ -74,5 +77,12 @@ class PreferencesGeneralViewController: NSViewController {
     @IBAction func onForceKeyboardLayoutChange(_ sender: Any) {
         let newInputSource = forceKeyboardLayout.selectedItem?.representedObject as? InputSource?
         UserDefaults.standard.set(newInputSource??.id, forKey: Utils.forceKeyboardLayoutKey)
+    }
+
+    @IBAction func launchOnStartupChange(_ sender: Any) {
+        let shouldLaunch = shouldLaunchOnStartup.state == .on
+        UserDefaults.standard.set(shouldLaunch, forKey: Utils.shouldLaunchOnStartupKey)
+        
+        LaunchAtLogin.isEnabled = shouldLaunch
     }
 }
