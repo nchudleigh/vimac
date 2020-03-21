@@ -77,7 +77,7 @@ class ModeCoordinator : Coordinator {
             forceKBLayout.select()
         }
         
-        var windowElements = Utils.getWindowElements(windowElement: applicationWindow)
+        let windowElements = Utils.getWindowElements(windowElement: applicationWindow)
         let menuBarElements = Utils.traverseForMenuBarItems(windowElement: applicationWindow)
         let extraMenuBarElements = Utils.traverseForExtraMenuBarItems()
         let notificationCenterElements = Utils.traverseForNotificationCenterItems()
