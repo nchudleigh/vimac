@@ -155,8 +155,10 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
                 .observeOn(MainScheduler.instance)
                 .subscribe(
                 onSuccess: { [weak self] elements in
-                    self?.onElementTraversalComplete(elements: elements.filter({
-                        ((try? $0.actionsAsStrings().count) ?? 0) > 0
+                    self?.onElementTraversalComplete(elements: elements.filter({ element in
+                        let actionCount = (try? element.actionsAsStrings().count) ?? 0
+                        let role = try? element.role()
+                        return actionCount > 0 || role == Role.row
                     }))
                 }, onError: { error in
                     print(error)
