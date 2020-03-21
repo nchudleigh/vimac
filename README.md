@@ -1,13 +1,40 @@
-<div align="center">
-  <h1>Vimac</h1>
-  <p>Vimium for macOS.</p>
-</div>
+# Vimac
+
+Vimium for macOS.
 
 ## Download
 
 You can find releases in [dexterleng/vimac-releases](https://github.com/dexterleng/vimac-releases).
 
-You can find the download link for v0.3.6 [here](https://github.com/dexterleng/vimac-releases/raw/master/vimac-v0.3.6.zip).
+You can find the download link for v0.3.7 [here](https://github.com/dexterleng/vimac-releases/raw/master/vimac-v0.3.7.zip).
+
+## Instaling
+
+Note that Mojave is the minimum version supported right now. Catalina has not been tested. You will need to give Vimac **Accessibility** permissions in **Security & Privacy.**
+
+:warning: **When you update Vimac, even though the app is in the permissions list, you have to untick and tick it (or remove and add back) for permissions to be granted.**
+
+## How to use Vimac
+
+**Hint Mode (CTRL+SPACE)** \
+Once Hint Mode is activated you can typed the hint letters to perform a click.
+
+**Right-Click** \
+Hold SHIFT while typing the hint text.
+
+**Double-Click** \
+Hold CMD while typing the hint text. \
+You can cycle between all hints and hints only for actionable elements with TAB.
+
+**Scrolling (CTRL+S)** \
+Scroll mode allows you to scroll with HJKL + DU keys. \
+D and U scroll the page down and up respectively by half the height of the scroll area. \
+You can cycle through the scroll areas with the TAB key.
+
+## Tips
+
+* When the yellow hints are shown on-screen, you can use the Spacebar to rotate the height of the overlapping hints.
+* After executing a right-click command, use the arrow-keys + Enter to select one of the menu items.
 
 ## Building
 
