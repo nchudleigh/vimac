@@ -138,6 +138,15 @@ class Utils: NSObject {
             })
     }
     
+    static func getWindowElements(windowElement: UIElement) -> Observable<UIElement> {
+        guard let windowSize: NSSize = try? windowElement.attribute(.size),
+            let windowPosition: NSPoint = try? windowElement.attribute(.position) else {
+                return Observable.empty()
+        }
+        let windowFrame = NSRect(origin: windowPosition, size: windowSize)
+        return Utils.getUIElementChildrenRecursive(element: windowElement, parentContainerFrame: windowFrame)
+    }
+    
     // eagerConcat behaves like concat but all the observables are fired simultaneously instead of only after the previous ones are completed.
     static func eagerConcat<T>(observables: [Observable<T>]) -> Observable<T> {
         let taggedWithIndex = observables.enumerated().map({ (index, element) in
@@ -251,6 +260,17 @@ class Utils: NSObject {
                 return Observable.from(menuBarItems)
             })
             .map({ UIElement($0.element) })
+    }
+    
+    static func traverseForNotificationCenterItems() -> Observable<UIElement> {
+        let notificationAppOptional = NSWorkspace.shared.runningApplications.first(where: { $0.localizedName == "Notification Centre" })
+        guard let notificationApp = notificationAppOptional,
+            let notificationAppUIElement = Application(notificationApp) else {
+            return Observable.empty()
+        }
+        
+        let windows = (try? notificationAppUIElement.windows()) ?? []
+        return eagerConcat(observables: windows.map({ getWindowElements(windowElement: $0 ) }))
     }
     
     // For performance reasons Chromium only makes the webview accessible when there it detects voiceover through the `AXEnhancedUserInterface` attribute on the Chrome application itself:

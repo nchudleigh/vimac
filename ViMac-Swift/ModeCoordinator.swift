@@ -72,23 +72,17 @@ class ModeCoordinator : Coordinator {
             return
         }
         
-        guard let windowSize: NSSize = try? applicationWindow.attribute(.size),
-            let windowPosition: NSPoint = try? applicationWindow.attribute(.position) else {
-                self.exitMode()
-                return
-        }
-        
         self.priorKBLayout = InputSourceManager.currentInputSource()
         if let forceKBLayout = self.forceKBLayout {
             forceKBLayout.select()
         }
         
-        let windowFrame = NSRect(origin: windowPosition, size: windowSize)
-        var windowElements = Utils.getUIElementChildrenRecursive(element: applicationWindow, parentContainerFrame: windowFrame)
+        var windowElements = Utils.getWindowElements(windowElement: applicationWindow)
         let menuBarElements = Utils.traverseForMenuBarItems(windowElement: applicationWindow)
         let extraMenuBarElements = Utils.traverseForExtraMenuBarItems()
+        let notificationCenterElements = Utils.traverseForNotificationCenterItems()
         
-        let allElements = Observable.merge(windowElements, menuBarElements, extraMenuBarElements)
+        let allElements = Observable.merge(windowElements, menuBarElements, extraMenuBarElements, notificationCenterElements)
         let vc = HintModeViewController.init(elements: allElements)
         self.setViewController(vc: vc)
     }
