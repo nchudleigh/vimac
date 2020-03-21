@@ -34,7 +34,7 @@ You can cycle through the scroll areas with the TAB key.
 ## Tips
 
 * When the yellow hints are shown on-screen, you can use the Spacebar to rotate the height of the overlapping hints.
-* After executing a right-click command, use the arrow-keys + Enter to select one of the menu items.
+* After executing a right-click command, use CTRL-N and CTRL-P to select the next and previous menu bar item respectively.
 
 ## Building
 
