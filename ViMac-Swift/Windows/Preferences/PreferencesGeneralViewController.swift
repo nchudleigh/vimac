@@ -19,11 +19,19 @@ class PreferencesGeneralViewController: NSViewController {
     @IBOutlet weak var forceKeyboardLayout: NSPopUpButton!
     let inputSources = InputSourceManager.inputSources
     @IBOutlet weak var shouldLaunchOnStartup: NSButton!
+    @IBOutlet weak var hintCharacters: NSTextField!
     
+
     override func viewWillAppear() {
         scrollSensitivitySlider.integerValue = UserDefaults.standard.integer(forKey: Utils.scrollSensitivityKey)
         reverseVerticalScroll.state = UserDefaults.standard.bool(forKey: Utils.isVerticalScrollReversedKey) ? .on : .off
         reverseHorizontalScroll.state = UserDefaults.standard.bool(forKey: Utils.isHorizontalScrollReversedKey) ? .on : .off
+        
+        var hintCharacters_ = UserDefaults.standard.string(forKey: Utils.hintCharacters) ?? ""
+        if hintCharacters_.count < 3 {
+            hintCharacters_ = AlphabetHints.defaultHintCharacters
+        }
+        hintCharacters.stringValue = hintCharacters_
         
         let menuItems = inputSources.map({ source -> NSMenuItem in
             let menuItem = NSMenuItem.init()
@@ -84,5 +92,9 @@ class PreferencesGeneralViewController: NSViewController {
         UserDefaults.standard.set(shouldLaunch, forKey: Utils.shouldLaunchOnStartupKey)
         
         LaunchAtLogin.isEnabled = shouldLaunch
+    }
+
+    @IBAction func onHintCharactersChange(_ sender: Any) {
+        UserDefaults.standard.set(hintCharacters.stringValue, forKey: Utils.hintCharacters)
     }
 }

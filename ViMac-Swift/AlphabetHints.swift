@@ -9,10 +9,15 @@
 // Refer to:
 // https://github.com/philc/vimium/blob/881a6fdc3644f55fc02ad56454203f654cc76618/content_scripts/link_hints.coffee#L434
 class AlphabetHints {
-    let linkHintCharacters = "sadfjklewcmpgh"
+    static let defaultHintCharacters = "sadfjklewcmpgh"
     let hintKeystrokeQueue: [String] = []
     
     func hintStrings(linkCount: Int) -> [String] {
+        var hintCharacters = UserDefaults.standard.string(forKey: Utils.hintCharacters) ?? ""
+        if hintCharacters.count < 3 {
+            hintCharacters = AlphabetHints.defaultHintCharacters
+        }
+        
         if linkCount == 0 {
             return []
         }
@@ -22,7 +27,7 @@ class AlphabetHints {
         while hints.count - offset < linkCount || hints.count == 1 {
             let hint = hints[offset]
             offset += 1
-            for allowedCharacter in linkHintCharacters {
+            for allowedCharacter in hintCharacters {
                 hints.append(String(allowedCharacter) + hint)
             }
         }
