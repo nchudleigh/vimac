@@ -145,30 +145,48 @@ class ScrollModeViewController: ModeViewController, NSTextFieldDelegate {
         let verticalScrollMultiplier = isVerticalScrollReversed ? -1 : 1
         let horizontalScrollMultiplier = isHorizontalScrollReversed ? -1 : 1
         
+        var _scrollCharacters = (UserDefaults.standard.string(forKey: Utils.scrollCharacters) ?? "hjkldu").lowercased()
+        if _scrollCharacters.count != 6 {
+            _scrollCharacters = "hjkldu"
+        }
+        
+        let scrollLeftKey = _scrollCharacters[_scrollCharacters.index(_scrollCharacters.startIndex, offsetBy: 0)]
+        let scrollDownKey = _scrollCharacters[_scrollCharacters.index(_scrollCharacters.startIndex, offsetBy: 1)]
+        let scrollUpKey = _scrollCharacters[_scrollCharacters.index(_scrollCharacters.startIndex, offsetBy: 2)]
+        let scrollRightKey = _scrollCharacters[_scrollCharacters.index(_scrollCharacters.startIndex, offsetBy: 3)]
+        
+        let scrollLeftKeyUpperCased = Character(scrollLeftKey.uppercased())
+        let scrollDownKeyUpperCased = Character(scrollDownKey.uppercased())
+        let scrollUpKeyUpperCased = Character(scrollUpKey.uppercased())
+        let scrollRightKeyUpperCased = Character(scrollRightKey.uppercased())
+        
+        let altScrollDownKey = Character(_scrollCharacters[_scrollCharacters.index(_scrollCharacters.startIndex, offsetBy: 4)].lowercased())
+        let altScrollUpKey = Character(_scrollCharacters[_scrollCharacters.index(_scrollCharacters.startIndex, offsetBy: 5)].lowercased())
+        
         let jKeyObservable = ScrollModeViewController.scrollObservableSmooth(
                 textField: textField,
-                character: "j",
+                character: scrollDownKey,
                 yAxis: Int64(-1 * verticalScrollMultiplier * scrollSensitivity),
                 xAxis: 0,
                 frequencyMilliseconds: 20)
         
         let kKeyObservable = ScrollModeViewController.scrollObservableSmooth(
                 textField: textField,
-                character: "k",
+                character: scrollUpKey,
                 yAxis: Int64(verticalScrollMultiplier * scrollSensitivity),
                 xAxis: 0,
                 frequencyMilliseconds: 20)
         
         let hKeyObservable = ScrollModeViewController.scrollObservableSmooth(
                 textField: textField,
-                character: "h",
+                character: scrollLeftKey,
                 yAxis: 0,
                 xAxis: Int64(horizontalScrollMultiplier * scrollSensitivity),
                 frequencyMilliseconds: 20)
         
         let lKeyObservable = ScrollModeViewController.scrollObservableSmooth(
                 textField: textField,
-                character: "l",
+                character: scrollRightKey,
                 yAxis: 0,
                 xAxis: Int64(-1 * horizontalScrollMultiplier * scrollSensitivity),
                 frequencyMilliseconds: 20)
@@ -178,41 +196,41 @@ class ScrollModeViewController: ModeViewController, NSTextFieldDelegate {
         
         let dKeyObservable = ScrollModeViewController.scrollObservableChunky(
                 textField: textField,
-                character: "d",
+                character: altScrollDownKey,
                 yAxis: verticalScrollMultiplier * -1 * halfScrollAreaHeight,
                 xAxis: 0, frequencyMilliseconds: 200)
-        
+
         let uKeyObservable = ScrollModeViewController.scrollObservableChunky(
                 textField: textField,
-                character: "u",
+                character: altScrollUpKey,
                 yAxis: verticalScrollMultiplier * halfScrollAreaHeight,
                 xAxis: 0,
                 frequencyMilliseconds: 200)
         
         let shiftHKeyObservable = ScrollModeViewController.scrollObservableChunky(
                 textField: textField,
-                character: "H",
+                character: scrollLeftKeyUpperCased,
                 yAxis: 0,
                 xAxis: horizontalScrollMultiplier * halfScrollAreaWidth,
                 frequencyMilliseconds: 200)
         
         let shiftLKeyObservable = ScrollModeViewController.scrollObservableChunky(
                 textField: textField,
-                character: "L",
+                character: scrollRightKeyUpperCased,
                 yAxis: 0,
                 xAxis: -1 * horizontalScrollMultiplier * halfScrollAreaWidth,
                 frequencyMilliseconds: 200)
         
         let shiftJKeyObservable = ScrollModeViewController.scrollObservableChunky(
                 textField: textField,
-                character: "J",
+                character: scrollDownKeyUpperCased,
                 yAxis: -1 * verticalScrollMultiplier * halfScrollAreaHeight,
                 xAxis: 0,
                 frequencyMilliseconds: 200)
         
         let shiftKKeyObservable = ScrollModeViewController.scrollObservableChunky(
                 textField: textField,
-                character: "K",
+                character: scrollUpKeyUpperCased,
                 yAxis: verticalScrollMultiplier * halfScrollAreaHeight,
                 xAxis: 0,
                 frequencyMilliseconds: 200)

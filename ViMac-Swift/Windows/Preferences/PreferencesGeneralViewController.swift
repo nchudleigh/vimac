@@ -20,6 +20,7 @@ class PreferencesGeneralViewController: NSViewController {
     let inputSources = InputSourceManager.inputSources
     @IBOutlet weak var shouldLaunchOnStartup: NSButton!
     @IBOutlet weak var hintCharacters: NSTextField!
+    @IBOutlet weak var scrollCharacters: NSTextField!
     
 
     override func viewWillAppear() {
@@ -32,6 +33,12 @@ class PreferencesGeneralViewController: NSViewController {
             hintCharacters_ = AlphabetHints.defaultHintCharacters
         }
         hintCharacters.stringValue = hintCharacters_
+        
+        var _scrollCharacters = UserDefaults.standard.string(forKey: Utils.scrollCharacters) ?? "hjkldu"
+        if _scrollCharacters.count != 6 {
+            _scrollCharacters = "hjkldu"
+        }
+        scrollCharacters.stringValue = _scrollCharacters
         
         let menuItems = inputSources.map({ source -> NSMenuItem in
             let menuItem = NSMenuItem.init()
@@ -96,5 +103,8 @@ class PreferencesGeneralViewController: NSViewController {
 
     @IBAction func onHintCharactersChange(_ sender: Any) {
         UserDefaults.standard.set(hintCharacters.stringValue, forKey: Utils.hintCharacters)
+    }
+    @IBAction func onScrollCharactersChange(_ sender: Any) {
+        UserDefaults.standard.set(scrollCharacters.stringValue.lowercased(), forKey: Utils.scrollCharacters)
     }
 }
