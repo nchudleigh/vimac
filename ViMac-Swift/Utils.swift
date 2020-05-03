@@ -20,6 +20,7 @@ class Utils: NSObject {
     static let forceKeyboardLayoutKey = "ForceKeyboardLayout"
     static let shouldLaunchOnStartupKey = "ShouldLaunchOnStartupKey"
     static let hintCharacters = "HintCharacters"
+    static let scrollCharacters = "ScrollCharacters"
     
     static func registerDefaults() {
         UserDefaults.standard.register(defaults: [
