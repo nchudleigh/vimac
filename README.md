@@ -8,7 +8,7 @@ You can find releases in [dexterleng/vimac-releases](https://github.com/dexterle
 
 You can find the download link for v0.3.7 [here](https://github.com/dexterleng/vimac-releases/raw/master/vimac-v0.3.7.zip).
 
-## Instaling
+## Installing
 
 Note that Mojave is the minimum version supported right now. Catalina has not been tested. You will need to give Vimac **Accessibility** permissions in **Security & Privacy.**
 
