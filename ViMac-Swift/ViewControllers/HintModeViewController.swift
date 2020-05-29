@@ -187,6 +187,12 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
                         }
                         let x = (topLeftPositionRelativeToWindow.x + (buttonSize.width / 2)) - (text.frame.size.width / 2)
                         let y = (topLeftPositionRelativeToWindow.y - (buttonSize.height) / 2) + (text.frame.size.height / 2)
+                        
+                        // buttonSize.width/height and topLeftPositionRelativeToScreen.x/y can be NaN
+                        if x.isNaN || y.isNaN {
+                            return nil
+                        }
+                        
                         return NSPoint(x: x, y: y)
                     } catch {
                         return nil
