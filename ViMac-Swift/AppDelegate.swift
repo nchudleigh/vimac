@@ -13,6 +13,7 @@ import MASShortcut
 import os
 import Sparkle
 import LaunchAtLogin
+import Preferences
 
 @NSApplicationMain
     class AppDelegate: NSObject, NSApplicationDelegate {

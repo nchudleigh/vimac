@@ -8,11 +8,18 @@
 
 import Cocoa
 import Sparkle
+import Preferences
 
 class StatusItemManager: NSMenu, NSMenuDelegate {
     static let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
     
-    var controller: NSWindowController?
+    lazy var controller = PreferencesWindowController(
+        preferencePanes: [
+            GeneralPreferenceViewController(),
+            HintModePreferenceViewController(),
+        ],
+        style: .segmentedControl
+    )
     
     override func awakeFromNib() {
         guard let button = StatusItemManager.statusItem.button else {
@@ -34,11 +41,7 @@ class StatusItemManager: NSMenu, NSMenuDelegate {
     }
     
     @objc func preferencesClick() {
-        let storyboard = NSStoryboard.init(name: "Main", bundle: nil)
-        controller = storyboard.instantiateController(withIdentifier: "PreferencesWindowController") as! NSWindowController
-        NSApp.activate(ignoringOtherApps: true)
-        controller?.showWindow(nil)
-        controller?.window?.makeKeyAndOrderFront(nil)
+        controller.show()
     }
     
     @objc func checkForUpdatesClick() {
