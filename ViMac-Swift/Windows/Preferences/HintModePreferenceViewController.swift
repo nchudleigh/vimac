@@ -15,18 +15,7 @@ final class HintModePreferenceViewController: NSViewController, PreferencePane {
     let compositeDisposable = CompositeDisposable()
     
     lazy var customCharactersViewObservable = customCharactersView.rx.text.map({ $0! })
-
-    lazy var customCharactersViewValidityChangeObservable = customCharactersViewObservable.distinctUntilChanged({ [weak self] (a, b) in
-        let bIsValid = self!.isCustomCharactersValid(characters: b)
-        
-        if bIsValid {
-            return false
-        }
-        
-        let aIsValid = self!.isCustomCharactersValid(characters: a)
-        
-        return aIsValid == bIsValid
-    })
+    lazy var customCharactersViewValidityChangeObservable = customCharactersViewObservable.distinctUntilChanged()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -35,7 +24,8 @@ final class HintModePreferenceViewController: NSViewController, PreferencePane {
         
         hintModeShortcutView.associatedUserDefaultsKey = Utils.hintModeShortcutKey
         
-        compositeDisposable.insert(observeCustomCharacters())
+        compositeDisposable.insert(observeCustomCharactersChange())
+        compositeDisposable.insert(observeCustomCharactersValidityChange())
     }
 
     deinit {
@@ -46,10 +36,22 @@ final class HintModePreferenceViewController: NSViewController, PreferencePane {
         return UserDefaults.standard.string(forKey: Utils.hintCharacters) ?? ""
     }
     
+    func observeCustomCharactersChange() -> Disposable {
+        return customCharactersViewObservable.bind(onNext: { [weak self] characters in
+            self?.serializeCustomCharacters(characters: characters)
+        })
+    }
     
-    func observeCustomCharacters() -> Disposable {
+    func observeCustomCharactersValidityChange() -> Disposable {
         return customCharactersViewValidityChangeObservable.bind(onNext: { [weak self] characters in
-            self?.onCustomCharactersChange(characters: characters)
+            let isValid = self!.isCustomCharactersValid(characters: characters)
+            
+            if !isValid {
+                self?.changeCustomTextViewBackgroundColor(color: NSColor.init(calibratedRed: 132/255, green: 46/255, blue: 48/255, alpha: 1))
+                return
+            }
+            
+            self?.changeCustomTextViewBackgroundColor(color: NSColor.black)
         })
     }
     
@@ -61,19 +63,6 @@ final class HintModePreferenceViewController: NSViewController, PreferencePane {
         customCharactersView.isEditable = false
         customCharactersView.isEditable = true
     }
-    
-    func onCustomCharactersChange(characters: String) {
-        let isValidInput = isCustomCharactersValid(characters: characters)
-        
-        if !isValidInput {
-            changeCustomTextViewBackgroundColor(color: NSColor.init(calibratedRed: 132/255, green: 46/255, blue: 48/255, alpha: 1))
-            serializeCustomCharacters(characters: AlphabetHints.defaultHintCharacters)
-            return
-        }
-        
-        changeCustomTextViewBackgroundColor(color: NSColor.black)
-        serializeCustomCharacters(characters: characters)
-    }
 
     func isCustomCharactersValid(characters: String) -> Bool {
         let minAllowedCharacters = 10
@@ -83,6 +72,7 @@ final class HintModePreferenceViewController: NSViewController, PreferencePane {
     }
     
     func serializeCustomCharacters(characters: String) {
+        print("serializing characters " + characters)
         UserDefaults.standard.set(characters, forKey: Utils.hintCharacters)
     }
 }
