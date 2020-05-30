@@ -72,7 +72,6 @@ final class HintModePreferenceViewController: NSViewController, PreferencePane {
     }
     
     func serializeCustomCharacters(characters: String) {
-        print("serializing characters " + characters)
         UserDefaults.standard.set(characters, forKey: Utils.hintCharacters)
     }
 }
