@@ -40,7 +40,7 @@
                     <gridCells>
                         <gridCell row="X8B-LY-3WJ" column="zWB-gs-tNY" id="beg-mN-5uP">
                             <textField key="contentView" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7QU-hI-KT0">
-                                <rect key="frame" x="72" y="115" width="61" height="16"/>
+                                <rect key="frame" x="72" y="115" width="61" height="17"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Shortcut:" id="fuD-h0-pui">
                                     <font key="font" usesAppearanceFont="YES"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -65,11 +65,11 @@
                         </gridCell>
                         <gridCell row="qei-yb-ZbA" column="Tnf-9N-ady" id="hrX-oI-nfD">
                             <textField key="contentView" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="oq5-Ge-dAG">
-                                <rect key="frame" x="141" y="80" width="200" height="20"/>
+                                <rect key="frame" x="141" y="79" width="200" height="21"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="200" id="g0X-4s-L4E"/>
                                 </constraints>
-                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="border" drawsBackground="YES" id="3Lc-cM-S7j">
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" id="3Lc-cM-S7j">
                                     <font key="font" usesAppearanceFont="YES"/>
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -79,7 +79,7 @@
                         <gridCell row="oV1-w2-ZuC" column="zWB-gs-tNY" id="1SQ-am-sJj"/>
                         <gridCell row="oV1-w2-ZuC" column="Tnf-9N-ady" id="g1W-5Z-ibP">
                             <textField key="contentView" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="wHk-Cd-Maa">
-                                <rect key="frame" x="139" y="44" width="313" height="28"/>
+                                <rect key="frame" x="139" y="43" width="313" height="28"/>
                                 <textFieldCell key="cell" selectable="YES" title="The characters placed beside UI Elements when hint mode is activated." id="856-gL-Axl">
                                     <font key="font" metaFont="system" size="11"/>
                                     <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>

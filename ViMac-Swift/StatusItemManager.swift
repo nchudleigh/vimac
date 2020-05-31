@@ -17,6 +17,7 @@ class StatusItemManager: NSMenu, NSMenuDelegate {
         preferencePanes: [
             GeneralPreferenceViewController(),
             HintModePreferenceViewController(),
+            ScrollModePreferenceViewController(),
         ],
         style: .segmentedControl
     )
