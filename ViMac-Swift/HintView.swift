@@ -40,6 +40,11 @@ class HintView: NSTextField {
         self.isBordered = true
         self.drawsBackground = true
         
+        // fixes blurry text
+        // side effect: hint-text is off-center
+        // https://stackoverflow.com/a/46568711/10390454
+        self.canDrawSubviewsIntoLayer = true
+        
         self.backgroundColor = HintView.backgroundColor
         
         self.layer?.backgroundColor = HintView.backgroundColor.cgColor
