@@ -9,49 +9,76 @@
 import Cocoa
 import AXSwift
 
-class HintView: NSTextField {
+class HintView: NSView {
     static let borderColor = NSColor(red: 212 / 255, green: 172 / 255, blue: 58 / 255, alpha: 1)
     static let backgroundColor = NSColor(red: 255 / 255, green: 224 / 255, blue: 112 / 255, alpha: 1)
     static let untypedHintColor = NSColor.black
     static let typedHintColor = NSColor(red: 212 / 255, green: 172 / 255, blue: 58 / 255, alpha: 1)
-    
-    var associatedElement: UIElement?
-    
-    override init(frame frameRect: NSRect) {
-        super.init(frame: frameRect)
+
+    let associatedElement: UIElement
+    var hintTextView: HintText?
+
+    required init(associatedElement: UIElement, hintTextSize: CGFloat, hintText: String, typedHintText: String) {
+        self.associatedElement = associatedElement
+
+        super.init(frame: .zero)
+
+        setTheme()
+
+        addHintText(hintTextSize: hintTextSize, hintText: hintText, typedHintText: typedHintText)
+        self.frame = self.hintTextView!.frame
     }
-    
+
     required init?(coder: NSCoder) {
-        super.init(coder: coder)
+        fatalError()
     }
-    
-    func initializeHint(hintText: String, typed: String) {
-        let attr = NSMutableAttributedString(string: hintText)
-        let range = NSMakeRange(0, hintText.count)
-        attr.addAttributes([NSAttributedString.Key.foregroundColor : HintView.untypedHintColor], range: range)
-        if hintText.starts(with: typed) {
-            let typedRange = NSMakeRange(0, typed.count)
-            attr.addAttributes([NSAttributedString.Key.foregroundColor : HintView.typedHintColor], range: typedRange)
-        }
-        self.stringValue = hintText
-        self.attributedStringValue = attr
-        
+
+    func setTheme() {
         self.wantsLayer = true
-        self.isBordered = true
-        self.drawsBackground = true
-        
-        // fixes blurry text
-        // side effect: hint-text is off-center
-        // https://stackoverflow.com/a/46568711/10390454
-        self.canDrawSubviewsIntoLayer = true
-        
-        self.backgroundColor = HintView.backgroundColor
-        
+
         self.layer?.backgroundColor = HintView.backgroundColor.cgColor
         self.layer?.borderColor = HintView.borderColor.cgColor
+        self.layer?.cornerRadius = 3
         self.layer?.borderWidth = 1
-        self.layer?.cornerRadius = 5
-        self.font = NSFont.boldSystemFont(ofSize: 10)
+    }
+
+    func addHintText(hintTextSize: CGFloat, hintText: String, typedHintText: String) {
+        self.hintTextView = HintText(hintTextSize: hintTextSize, hintText: hintText, typedHintText: typedHintText)
+        self.subviews.append(hintTextView!)
+    }
+    
+    func updateTypedText(typed: String) {
+        self.hintTextView!.updateTypedText(typed: typed)
+    }
+}
+
+class HintText: NSTextField {
+
+    required init(hintTextSize: CGFloat, hintText: String, typedHintText: String) {
+        super.init(frame: .zero)
+        
+        self.setup(hintTextSize: hintTextSize, hintText: hintText, typedHintText: typedHintText)
+    }
+
+    required init(coder: NSCoder) {
+        fatalError()
+    }
+    
+    func setup(hintTextSize: CGFloat, hintText: String, typedHintText: String) {
+        self.stringValue = hintText
+        self.font = NSFont.systemFont(ofSize: hintTextSize, weight: .bold)
+        self.textColor = .black
+
+        // isBezeled causes unwanted padding.
+        self.isBezeled = false
+        
+        // fixes black background caused by setting isBezeled
+        self.drawsBackground = true
+        self.wantsLayer = true
+        self.backgroundColor = NSColor.clear
+        
+        // fixes blurry text
+        self.canDrawSubviewsIntoLayer = true
         
         self.sizeToFit()
     }
@@ -66,11 +93,5 @@ class HintView: NSTextField {
             attr.addAttributes([NSAttributedString.Key.foregroundColor : HintView.typedHintColor], range: typedRange)
         }
         self.attributedStringValue = attr
-    }
-    
-    // the first NSTextField that get's drawn to screen is made active, which changes the
-    // first hint's text color to white. This prevents the hints from being made active.
-    override func becomeFirstResponder() -> Bool {
-        return false
     }
 }
