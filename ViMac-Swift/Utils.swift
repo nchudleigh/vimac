@@ -21,13 +21,15 @@ class Utils: NSObject {
     static let shouldLaunchOnStartupKey = "ShouldLaunchOnStartupKey"
     static let hintCharacters = "HintCharacters"
     static let scrollCharacters = "ScrollCharacters"
+    static let hintTextSize = "HintTextSize"
     
     static func registerDefaults() {
         UserDefaults.standard.register(defaults: [
             Utils.scrollSensitivityKey: 20,
             Utils.isVerticalScrollReversedKey: false,
             Utils.isHorizontalScrollReversedKey: false,
-            Utils.shouldLaunchOnStartupKey: false
+            Utils.shouldLaunchOnStartupKey: false,
+            Utils.hintTextSize: 11,
         ])
     }
     

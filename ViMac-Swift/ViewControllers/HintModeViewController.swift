@@ -164,12 +164,18 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     
     func onElementTraversalComplete(elements: [UIElement]) {
         let hintStrings = AlphabetHints().hintStrings(linkCount: elements.count)
+        
+        var textSize = UserDefaults.standard.float(forKey: Utils.hintTextSize)
+        
+        if textSize <= 0 {
+            textSize = 11
+        }
 
         let hintViews: [HintView] = elements
             .enumerated()
             .map ({ (index, button) in
                 
-                let text = HintView(associatedElement: button, hintTextSize: 11, hintText: hintStrings[index], typedHintText: "")
+                let text = HintView(associatedElement: button, hintTextSize: CGFloat(textSize), hintText: hintStrings[index], typedHintText: "")
                 
                 let centerPositionOptional: NSPoint? = {
                     do {
