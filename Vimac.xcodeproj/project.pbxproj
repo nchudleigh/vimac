@@ -323,7 +323,7 @@
 				075FA56C1F3C1127C2575CA3 /* [CP] Check Pods Manifest.lock */,
 				E261721C2322968500E396CA /* Sources */,
 				E261721D2322968500E396CA /* Frameworks */,
-				E20696FA23294E25001EFDB2 /* ShellScript */,
+				E20696FA23294E25001EFDB2 /* Run Script */,
 				E261721E2322968500E396CA /* Resources */,
 				B3CE1D10BB47F45CF7F30714 /* [CP] Embed Pods Frameworks */,
 				E27776E1240B765E00488320 /* ShellScript */,
@@ -535,7 +535,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Vimac/Pods-Vimac-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		E20696FA23294E25001EFDB2 /* ShellScript */ = {
+		E20696FA23294E25001EFDB2 /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 12;
 			files = (
@@ -545,13 +545,14 @@
 			inputPaths = (
 				"$(SRCROOT)/newInputFile",
 			);
+			name = "Run Script";
 			outputFileListPaths = (
 			);
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "osascript grant-accessibility-permission-dev.scpt \n";
+			shellScript = "if [ \"$BUILD_ENV\" != 'CI' ]; then\n    osascript grant-accessibility-permission-dev.scpt;\nfi\n";
 		};
 		E27776E1240B765E00488320 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
