@@ -71,7 +71,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
                     let typed = String(vc.characterStack)
             
                     let matchingHints = vc.hintViews!.filter { hintView in
-                        return hintView.stringValue.starts(with: typed.uppercased())
+                        return hintView.hintTextView!.stringValue.starts(with: typed.uppercased())
                     }
 
                     if matchingHints.count == 0 && typed.count > 0 {
@@ -81,11 +81,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
             
                     if matchingHints.count == 1 {
                         let matchingHint = matchingHints.first!
-                        let buttonOptional = matchingHint.associatedElement
-                        guard let button = buttonOptional else {
-                            vc.modeCoordinator?.exitMode()
-                            return
-                        }
+                        let button = matchingHint.associatedElement
             
                         let buttonPositionOptional: NSPoint? = try? button.attribute(.position)
                         let buttonSizeOptional: NSSize? = try? button.attribute(.size)
@@ -168,12 +164,18 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     
     func onElementTraversalComplete(elements: [UIElement]) {
         let hintStrings = AlphabetHints().hintStrings(linkCount: elements.count)
+        
+        var textSize = UserDefaults.standard.float(forKey: Utils.hintTextSize)
+        
+        if textSize <= 0 {
+            textSize = 11
+        }
 
         let hintViews: [HintView] = elements
             .enumerated()
             .map ({ (index, button) in
-                let text = HintView(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
-                text.initializeHint(hintText: hintStrings[index], typed: "")
+                
+                let text = HintView(associatedElement: button, hintTextSize: CGFloat(textSize), hintText: hintStrings[index], typedHintText: "")
                 
                 let centerPositionOptional: NSPoint? = {
                     do {
@@ -202,9 +204,9 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
                 guard let centerPosition = centerPositionOptional else {
                     return nil
                 }
-
-                text.associatedElement = button
+                
                 text.frame.origin = centerPosition
+                
                 return text
             })
             .compactMap({ $0 })
@@ -226,7 +228,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
 
         hintViews.forEach { hintView in
             hintView.isHidden = true
-            if hintView.stringValue.starts(with: typed.uppercased()) {
+            if hintView.hintTextView!.stringValue.starts(with: typed.uppercased()) {
                 hintView.updateTypedText(typed: typed)
                 hintView.isHidden = false
             }
