@@ -22,11 +22,11 @@ final class HintModePreferenceViewController: NSViewController, PreferencePane {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        customCharactersView.stringValue = UserPreferences.HintMode.readCustomCharactersRaw()
+        customCharactersView.stringValue = UserPreferences.HintMode.CustomCharactersProperty.readRaw()
         
         hintModeShortcutView.associatedUserDefaultsKey = Utils.hintModeShortcutKey
         
-        textSizeView.stringValue = UserPreferences.HintMode.readHintSizeRaw()
+        textSizeView.stringValue = String(UserPreferences.HintMode.TextSizeProperty.readRaw())
         
         compositeDisposable.insert(observeCustomCharactersChange())
         compositeDisposable.insert(observeCustomCharactersValidityChange())
@@ -39,13 +39,13 @@ final class HintModePreferenceViewController: NSViewController, PreferencePane {
     
     func observeCustomCharactersChange() -> Disposable {
         return customCharactersViewObservable.bind(onNext: { [weak self] characters in
-            UserPreferences.HintMode.saveCustomCharacters(characters: characters)
+            UserPreferences.HintMode.CustomCharactersProperty.saveRaw(rawValue: characters)
         })
     }
     
     func observeCustomCharactersValidityChange() -> Disposable {
         return customCharactersViewValidityChangeObservable.bind(onNext: { [weak self] characters in
-            let isValid = UserPreferences.HintMode.isCustomCharactersValid(characters: characters)
+            let isValid = UserPreferences.HintMode.CustomCharactersProperty.isValid(value: characters)
             
             if !isValid {
                 self?.changeCustomTextViewBackgroundColor(textField: self!.customCharactersView, color: NSColor.init(calibratedRed: 132/255, green: 46/255, blue: 48/255, alpha: 1))
@@ -58,10 +58,10 @@ final class HintModePreferenceViewController: NSViewController, PreferencePane {
     
     func observeTextSizeChange() -> Disposable {
         return textSizeObservable.bind(onNext: { [weak self] textSize in
-            UserPreferences.HintMode.saveTextSize(size: textSize)
+            UserPreferences.HintMode.TextSizeProperty.saveRaw(rawValue: textSize)
 
-            let isValid = UserPreferences.HintMode.isRawHintSizeValid(sizeRaw: textSize)
-            
+            let isValid = UserPreferences.HintMode.TextSizeProperty.isRawValid(rawValue: textSize)
+
             if !isValid {
                 self?.changeCustomTextViewBackgroundColor(textField: self!.textSizeView, color: NSColor.init(calibratedRed: 132/255, green: 46/255, blue: 48/255, alpha: 1))
                 return
