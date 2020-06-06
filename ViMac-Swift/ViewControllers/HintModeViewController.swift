@@ -163,13 +163,9 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     }
     
     func onElementTraversalComplete(elements: [UIElement]) {
-        let hintStrings = AlphabetHints().hintStrings(linkCount: elements.count)
+        let hintStrings = AlphabetHints().hintStrings(linkCount: elements.count, hintCharacters: UserPreferences.HintMode.readCustomCharacters())
         
-        var textSize = UserDefaults.standard.float(forKey: Utils.hintTextSize)
-        
-        if textSize <= 0 {
-            textSize = 11
-        }
+        let textSize = UserPreferences.HintMode.readHintSize()
 
         let hintViews: [HintView] = elements
             .enumerated()

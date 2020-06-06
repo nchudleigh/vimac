@@ -19,9 +19,7 @@ class Utils: NSObject {
     static let isHorizontalScrollReversedKey = "IsHorizontalScrollReversed"
     static let forceKeyboardLayoutKey = "ForceKeyboardLayout"
     static let shouldLaunchOnStartupKey = "ShouldLaunchOnStartupKey"
-    static let hintCharacters = "HintCharacters"
     static let scrollCharacters = "ScrollCharacters"
-    static let hintTextSize = "HintTextSize"
     
     static func registerDefaults() {
         UserDefaults.standard.register(defaults: [
@@ -29,7 +27,6 @@ class Utils: NSObject {
             Utils.isVerticalScrollReversedKey: false,
             Utils.isHorizontalScrollReversedKey: false,
             Utils.shouldLaunchOnStartupKey: false,
-            Utils.hintTextSize: 11,
         ])
     }
     
