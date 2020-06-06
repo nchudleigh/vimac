@@ -32,12 +32,12 @@ final class ScrollModePreferenceViewController: NSViewController, PreferencePane
         
         shortcutView.associatedUserDefaultsKey = Utils.scrollModeShortcutKey
         
-        scrollModeKeysView.stringValue = readScrollModeKeys()
+        scrollModeKeysView.stringValue = UserPreferences.ScrollMode.ScrollKeysProperty.readUnvalidated() ?? ""
         
-        scrollSensitivityView.integerValue = readScrollSensitivity()
+        scrollSensitivityView.integerValue = UserPreferences.ScrollMode.ScrollSensitivityProperty.read()
         
-        revHorizontalScrollView.state = readSerializedRevHorizontalScroll() ? .on : .off
-        revVerticalScrollView.state = readSerializedRevVerticalScroll() ? .on : .off
+        revHorizontalScrollView.state = UserPreferences.ScrollMode.ReverseHorizontalScrollProperty.read() ? .on : .off
+        revVerticalScrollView.state = UserPreferences.ScrollMode.ReverseVerticalScrollProperty.read() ? .on : .off
         
         observeScrollModeKeys().disposed(by: disposeBag)
         observeScrollModeKeysValidity().disposed(by: disposeBag)
@@ -57,48 +57,10 @@ final class ScrollModePreferenceViewController: NSViewController, PreferencePane
         scrollModeKeysView.isEditable = false
         scrollModeKeysView.isEditable = true
     }
-    
-    func readScrollModeKeys() -> String {
-        return UserDefaults.standard.string(forKey: Utils.scrollCharacters) ?? ""
-    }
-    
-    func saveScrollModeKeys(scrollKeys: String) {
-        UserDefaults.standard.set(scrollKeys, forKey: Utils.scrollCharacters)
-    }
-    
-    func readScrollSensitivity() -> Int {
-        return UserDefaults.standard.integer(forKey: Utils.scrollSensitivityKey)
-    }
-    
-    func saveScrollSensitivity(sensitivity: Int) {
-        let isValid = sensitivity >= 0 && sensitivity <= 100
-        
-        if !isValid {
-            return
-        }
-        
-        UserDefaults.standard.set(sensitivity, forKey: Utils.scrollSensitivityKey)
-    }
-    
-    func readSerializedRevHorizontalScroll() -> Bool {
-        return UserDefaults.standard.bool(forKey: Utils.isHorizontalScrollReversedKey)
-    }
-    
-    func serializeRevHorizontalScroll(isRev: Bool) {
-        UserDefaults.standard.set(isRev, forKey: Utils.isHorizontalScrollReversedKey)
-    }
-    
-    func readSerializedRevVerticalScroll() -> Bool {
-        return UserDefaults.standard.bool(forKey: Utils.isVerticalScrollReversedKey)
-    }
-    
-    func serializeRevVerticalScroll(isRev: Bool) {
-        UserDefaults.standard.set(isRev, forKey: Utils.isVerticalScrollReversedKey)
-    }
-    
+
     func observeScrollModeKeys() -> Disposable {
-        return scrollKeysObservable.bind(onNext: { [weak self] keys in
-            self?.saveScrollModeKeys(scrollKeys: keys)
+        return scrollKeysObservable.bind(onNext: { keys in
+            UserPreferences.ScrollMode.ScrollKeysProperty.save(value: keys)
         })
     }
     
@@ -114,26 +76,26 @@ final class ScrollModePreferenceViewController: NSViewController, PreferencePane
     }
     
     func observeScrollSensitivity() -> Disposable {
-        return scrollSensitivityObservable.bind(onNext: { [weak self] sensitivity in
-            let isValid = sensitivity >= 0 && sensitivity <= 100
+        return scrollSensitivityObservable.bind(onNext: { sensitivity in
+            let isValid = UserPreferences.ScrollMode.ScrollSensitivityProperty.isValid(value: sensitivity)
             
             if !isValid {
                 return
             }
             
-            self?.saveScrollSensitivity(sensitivity: sensitivity)
+            UserPreferences.ScrollMode.ScrollSensitivityProperty.save(value: sensitivity)
         })
     }
     
     func observeRevHorizontalScroll() -> Disposable {
-        return revHorizontalScrollObservable.bind(onNext: { [weak self] isRev in
-            self?.serializeRevHorizontalScroll(isRev: isRev)
+        return revHorizontalScrollObservable.bind(onNext: { isRev in
+            UserPreferences.ScrollMode.ReverseHorizontalScrollProperty.save(value: isRev)
         })
     }
     
     func observeRevVerticalScroll() -> Disposable {
-        return revVerticalScrollObservable.bind(onNext: { [weak self] isRev in
-            self?.serializeRevVerticalScroll(isRev: isRev)
+        return revVerticalScrollObservable.bind(onNext: { isRev in
+            UserPreferences.ScrollMode.ReverseVerticalScrollProperty.save(value: isRev)
         })
     }
 }

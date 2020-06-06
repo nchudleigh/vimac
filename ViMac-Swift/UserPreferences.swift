@@ -82,10 +82,6 @@ struct UserPreferences {
                 let areKeysUnique = keys.count == Set(keys).count
                 return isCountValid && areKeysUnique
             }
-            
-            static func parseRaw(rawValue: String) -> String? {
-                return rawValue
-            }
         }
         
         class ScrollSensitivityProperty : PreferenceProperty {
@@ -96,10 +92,6 @@ struct UserPreferences {
             
             static func isValid(value sensitivity: Int) -> Bool {
                 return sensitivity >= 0 && sensitivity <= 100
-            }
-            
-            static func parseRaw(rawValue: String) -> Int? {
-                return Int(rawValue)
             }
         }
         
@@ -112,10 +104,6 @@ struct UserPreferences {
             static func isValid(value: Bool) -> Bool {
                 return true
             }
-            
-            static func parseRaw(rawValue: String) -> Bool? {
-                return nil
-            }
         }
         
         class ReverseVerticalScrollProperty : PreferenceProperty {
@@ -126,10 +114,6 @@ struct UserPreferences {
             
             static func isValid(value: Bool) -> Bool {
                 return true
-            }
-
-            static func parseRaw(rawValue: String) -> Bool? {
-                return nil
             }
         }
     }
