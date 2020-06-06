@@ -21,12 +21,12 @@ final class HintModePreferenceViewController: NSViewController, PreferencePane {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        customCharactersView.stringValue = readSerializedCustomCharacters()
         
         hintModeShortcutView.associatedUserDefaultsKey = Utils.hintModeShortcutKey
         
-        textSizeView.stringValue = String(readTextSize())
+        customCharactersView.stringValue = UserPreferences.HintMode.CustomCharactersProperty.readUnvalidated() ?? ""
+        
+        textSizeView.stringValue = UserPreferences.HintMode.TextSizeProperty.readUnvalidated() ?? ""
         
         compositeDisposable.insert(observeCustomCharactersChange())
         compositeDisposable.insert(observeCustomCharactersValidityChange())
@@ -37,23 +37,15 @@ final class HintModePreferenceViewController: NSViewController, PreferencePane {
         compositeDisposable.dispose()
     }
     
-    func readSerializedCustomCharacters() -> String {
-        return UserDefaults.standard.string(forKey: Utils.hintCharacters) ?? ""
-    }
-    
-    func readTextSize() -> Float {
-        return UserDefaults.standard.float(forKey: Utils.hintTextSize)
-    }
-    
     func observeCustomCharactersChange() -> Disposable {
         return customCharactersViewObservable.bind(onNext: { [weak self] characters in
-            self?.serializeCustomCharacters(characters: characters)
+            UserPreferences.HintMode.CustomCharactersProperty.save(value: characters)
         })
     }
     
     func observeCustomCharactersValidityChange() -> Disposable {
         return customCharactersViewValidityChangeObservable.bind(onNext: { [weak self] characters in
-            let isValid = self!.isCustomCharactersValid(characters: characters)
+            let isValid = UserPreferences.HintMode.CustomCharactersProperty.isValid(value: characters)
             
             if !isValid {
                 self?.changeCustomTextViewBackgroundColor(textField: self!.customCharactersView, color: NSColor.init(calibratedRed: 132/255, green: 46/255, blue: 48/255, alpha: 1))
@@ -66,10 +58,10 @@ final class HintModePreferenceViewController: NSViewController, PreferencePane {
     
     func observeTextSizeChange() -> Disposable {
         return textSizeObservable.bind(onNext: { [weak self] textSize in
-            self!.serializeTextSize(size: textSize)
-            
-            let isValid = Double(textSize) != nil
-            
+            UserPreferences.HintMode.TextSizeProperty.save(value: textSize)
+
+            let isValid = UserPreferences.HintMode.TextSizeProperty.isValid(value: textSize)
+
             if !isValid {
                 self?.changeCustomTextViewBackgroundColor(textField: self!.textSizeView, color: NSColor.init(calibratedRed: 132/255, green: 46/255, blue: 48/255, alpha: 1))
                 return
@@ -86,20 +78,5 @@ final class HintModePreferenceViewController: NSViewController, PreferencePane {
         // see: https://stackoverflow.com/a/16489472/10390454
         textField.isEditable = false
         textField.isEditable = true
-    }
-
-    func isCustomCharactersValid(characters: String) -> Bool {
-        let minAllowedCharacters = 10
-        let isEqOrMoreThanMinChars = characters.count >= minAllowedCharacters
-        let areCharsUnique = characters.count == Set(characters).count
-        return isEqOrMoreThanMinChars && areCharsUnique
-    }
-    
-    func serializeCustomCharacters(characters: String) {
-        UserDefaults.standard.set(characters, forKey: Utils.hintCharacters)
-    }
-    
-    func serializeTextSize(size: String) {
-        UserDefaults.standard.set(size, forKey: Utils.hintTextSize)
     }
 }

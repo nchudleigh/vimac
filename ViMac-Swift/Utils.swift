@@ -14,22 +14,12 @@ class Utils: NSObject {
     static let defaultScrollShortcut = MASShortcut.init(keyCode: kVK_ANSI_S, modifierFlags: [.control])
     static let hintModeShortcutKey = "HintModeShortcut"
     static let scrollModeShortcutKey = "ScrollModeShortcut"
-    static let scrollSensitivityKey = "ScrollSensitivity"
-    static let isVerticalScrollReversedKey = "IsVerticalScrollReversed"
-    static let isHorizontalScrollReversedKey = "IsHorizontalScrollReversed"
     static let forceKeyboardLayoutKey = "ForceKeyboardLayout"
     static let shouldLaunchOnStartupKey = "ShouldLaunchOnStartupKey"
-    static let hintCharacters = "HintCharacters"
-    static let scrollCharacters = "ScrollCharacters"
-    static let hintTextSize = "HintTextSize"
     
     static func registerDefaults() {
         UserDefaults.standard.register(defaults: [
-            Utils.scrollSensitivityKey: 20,
-            Utils.isVerticalScrollReversedKey: false,
-            Utils.isHorizontalScrollReversedKey: false,
             Utils.shouldLaunchOnStartupKey: false,
-            Utils.hintTextSize: 11,
         ])
     }
     

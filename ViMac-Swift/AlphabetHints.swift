@@ -9,15 +9,9 @@
 // Refer to:
 // https://github.com/philc/vimium/blob/881a6fdc3644f55fc02ad56454203f654cc76618/content_scripts/link_hints.coffee#L434
 class AlphabetHints {
-    static let defaultHintCharacters = "sadfjklewcmpgh"
     let hintKeystrokeQueue: [String] = []
     
-    func hintStrings(linkCount: Int) -> [String] {
-        var hintCharacters = UserDefaults.standard.string(forKey: Utils.hintCharacters) ?? ""
-        if hintCharacters.count < 3 {
-            hintCharacters = AlphabetHints.defaultHintCharacters
-        }
-        
+    func hintStrings(linkCount: Int, hintCharacters: String) -> [String] {
         if linkCount == 0 {
             return []
         }
