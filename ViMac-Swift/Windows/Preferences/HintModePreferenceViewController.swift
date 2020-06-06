@@ -21,12 +21,12 @@ final class HintModePreferenceViewController: NSViewController, PreferencePane {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        customCharactersView.stringValue = UserPreferences.HintMode.CustomCharactersProperty.readRaw()
         
         hintModeShortcutView.associatedUserDefaultsKey = Utils.hintModeShortcutKey
         
-        textSizeView.stringValue = String(UserPreferences.HintMode.TextSizeProperty.readRaw())
+        customCharactersView.stringValue = UserPreferences.HintMode.CustomCharactersProperty.readUnvalidated() ?? ""
+        
+        textSizeView.stringValue = UserPreferences.HintMode.TextSizeProperty.readUnvalidated() ?? ""
         
         compositeDisposable.insert(observeCustomCharactersChange())
         compositeDisposable.insert(observeCustomCharactersValidityChange())
@@ -39,7 +39,7 @@ final class HintModePreferenceViewController: NSViewController, PreferencePane {
     
     func observeCustomCharactersChange() -> Disposable {
         return customCharactersViewObservable.bind(onNext: { [weak self] characters in
-            UserPreferences.HintMode.CustomCharactersProperty.saveRaw(rawValue: characters)
+            UserPreferences.HintMode.CustomCharactersProperty.save(value: characters)
         })
     }
     
@@ -58,9 +58,9 @@ final class HintModePreferenceViewController: NSViewController, PreferencePane {
     
     func observeTextSizeChange() -> Disposable {
         return textSizeObservable.bind(onNext: { [weak self] textSize in
-            UserPreferences.HintMode.TextSizeProperty.saveRaw(rawValue: textSize)
+            UserPreferences.HintMode.TextSizeProperty.save(value: textSize)
 
-            let isValid = UserPreferences.HintMode.TextSizeProperty.isRawValid(rawValue: textSize)
+            let isValid = UserPreferences.HintMode.TextSizeProperty.isValid(value: textSize)
 
             if !isValid {
                 self?.changeCustomTextViewBackgroundColor(textField: self!.textSizeView, color: NSColor.init(calibratedRed: 132/255, green: 46/255, blue: 48/255, alpha: 1))

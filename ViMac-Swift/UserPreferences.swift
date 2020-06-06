@@ -9,26 +9,18 @@ protocol PreferenceProperty {
     static var defaultValue: T { get }
     
     static func isValid(value: T) -> Bool
-    static func parseRaw(rawValue: String) -> T?
 }
 
 extension PreferenceProperty {
-    static func isRawValid(rawValue: String) -> Bool {
-        return parseRaw(rawValue: rawValue) != nil
+    static func save(value: T) {
+        UserDefaults.standard.set(value, forKey: key)
     }
     
-    static func saveRaw(rawValue: String) {
-        UserDefaults.standard.set(rawValue, forKey: key)
-    }
-
-    static func readRaw() -> String {
-        return UserDefaults.standard.string(forKey: key) ?? ""
-    }
-
     static func readUnvalidated() -> T? {
-        return parseRaw(rawValue: readRaw())
+        let invalidValue = (UserDefaults.standard.value(forKey: key) as? T?)?.flatMap({ $0 })
+        return invalidValue
     }
- 
+    
     static func read() -> T {
         let unvalidatedValueWeak = readUnvalidated()
         
@@ -54,24 +46,90 @@ struct UserPreferences {
                 let areCharsUnique = characters.count == Set(characters).count
                 return isEqOrMoreThanMinChars && areCharsUnique
             }
+        }
+        
+        class TextSizeProperty : PreferenceProperty {
+            typealias T = String
+            
+            static var key = "HintTextSize"
+            static var defaultValue = "11.0"
+            
+            static func isValid(value: String) -> Bool {
+                let floatValueMaybe = Float(value)
+                
+                guard let floatValue = floatValueMaybe else {
+                    return false
+                }
+                
+                return floatValue > 0 && floatValue <= 100
+            }
+            
+            static func readAsFloat() -> Float {
+                return Float(read())!
+            }
+        }
+    }
+    
+    struct ScrollMode {
+        class ScrollKeysProperty : PreferenceProperty {
+            typealias T = String
+            
+            static var key = "ScrollCharacters"
+            static var defaultValue = "hjkldu"
+            
+            static func isValid(value keys: String) -> Bool {
+                let isCountValid = keys.count == 4 || keys.count == 6
+                let areKeysUnique = keys.count == Set(keys).count
+                return isCountValid && areKeysUnique
+            }
             
             static func parseRaw(rawValue: String) -> String? {
                 return rawValue
             }
         }
         
-        class TextSizeProperty : PreferenceProperty {
-            typealias T = Float
+        class ScrollSensitivityProperty : PreferenceProperty {
+            typealias T = Int
             
-            static var key = "HintTextSize"
-            static var defaultValue: Float = 11.0
+            static var key = "ScrollSensitivity"
+            static var defaultValue = 20
             
-            static func isValid(value size: Float) -> Bool {
-                return size > 0 && size <= 100
+            static func isValid(value sensitivity: Int) -> Bool {
+                return sensitivity >= 0 && sensitivity <= 100
             }
             
-            static func parseRaw(rawValue: String) -> Float? {
-                return Float(rawValue)
+            static func parseRaw(rawValue: String) -> Int? {
+                return Int(rawValue)
+            }
+        }
+        
+        class ReverseHorizontalScrollProperty : PreferenceProperty {
+            typealias T = Bool
+            
+            static var key = "IsHorizontalScrollReversed"
+            static var defaultValue = false
+            
+            static func isValid(value: Bool) -> Bool {
+                return true
+            }
+            
+            static func parseRaw(rawValue: String) -> Bool? {
+                return nil
+            }
+        }
+        
+        class ReverseVerticalScrollProperty : PreferenceProperty {
+            typealias T = Bool
+            
+            static var key = "IsVerticalScrollReversed"
+            static var defaultValue = false
+            
+            static func isValid(value: Bool) -> Bool {
+                return true
+            }
+
+            static func parseRaw(rawValue: String) -> Bool? {
+                return nil
             }
         }
     }
