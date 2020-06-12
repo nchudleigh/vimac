@@ -329,9 +329,9 @@
 				E20696FA23294E25001EFDB2 /* Run Script */,
 				E261721E2322968500E396CA /* Resources */,
 				B3CE1D10BB47F45CF7F30714 /* [CP] Embed Pods Frameworks */,
+				E27776E1240B765E00488320 /* ShellScript */,
 				E27776E5240B780D00488320 /* Embed Frameworks */,
 				E27776E6240B782800488320 /* CopyFiles */,
-				E27776E1240B765E00488320 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -572,7 +572,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "#!/bin/bash\n\norigin_helper_path=\"$BUILT_PRODUCTS_DIR/$FRAMEWORKS_FOLDER_PATH/LaunchAtLogin.framework/Resources/LaunchAtLoginHelper.app\"\nhelper_dir=\"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/Library/LoginItems\"\nhelper_path=\"$helper_dir/LaunchAtLoginHelper.app\"\n\nrm -rf \"$helper_path\"\nmkdir -p \"$helper_dir\"\ncp -rf \"$origin_helper_path\" \"$helper_dir/\"\n\ndefaults write \"$helper_path/Contents/Info\" CFBundleIdentifier -string \"$PRODUCT_BUNDLE_IDENTIFIER-LaunchAtLoginHelper\"\n\nif [[ $CONFIGURATION == \"Release\" ]]; then\n    rm -rf \"$origin_helper_path\"\n    rm \"$(dirname \"$origin_helper_path\")/copy-helper.sh\"\nfi\n";
+			shellScript = "origin_helper_path=\"$BUILT_PRODUCTS_DIR/$FRAMEWORKS_FOLDER_PATH/LaunchAtLogin.framework/Resources/LaunchAtLoginHelper.app\"\nhelper_dir=\"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/Library/LoginItems\"\nhelper_path=\"$helper_dir/LaunchAtLoginHelper.app\"\n\nrm -rf \"$helper_path\"\nmkdir -p \"$helper_dir\"\ncp -rf \"$origin_helper_path\" \"$helper_dir/\"\n\ndefaults write \"$helper_path/Contents/Info\" CFBundleIdentifier -string \"$PRODUCT_BUNDLE_IDENTIFIER-LaunchAtLoginHelper\"\n\nif [[ -n $CODE_SIGN_ENTITLEMENTS ]]; then\n    codesign --force --entitlements=\"$CODE_SIGN_ENTITLEMENTS\" --options=runtime --sign=\"$EXPANDED_CODE_SIGN_IDENTITY_NAME\" \"$helper_path\"\nelse\n    codesign --force --options=runtime --sign=\"$EXPANDED_CODE_SIGN_IDENTITY_NAME\" \"$helper_path\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
