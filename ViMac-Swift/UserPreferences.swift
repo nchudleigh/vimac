@@ -41,7 +41,7 @@ struct UserPreferences {
             static var defaultValue = "sadfjklewcmpgh"
             
             static func isValid(value characters: String) -> Bool {
-                let minAllowedCharacters = 10
+                let minAllowedCharacters = 6
                 let isEqOrMoreThanMinChars = characters.count >= minAllowedCharacters
                 let areCharsUnique = characters.count == Set(characters).count
                 return isEqOrMoreThanMinChars && areCharsUnique
