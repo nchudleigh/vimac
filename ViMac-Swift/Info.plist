@@ -31,7 +31,7 @@
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 	<key>SUFeedURL</key>
-	<string>https://raw.githubusercontent.com/dexterleng/vimac-releases/master/appcast.xml</string>
+	<string>https://api.appcenter.ms/v0.1/public/sparkle/apps/d28ff448-1768-4ee9-ab61-49f20cf5323e</string>
 	<key>SUPublicEDKey</key>
 	<string>OtDAJPNO6QsDcZeyySlbD9caJgxWoV/BA+rW9rfTKHM=</string>
 </dict>
