@@ -780,6 +780,7 @@
 				CODE_SIGN_ENTITLEMENTS = "ViMac-Swift/ViMac_Swift.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = LQ2VH8VB84;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/Mac",
@@ -806,6 +807,7 @@
 				CODE_SIGN_ENTITLEMENTS = "ViMac-Swift/ViMac_Swift.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = LQ2VH8VB84;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/Mac",
