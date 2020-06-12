@@ -92,8 +92,8 @@
                         <gridCell row="tDS-u7-e72" column="zWB-gs-tNY" id="5x6-dk-UgH"/>
                         <gridCell row="tDS-u7-e72" column="Tnf-9N-ady" id="BBV-eQ-EeD">
                             <textField key="contentView" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="ObR-3t-fGy">
-                                <rect key="frame" x="139" y="34" width="190" height="14"/>
-                                <textFieldCell key="cell" selectable="YES" title="Enter at least 10 unique characters." id="807-LK-4ri">
+                                <rect key="frame" x="139" y="34" width="185" height="14"/>
+                                <textFieldCell key="cell" selectable="YES" title="Enter at least 6 unique characters." id="807-LK-4ri">
                                     <font key="font" metaFont="smallSystem"/>
                                     <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
