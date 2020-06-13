@@ -31,6 +31,8 @@
 		E27776E3240B780D00488320 /* LaunchAtLogin.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E27776E2240B780D00488320 /* LaunchAtLogin.framework */; };
 		E27776E4240B780D00488320 /* LaunchAtLogin.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = E27776E2240B780D00488320 /* LaunchAtLogin.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		E27776E8240B784900488320 /* LaunchAtLogin.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = E27776E7240B784900488320 /* LaunchAtLogin.framework.dSYM */; };
+		E279534B2494C534006D8D7A /* InputListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = E279534A2494C534006D8D7A /* InputListener.swift */; };
+		E279534D2494CC69006D8D7A /* ScrollModeInputListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = E279534C2494CC69006D8D7A /* ScrollModeInputListener.swift */; };
 		E28867F0235F54F2001691A5 /* Vimac.icns in Resources */ = {isa = PBXBuildFile; fileRef = E28867EF235F54F1001691A5 /* Vimac.icns */; };
 		E2C29562234DD7F8001A38D6 /* OverlayWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2C29561234DD7F8001A38D6 /* OverlayWindowController.swift */; };
 		E2C29566234DE09C001A38D6 /* ModeCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2C29565234DE09C001A38D6 /* ModeCoordinator.swift */; };
@@ -128,6 +130,8 @@
 		E26981BA23C9E35D00E46217 /* TISInputSourceExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TISInputSourceExtension.swift; sourceTree = "<group>"; };
 		E27776E2240B780D00488320 /* LaunchAtLogin.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = LaunchAtLogin.framework; path = Carthage/Build/Mac/LaunchAtLogin.framework; sourceTree = "<group>"; };
 		E27776E7240B784900488320 /* LaunchAtLogin.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = LaunchAtLogin.framework.dSYM; path = Carthage/Build/Mac/LaunchAtLogin.framework.dSYM; sourceTree = "<group>"; };
+		E279534A2494C534006D8D7A /* InputListener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputListener.swift; sourceTree = "<group>"; };
+		E279534C2494CC69006D8D7A /* ScrollModeInputListener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollModeInputListener.swift; sourceTree = "<group>"; };
 		E28867EF235F54F1001691A5 /* Vimac.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Vimac.icns; sourceTree = SOURCE_ROOT; };
 		E2C29561234DD7F8001A38D6 /* OverlayWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayWindowController.swift; sourceTree = "<group>"; };
 		E2C29565234DE09C001A38D6 /* ModeCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModeCoordinator.swift; sourceTree = "<group>"; };
@@ -275,6 +279,8 @@
 				E26981B823C9E31600E46217 /* InputSourceManager.swift */,
 				E26981BA23C9E35D00E46217 /* TISInputSourceExtension.swift */,
 				E266D915248AAC99005A261F /* UserPreferences.swift */,
+				E279534A2494C534006D8D7A /* InputListener.swift */,
+				E279534C2494CC69006D8D7A /* ScrollModeInputListener.swift */,
 			);
 			path = "ViMac-Swift";
 			sourceTree = "<group>";
@@ -586,10 +592,12 @@
 				E2DFF5AB24815C5800B4090D /* PreferencesPaneIdentifiers.swift in Sources */,
 				E2F6C9B1232E337500F2975B /* OverlayTextField.swift in Sources */,
 				E2C29571234E19E4001A38D6 /* HintModeViewController.swift in Sources */,
+				E279534B2494C534006D8D7A /* InputListener.swift in Sources */,
 				E26981B923C9E31600E46217 /* InputSourceManager.swift in Sources */,
 				E2C29573234E2E8B001A38D6 /* ScrollModeViewController.swift in Sources */,
 				E2DFF5B12481693800B4090D /* HintModePreferenceViewController.swift in Sources */,
 				E2F6C9AF232DEA1800F2975B /* Utils.swift in Sources */,
+				E279534D2494CC69006D8D7A /* ScrollModeInputListener.swift in Sources */,
 				E268A02A236D8F6F00EE08CB /* CachedUIElement.swift in Sources */,
 				E26981B523C99DF900E46217 /* WelcomeViewController.swift in Sources */,
 				E2C29568234DE51F001A38D6 /* ModeViewController.swift in Sources */,
