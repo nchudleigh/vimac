@@ -88,6 +88,8 @@ class ScrollModeViewController: ModeViewController {
         
         self.view.addSubview(borderView)
         
+        hideMouse()
+        
         disposeBag.insert(observeScrollEvents())
         disposeBag.insert(observeEscapeEvents())
         disposeBag.insert(observeTabEvents())
@@ -160,6 +162,10 @@ class ScrollModeViewController: ModeViewController {
     
     func revertMouseLocation() {
         Utils.moveMouse(position: Utils.toOrigin(point: originalMousePosition, size: NSSize.zero))
+    }
+    
+    func hideMouse() {
+        HideCursorGlobally.hide()
     }
     
     func showMouse() {
