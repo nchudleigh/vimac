@@ -77,8 +77,6 @@ class ScrollModeViewController: ModeViewController {
     }
     
     deinit {
-        print("scroll mode view controller deinitialized")
-        
         self.scroller?.stop()
     }
     
@@ -103,8 +101,6 @@ class ScrollModeViewController: ModeViewController {
     
     
     func on(scrollEvent: ScrollModeInputListener.ScrollEvent) {
-        print(scrollEvent)
-        
         self.scroller?.stop()
         
         if scrollEvent.state == .start && [.left, .right, .up, .down].contains(scrollEvent.direction) {

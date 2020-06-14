@@ -48,17 +48,12 @@ class ScrollModeInputListener: InputListener {
     let tabEventSubject: PublishSubject<Void> = PublishSubject()
     
     init(scrollKeyConfig: ScrollKeyConfig) {
-        print("scroll mode listener initialized")
         self.scrollKeyConfig = scrollKeyConfig
         super.init()
 
         disposeBag.insert(observeScrollEvent(bindings: scrollKeyConfig.bindings))
         disposeBag.insert(observeEscapeKey())
         disposeBag.insert(observeTabKey())
-    }
-    
-    deinit {
-        print("scroll mode listener deinitialized")
     }
     
     func onScrollEvent(event: ScrollEvent) {
