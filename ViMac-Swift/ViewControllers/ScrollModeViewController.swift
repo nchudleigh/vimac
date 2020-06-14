@@ -11,14 +11,16 @@ import RxSwift
 import Carbon.HIToolbox
 import AXSwift
 
-class ScrollModeViewController: ModeViewController, NSTextFieldDelegate {
-    let textField = OverlayTextField(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
-    let borderView = BorderView();
-    var scrollKeysDisposable: Disposable?
-    var compositeDisposable: CompositeDisposable = CompositeDisposable()
-    var currentScrollAreaIndex = 0
+class ScrollModeViewController: ModeViewController {
+    let inputListener: ScrollModeInputListener = ScrollModeInputListenerFactory.instantiate()
+    let borderView: BorderView = ScrollModeViewController.instantiateBorderView()
+    let inputListeningTextField: NSTextField = ScrollModeViewController.instantiateInputListeningTextField()
     let scrollAreas = getScrollAreasByDescendingArea()
-    var originalMousePosition: NSPoint?
+    let activeScrollAreaIndex = BehaviorSubject<Int>(value: 0)
+    let originalMousePosition = NSEvent.mouseLocation
+    var scroller: Scroller?
+    
+    let disposeBag = DisposeBag()
     
     static func getScrollAreasByDescendingArea() -> [(NSSize, NSPoint)] {
         let scrollAreas = getScrollAreaElementsByDescendingArea()
@@ -36,7 +38,7 @@ class ScrollModeViewController: ModeViewController, NSTextFieldDelegate {
         }
         return sizePositionTuple
     }
-
+    
     static func getScrollAreaElementsByDescendingArea() -> [CachedUIElement] {
         guard let applicationWindow = Utils.getCurrentApplicationWindowManually() else {
             return []
@@ -74,60 +76,65 @@ class ScrollModeViewController: ModeViewController, NSTextFieldDelegate {
         return scrollAreasDescendingArea
     }
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
+    deinit {
+        print("scroll mode view controller deinitialized")
         
-        textField.stringValue = ""
-        textField.isEditable = true
-        textField.delegate = self
-        textField.overlayTextFieldDelegate = self
-        self.view.addSubview(textField)
+        self.scroller?.stop()
+    }
+    
+    override func viewDidLoad() {
+        self.view.addSubview(inputListeningTextField)
+        inputListeningTextField.becomeFirstResponder()
+        
         self.view.addSubview(borderView)
         
-        self.originalMousePosition = NSEvent.mouseLocation
-        HideCursorGlobally.hide()
-
-        self.scrollKeysDisposable = self.setActiveScrollArea(index: self.currentScrollAreaIndex)
-        
-        let tabKeyDownObservable = textField.distinctNSEventObservable.filter({ event in
-            return event.keyCode == kVK_Tab && event.type == .keyDown
-        })
-        
-        let escapeKeyDownObservable = textField.distinctNSEventObservable.filter({ event in
-            return event.keyCode == kVK_Escape && event.type == .keyDown
-        })
-        
-        self.compositeDisposable.insert(tabKeyDownObservable
-            .observeOn(MainScheduler.instance)
-            .subscribe(onNext: { [weak self] event in
-                self?.scrollKeysDisposable?.dispose()
-                self?.scrollKeysDisposable = self?.cycleActiveScrollArea()
-            })
-        )
-        
-        self.compositeDisposable.insert(escapeKeyDownObservable
-            .observeOn(MainScheduler.instance)
-            .subscribe(onNext: { [weak self] event in
-                self?.onEscape()
-            })
-        )
+        disposeBag.insert(observeScrollEvents())
+        disposeBag.insert(observeEscapeEvents())
+        disposeBag.insert(observeTabEvents())
+        disposeBag.insert(observeActiveScrollAreaChange())
     }
     
-    func cycleActiveScrollArea() -> Disposable? {
-        self.currentScrollAreaIndex = (self.currentScrollAreaIndex + 1) % self.scrollAreas.count
-        return self.setActiveScrollArea(index: self.currentScrollAreaIndex)
+    override func viewDidDisappear() {
+        revertMouseLocation()
+        showMouse()
     }
     
-    func setActiveScrollArea(index: Int) -> Disposable? {
-        if index < 0 || index >= scrollAreas.count {
+    
+    func on(scrollEvent: ScrollModeInputListener.ScrollEvent) {
+        print(scrollEvent)
+        
+        self.scroller?.stop()
+        
+        if scrollEvent.state == .start && [.left, .right, .up, .down].contains(scrollEvent.direction) {
+            self.scroller = SmoothScroller.instantiate(direction: scrollEvent.direction)
+            self.scroller?.start()
+        }
+        
+        if scrollEvent.state == .start && [.halfLeft, .halfRight, .halfUp, .halfDown].contains(scrollEvent.direction) {
+            if let activeScrollArea = self.activeScrollArea() {
+                if [.halfLeft, .halfRight].contains(scrollEvent.direction) {
+                    self.scroller = ChunkyScroller.instantiate(direction: scrollEvent.direction, scrollAmount: Int(activeScrollArea.0.width / 2))
+                } else {
+                    self.scroller = ChunkyScroller.instantiate(direction: scrollEvent.direction, scrollAmount: Int(activeScrollArea.0.height / 2))
+                }
+                self.scroller?.start()
+            }
+        }
+    }
+    
+    func activeScrollArea() -> (NSSize, NSPoint)? {
+        let index = try! activeScrollAreaIndex.value()
+        
+        if scrollAreas.count == 0 {
             return nil
         }
-
-        let (scrollAreaSize, scrollAreaPosition) = scrollAreas[index]
         
-        resizeBorderViewToFitScrollArea(scrollAreaSize: scrollAreaSize, scrollAreaPosition: scrollAreaPosition)
-        moveMouseToScrollAreaCenter(scrollAreaPosition: scrollAreaPosition, scrollAreaSize: scrollAreaSize)
-        return setupScrollObservers(scrollAreaSize: scrollAreaSize, scrollAreaPosition: scrollAreaPosition)
+        return scrollAreas[index]
+    }
+    
+    func activateScrollArea(scrollArea: (NSSize, NSPoint)) {
+        resizeBorderViewToFitScrollArea(scrollAreaSize: scrollArea.0, scrollAreaPosition: scrollArea.1)
+        moveMouseToScrollAreaCenter(scrollAreaPosition: scrollArea.1, scrollAreaSize: scrollArea.0)
     }
     
     func resizeBorderViewToFitScrollArea(scrollAreaSize: NSSize, scrollAreaPosition: NSPoint) {
@@ -138,128 +145,6 @@ class ScrollModeViewController: ModeViewController, NSTextFieldDelegate {
         self.borderView.frame = NSRect(origin: topLeftPositionRelativeToWindow, size: scrollAreaSize)
     }
     
-    func setupScrollObservers(scrollAreaSize: NSSize, scrollAreaPosition: NSPoint) -> Disposable {
-        let scrollSensitivity = UserPreferences.ScrollMode.ScrollSensitivityProperty.read()
-        let isVerticalScrollReversed = UserPreferences.ScrollMode.ReverseVerticalScrollProperty.read()
-        let isHorizontalScrollReversed = UserPreferences.ScrollMode.ReverseHorizontalScrollProperty.read()
-        let verticalScrollMultiplier = isVerticalScrollReversed ? -1 : 1
-        let horizontalScrollMultiplier = isHorizontalScrollReversed ? -1 : 1
-        
-        let _scrollCharacters = UserPreferences.ScrollMode.ScrollKeysProperty.read()
-        var scrollObservables = [Observable<Void>]()
-        
-        let scrollLeftKey = _scrollCharacters[_scrollCharacters.index(_scrollCharacters.startIndex, offsetBy: 0)]
-        let scrollDownKey = _scrollCharacters[_scrollCharacters.index(_scrollCharacters.startIndex, offsetBy: 1)]
-        let scrollUpKey = _scrollCharacters[_scrollCharacters.index(_scrollCharacters.startIndex, offsetBy: 2)]
-        let scrollRightKey = _scrollCharacters[_scrollCharacters.index(_scrollCharacters.startIndex, offsetBy: 3)]
-        
-        let scrollLeftKeyUpperCased = Character(scrollLeftKey.uppercased())
-        let scrollDownKeyUpperCased = Character(scrollDownKey.uppercased())
-        let scrollUpKeyUpperCased = Character(scrollUpKey.uppercased())
-        let scrollRightKeyUpperCased = Character(scrollRightKey.uppercased())
-        
-        let jKeyObservable = ScrollModeViewController.scrollObservableSmooth(
-                textField: textField,
-                character: scrollDownKey,
-                yAxis: Int64(-1 * verticalScrollMultiplier * scrollSensitivity),
-                xAxis: 0,
-                frequencyMilliseconds: 20)
-
-        let kKeyObservable = ScrollModeViewController.scrollObservableSmooth(
-                textField: textField,
-                character: scrollUpKey,
-                yAxis: Int64(verticalScrollMultiplier * scrollSensitivity),
-                xAxis: 0,
-                frequencyMilliseconds: 20)
-        
-        let hKeyObservable = ScrollModeViewController.scrollObservableSmooth(
-                textField: textField,
-                character: scrollLeftKey,
-                yAxis: 0,
-                xAxis: Int64(horizontalScrollMultiplier * scrollSensitivity),
-                frequencyMilliseconds: 20)
-        
-        let lKeyObservable = ScrollModeViewController.scrollObservableSmooth(
-                textField: textField,
-                character: scrollRightKey,
-                yAxis: 0,
-                xAxis: Int64(-1 * horizontalScrollMultiplier * scrollSensitivity),
-                frequencyMilliseconds: 20)
-        
-        scrollObservables.append(contentsOf: [
-            jKeyObservable,
-            hKeyObservable,
-            kKeyObservable,
-            lKeyObservable,
-        ])
-        
-        if (_scrollCharacters.count == 6) {
-            let altScrollDownKey = Character(_scrollCharacters[_scrollCharacters.index(_scrollCharacters.startIndex, offsetBy: 4)].lowercased())
-            let altScrollUpKey = Character(_scrollCharacters[_scrollCharacters.index(_scrollCharacters.startIndex, offsetBy: 5)].lowercased())
-            
-            let halfScrollAreaHeight = Int(scrollAreaSize.height / 2)
-            let halfScrollAreaWidth = Int(scrollAreaSize.width / 2)
-            
-            let dKeyObservable = ScrollModeViewController.scrollObservableChunky(
-                    textField: textField,
-                    character: altScrollDownKey,
-                    yAxis: verticalScrollMultiplier * -1 * halfScrollAreaHeight,
-                    xAxis: 0, frequencyMilliseconds: 200)
-
-            let uKeyObservable = ScrollModeViewController.scrollObservableChunky(
-                    textField: textField,
-                    character: altScrollUpKey,
-                    yAxis: verticalScrollMultiplier * halfScrollAreaHeight,
-                    xAxis: 0,
-                    frequencyMilliseconds: 200)
-            
-            let shiftHKeyObservable = ScrollModeViewController.scrollObservableChunky(
-                    textField: textField,
-                    character: scrollLeftKeyUpperCased,
-                    yAxis: 0,
-                    xAxis: horizontalScrollMultiplier * halfScrollAreaWidth,
-                    frequencyMilliseconds: 200)
-            
-            let shiftLKeyObservable = ScrollModeViewController.scrollObservableChunky(
-                    textField: textField,
-                    character: scrollRightKeyUpperCased,
-                    yAxis: 0,
-                    xAxis: -1 * horizontalScrollMultiplier * halfScrollAreaWidth,
-                    frequencyMilliseconds: 200)
-            
-            let shiftJKeyObservable = ScrollModeViewController.scrollObservableChunky(
-                    textField: textField,
-                    character: scrollDownKeyUpperCased,
-                    yAxis: -1 * verticalScrollMultiplier * halfScrollAreaHeight,
-                    xAxis: 0,
-                    frequencyMilliseconds: 200)
-            
-            let shiftKKeyObservable = ScrollModeViewController.scrollObservableChunky(
-                    textField: textField,
-                    character: scrollUpKeyUpperCased,
-                    yAxis: verticalScrollMultiplier * halfScrollAreaHeight,
-                    xAxis: 0,
-                    frequencyMilliseconds: 200)
-            
-            scrollObservables.append(contentsOf: [
-                dKeyObservable,
-                uKeyObservable,
-                shiftHKeyObservable,
-                shiftLKeyObservable,
-                shiftJKeyObservable,
-                shiftKKeyObservable
-            ])
-        }
-        
-        let allScrollObservables = Observable.from(scrollObservables)
-            .merge()
-            .do(onNext: { [weak self] in
-                self?.moveMouseToScrollAreaCenter(scrollAreaPosition: scrollAreaPosition, scrollAreaSize: scrollAreaSize)
-            })
-        
-        return allScrollObservables.subscribe()
-    }
-    
     func moveMouseToScrollAreaCenter(scrollAreaPosition: NSPoint, scrollAreaSize: NSSize) {
         let positionX = scrollAreaPosition.x + (scrollAreaSize.width / 2)
         let positionY = scrollAreaPosition.y + scrollAreaSize.height - (scrollAreaSize.height / 2)
@@ -267,87 +152,57 @@ class ScrollModeViewController: ModeViewController, NSTextFieldDelegate {
         Utils.moveMouse(position: position)
     }
     
-    override func viewDidDisappear() {
-        if let pos = self.originalMousePosition {
-            Utils.moveMouse(position: Utils.toOrigin(point: pos, size: NSSize.zero))
-        }
+    func activateNextScrollArea() {
+        let currentIndex = try! activeScrollAreaIndex.value()
+        let nextIndex = (currentIndex + 1) % scrollAreas.count
+        activeScrollAreaIndex.onNext(nextIndex)
+    }
+    
+    func revertMouseLocation() {
+        Utils.moveMouse(position: Utils.toOrigin(point: originalMousePosition, size: NSSize.zero))
+    }
+    
+    func showMouse() {
         HideCursorGlobally.unhide()
-        self.compositeDisposable.dispose()
-        self.scrollKeysDisposable?.dispose()
     }
     
-    static func scrollObservableSmooth(textField: OverlayTextField, character: Character, yAxis: Int64, xAxis: Int64, frequencyMilliseconds: Int) -> Observable<Void> {
-        return textField.distinctNSEventObservable
-            .filter({ $0.type == .keyUp || $0.type == .keyDown })
-            .filter({ $0.characters?.first == character })
-            .flatMapLatest({ event -> Observable<Void> in
-                if event.type == .keyUp {
-                    // trackpad "release" event
-                    // this prevents us from scrolling against the "rubber band" at the end of a scroll area
-                    // unfortunately it causes the scroll to "glide" at the end, which may not be desirable
-                    let scrollEventPhase4 = CGEvent.init(scrollWheelEvent2Source: nil, units: .pixel, wheelCount: 1, wheel1: 0, wheel2: 0, wheel3: 0)!
-                    scrollEventPhase4.setIntegerValueField(.scrollWheelEventIsContinuous, value: 1)
-                    scrollEventPhase4.setIntegerValueField(.scrollWheelEventMomentumPhase, value: 0)
-                    scrollEventPhase4.setDoubleValueField(.scrollWheelEventScrollPhase, value: 4)
-                    scrollEventPhase4.setIntegerValueField(.scrollWheelEventPointDeltaAxis1, value: 0)
-                    scrollEventPhase4.setIntegerValueField(.scrollWheelEventPointDeltaAxis2, value: 0)
-                    scrollEventPhase4.post(tap: .cghidEventTap)
-                    return Observable.just(Void())
-                }
-                
-
-                // this scroll phase 128 signifies the start of a trackpad scroll
-                // if an application did not receive this event, the scroll events below will not work
-                // the application only needs to receive this event once.
-                let scrollEventPhase128 = CGEvent.init(scrollWheelEvent2Source: nil, units: .pixel, wheelCount: 1, wheel1: 0, wheel2: 0, wheel3: 0)!
-                scrollEventPhase128.setIntegerValueField(.scrollWheelEventIsContinuous, value: 1)
-                scrollEventPhase128.setIntegerValueField(.scrollWheelEventMomentumPhase, value: 0)
-                scrollEventPhase128.setIntegerValueField(.scrollWheelEventScrollPhase, value: 128)
-                scrollEventPhase128.setIntegerValueField(.scrollWheelEventPointDeltaAxis1, value: 0)
-                scrollEventPhase128.setIntegerValueField(.scrollWheelEventPointDeltaAxis2, value: 0)
-                scrollEventPhase128.post(tap: .cghidEventTap)
-                
-                // this event is the second event emitted.
-                // if not present the final event (scroll phase 4) will not be allowed to emit (hence rubber banding will not work)
-                let scrollEventPhase1 = CGEvent.init(scrollWheelEvent2Source: nil, units: .pixel, wheelCount: 1, wheel1: 0, wheel2: 0, wheel3: 0)!
-                scrollEventPhase1.setIntegerValueField(.scrollWheelEventIsContinuous, value: 1)
-                scrollEventPhase1.setIntegerValueField(.scrollWheelEventMomentumPhase, value: 0)
-                scrollEventPhase1.setIntegerValueField(.scrollWheelEventScrollPhase, value: 1)
-                scrollEventPhase1.setIntegerValueField(.scrollWheelEventPointDeltaAxis1, value: yAxis)
-                scrollEventPhase1.setIntegerValueField(.scrollWheelEventPointDeltaAxis2, value: xAxis)
-                scrollEventPhase1.post(tap: .cghidEventTap)
-
-                return Observable<Int>.interval(.milliseconds(frequencyMilliseconds), scheduler: MainScheduler.instance)
-                    .map({ _ in Void() })
-                    .do(onNext: { _ in
-                        let scrollEventPhase2 = CGEvent.init(scrollWheelEvent2Source: nil, units: .pixel, wheelCount: 1, wheel1: 0, wheel2: 0, wheel3: 0)!
-                        scrollEventPhase2.setIntegerValueField(.scrollWheelEventIsContinuous, value: 1)
-                        scrollEventPhase2.setIntegerValueField(.scrollWheelEventMomentumPhase, value: 0)
-                        scrollEventPhase2.setIntegerValueField(.scrollWheelEventScrollPhase, value: 2)
-                        scrollEventPhase2.setIntegerValueField(.scrollWheelEventPointDeltaAxis1, value: yAxis)
-                        scrollEventPhase2.setIntegerValueField(.scrollWheelEventPointDeltaAxis2, value: xAxis)
-                        scrollEventPhase2.post(tap: .cghidEventTap)
-                    })
-            })
+    func observeActiveScrollAreaChange() -> Disposable {
+        return activeScrollAreaIndex.bind(onNext: { [weak self] i in
+            if self!.scrollAreas.count == 0 {
+                return
+            }
+            
+            let scrollArea = self!.scrollAreas[i]
+            self!.activateScrollArea(scrollArea: scrollArea)
+        })
     }
     
-    static func scrollObservableChunky(textField: OverlayTextField, character: Character, yAxis: Int, xAxis: Int, frequencyMilliseconds: Int) -> Observable<Void> {
-        textField.distinctNSEventObservable
-            .filter({ $0.type == .keyUp || $0.type == .keyDown })
-            .filter({ $0.characters?.first == character })
-            .flatMapLatest({ event -> Observable<Void> in
-                if event.type == .keyUp {
-                    return Observable.empty()
-                }
-                return Observable<Int>.interval(.milliseconds(frequencyMilliseconds), scheduler: MainScheduler.instance)
-                    .startWith(1)
-                    .map({ _ in Void() })
-                    .do(onNext: { _ in
-                        let event = CGEvent.init(scrollWheelEvent2Source: nil, units: .pixel, wheelCount: 1, wheel1: 0, wheel2: 0, wheel3: 0)!
-                        event.setIntegerValueField(.scrollWheelEventPointDeltaAxis1, value: Int64(yAxis))
-                        event.setIntegerValueField(.scrollWheelEventPointDeltaAxis2, value: Int64(xAxis))
-                        event.post(tap: .cghidEventTap)
-                    })
-            })
+    func observeScrollEvents() -> Disposable {
+        inputListener.scrollEventSubject.bind(onNext: { [weak self] event in
+            self?.on(scrollEvent: event)
+        })
+    }
+    
+    func observeEscapeEvents() -> Disposable {
+        return inputListener.escapeEventSubject.bind(onNext: { [weak self] _ in
+            self?.onEscape()
+        })
+    }
+    
+    func observeTabEvents() -> Disposable {
+        return inputListener.tabEventSubject.bind(onNext: { [weak self] _ in
+            self?.activateNextScrollArea()
+        })
+    }
+
+    static func instantiateInputListeningTextField() -> NSTextField {
+        let textField = NSTextField()
+        textField.stringValue = ""
+        textField.isEditable = true
+        return textField
+    }
+    
+    static func instantiateBorderView() -> BorderView {
+        return BorderView()
     }
 }
