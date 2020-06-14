@@ -8,7 +8,7 @@ PODS:
   - RxRelay (5.0.0):
     - RxSwift (~> 5)
   - RxSwift (5.0.0)
-  - Sparkle (1.21.3)
+  - Sparkle (1.23.0)
 
 DEPENDENCIES:
   - AXSwift (~> 0.2)
@@ -25,9 +25,9 @@ SPEC REPOS:
     - RxCocoa
     - RxRelay
     - RxSwift
-    - Sparkle
   trunk:
     - Preferences
+    - Sparkle
 
 SPEC CHECKSUMS:
   AXSwift: d49fe05ca04f983196c5caedfc88f617922ae671
@@ -36,7 +36,7 @@ SPEC CHECKSUMS:
   RxCocoa: fcf32050ac00d801f34a7f71d5e8e7f23026dcd8
   RxRelay: 4f7409406a51a55cd88483f21ed898c234d60f18
   RxSwift: 8b0671caa829a763bbce7271095859121cbd895f
-  Sparkle: 3f75576db8b0265adef36c43249d747f22d0b708
+  Sparkle: 55b1a87ba69d56913375a281546b7c82dec95bb0
 
 PODFILE CHECKSUM: 7b6ba65266337439d7050314252aa63d075aba9b
 
