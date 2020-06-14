@@ -29,9 +29,7 @@ enum ScrollState {
 
 class ScrollModeInputListenerFactory {
     static func instantiate() -> ScrollModeInputListener {
-        let config = ScrollKeyConfig(bindings: [
-            .init(key: "j", direction: .down, modifiers: nil)
-        ])
+        let config = UserPreferences.ScrollMode.ScrollKeysProperty.readAsConfig()
         return ScrollModeInputListener(scrollKeyConfig: config)
     }
 }
@@ -90,14 +88,33 @@ class ScrollModeInputListener: InputListener {
     func events(character: Character, modifierFlags: NSEvent.ModifierFlags?) -> Observable<NSEvent> {
         return events
             .filter({ [weak self] event in
+                return self!.doesEventMatchCharacter(event: event, character: character)
+            })
+            .filter({ [weak self] event in
                 return
-                    self!.doesEventMatchesCharacter(event: event, character: character) &&
-                                                                      // 256 is the rawValue when there are no modifiers
-                    event.modifierFlags.rawValue == (modifierFlags ?? NSEvent.ModifierFlags.init(rawValue: 256)).rawValue
+                    self!.doesEventMatchCharacter(event: event, character: character) &&
+                        event.modifierFlags.intersection(.deviceIndependentFlagsMask) == (modifierFlags ?? .init())
             })
     }
     
-    func doesEventMatchesCharacter(event: NSEvent, character: Character) -> Bool {
+    
+    
+    func doesEventMatchBinding(event: NSEvent, binding: ScrollKeyConfig.Binding) -> Bool {
+        return
+            doesEventMatchCharacter(event: event, character: binding.key) &&
+            doesEventMatchModifiers(event: event, modifiers: binding.modifiers)
+    }
+    
+    func doesEventMatchCharacter(event: NSEvent, character: Character) -> Bool {
         return event.characters == String(character)
+    }
+    
+    func doesEventMatchModifiers(event: NSEvent, modifiers: NSEvent.ModifierFlags?) -> Bool {
+        return event.modifierFlags.intersection(.deviceIndependentFlagsMask) ==
+            (
+                modifiers ??
+                // 256 is the rawValue when there are no modifiers
+                NSEvent.ModifierFlags.init(rawValue: 256)
+            )
     }
 }
