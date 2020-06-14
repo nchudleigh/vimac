@@ -44,6 +44,8 @@ class ScrollModeInputListener: InputListener {
     private let scrollKeyConfig: ScrollKeyConfig
     
     let scrollEventSubject: PublishSubject<ScrollEvent> = PublishSubject()
+    let escapeEventSubject: PublishSubject<Void> = PublishSubject()
+    let tabEventSubject: PublishSubject<Void> = PublishSubject()
     
     init(scrollKeyConfig: ScrollKeyConfig) {
         print("scroll mode listener initialized")
@@ -51,6 +53,8 @@ class ScrollModeInputListener: InputListener {
         super.init()
 
         disposeBag.insert(observeScrollEvent(bindings: scrollKeyConfig.bindings))
+        disposeBag.insert(observeEscapeKey())
+        disposeBag.insert(observeTabKey())
     }
     
     deinit {
@@ -66,6 +70,24 @@ class ScrollModeInputListener: InputListener {
         let observable = Observable.merge(scrollEventObservables)
         return observable.bind(onNext: { [weak self] event in
             self?.onScrollEvent(event: event)
+        })
+    }
+    
+    func observeEscapeKey() -> Disposable {
+        let escapeEvents = events.filter({ event in
+            event.keyCode == kVK_Escape && event.type == .keyDown
+        })
+        return escapeEvents.bind(onNext: { [weak self] _ in
+            self!.escapeEventSubject.onNext(())
+        })
+    }
+    
+    func observeTabKey() -> Disposable {
+        let tabEvents = events.filter({ event in
+            event.keyCode == kVK_Tab && event.type == .keyDown
+        })
+        return tabEvents.bind(onNext: { [weak self] _ in
+            self!.tabEventSubject.onNext(())
         })
     }
     
@@ -96,8 +118,6 @@ class ScrollModeInputListener: InputListener {
                         event.modifierFlags.intersection(.deviceIndependentFlagsMask) == (modifierFlags ?? .init())
             })
     }
-    
-    
     
     func doesEventMatchBinding(event: NSEvent, binding: ScrollKeyConfig.Binding) -> Bool {
         return
