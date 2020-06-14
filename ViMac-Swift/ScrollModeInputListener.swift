@@ -37,7 +37,7 @@ class ScrollModeInputListenerFactory {
 }
 
 class ScrollModeInputListener: InputListener {
-    struct ScrollEvent {
+    struct ScrollEvent: Equatable {
         let direction: ScrollDirection
         let state: ScrollState
     }
@@ -48,10 +48,15 @@ class ScrollModeInputListener: InputListener {
     let scrollEventSubject: PublishSubject<ScrollEvent> = PublishSubject()
     
     init(scrollKeyConfig: ScrollKeyConfig) {
+        print("scroll mode listener initialized")
         self.scrollKeyConfig = scrollKeyConfig
         super.init()
 
         disposeBag.insert(observeScrollEvent(bindings: scrollKeyConfig.bindings))
+    }
+    
+    deinit {
+        print("scroll mode listener deinitialized")
     }
     
     func onScrollEvent(event: ScrollEvent) {
@@ -77,15 +82,19 @@ class ScrollModeInputListener: InputListener {
                     fatalError("An unexpected non-keyDown/keyUp event was received.")
                 }
             })
+            // keyDown events are repeatedly fired when the key is held down.
+            // this prevents sequential events of the same direction and state from being emitted.
+            .distinctUntilChanged()
     }
 
     func events(character: Character, modifierFlags: NSEvent.ModifierFlags?) -> Observable<NSEvent> {
-        return events.filter({ [weak self] event in
-            return
-                self!.doesEventMatchesCharacter(event: event, character: character) &&
-                                                                  // 256 is the rawValue when there are no modifiers
-                event.modifierFlags.rawValue == (modifierFlags ?? NSEvent.ModifierFlags.init(rawValue: 256)).rawValue
-        })
+        return events
+            .filter({ [weak self] event in
+                return
+                    self!.doesEventMatchesCharacter(event: event, character: character) &&
+                                                                      // 256 is the rawValue when there are no modifiers
+                    event.modifierFlags.rawValue == (modifierFlags ?? NSEvent.ModifierFlags.init(rawValue: 256)).rawValue
+            })
     }
     
     func doesEventMatchesCharacter(event: NSEvent, character: Character) -> Bool {
