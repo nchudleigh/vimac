@@ -4,13 +4,11 @@ Vimium for macOS.
 
 ## Download
 
-You can find releases in [dexterleng/vimac-releases](https://github.com/dexterleng/vimac-releases).
-
-You can find the download link for v0.3.7 [here](https://github.com/dexterleng/vimac-releases/raw/master/vimac-v0.3.7.zip).
+You can download all versions of Vimac [here](https://install.appcenter.ms/users/dexterleng/apps/vimac/distribution_groups/sparkle).
 
 ## Installing
 
-Note that Mojave is the minimum version supported right now. Catalina has not been tested. You will need to give Vimac **Accessibility** permissions in **Security & Privacy.**
+You will need to give Vimac **Accessibility** permissions in **Security & Privacy.**
 
 :warning: **When you update Vimac, even though the app is in the permissions list, you have to untick and tick it (or remove and add back) for permissions to be granted.**
 
