@@ -11,6 +11,14 @@ import Cocoa
 class ModeViewController: NSViewController, OverlayTextFieldDelegate {
     weak var modeCoordinator: ModeCoordinator?
     
+    init() {
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError()
+    }
+    
     override func loadView() {
         self.view = NSView()
     }

@@ -20,7 +20,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
 
     init(elements: Observable<UIElement>) {
         self.elements = elements.share()
-        super.init(nibName: nil, bundle: nil)
+        super.init()
     }
     
     required init?(coder: NSCoder) {

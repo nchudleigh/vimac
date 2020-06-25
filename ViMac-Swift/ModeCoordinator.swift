@@ -62,7 +62,6 @@ class ModeCoordinator : Coordinator {
         
         let vc = ScrollModeViewController.init()
         self.setViewController(vc: vc)
-        vc.textField.becomeFirstResponder()
     }
     
     func setHintMode() {

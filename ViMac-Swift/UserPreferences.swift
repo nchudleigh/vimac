@@ -82,6 +82,43 @@ struct UserPreferences {
                 let areKeysUnique = keys.count == Set(keys).count
                 return isCountValid && areKeysUnique
             }
+            
+            static func readAsConfig() -> ScrollKeyConfig {
+                let s = read()
+                
+                let scrollLeftKey = s[s.index(s.startIndex, offsetBy: 0)]
+                let scrollDownKey = s[s.index(s.startIndex, offsetBy: 1)]
+                let scrollUpKey = s[s.index(s.startIndex, offsetBy: 2)]
+                let scrollRightKey = s[s.index(s.startIndex, offsetBy: 3)]
+                let scrollHalfDownKey = s.count == 6 ? (s[s.index(s.startIndex, offsetBy: 4)]) : nil
+                let scrollHalfUpKey = s.count == 6 ? (s[s.index(s.startIndex, offsetBy: 5)]) : nil
+                
+                var bindings: [ScrollKeyConfig.Binding] = [
+                    .init(key: scrollLeftKey, direction: .left, modifiers: nil),
+                    .init(key: scrollDownKey, direction: .down, modifiers: nil),
+                    .init(key: scrollUpKey, direction: .up, modifiers: nil),
+                    .init(key: scrollRightKey, direction: .right, modifiers: nil),
+                    
+                    .init(key: Character(scrollLeftKey.uppercased()), direction: .halfLeft, modifiers: .shift),
+                    .init(key: Character(scrollDownKey.uppercased()), direction: .halfDown, modifiers: .shift),
+                    .init(key: Character(scrollUpKey.uppercased()), direction: .halfUp, modifiers: .shift),
+                    .init(key: Character(scrollRightKey.uppercased()), direction: .halfRight, modifiers: .shift),
+                ]
+                
+                if let k = scrollHalfDownKey {
+                    bindings.append(
+                        .init(key: k, direction: .halfDown, modifiers: nil)
+                    )
+                }
+                
+                if let k = scrollHalfUpKey {
+                    bindings.append(
+                        .init(key: k, direction: .halfUp, modifiers: nil)
+                    )
+                }
+                
+                return ScrollKeyConfig(bindings: bindings)
+            }
         }
         
         class ScrollSensitivityProperty : PreferenceProperty {
