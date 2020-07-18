@@ -10,6 +10,7 @@ import Cocoa
 import AXSwift
 import RxSwift
 import Carbon.HIToolbox
+import os
 
 class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     let elements: Observable<UIElement>
@@ -17,6 +18,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     var hintViews: [HintView]?
     let compositeDisposable = CompositeDisposable()
     var characterStack: [Character] = [Character]()
+    let startTime = CFAbsoluteTimeGetCurrent()
 
     init(elements: Observable<UIElement>) {
         self.elements = elements.share()
@@ -151,6 +153,9 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
                 .observeOn(MainScheduler.instance)
                 .subscribe(
                 onSuccess: { [weak self] elements in
+                    let timeElapsed = CFAbsoluteTimeGetCurrent() - self!.startTime
+                    os_log("[Hint mode] time: %@", log: Log.accessibility, String(describing: timeElapsed))
+                    
                     self?.onElementTraversalComplete(elements: elements.filter({ element in
                         let actionCount = (try? element.actionsAsStrings().count) ?? 0
                         let role = try? element.role()
