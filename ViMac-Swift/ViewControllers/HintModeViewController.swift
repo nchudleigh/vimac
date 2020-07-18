@@ -154,7 +154,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
                     self?.onElementTraversalComplete(elements: elements.filter({ element in
                         let actionCount = (try? element.actionsAsStrings().count) ?? 0
                         let role = try? element.role()
-                        return actionCount > 0 || role == Role.row
+                        return actionCount > 0
                     }))
                 }, onError: { error in
                     print(error)
