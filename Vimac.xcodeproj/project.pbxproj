@@ -36,6 +36,9 @@
 		E279534F24961DFB006D8D7A /* SmoothScroller.swift in Sources */ = {isa = PBXBuildFile; fileRef = E279534E24961DFB006D8D7A /* SmoothScroller.swift */; };
 		E279535124962E8D006D8D7A /* ChunkyScroller.swift in Sources */ = {isa = PBXBuildFile; fileRef = E279535024962E8C006D8D7A /* ChunkyScroller.swift */; };
 		E2795353249633DE006D8D7A /* Scroller.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2795352249633DE006D8D7A /* Scroller.swift */; };
+		E287C6EA24C2F23500CFD259 /* QueryElementService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E287C6E924C2F23500CFD259 /* QueryElementService.swift */; };
+		E287C6EC24C2F60500CFD259 /* Element.swift in Sources */ = {isa = PBXBuildFile; fileRef = E287C6EB24C2F60500CFD259 /* Element.swift */; };
+		E287C6EE24C2F6A000CFD259 /* ElementStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E287C6ED24C2F6A000CFD259 /* ElementStore.swift */; };
 		E28867F0235F54F2001691A5 /* Vimac.icns in Resources */ = {isa = PBXBuildFile; fileRef = E28867EF235F54F1001691A5 /* Vimac.icns */; };
 		E2C29562234DD7F8001A38D6 /* OverlayWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2C29561234DD7F8001A38D6 /* OverlayWindowController.swift */; };
 		E2C29566234DE09C001A38D6 /* ModeCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2C29565234DE09C001A38D6 /* ModeCoordinator.swift */; };
@@ -43,6 +46,7 @@
 		E2C29571234E19E4001A38D6 /* HintModeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2C29570234E19E4001A38D6 /* HintModeViewController.swift */; };
 		E2C29573234E2E8B001A38D6 /* ScrollModeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2C29572234E2E8B001A38D6 /* ScrollModeViewController.swift */; };
 		E2C3221E23BC828C00508B44 /* HideCursorGlobally.m in Sources */ = {isa = PBXBuildFile; fileRef = E2C3221D23BC828C00508B44 /* HideCursorGlobally.m */; };
+		E2CF308F24C5FC81005CA8AE /* HintModeWindowQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2CF308E24C5FC81005CA8AE /* HintModeWindowQuery.swift */; };
 		E2DFF5AB24815C5800B4090D /* PreferencesPaneIdentifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2DFF5AA24815C5800B4090D /* PreferencesPaneIdentifiers.swift */; };
 		E2DFF5AD24815D3E00B4090D /* GeneralPreferenceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2DFF5AC24815D3E00B4090D /* GeneralPreferenceViewController.swift */; };
 		E2DFF5AF2481638F00B4090D /* GeneralPreferenceViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = E2DFF5AE2481638F00B4090D /* GeneralPreferenceViewController.xib */; };
@@ -138,6 +142,9 @@
 		E279534E24961DFB006D8D7A /* SmoothScroller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmoothScroller.swift; sourceTree = "<group>"; };
 		E279535024962E8C006D8D7A /* ChunkyScroller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChunkyScroller.swift; sourceTree = "<group>"; };
 		E2795352249633DE006D8D7A /* Scroller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scroller.swift; sourceTree = "<group>"; };
+		E287C6E924C2F23500CFD259 /* QueryElementService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryElementService.swift; sourceTree = "<group>"; };
+		E287C6EB24C2F60500CFD259 /* Element.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Element.swift; sourceTree = "<group>"; };
+		E287C6ED24C2F6A000CFD259 /* ElementStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElementStore.swift; sourceTree = "<group>"; };
 		E28867EF235F54F1001691A5 /* Vimac.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Vimac.icns; sourceTree = SOURCE_ROOT; };
 		E2C29561234DD7F8001A38D6 /* OverlayWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayWindowController.swift; sourceTree = "<group>"; };
 		E2C29565234DE09C001A38D6 /* ModeCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModeCoordinator.swift; sourceTree = "<group>"; };
@@ -146,6 +153,7 @@
 		E2C29572234E2E8B001A38D6 /* ScrollModeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollModeViewController.swift; sourceTree = "<group>"; };
 		E2C3221C23BC828C00508B44 /* HideCursorGlobally.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HideCursorGlobally.h; sourceTree = "<group>"; };
 		E2C3221D23BC828C00508B44 /* HideCursorGlobally.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HideCursorGlobally.m; sourceTree = "<group>"; };
+		E2CF308E24C5FC81005CA8AE /* HintModeWindowQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HintModeWindowQuery.swift; sourceTree = "<group>"; };
 		E2DFF5AA24815C5800B4090D /* PreferencesPaneIdentifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesPaneIdentifiers.swift; sourceTree = "<group>"; };
 		E2DFF5AC24815D3E00B4090D /* GeneralPreferenceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneralPreferenceViewController.swift; sourceTree = "<group>"; };
 		E2DFF5AE2481638F00B4090D /* GeneralPreferenceViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = GeneralPreferenceViewController.xib; sourceTree = "<group>"; };
@@ -259,6 +267,8 @@
 		E26172222322968500E396CA /* ViMac-Swift */ = {
 			isa = PBXGroup;
 			children = (
+				E2CF308D24C5FC31005CA8AE /* Element */,
+				E287C6E824C2F22A00CFD259 /* Services */,
 				E28867EF235F54F1001691A5 /* Vimac.icns */,
 				E2C2956F234E0A32001A38D6 /* ViewControllers */,
 				E225BD1E233354AD00ECDEF4 /* Windows */,
@@ -321,6 +331,14 @@
 			path = Welcome;
 			sourceTree = "<group>";
 		};
+		E287C6E824C2F22A00CFD259 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				E287C6E924C2F23500CFD259 /* QueryElementService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
 		E2C2956F234E0A32001A38D6 /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
@@ -329,6 +347,16 @@
 				E2C29572234E2E8B001A38D6 /* ScrollModeViewController.swift */,
 			);
 			path = ViewControllers;
+			sourceTree = "<group>";
+		};
+		E2CF308D24C5FC31005CA8AE /* Element */ = {
+			isa = PBXGroup;
+			children = (
+				E287C6ED24C2F6A000CFD259 /* ElementStore.swift */,
+				E287C6EB24C2F60500CFD259 /* Element.swift */,
+				E2CF308E24C5FC81005CA8AE /* HintModeWindowQuery.swift */,
+			);
+			path = Element;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -601,6 +629,7 @@
 				E2795353249633DE006D8D7A /* Scroller.swift in Sources */,
 				E2C3221E23BC828C00508B44 /* HideCursorGlobally.m in Sources */,
 				E279534F24961DFB006D8D7A /* SmoothScroller.swift in Sources */,
+				E287C6EA24C2F23500CFD259 /* QueryElementService.swift in Sources */,
 				E2DFF5AB24815C5800B4090D /* PreferencesPaneIdentifiers.swift in Sources */,
 				E2F6C9B1232E337500F2975B /* OverlayTextField.swift in Sources */,
 				E2C29571234E19E4001A38D6 /* HintModeViewController.swift in Sources */,
@@ -612,6 +641,7 @@
 				E279534D2494CC69006D8D7A /* ScrollModeInputListener.swift in Sources */,
 				E268A02A236D8F6F00EE08CB /* CachedUIElement.swift in Sources */,
 				E26981B523C99DF900E46217 /* WelcomeViewController.swift in Sources */,
+				E287C6EC24C2F60500CFD259 /* Element.swift in Sources */,
 				E2C29568234DE51F001A38D6 /* ModeViewController.swift in Sources */,
 				E245F9B123941AE8009CA9C6 /* BorderView.swift in Sources */,
 				E25F8711233222A9007AA958 /* AccessibilityObservables.swift in Sources */,
@@ -620,10 +650,12 @@
 				E266D916248AAC99005A261F /* UserPreferences.swift in Sources */,
 				E2C29566234DE09C001A38D6 /* ModeCoordinator.swift in Sources */,
 				E2C29562234DD7F8001A38D6 /* OverlayWindowController.swift in Sources */,
+				E2CF308F24C5FC81005CA8AE /* HintModeWindowQuery.swift in Sources */,
 				E229E57A2482ABAF00A558D3 /* ScrollModePreferenceViewController.swift in Sources */,
 				E2069700232A52EA001EFDB2 /* AlphabetHints.swift in Sources */,
 				E20696F923290D41001EFDB2 /* Log.swift in Sources */,
 				E225BD1D233292B800ECDEF4 /* StatusItemManager.swift in Sources */,
+				E287C6EE24C2F6A000CFD259 /* ElementStore.swift in Sources */,
 				E26981B323C99DBB00E46217 /* WelcomeWindowController.swift in Sources */,
 				E26172242322968500E396CA /* AppDelegate.swift in Sources */,
 				E2F6C9AD232DE89F00F2975B /* HintView.swift in Sources */,

@@ -13,21 +13,11 @@ import Carbon.HIToolbox
 import os
 
 class HintModeViewController: ModeViewController, NSTextFieldDelegate {
-    let elements: Observable<UIElement>
     let textField = OverlayTextField(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
     var hintViews: [HintView]?
     let compositeDisposable = CompositeDisposable()
     var characterStack: [Character] = [Character]()
     let startTime = CFAbsoluteTimeGetCurrent()
-
-    init(elements: Observable<UIElement>) {
-        self.elements = elements.share()
-        super.init()
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError()
-    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -148,67 +138,24 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
                     vc.rotateHints()
         }))
         
-        self.compositeDisposable.insert(
-            elements.toArray()
-                .observeOn(MainScheduler.instance)
-                .subscribe(
-                onSuccess: { [weak self] elements in
-                    let timeElapsed = CFAbsoluteTimeGetCurrent() - self!.startTime
-                    os_log("[Hint mode] time: %@", log: Log.accessibility, String(describing: timeElapsed))
-                    
-                    self?.onElementTraversalComplete(elements: elements.filter({ element in
-                        let actionCount = (try? element.actionsAsStrings().count) ?? 0
-                        let role = try? element.role()
-                        return actionCount > 0
-                    }))
-                }, onError: { error in
-                    print(error)
-                })
-        )
+        self.compositeDisposable.insert(observeWindowElements())
     }
     
-    func onElementTraversalComplete(elements: [UIElement]) {
+    func onElementTraversalComplete(elements: [Element]) {
+        let elements = elements
+            .filter({ element in
+                let actionCount = (try? element.cachedUIElement.actionsAsStrings().count) ?? 0
+                return actionCount > 0
+            })
+        
         let hintStrings = AlphabetHints().hintStrings(linkCount: elements.count, hintCharacters: UserPreferences.HintMode.CustomCharactersProperty.read())
         
         let textSize = UserPreferences.HintMode.TextSizeProperty.readAsFloat()
 
         let hintViews: [HintView] = elements
             .enumerated()
-            .map ({ (index, button) in
-                
-                let text = HintView(associatedElement: button, hintTextSize: CGFloat(textSize), hintText: hintStrings[index], typedHintText: "")
-                
-                let centerPositionOptional: NSPoint? = {
-                    do {
-                        guard let topLeftPositionFlipped: NSPoint = try button.attribute(.position),
-                            let buttonSize: NSSize = try button.attribute(.size) else {
-                            return nil
-                        }
-                        let topLeftPositionRelativeToScreen = Utils.toOrigin(point: topLeftPositionFlipped, size: text.frame.size)
-                        guard let topLeftPositionRelativeToWindow = self.modeCoordinator?.windowController.window?.convertPoint(fromScreen: topLeftPositionRelativeToScreen) else {
-                            return nil
-                        }
-                        let x = (topLeftPositionRelativeToWindow.x + (buttonSize.width / 2)) - (text.frame.size.width / 2)
-                        let y = (topLeftPositionRelativeToWindow.y - (buttonSize.height) / 2) + (text.frame.size.height / 2)
-                        
-                        // buttonSize.width/height and topLeftPositionRelativeToScreen.x/y can be NaN
-                        if x.isNaN || y.isNaN {
-                            return nil
-                        }
-                        
-                        return NSPoint(x: x, y: y)
-                    } catch {
-                        return nil
-                    }
-                }()
-
-                guard let centerPosition = centerPositionOptional else {
-                    return nil
-                }
-                
-                text.frame.origin = centerPosition
-                
-                return text
+            .map ({ x in
+                return instantiateHintView(element: x.element, hintText: hintStrings[x.offset], textSize: textSize)
             })
             .compactMap({ $0 })
         
@@ -259,5 +206,57 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     override func viewDidDisappear() {
         super.viewDidDisappear()
         self.compositeDisposable.dispose()
+    }
+    
+    func observeWindowElements() -> Disposable {
+        let activeWindowRawElement = Utils.getCurrentApplicationWindowManually()?.element
+        let activeWindowElement = Element.init(axUIElement: activeWindowRawElement!)
+        let elementsObservable: Observable<[Element]> = createWindowObservable(windowElement: activeWindowElement)
+        return elementsObservable
+            .observeOn(MainScheduler.instance)
+            .bind(onNext: { [weak self] elements in
+            self?.onElementTraversalComplete(elements: elements)
+        })
+    }
+    
+    func createWindowObservable(windowElement: Element) -> Observable<[Element]> {
+        return Observable.create { observer in
+            let queryElementService = QueryElementService(rootElement: windowElement, query: HintModeWindowQuery())
+            try! queryElementService.perform(onComplete: { store in
+                let elements = try! store.flatten(element: windowElement)
+                observer.onNext(elements)
+                observer.onCompleted()
+            })
+            return Disposables.create()
+        }
+    }
+    
+    private func instantiateHintView(element: Element, hintText: String, textSize: Float) -> HintView? {
+        let text = HintView(associatedElement: element.cachedUIElement, hintTextSize: CGFloat(textSize), hintText: hintText, typedHintText: "")
+        let position = element.position()!
+        let size = element.size()!
+        
+        let centerPositionOptional: NSPoint? = {
+            let topLeftPositionFlipped: NSPoint = position
+            let topLeftPositionRelativeToScreen = Utils.toOrigin(point: topLeftPositionFlipped, size: text.frame.size)
+            let topLeftPositionRelativeToWindow = self.modeCoordinator!.windowController.window!.convertPoint(fromScreen: topLeftPositionRelativeToScreen)
+            let x = (topLeftPositionRelativeToWindow.x + (size.width / 2)) - (text.frame.size.width / 2)
+            let y = (topLeftPositionRelativeToWindow.y - (size.height) / 2) + (text.frame.size.height / 2)
+            
+            // buttonSize.width/height and topLeftPositionRelativeToScreen.x/y can be NaN
+            if x.isNaN || y.isNaN {
+                return nil
+            }
+            
+            return NSPoint(x: x, y: y)
+        }()
+
+        guard let centerPosition = centerPositionOptional else {
+            return nil
+        }
+        
+        text.frame.origin = centerPosition
+        
+        return text
     }
 }
