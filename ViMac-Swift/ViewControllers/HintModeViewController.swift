@@ -221,7 +221,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     
     func createWindowElementsObservable(windowElement: Element) -> Single<[Element]> {
         return Single.create { observer in
-            let queryService = HintModeWindowQueryService(windowElement: windowElement)
+            let queryService = HintModeElementQueryService(windowElement: windowElement)
             queryService.query(onComplete: { elements in
                 observer(SingleEvent.success(elements))
             })
