@@ -35,14 +35,14 @@ class QueryElementService {
     }
     
     func perform(onComplete: @escaping (ElementStore) -> ()) throws {
-        let visitElementObservable = createVisitElementObservable(element: rootElement, parent: nil, context: [String:Any]())
+        let visitElementObservable = createVisitElementObservable(element: rootElement, nthChild: nil, parent: nil, context: [String:Any]())
         disposeBag.insert(visitElementObservable.bind(onNext: {
             onComplete(self.store)
         }))
     }
     
-    func createVisitElementObservable(element: Element, parent: Element?, context: [String:Any]) -> Observable<Void> {
-        let registerParentRelationshipObservable = createRegisterParentRelationshipObservable(element: element, parent: parent)
+    func createVisitElementObservable(element: Element, nthChild: Int?, parent: Element?, context: [String:Any]) -> Observable<Void> {
+        let registerParentRelationshipObservable = createRegisterParentRelationshipObservable(element: element, nthChild: nthChild, parent: parent)
         let onElementObservable = createOnElementObservable(query: query, element: element, context: context)
         
         let chainedObservable = onElementObservable
@@ -59,8 +59,8 @@ class QueryElementService {
                 return Observable.zip(registerParentRelationshipObservable, Observable.just(queryAction), Observable.just([]))
             })
             .flatMap({ (_, queryAction, children) -> Observable<Void> in
-                let visitChildrenObservables = children.map({ child in
-                    return self.createVisitElementObservable(element: child, parent: element, context: queryAction.childrenContext!)
+                let visitChildrenObservables = children.enumerated().map({ e in
+                    return self.createVisitElementObservable(element: e.element, nthChild: e.offset, parent: element, context: queryAction.childrenContext!)
                 })
                 return Observable.merge(visitChildrenObservables)
             })
@@ -83,12 +83,13 @@ class QueryElementService {
         })
     }
     
-    func createRegisterParentRelationshipObservable(element: Element, parent: Element?) -> Observable<Void> {
+    func createRegisterParentRelationshipObservable(element: Element, nthChild: Int?, parent: Element?) -> Observable<Void> {
         return Observable.create({ observer in
             self.element_store_mutating_queue.sync {
                 self.store.add(element: element)
-                if let parent = parent {
-                    try! self.store.add_parent(element: element, parent: parent)
+                if let parent = parent,
+                    let nthChild = nthChild {
+                    try! self.store.add_parent(element: element, parent: parent, nthChild: nthChild)
                 }
 
                 observer.onNext(Void())

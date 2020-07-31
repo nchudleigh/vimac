@@ -25,7 +25,6 @@ class HintModeElementQueryService {
         let elementObservable = Utils.eagerConcat(observables: [
             queryMenuBarObservable().asObservable().flatMap({ Observable.from($0) }),
             queryWindowObservable().asObservable().flatMap({ Observable.from($0) }),
-            queryMenuBarExtraObservable().asObservable().flatMap({ Observable.from($0) }),
         ])
         disposeBag.insert(
             elementObservable

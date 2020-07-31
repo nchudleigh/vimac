@@ -16,7 +16,7 @@ import Cocoa
 class ElementStore {
     private var store: [UUID: Element] = [:]
     private var parent_map: [UUID: Element] = [:]
-    private var children_map: [UUID: [Element]] = [:]
+    private var children_map: [UUID: [(Element, Int)]] = [:]
     
     func add(element: Element) {
         store[element.uuid] = element
@@ -34,14 +34,14 @@ class ElementStore {
         return element
     }
     
-    func add_parent(element: Element, parent: Element) throws {
+    func add_parent(element: Element, parent: Element, nthChild: Int) throws {
         try! validate_element_existence(element: element)
         try! validate_element_existence(element: parent)
         try! validate_parent_absence(element: element)
         
         parent_map[element.uuid] = parent
-        var parent_children = try! get_children(element: parent)
-        parent_children.append(element)
+        var parent_children = try! get_children_index_tagged_unsorted(element: parent)
+        parent_children.append((element, nthChild))
         children_map[parent.uuid] = parent_children
     }
     
@@ -58,6 +58,12 @@ class ElementStore {
     }
     
     func get_children(element: Element) throws -> [Element] {
+        try! get_children_index_tagged_unsorted(element: element)
+            .sorted(by: { (a, b) in a.1 <= b.1 })
+            .map { $0.0 }
+    }
+    
+    func get_children_index_tagged_unsorted(element: Element) throws -> [(Element, Int)] {
         try! validate_element_existence(element: element)
         return children_map[element.uuid] ?? []
     }
