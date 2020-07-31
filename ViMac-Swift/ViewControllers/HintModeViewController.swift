@@ -211,23 +211,25 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     func observeWindowElements() -> Disposable {
         let activeWindowRawElement = Utils.getCurrentApplicationWindowManually()?.element
         let activeWindowElement = Element.init(axUIElement: activeWindowRawElement!)
-        let elementsObservable: Observable<[Element]> = createWindowObservable(windowElement: activeWindowElement)
+        let elementsObservable: Single<[Element]> = createWindowElementsObservable(windowElement: activeWindowElement)
         return elementsObservable
             .observeOn(MainScheduler.instance)
-            .bind(onNext: { [weak self] elements in
-            self?.onElementTraversalComplete(elements: elements)
+            .subscribe(onSuccess: { [weak self] elements in
+                self?.onElementTraversalComplete(elements: elements)
         })
     }
     
-    func createWindowObservable(windowElement: Element) -> Observable<[Element]> {
-        return Observable.create { observer in
-            let queryElementService = QueryElementService(rootElement: windowElement, query: HintModeWindowQuery())
-            try! queryElementService.perform(onComplete: { store in
-                let elements = try! store.flatten(element: windowElement)
-                observer.onNext(elements)
-                observer.onCompleted()
+    func createWindowElementsObservable(windowElement: Element) -> Single<[Element]> {
+        return Single.create { observer in
+            let queryService = HintModeWindowQueryService(windowElement: windowElement)
+            queryService.query(onComplete: { elements in
+                observer(SingleEvent.success(elements))
             })
-            return Disposables.create()
+
+            return Disposables.create {
+                // hold a reference to queryService so it isn't GC'd
+                return queryService
+            }
         }
     }
     
