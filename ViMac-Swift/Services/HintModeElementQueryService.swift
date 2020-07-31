@@ -9,8 +9,10 @@
 import Cocoa
 import RxSwift
 import AXSwift
+import os
 
 class HintModeElementQueryService {
+    let startTime = CFAbsoluteTimeGetCurrent()
     let windowElement: Element
     lazy var windowQueryService: QueryElementService = QueryElementService(rootElement: windowElement, query: HintModeWindowQuery())
     let disposeBag = DisposeBag()
@@ -29,6 +31,8 @@ class HintModeElementQueryService {
             elementObservable
                 .toArray().asObservable()
                 .bind(onNext: { elements in
+                    let timeElapsed = CFAbsoluteTimeGetCurrent() - self.startTime
+                    os_log("[Hint mode] time: %@", log: Log.accessibility, String(describing: timeElapsed))
                     onComplete(elements)
                 })
         )
