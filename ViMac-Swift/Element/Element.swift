@@ -23,7 +23,14 @@ class Element {
     }
     
     func attribute<T>(attr: Attribute) -> T? {
-        return try? self.cachedUIElement.attribute(attr)
+        let result: Any? = try? self.cachedUIElement.attribute(attr)
+        
+        // AXSwift wraps AXUIElement as UIElement https://github.com/tmandry/AXSwift/blob/2328ea6a967138052c292c76a099609793ea3234/Sources/UIElement.swift#L421
+        // this is similar - we convert UIElement to Element instead
+        if let uiElement = result as? UIElement {
+            return Element(axUIElement: uiElement.element) as? T
+        }
+        return result as? T
     }
     
     func role() -> String? {

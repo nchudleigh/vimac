@@ -163,17 +163,10 @@ class Utils: NSObject {
     static func traverseForMenuBarItems(windowElement: Element) -> Observable<Element> {
         let application: Observable<Element> = getElementAttribute(element: windowElement, attribute: .parent)
             .compactMap({ $0 })
-            .map { Utils.uiElementToElement(uiElement: $0) }
         return application
             .flatMap({ app -> Observable<Element> in
-                let menuBarUIElementObservable: Observable<UIElement?> = getElementAttribute(element: app, attribute: .menuBar)
-                let manuBarElementObservable: Observable<Element?> = menuBarUIElementObservable.map { uiElementMaybe in
-                    guard let uiElement = uiElementMaybe else {
-                        return nil
-                    }
-                    return Utils.uiElementToElement(uiElement: uiElement)
-                }
-                return manuBarElementObservable.compactMap({ $0 })
+                return getElementAttribute(element: app, attribute: .menuBar)
+                    .compactMap({ $0 })
             })
             .flatMap({ menuBar -> Observable<[Element]> in
                 return getChildren(element: menuBar)
@@ -186,14 +179,8 @@ class Utils: NSObject {
     static func traverseForExtraMenuBarItems() -> Observable<Element> {
         let menuBars = eagerConcat(observables: Application.all()
             .map({ app -> Observable<Element> in
-                let menuBarUIElementOptional: Observable<UIElement?> = getElementAttribute(element: Utils.uiElementToElement(uiElement: app), attribute: .extrasMenuBar)
-                let menuBarOptional: Observable<Element?> = menuBarUIElementOptional.map { uiElementMaybe in
-                    guard let uiElement = uiElementMaybe else {
-                        return nil
-                    }
-                    return Utils.uiElementToElement(uiElement: uiElement)
-                }
-                return menuBarOptional.compactMap({ $0 })
+                return getElementAttribute(element: Utils.uiElementToElement(uiElement: app), attribute: .extrasMenuBar)
+                    .compactMap({ $0 })
             })
         )
         return menuBars
