@@ -11,8 +11,7 @@ import AXSwift
 
 class HintModeWindowQuery : ElementQuery {
     func onElement(element: Element, context: [String : Any]) -> ElementQueryAction {
-        // fetch and cache these attributes in bulk
-        let _ = try? element.cachedUIElement.getMultipleAttributes([.role, .position, .size])
+        element.bulkCacheAttributes()
         
         if !areElementAttributesPresent(element: element, attributes: [.role, .position, .size]) {
             return ElementQueryAction.init(includeElement: false, visitChildren: false, childrenContext: nil)
@@ -31,7 +30,7 @@ class HintModeWindowQuery : ElementQuery {
     
     private func areElementAttributesPresent(element: Element, attributes: [Attribute]) -> Bool {
         for attribute in attributes {
-            let v: Any? = try? element.cachedUIElement.attribute(attribute)
+            let v: Any? = element.attribute(attr: attribute)
             if v == nil {
                 return false
             }

@@ -12,10 +12,18 @@ import AXSwift
 class Element {
     let uuid = UUID()
     let axUIElement: AXUIElement
-    lazy var cachedUIElement: CachedUIElement = CachedUIElement.init(axUIElement)
+    private lazy var cachedUIElement: CachedUIElement = CachedUIElement.init(axUIElement)
 
     init(axUIElement: AXUIElement) {
         self.axUIElement = axUIElement
+    }
+    
+    func bulkCacheAttributes() {
+        try? cachedUIElement.getMultipleAttributes([.role, .position, .size])
+    }
+    
+    func attribute<T>(attr: Attribute) -> T? {
+        return try? self.cachedUIElement.attribute(attr)
     }
     
     func role() -> String? {
@@ -36,6 +44,10 @@ class Element {
                 return nil
         }
         return NSRect(origin: position, size: size)
+    }
+    
+    func actions() -> [String]? {
+        return try? cachedUIElement.actionsAsStrings()
     }
     
     func children() -> [Element] {

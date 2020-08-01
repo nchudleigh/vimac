@@ -48,14 +48,12 @@ class HintModeElementQueryService {
     }
     
     func queryMenuBarObservable() -> Single<[Element]> {
-        Utils.traverseForMenuBarItems(windowElement: windowElement.cachedUIElement)
-            .map { Element(axUIElement: $0.element) }
+        Utils.traverseForMenuBarItems(windowElement: windowElement)
             .toArray()
     }
     
     func queryMenuBarExtraObservable() -> Single<[Element]> {
         Utils.traverseForExtraMenuBarItems()
-            .map { Element(axUIElement: $0.element) }
             .toArray()
     }
 }

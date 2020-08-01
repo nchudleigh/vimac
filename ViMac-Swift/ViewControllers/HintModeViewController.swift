@@ -73,10 +73,10 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
             
                     if matchingHints.count == 1 {
                         let matchingHint = matchingHints.first!
-                        let button = matchingHint.associatedElement
+                        let element = matchingHint.associatedElement
             
-                        let buttonPositionOptional: NSPoint? = try? button.attribute(.position)
-                        let buttonSizeOptional: NSSize? = try? button.attribute(.size)
+                        let buttonPositionOptional: NSPoint? = element.position()
+                        let buttonSizeOptional: NSSize? = element.size()
             
                         guard let buttonPosition = buttonPositionOptional,
                             let buttonSize = buttonSizeOptional else {
@@ -144,7 +144,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     func onElementTraversalComplete(elements: [Element]) {
         let elements = elements
             .filter({ element in
-                let actionCount = (try? element.cachedUIElement.actionsAsStrings().count) ?? 0
+                let actionCount = element.actions()?.count ?? 0
                 return actionCount > 0
             })
         
@@ -234,7 +234,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     }
     
     private func instantiateHintView(element: Element, hintText: String, textSize: Float) -> HintView? {
-        let text = HintView(associatedElement: element.cachedUIElement, hintTextSize: CGFloat(textSize), hintText: hintText, typedHintText: "")
+        let text = HintView(associatedElement: element, hintTextSize: CGFloat(textSize), hintText: hintText, typedHintText: "")
         let position = element.position()!
         let size = element.size()!
         

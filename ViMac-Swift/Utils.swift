@@ -83,64 +83,7 @@ class Utils: NSObject {
         event?.post(tap: .cghidEventTap)
         event2?.post(tap: .cghidEventTap)
     }
-    
-    static func getUIElementChildrenRecursive(element: UIElement, parentContainerFrame: NSRect) -> Observable<UIElement> {
-        return getAttributes(element: element)
-            .flatMap({ attributes -> Observable<UIElement> in
-                let (roleOptional, positionOptional, sizeOptional) = attributes
-                guard let role = roleOptional,
-                    let position = positionOptional,
-                    let size = sizeOptional else {
-                        return Observable.empty()
-                }
-                
-                var newParentContainerFrame: NSRect?
-                
-                // ignore subcomponents of a scrollbar
-                if role == Role.scrollBar.rawValue {
-                    return Observable.empty()
-                }
-                
-                if role == Role.scrollArea.rawValue ||
-                    role == Role.row.rawValue ||
-                    role == "AXPage" ||
-                    role == Role.group.rawValue {
-                    newParentContainerFrame = NSRect(origin: position, size: size)
-                }
-                
-                // append to allowed elements list if element's frame intersect with it's parent container's frame.
-                let frame = NSRect(origin: position, size: size)
-                let includeElement = parentContainerFrame.intersects(frame)
-                
-                if !includeElement {
-                    return Observable.empty()
-                }
-                
-                return getChildren(element: element)
-                    .flatMap({ children -> Observable<UIElement> in
-                        if children.count <= 0 {
-                            return Observable.just(element)
-                        }
-                        
-                        return Utils.eagerConcat(observables: [
-                            Observable.just(element),
-                            Utils.eagerConcat(observables: 
-                                children.map({ getUIElementChildrenRecursive(element: $0, parentContainerFrame: newParentContainerFrame ?? parentContainerFrame) })
-                            )
-                        ])
-                    })
-            })
-    }
-    
-    static func getWindowElements(windowElement: UIElement) -> Observable<UIElement> {
-        guard let windowSize: NSSize = try? windowElement.attribute(.size),
-            let windowPosition: NSPoint = try? windowElement.attribute(.position) else {
-                return Observable.empty()
-        }
-        let windowFrame = NSRect(origin: windowPosition, size: windowSize)
-        return Utils.getUIElementChildrenRecursive(element: windowElement, parentContainerFrame: windowFrame)
-    }
-    
+
     // eagerConcat behaves like concat but all the observables are fired simultaneously instead of only after the previous ones are completed.
     static func eagerConcat<T>(observables: [Observable<T>]) -> Observable<T> {
         let taggedWithIndex = observables.enumerated().map({ (index, element) in
@@ -195,10 +138,10 @@ class Utils: NSObject {
         })
     }
     
-    static func getElementAttribute<T>(element: UIElement, attribute: Attribute) -> Observable<T?> {
+    static func getElementAttribute<T>(element: Element, attribute: Attribute) -> Observable<T?> {
         return Observable.create({ observer in
             DispatchQueue.global().async {
-                let value: T? = try? element.attribute(attribute)
+                let value: T? = element.attribute(attr: attribute)
                 observer.onNext(value)
                 observer.onCompleted()
             }
@@ -206,16 +149,10 @@ class Utils: NSObject {
         })
     }
     
-    static func getChildren(element: UIElement) -> Observable<[CachedUIElement]> {
+    static func getChildren(element: Element) -> Observable<[Element]> {
         return Observable.create({ observer in
             DispatchQueue.global().async {
-                let children: [CachedUIElement] = {
-                    let childrenOptional = try? element.attribute(Attribute.children) as [AXUIElement]?;
-                    guard let children = childrenOptional else {
-                        return []
-                    }
-                    return children.map({ CachedUIElement($0) })
-                }()
+                let children: [Element] = element.children()
                 observer.onNext(children)
                 observer.onCompleted()
             }
@@ -223,48 +160,49 @@ class Utils: NSObject {
         })
     }
     
-    static func traverseForMenuBarItems(windowElement: UIElement) -> Observable<UIElement> {
-        let application: Observable<UIElement> = getElementAttribute(element: windowElement, attribute: .parent).compactMap({ $0 })
+    static func traverseForMenuBarItems(windowElement: Element) -> Observable<Element> {
+        let application: Observable<Element> = getElementAttribute(element: windowElement, attribute: .parent)
+            .compactMap({ $0 })
+            .map { Utils.uiElementToElement(uiElement: $0) }
         return application
-            .flatMap({ app -> Observable<UIElement> in
-                let menuBarObservable: Observable<UIElement?> = getElementAttribute(element: app, attribute: .menuBar)
-                return menuBarObservable.compactMap({ $0 })
+            .flatMap({ app -> Observable<Element> in
+                let menuBarUIElementObservable: Observable<UIElement?> = getElementAttribute(element: app, attribute: .menuBar)
+                let manuBarElementObservable: Observable<Element?> = menuBarUIElementObservable.map { uiElementMaybe in
+                    guard let uiElement = uiElementMaybe else {
+                        return nil
+                    }
+                    return Utils.uiElementToElement(uiElement: uiElement)
+                }
+                return manuBarElementObservable.compactMap({ $0 })
             })
-            .flatMap({ menuBar -> Observable<[CachedUIElement]> in
+            .flatMap({ menuBar -> Observable<[Element]> in
                 return getChildren(element: menuBar)
             })
-            .flatMap({ children -> Observable<CachedUIElement> in
+            .flatMap({ children -> Observable<Element> in
                 return Observable.from(children)
             })
-            .map({ UIElement($0.element) })
     }
     
-    static func traverseForExtraMenuBarItems() -> Observable<UIElement> {
+    static func traverseForExtraMenuBarItems() -> Observable<Element> {
         let menuBars = eagerConcat(observables: Application.all()
-            .map({ app -> Observable<UIElement> in
-                let menuBarOptional: Observable<UIElement?> = getElementAttribute(element: app, attribute: .extrasMenuBar)
+            .map({ app -> Observable<Element> in
+                let menuBarUIElementOptional: Observable<UIElement?> = getElementAttribute(element: Utils.uiElementToElement(uiElement: app), attribute: .extrasMenuBar)
+                let menuBarOptional: Observable<Element?> = menuBarUIElementOptional.map { uiElementMaybe in
+                    guard let uiElement = uiElementMaybe else {
+                        return nil
+                    }
+                    return Utils.uiElementToElement(uiElement: uiElement)
+                }
                 return menuBarOptional.compactMap({ $0 })
             })
         )
         return menuBars
-            .flatMap({ menuBar -> Observable<[CachedUIElement]> in
+            .flatMap({ menuBar -> Observable<[Element]> in
                 return getChildren(element: menuBar)
             })
-            .flatMap({ menuBarItems -> Observable<CachedUIElement> in
+            .flatMap({ menuBarItems -> Observable<Element> in
                 return Observable.from(menuBarItems)
             })
-            .map({ UIElement($0.element) })
-    }
-    
-    static func traverseForNotificationCenterItems() -> Observable<UIElement> {
-        let notificationAppOptional = NSWorkspace.shared.runningApplications.first(where: { $0.localizedName == "Notification Centre" })
-        guard let notificationApp = notificationAppOptional,
-            let notificationAppUIElement = Application(notificationApp) else {
-            return Observable.empty()
-        }
-        
-        let windows = (try? notificationAppUIElement.windows()) ?? []
-        return eagerConcat(observables: windows.map({ getWindowElements(windowElement: $0 ) }))
     }
     
     // For performance reasons Chromium only makes the webview accessible when there it detects voiceover through the `AXEnhancedUserInterface` attribute on the Chrome application itself:
@@ -292,5 +230,9 @@ class Utils: NSObject {
         }
         
         return try? appOptional?.attribute(.focusedWindow)
+    }
+    
+    static func uiElementToElement(uiElement: UIElement) -> Element {
+        return Element(axUIElement: uiElement.element)
     }
 }
