@@ -32,15 +32,15 @@ class ModeCoordinator : Coordinator {
     }
     
     func exitMode() {
+        if self.forceKBLayout != nil {
+            self.priorKBLayout?.select()
+        }
+        
         // if there is an active mode, remove its view controller and revert keyboard layout
         if let vc = self.windowController.window?.contentViewController {
+
             vc.view.removeFromSuperview()
             self.windowController.window?.contentViewController = nil
-            
-            // only reverse keyboard layout if user is forcing layout.
-            if self.forceKBLayout != nil {
-                self.priorKBLayout?.select()
-            }
         }
 
         self.windowController.close()
