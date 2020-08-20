@@ -56,25 +56,6 @@ class InputSource: Equatable {
 
     func select() {
         TISSelectInputSource(tisInputSource)
-        
-        
-        if !isCJKV {
-            // employ same logic as the CJKV case below
-            let nonCJKVAndNonTargetSource = InputSourceManager.inputSources.first(where: { $0.id != self.id && !$0.isCJKV })
-            if let x = nonCJKVAndNonTargetSource, let selectPreviousShortcut = InputSourceManager.getSelectPreviousShortcut() {
-                TISSelectInputSource(x.tisInputSource)
-                InputSourceManager.selectPrevious(shortcut: selectPreviousShortcut)
-            }
-        }
-        
-        if isCJKV, let selectPreviousShortcut = InputSourceManager.getSelectPreviousShortcut() {
-            // Workaround for TIS CJKV layout bug:
-            // when switching to CJKV, select nonCJKV input first and then switch back (by emitting the Select the previous input source shortcut)
-            if let nonCJKV = InputSourceManager.nonCJKVSource() {
-                TISSelectInputSource(nonCJKV.tisInputSource)
-                InputSourceManager.selectPrevious(shortcut: selectPreviousShortcut)
-            }
-        }
     }
 }
 
