@@ -33,7 +33,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
 
         attachInputListeningTextField()
         
-        let alphabetKeyDownObservable = inputListeningTextField.distinctNSEventObservable
+        let alphabetKeyDownObservable = kbInputObservable()
             .filter({ event in
                 guard let character = event.charactersIgnoringModifiers?.first else {
                     return false
@@ -184,7 +184,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     }
     
     func observeEscKey() -> Disposable {
-        let escapeKeyDownObservable = inputListeningTextField.distinctNSEventObservable.filter({ event in
+        let escapeKeyDownObservable = kbInputObservable().filter({ event in
             return event.keyCode == kVK_Escape && event.type == .keyDown
         })
         return escapeKeyDownObservable
@@ -194,7 +194,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     }
     
     func observeDeleteKey() -> Disposable {
-        let deleteKeyDownObservable = inputListeningTextField.distinctNSEventObservable.filter({ event in
+        let deleteKeyDownObservable = kbInputObservable().filter({ event in
             return event.keyCode == kVK_Delete && event.type == .keyDown
         })
         return deleteKeyDownObservable
@@ -208,7 +208,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     }
     
     func observeSpaceKey() -> Disposable {
-        let spaceKeyDownObservable = inputListeningTextField.distinctNSEventObservable.filter({ event in
+        let spaceKeyDownObservable = kbInputObservable().filter({ event in
             return event.keyCode == kVK_Space && event.type == .keyDown
         })
         return spaceKeyDownObservable
@@ -270,4 +270,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
         self.view.addSubview(inputListeningTextField)
     }
     
+    func kbInputObservable() -> Observable<NSEvent> {
+        return inputListeningTextField.distinctNSEventObservable
+    }
 }
