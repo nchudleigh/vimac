@@ -27,22 +27,17 @@ class ModeCoordinator : Coordinator {
         self.forceKBLayoutObservation = observeForceKBInputSource()
     }
     
-    func setCurrentWindow(window: UIElement?) {
-        self.exitMode()
-    }
-    
     func exitMode() {
+        guard let vc = self.windowController.window?.contentViewController else {
+            return
+        }
+        
         if self.forceKBLayout != nil {
             self.priorKBLayout?.select()
         }
-        
-        // if there is an active mode, remove its view controller and revert keyboard layout
-        if let vc = self.windowController.window?.contentViewController {
 
-            vc.view.removeFromSuperview()
-            self.windowController.window?.contentViewController = nil
-        }
-
+        vc.view.removeFromSuperview()
+        self.windowController.window?.contentViewController = nil
         self.windowController.close()
     }
     
