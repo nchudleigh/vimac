@@ -177,41 +177,8 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
 
         let hintViews: [HintView] = elements
             .enumerated()
-            .map ({ (index, button) in
-                
-                let text = HintView(associatedElement: button, hintTextSize: CGFloat(textSize), hintText: hintStrings[index], typedHintText: "")
-                
-                let centerPositionOptional: NSPoint? = {
-                    do {
-                        guard let topLeftPositionFlipped: NSPoint = try button.attribute(.position),
-                            let buttonSize: NSSize = try button.attribute(.size) else {
-                            return nil
-                        }
-                        let topLeftPositionRelativeToScreen = Utils.toOrigin(point: topLeftPositionFlipped, size: text.frame.size)
-                        guard let topLeftPositionRelativeToWindow = self.modeCoordinator?.windowController.window?.convertPoint(fromScreen: topLeftPositionRelativeToScreen) else {
-                            return nil
-                        }
-                        let x = (topLeftPositionRelativeToWindow.x + (buttonSize.width / 2)) - (text.frame.size.width / 2)
-                        let y = (topLeftPositionRelativeToWindow.y - (buttonSize.height) / 2) + (text.frame.size.height / 2)
-                        
-                        // buttonSize.width/height and topLeftPositionRelativeToScreen.x/y can be NaN
-                        if x.isNaN || y.isNaN {
-                            return nil
-                        }
-                        
-                        return NSPoint(x: x, y: y)
-                    } catch {
-                        return nil
-                    }
-                }()
-
-                guard let centerPosition = centerPositionOptional else {
-                    return nil
-                }
-                
-                text.frame.origin = centerPosition
-                
-                return text
+            .map ({ (index, element) in
+                return instantiateHintView(associatedElement: element, textSize: CGFloat(textSize), text: hintStrings[index])
             })
             .compactMap({ $0 })
         
@@ -222,6 +189,42 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
         }
         
         self.inputListeningTextField.becomeFirstResponder()
+    }
+    
+    func instantiateHintView(associatedElement: UIElement, textSize: CGFloat, text: String) -> HintView? {
+        let text = HintView(associatedElement: associatedElement, hintTextSize: CGFloat(textSize), hintText: text, typedHintText: "")
+        
+        let centerPositionOptional: NSPoint? = {
+            do {
+                guard let topLeftPositionFlipped: NSPoint = try associatedElement.attribute(.position),
+                    let buttonSize: NSSize = try associatedElement.attribute(.size) else {
+                    return nil
+                }
+                let topLeftPositionRelativeToScreen = Utils.toOrigin(point: topLeftPositionFlipped, size: text.frame.size)
+                guard let topLeftPositionRelativeToWindow = self.modeCoordinator?.windowController.window?.convertPoint(fromScreen: topLeftPositionRelativeToScreen) else {
+                    return nil
+                }
+                let x = (topLeftPositionRelativeToWindow.x + (buttonSize.width / 2)) - (text.frame.size.width / 2)
+                let y = (topLeftPositionRelativeToWindow.y - (buttonSize.height) / 2) + (text.frame.size.height / 2)
+                
+                // buttonSize.width/height and topLeftPositionRelativeToScreen.x/y can be NaN
+                if x.isNaN || y.isNaN {
+                    return nil
+                }
+                
+                return NSPoint(x: x, y: y)
+            } catch {
+                return nil
+            }
+        }()
+
+        guard let centerPosition = centerPositionOptional else {
+            return nil
+        }
+        
+        text.frame.origin = centerPosition
+        
+        return text
     }
     
     func updateHints(typed: String) {
