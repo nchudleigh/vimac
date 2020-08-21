@@ -14,7 +14,7 @@ import Carbon.HIToolbox
 class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     let applicationWindow: UIElement
     lazy var elements: Observable<UIElement> = elementObservable()
-    let textField = OverlayTextField(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
+    lazy var inputListeningTextField = instantiateInputListeningTextField()
     var hintViews: [HintView]?
     let compositeDisposable = CompositeDisposable()
     var characterStack: [Character] = [Character]()
@@ -31,15 +31,9 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        textField.stringValue = ""
-        textField.isEditable = true
-        textField.delegate = self
-        // for some reason setting the text field to hidden breaks hint updating after the first hint update.
-        // selectorTextField.isHidden = true
-        textField.overlayTextFieldDelegate = self
-        self.view.addSubview(textField)
+        attachInputListeningTextField()
         
-        let alphabetKeyDownObservable = textField.distinctNSEventObservable
+        let alphabetKeyDownObservable = inputListeningTextField.distinctNSEventObservable
             .filter({ event in
                 guard let character = event.charactersIgnoringModifiers?.first else {
                     return false
@@ -186,11 +180,11 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
             self.view.addSubview(hintView)
         }
         
-        self.textField.becomeFirstResponder()
+        self.inputListeningTextField.becomeFirstResponder()
     }
     
     func observeEscKey() -> Disposable {
-        let escapeKeyDownObservable = textField.distinctNSEventObservable.filter({ event in
+        let escapeKeyDownObservable = inputListeningTextField.distinctNSEventObservable.filter({ event in
             return event.keyCode == kVK_Escape && event.type == .keyDown
         })
         return escapeKeyDownObservable
@@ -200,7 +194,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     }
     
     func observeDeleteKey() -> Disposable {
-        let deleteKeyDownObservable = textField.distinctNSEventObservable.filter({ event in
+        let deleteKeyDownObservable = inputListeningTextField.distinctNSEventObservable.filter({ event in
             return event.keyCode == kVK_Delete && event.type == .keyDown
         })
         return deleteKeyDownObservable
@@ -214,7 +208,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     }
     
     func observeSpaceKey() -> Disposable {
-        let spaceKeyDownObservable = textField.distinctNSEventObservable.filter({ event in
+        let spaceKeyDownObservable = inputListeningTextField.distinctNSEventObservable.filter({ event in
             return event.keyCode == kVK_Space && event.type == .keyDown
         })
         return spaceKeyDownObservable
@@ -262,4 +256,18 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
         super.viewDidDisappear()
         self.compositeDisposable.dispose()
     }
+    
+    func instantiateInputListeningTextField() -> OverlayTextField {
+        let tf = OverlayTextField(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
+        tf.stringValue = ""
+        tf.isEditable = true
+        tf.delegate = self
+        return tf
+    }
+    
+    func attachInputListeningTextField() {
+        inputListeningTextField.overlayTextFieldDelegate = self
+        self.view.addSubview(inputListeningTextField)
+    }
+    
 }
