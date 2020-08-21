@@ -12,14 +12,15 @@ import RxSwift
 import Carbon.HIToolbox
 
 class HintModeViewController: ModeViewController, NSTextFieldDelegate {
-    let elements: Observable<UIElement>
+    let applicationWindow: UIElement
+    lazy var elements: Observable<UIElement> = elementObservable()
     let textField = OverlayTextField(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
     var hintViews: [HintView]?
     let compositeDisposable = CompositeDisposable()
     var characterStack: [Character] = [Character]()
 
-    init(elements: Observable<UIElement>) {
-        self.elements = elements.share()
+    init(applicationWindow: UIElement) {
+        self.applicationWindow = applicationWindow
         super.init()
     }
     
@@ -160,6 +161,14 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
                     print(error)
                 })
         )
+    }
+    
+    func elementObservable() -> Observable<UIElement> {
+        let windowElements = Utils.getWindowElements(windowElement: applicationWindow)
+        let menuBarElements = Utils.traverseForMenuBarItems(windowElement: applicationWindow)
+        let extraMenuBarElements = Utils.traverseForExtraMenuBarItems()
+        let notificationCenterElements = Utils.traverseForNotificationCenterItems()
+        return Observable.merge(windowElements, menuBarElements, extraMenuBarElements, notificationCenterElements)
     }
     
     func onElementTraversalComplete(elements: [UIElement]) {
