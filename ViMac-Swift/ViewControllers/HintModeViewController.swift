@@ -39,18 +39,6 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
         textField.overlayTextFieldDelegate = self
         self.view.addSubview(textField)
         
-        let escapeKeyDownObservable = textField.distinctNSEventObservable.filter({ event in
-            return event.keyCode == kVK_Escape && event.type == .keyDown
-        })
-        
-        let deleteKeyDownObservable = textField.distinctNSEventObservable.filter({ event in
-            return event.keyCode == kVK_Delete && event.type == .keyDown
-        })
-        
-        let spaceKeyDownObservable = textField.distinctNSEventObservable.filter({ event in
-            return event.keyCode == kVK_Space && event.type == .keyDown
-        })
-        
         let alphabetKeyDownObservable = textField.distinctNSEventObservable
             .filter({ event in
                 guard let character = event.charactersIgnoringModifiers?.first else {
@@ -119,33 +107,9 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
                 })
         )
         
-        self.compositeDisposable.insert(
-            escapeKeyDownObservable
-                .observeOn(MainScheduler.instance)
-                .subscribe(onNext: { [weak self] _ in
-                    self?.onEscape()
-        }))
-        
-        self.compositeDisposable.insert(
-            deleteKeyDownObservable
-                .observeOn(MainScheduler.instance)
-                .subscribe(onNext: { [weak self] _ in
-                    guard let vc = self else {
-                        return
-                    }
-                    vc.characterStack.popLast()
-                    vc.updateHints(typed: String(vc.characterStack))
-        }))
-        
-        self.compositeDisposable.insert(
-            spaceKeyDownObservable
-                .observeOn(MainScheduler.instance)
-                .subscribe(onNext: { [weak self] _ in
-                    guard let vc = self else {
-                        return
-                    }
-                    vc.rotateHints()
-        }))
+        self.compositeDisposable.insert(observeEscKey())
+        self.compositeDisposable.insert(observeDeleteKey())
+        self.compositeDisposable.insert(observeSpaceKey())
         
         self.compositeDisposable.insert(
             elements.toArray()
@@ -223,6 +187,40 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
         }
         
         self.textField.becomeFirstResponder()
+    }
+    
+    func observeEscKey() -> Disposable {
+        let escapeKeyDownObservable = textField.distinctNSEventObservable.filter({ event in
+            return event.keyCode == kVK_Escape && event.type == .keyDown
+        })
+        return escapeKeyDownObservable
+            .bind(onNext: { [weak self] _ in
+                self?.onEscape()
+            })
+    }
+    
+    func observeDeleteKey() -> Disposable {
+        let deleteKeyDownObservable = textField.distinctNSEventObservable.filter({ event in
+            return event.keyCode == kVK_Delete && event.type == .keyDown
+        })
+        return deleteKeyDownObservable
+            .bind(onNext: { [weak self] _ in
+                guard let vc = self else {
+                    return
+                }
+                vc.characterStack.popLast()
+                vc.updateHints(typed: String(vc.characterStack))
+            })
+    }
+    
+    func observeSpaceKey() -> Disposable {
+        let spaceKeyDownObservable = textField.distinctNSEventObservable.filter({ event in
+            return event.keyCode == kVK_Space && event.type == .keyDown
+        })
+        return spaceKeyDownObservable
+            .bind(onNext: { [weak self] _ in
+                self?.rotateHints()
+            })
     }
     
     func updateHints(typed: String) {
