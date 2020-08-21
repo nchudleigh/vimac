@@ -33,73 +33,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
 
         attachInputListeningTextField()
         
-        let alphabetKeyDownObservable = kbInputObservable()
-            .filter({ event in
-                guard let character = event.charactersIgnoringModifiers?.first else {
-                    return false
-                }
-                return character.isLetter && event.type == .keyDown
-            })
-        
-        self.compositeDisposable.insert(
-            alphabetKeyDownObservable
-                .observeOn(MainScheduler.instance)
-                .subscribe(onNext: { [weak self] event in
-                    guard let vc = self,
-                        let character = event.charactersIgnoringModifiers?.first else {
-                        return
-                    }
-
-                    vc.characterStack.append(character)
-                    let typed = String(vc.characterStack)
-            
-                    let matchingHints = vc.hintViews!.filter { hintView in
-                        return hintView.hintTextView!.stringValue.starts(with: typed.uppercased())
-                    }
-
-                    if matchingHints.count == 0 && typed.count > 0 {
-                        vc.modeCoordinator?.exitMode()
-                        return
-                    }
-            
-                    if matchingHints.count == 1 {
-                        let matchingHint = matchingHints.first!
-                        let button = matchingHint.associatedElement
-            
-                        let buttonPositionOptional: NSPoint? = try? button.attribute(.position)
-                        let buttonSizeOptional: NSSize? = try? button.attribute(.size)
-            
-                        guard let buttonPosition = buttonPositionOptional,
-                            let buttonSize = buttonSizeOptional else {
-                                vc.modeCoordinator?.exitMode()
-                                return
-                        }
-            
-                        let centerPositionX = buttonPosition.x + (buttonSize.width / 2)
-                        let centerPositionY = buttonPosition.y + (buttonSize.height / 2)
-                        let centerPosition = NSPoint(x: centerPositionX, y: centerPositionY)
-            
-                        // close the window before performing click(s)
-                        // Chrome's bookmark bar doesn't let you right click if Chrome is not the active window
-                        vc.modeCoordinator?.exitMode()
-                        
-                        Utils.moveMouse(position: centerPosition)
-                        
-                        if (event.modifierFlags.rawValue & NSEvent.ModifierFlags.shift.rawValue == NSEvent.ModifierFlags.shift.rawValue) {
-                            Utils.rightClickMouse(position: centerPosition)
-                        } else if (event.modifierFlags.rawValue & NSEvent.ModifierFlags.command.rawValue == NSEvent.ModifierFlags.command.rawValue) {
-                            Utils.doubleLeftClickMouse(position: centerPosition)
-                        } else if (event.modifierFlags.rawValue & NSEvent.ModifierFlags.control.rawValue == NSEvent.ModifierFlags.control.rawValue) {
-                        } else {
-                            Utils.leftClickMouse(position: centerPosition)
-                        }
-                        return
-                    }
-            
-                    // update hints to reflect new typed text
-                    vc.updateHints(typed: typed)
-                })
-        )
+        self.compositeDisposable.insert(observeLetterKeyDown())
         
         self.compositeDisposable.insert(observeEscKey())
         self.compositeDisposable.insert(observeDeleteKey())
@@ -181,6 +115,75 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
         }
         
         self.inputListeningTextField.becomeFirstResponder()
+    }
+    
+    func observeLetterKeyDown() -> Disposable {
+        let alphabetKeyDownObservable = kbInputObservable()
+            .filter({ event in
+                guard let character = event.charactersIgnoringModifiers?.first else {
+                    return false
+                }
+                return character.isLetter && event.type == .keyDown
+            })
+        return alphabetKeyDownObservable
+            .bind(onNext: { [weak self] event in
+                self?.onLetterKeyDown(event: event)
+            })
+    }
+    
+    func onLetterKeyDown(event: NSEvent) {
+            guard let character = event.charactersIgnoringModifiers?.first else {
+                return
+            }
+
+            self.characterStack.append(character)
+            let typed = String(self.characterStack)
+    
+            let matchingHints = self.hintViews!.filter { hintView in
+                return hintView.hintTextView!.stringValue.starts(with: typed.uppercased())
+            }
+
+            if matchingHints.count == 0 && typed.count > 0 {
+                self.modeCoordinator?.exitMode()
+                return
+            }
+    
+            if matchingHints.count == 1 {
+                let matchingHint = matchingHints.first!
+                let button = matchingHint.associatedElement
+    
+                let buttonPositionOptional: NSPoint? = try? button.attribute(.position)
+                let buttonSizeOptional: NSSize? = try? button.attribute(.size)
+    
+                guard let buttonPosition = buttonPositionOptional,
+                    let buttonSize = buttonSizeOptional else {
+                        self.modeCoordinator?.exitMode()
+                        return
+                }
+    
+                let centerPositionX = buttonPosition.x + (buttonSize.width / 2)
+                let centerPositionY = buttonPosition.y + (buttonSize.height / 2)
+                let centerPosition = NSPoint(x: centerPositionX, y: centerPositionY)
+    
+                // close the window before performing click(s)
+                // Chrome's bookmark bar doesn't let you right click if Chrome is not the active window
+                self.modeCoordinator?.exitMode()
+                
+                Utils.moveMouse(position: centerPosition)
+                
+                if (event.modifierFlags.rawValue & NSEvent.ModifierFlags.shift.rawValue == NSEvent.ModifierFlags.shift.rawValue) {
+                    Utils.rightClickMouse(position: centerPosition)
+                } else if (event.modifierFlags.rawValue & NSEvent.ModifierFlags.command.rawValue == NSEvent.ModifierFlags.command.rawValue) {
+                    Utils.doubleLeftClickMouse(position: centerPosition)
+                } else if (event.modifierFlags.rawValue & NSEvent.ModifierFlags.control.rawValue == NSEvent.ModifierFlags.control.rawValue) {
+                } else {
+                    Utils.leftClickMouse(position: centerPosition)
+                }
+                return
+            }
+    
+            // update hints to reflect new typed text
+            self.updateHints(typed: typed)
     }
     
     func observeEscKey() -> Disposable {
