@@ -65,58 +65,58 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     }
     
     func onLetterKeyDown(event: NSEvent) {
-            guard let character = event.charactersIgnoringModifiers?.first else {
-                return
+        guard let character = event.charactersIgnoringModifiers?.first else {
+            return
+        }
+
+        self.characterStack.append(character)
+        let typed = String(self.characterStack)
+
+        let matchingHints = self.hintViews!.filter { hintView in
+            return hintView.hintTextView!.stringValue.starts(with: typed.uppercased())
+        }
+
+        if matchingHints.count == 0 && typed.count > 0 {
+            self.modeCoordinator?.exitMode()
+            return
+        }
+
+        if matchingHints.count == 1 {
+            let matchingHint = matchingHints.first!
+            let button = matchingHint.associatedElement
+
+            let buttonPositionOptional: NSPoint? = try? button.attribute(.position)
+            let buttonSizeOptional: NSSize? = try? button.attribute(.size)
+
+            guard let buttonPosition = buttonPositionOptional,
+                let buttonSize = buttonSizeOptional else {
+                    self.modeCoordinator?.exitMode()
+                    return
             }
 
-            self.characterStack.append(character)
-            let typed = String(self.characterStack)
-    
-            let matchingHints = self.hintViews!.filter { hintView in
-                return hintView.hintTextView!.stringValue.starts(with: typed.uppercased())
-            }
+            let centerPositionX = buttonPosition.x + (buttonSize.width / 2)
+            let centerPositionY = buttonPosition.y + (buttonSize.height / 2)
+            let centerPosition = NSPoint(x: centerPositionX, y: centerPositionY)
 
-            if matchingHints.count == 0 && typed.count > 0 {
-                self.modeCoordinator?.exitMode()
-                return
+            // close the window before performing click(s)
+            // Chrome's bookmark bar doesn't let you right click if Chrome is not the active window
+            self.modeCoordinator?.exitMode()
+            
+            Utils.moveMouse(position: centerPosition)
+            
+            if (event.modifierFlags.rawValue & NSEvent.ModifierFlags.shift.rawValue == NSEvent.ModifierFlags.shift.rawValue) {
+                Utils.rightClickMouse(position: centerPosition)
+            } else if (event.modifierFlags.rawValue & NSEvent.ModifierFlags.command.rawValue == NSEvent.ModifierFlags.command.rawValue) {
+                Utils.doubleLeftClickMouse(position: centerPosition)
+            } else if (event.modifierFlags.rawValue & NSEvent.ModifierFlags.control.rawValue == NSEvent.ModifierFlags.control.rawValue) {
+            } else {
+                Utils.leftClickMouse(position: centerPosition)
             }
-    
-            if matchingHints.count == 1 {
-                let matchingHint = matchingHints.first!
-                let button = matchingHint.associatedElement
-    
-                let buttonPositionOptional: NSPoint? = try? button.attribute(.position)
-                let buttonSizeOptional: NSSize? = try? button.attribute(.size)
-    
-                guard let buttonPosition = buttonPositionOptional,
-                    let buttonSize = buttonSizeOptional else {
-                        self.modeCoordinator?.exitMode()
-                        return
-                }
-    
-                let centerPositionX = buttonPosition.x + (buttonSize.width / 2)
-                let centerPositionY = buttonPosition.y + (buttonSize.height / 2)
-                let centerPosition = NSPoint(x: centerPositionX, y: centerPositionY)
-    
-                // close the window before performing click(s)
-                // Chrome's bookmark bar doesn't let you right click if Chrome is not the active window
-                self.modeCoordinator?.exitMode()
-                
-                Utils.moveMouse(position: centerPosition)
-                
-                if (event.modifierFlags.rawValue & NSEvent.ModifierFlags.shift.rawValue == NSEvent.ModifierFlags.shift.rawValue) {
-                    Utils.rightClickMouse(position: centerPosition)
-                } else if (event.modifierFlags.rawValue & NSEvent.ModifierFlags.command.rawValue == NSEvent.ModifierFlags.command.rawValue) {
-                    Utils.doubleLeftClickMouse(position: centerPosition)
-                } else if (event.modifierFlags.rawValue & NSEvent.ModifierFlags.control.rawValue == NSEvent.ModifierFlags.control.rawValue) {
-                } else {
-                    Utils.leftClickMouse(position: centerPosition)
-                }
-                return
-            }
-    
-            // update hints to reflect new typed text
-            self.updateHints(typed: typed)
+            return
+        }
+
+        // update hints to reflect new typed text
+        self.updateHints(typed: typed)
     }
     
     func observeEscKey() -> Disposable {
