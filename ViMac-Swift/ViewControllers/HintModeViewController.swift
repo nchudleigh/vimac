@@ -12,14 +12,15 @@ import RxSwift
 import Carbon.HIToolbox
 
 class HintModeViewController: ModeViewController, NSTextFieldDelegate {
-    let elements: Observable<UIElement>
-    let textField = OverlayTextField(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
+    let applicationWindow: UIElement
+    lazy var elements: Single<[UIElement]> = elementObservable().toArray()
+    lazy var inputListeningTextField = instantiateInputListeningTextField()
     var hintViews: [HintView]?
     let compositeDisposable = CompositeDisposable()
     var characterStack: [Character] = [Character]()
 
-    init(elements: Observable<UIElement>) {
-        self.elements = elements.share()
+    init(applicationWindow: UIElement) {
+        self.applicationWindow = applicationWindow
         super.init()
     }
     
@@ -30,136 +31,143 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        textField.stringValue = ""
-        textField.isEditable = true
-        textField.delegate = self
-        // for some reason setting the text field to hidden breaks hint updating after the first hint update.
-        // selectorTextField.isHidden = true
-        textField.overlayTextFieldDelegate = self
-        self.view.addSubview(textField)
+        attachInputListeningTextField()
         
-        let escapeKeyDownObservable = textField.distinctNSEventObservable.filter({ event in
-            return event.keyCode == kVK_Escape && event.type == .keyDown
-        })
+        self.compositeDisposable.insert(observeLetterKeyDown())
         
-        let deleteKeyDownObservable = textField.distinctNSEventObservable.filter({ event in
-            return event.keyCode == kVK_Delete && event.type == .keyDown
-        })
+        self.compositeDisposable.insert(observeEscKey())
+        self.compositeDisposable.insert(observeDeleteKey())
+        self.compositeDisposable.insert(observeSpaceKey())
         
-        let spaceKeyDownObservable = textField.distinctNSEventObservable.filter({ event in
-            return event.keyCode == kVK_Space && event.type == .keyDown
-        })
-        
-        let alphabetKeyDownObservable = textField.distinctNSEventObservable
+        self.compositeDisposable.insert(observeElements())
+    }
+    
+    func elementObservable() -> Observable<UIElement> {
+        let windowElements = Utils.getWindowElements(windowElement: applicationWindow)
+        let menuBarElements = Utils.traverseForMenuBarItems(windowElement: applicationWindow)
+        let extraMenuBarElements = Utils.traverseForExtraMenuBarItems()
+        let notificationCenterElements = Utils.traverseForNotificationCenterItems()
+        return Observable.merge(windowElements, menuBarElements, extraMenuBarElements, notificationCenterElements)
+    }
+    
+    func observeLetterKeyDown() -> Disposable {
+        let alphabetKeyDownObservable = kbInputObservable()
             .filter({ event in
                 guard let character = event.charactersIgnoringModifiers?.first else {
                     return false
                 }
                 return character.isLetter && event.type == .keyDown
             })
-        
-        self.compositeDisposable.insert(
-            alphabetKeyDownObservable
-                .observeOn(MainScheduler.instance)
-                .subscribe(onNext: { [weak self] event in
-                    guard let vc = self,
-                        let character = event.charactersIgnoringModifiers?.first else {
-                        return
-                    }
+        return alphabetKeyDownObservable
+            .bind(onNext: { [weak self] event in
+                self?.onLetterKeyDown(event: event)
+            })
+    }
+    
+    func onLetterKeyDown(event: NSEvent) {
+        guard let character = event.charactersIgnoringModifiers?.first else {
+            return
+        }
 
-                    vc.characterStack.append(character)
-                    let typed = String(vc.characterStack)
-            
-                    let matchingHints = vc.hintViews!.filter { hintView in
-                        return hintView.hintTextView!.stringValue.starts(with: typed.uppercased())
-                    }
+        self.characterStack.append(character)
+        let typed = String(self.characterStack)
 
-                    if matchingHints.count == 0 && typed.count > 0 {
-                        vc.modeCoordinator?.exitMode()
-                        return
-                    }
+        let matchingHints = self.hintViews!.filter { hintView in
+            return hintView.hintTextView!.stringValue.starts(with: typed.uppercased())
+        }
+
+        if matchingHints.count == 0 && typed.count > 0 {
+            self.modeCoordinator?.exitMode()
+            return
+        }
+
+        if matchingHints.count == 1 {
+            let matchingHint = matchingHints.first!
+            let button = matchingHint.associatedElement
+
+            let buttonPositionOptional: NSPoint? = try? button.attribute(.position)
+            let buttonSizeOptional: NSSize? = try? button.attribute(.size)
+
+            guard let buttonPosition = buttonPositionOptional,
+                let buttonSize = buttonSizeOptional else {
+                    self.modeCoordinator?.exitMode()
+                    return
+            }
+
+            let centerPositionX = buttonPosition.x + (buttonSize.width / 2)
+            let centerPositionY = buttonPosition.y + (buttonSize.height / 2)
+            let centerPosition = NSPoint(x: centerPositionX, y: centerPositionY)
+
+            // close the window before performing click(s)
+            // Chrome's bookmark bar doesn't let you right click if Chrome is not the active window
+            self.modeCoordinator?.exitMode()
             
-                    if matchingHints.count == 1 {
-                        let matchingHint = matchingHints.first!
-                        let button = matchingHint.associatedElement
+            Utils.moveMouse(position: centerPosition)
             
-                        let buttonPositionOptional: NSPoint? = try? button.attribute(.position)
-                        let buttonSizeOptional: NSSize? = try? button.attribute(.size)
-            
-                        guard let buttonPosition = buttonPositionOptional,
-                            let buttonSize = buttonSizeOptional else {
-                                vc.modeCoordinator?.exitMode()
-                                return
-                        }
-            
-                        let centerPositionX = buttonPosition.x + (buttonSize.width / 2)
-                        let centerPositionY = buttonPosition.y + (buttonSize.height / 2)
-                        let centerPosition = NSPoint(x: centerPositionX, y: centerPositionY)
-            
-                        // close the window before performing click(s)
-                        // Chrome's bookmark bar doesn't let you right click if Chrome is not the active window
-                        vc.modeCoordinator?.exitMode()
-                        
-                        Utils.moveMouse(position: centerPosition)
-                        
-                        if (event.modifierFlags.rawValue & NSEvent.ModifierFlags.shift.rawValue == NSEvent.ModifierFlags.shift.rawValue) {
-                            Utils.rightClickMouse(position: centerPosition)
-                        } else if (event.modifierFlags.rawValue & NSEvent.ModifierFlags.command.rawValue == NSEvent.ModifierFlags.command.rawValue) {
-                            Utils.doubleLeftClickMouse(position: centerPosition)
-                        } else if (event.modifierFlags.rawValue & NSEvent.ModifierFlags.control.rawValue == NSEvent.ModifierFlags.control.rawValue) {
-                        } else {
-                            Utils.leftClickMouse(position: centerPosition)
-                        }
-                        return
-                    }
-            
-                    // update hints to reflect new typed text
-                    vc.updateHints(typed: typed)
-                })
-        )
-        
-        self.compositeDisposable.insert(
-            escapeKeyDownObservable
-                .observeOn(MainScheduler.instance)
-                .subscribe(onNext: { [weak self] _ in
-                    self?.onEscape()
-        }))
-        
-        self.compositeDisposable.insert(
-            deleteKeyDownObservable
-                .observeOn(MainScheduler.instance)
-                .subscribe(onNext: { [weak self] _ in
-                    guard let vc = self else {
-                        return
-                    }
-                    vc.characterStack.popLast()
-                    vc.updateHints(typed: String(vc.characterStack))
-        }))
-        
-        self.compositeDisposable.insert(
-            spaceKeyDownObservable
-                .observeOn(MainScheduler.instance)
-                .subscribe(onNext: { [weak self] _ in
-                    guard let vc = self else {
-                        return
-                    }
-                    vc.rotateHints()
-        }))
-        
-        self.compositeDisposable.insert(
-            elements.toArray()
-                .observeOn(MainScheduler.instance)
-                .subscribe(
+            if (event.modifierFlags.rawValue & NSEvent.ModifierFlags.shift.rawValue == NSEvent.ModifierFlags.shift.rawValue) {
+                Utils.rightClickMouse(position: centerPosition)
+            } else if (event.modifierFlags.rawValue & NSEvent.ModifierFlags.command.rawValue == NSEvent.ModifierFlags.command.rawValue) {
+                Utils.doubleLeftClickMouse(position: centerPosition)
+            } else if (event.modifierFlags.rawValue & NSEvent.ModifierFlags.control.rawValue == NSEvent.ModifierFlags.control.rawValue) {
+            } else {
+                Utils.leftClickMouse(position: centerPosition)
+            }
+            return
+        }
+
+        // update hints to reflect new typed text
+        self.updateHints(typed: typed)
+    }
+    
+    func observeEscKey() -> Disposable {
+        let escapeKeyDownObservable = kbInputObservable().filter({ event in
+            return event.keyCode == kVK_Escape && event.type == .keyDown
+        })
+        return escapeKeyDownObservable
+            .bind(onNext: { [weak self] _ in
+                self?.onEscape()
+            })
+    }
+    
+    func observeDeleteKey() -> Disposable {
+        let deleteKeyDownObservable = kbInputObservable().filter({ event in
+            return event.keyCode == kVK_Delete && event.type == .keyDown
+        })
+        return deleteKeyDownObservable
+            .bind(onNext: { [weak self] _ in
+                guard let vc = self else {
+                    return
+                }
+                vc.characterStack.popLast()
+                vc.updateHints(typed: String(vc.characterStack))
+            })
+    }
+    
+    func observeSpaceKey() -> Disposable {
+        let spaceKeyDownObservable = kbInputObservable().filter({ event in
+            return event.keyCode == kVK_Space && event.type == .keyDown
+        })
+        return spaceKeyDownObservable
+            .bind(onNext: { [weak self] _ in
+                self?.rotateHints()
+            })
+    }
+    
+    func observeElements() -> Disposable {
+        return elements
+            .observeOn(MainScheduler.instance)
+            .subscribe(
                 onSuccess: { [weak self] elements in
                     self?.onElementTraversalComplete(elements: elements.filter({ element in
                         let actionCount = (try? element.actionsAsStrings().count) ?? 0
                         let role = try? element.role()
                         return actionCount > 0
                     }))
-                }, onError: { error in
+                },
+                onError: { error in
                     print(error)
-                })
-        )
+                }
+            )
     }
     
     func onElementTraversalComplete(elements: [UIElement]) {
@@ -169,41 +177,8 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
 
         let hintViews: [HintView] = elements
             .enumerated()
-            .map ({ (index, button) in
-                
-                let text = HintView(associatedElement: button, hintTextSize: CGFloat(textSize), hintText: hintStrings[index], typedHintText: "")
-                
-                let centerPositionOptional: NSPoint? = {
-                    do {
-                        guard let topLeftPositionFlipped: NSPoint = try button.attribute(.position),
-                            let buttonSize: NSSize = try button.attribute(.size) else {
-                            return nil
-                        }
-                        let topLeftPositionRelativeToScreen = Utils.toOrigin(point: topLeftPositionFlipped, size: text.frame.size)
-                        guard let topLeftPositionRelativeToWindow = self.modeCoordinator?.windowController.window?.convertPoint(fromScreen: topLeftPositionRelativeToScreen) else {
-                            return nil
-                        }
-                        let x = (topLeftPositionRelativeToWindow.x + (buttonSize.width / 2)) - (text.frame.size.width / 2)
-                        let y = (topLeftPositionRelativeToWindow.y - (buttonSize.height) / 2) + (text.frame.size.height / 2)
-                        
-                        // buttonSize.width/height and topLeftPositionRelativeToScreen.x/y can be NaN
-                        if x.isNaN || y.isNaN {
-                            return nil
-                        }
-                        
-                        return NSPoint(x: x, y: y)
-                    } catch {
-                        return nil
-                    }
-                }()
-
-                guard let centerPosition = centerPositionOptional else {
-                    return nil
-                }
-                
-                text.frame.origin = centerPosition
-                
-                return text
+            .map ({ (index, element) in
+                return instantiateHintView(associatedElement: element, textSize: CGFloat(textSize), text: hintStrings[index])
             })
             .compactMap({ $0 })
         
@@ -213,7 +188,43 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
             self.view.addSubview(hintView)
         }
         
-        self.textField.becomeFirstResponder()
+        self.inputListeningTextField.becomeFirstResponder()
+    }
+    
+    func instantiateHintView(associatedElement: UIElement, textSize: CGFloat, text: String) -> HintView? {
+        let text = HintView(associatedElement: associatedElement, hintTextSize: CGFloat(textSize), hintText: text, typedHintText: "")
+        
+        let centerPositionOptional: NSPoint? = {
+            do {
+                guard let topLeftPositionFlipped: NSPoint = try associatedElement.attribute(.position),
+                    let buttonSize: NSSize = try associatedElement.attribute(.size) else {
+                    return nil
+                }
+                let topLeftPositionRelativeToScreen = Utils.toOrigin(point: topLeftPositionFlipped, size: text.frame.size)
+                guard let topLeftPositionRelativeToWindow = self.modeCoordinator?.windowController.window?.convertPoint(fromScreen: topLeftPositionRelativeToScreen) else {
+                    return nil
+                }
+                let x = (topLeftPositionRelativeToWindow.x + (buttonSize.width / 2)) - (text.frame.size.width / 2)
+                let y = (topLeftPositionRelativeToWindow.y - (buttonSize.height) / 2) + (text.frame.size.height / 2)
+                
+                // buttonSize.width/height and topLeftPositionRelativeToScreen.x/y can be NaN
+                if x.isNaN || y.isNaN {
+                    return nil
+                }
+                
+                return NSPoint(x: x, y: y)
+            } catch {
+                return nil
+            }
+        }()
+
+        guard let centerPosition = centerPositionOptional else {
+            return nil
+        }
+        
+        text.frame.origin = centerPosition
+        
+        return text
     }
     
     func updateHints(typed: String) {
@@ -254,5 +265,22 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     override func viewDidDisappear() {
         super.viewDidDisappear()
         self.compositeDisposable.dispose()
+    }
+    
+    func instantiateInputListeningTextField() -> OverlayTextField {
+        let tf = OverlayTextField(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
+        tf.stringValue = ""
+        tf.isEditable = true
+        tf.delegate = self
+        return tf
+    }
+    
+    func attachInputListeningTextField() {
+        inputListeningTextField.overlayTextFieldDelegate = self
+        self.view.addSubview(inputListeningTextField)
+    }
+    
+    func kbInputObservable() -> Observable<NSEvent> {
+        return inputListeningTextField.distinctNSEventObservable
     }
 }

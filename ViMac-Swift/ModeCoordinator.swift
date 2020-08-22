@@ -70,14 +70,8 @@ class ModeCoordinator : Coordinator {
         if let forceKBLayout = self.forceKBLayout {
             forceKBLayout.select()
         }
-        
-        let windowElements = Utils.getWindowElements(windowElement: applicationWindow)
-        let menuBarElements = Utils.traverseForMenuBarItems(windowElement: applicationWindow)
-        let extraMenuBarElements = Utils.traverseForExtraMenuBarItems()
-        let notificationCenterElements = Utils.traverseForNotificationCenterItems()
-        
-        let allElements = Observable.merge(windowElements, menuBarElements, extraMenuBarElements, notificationCenterElements)
-        let vc = HintModeViewController.init(elements: allElements)
+
+        let vc = HintModeViewController.init(applicationWindow: applicationWindow)
         self.setViewController(vc: vc)
     }
     
