@@ -52,7 +52,6 @@
 		E2F6C9A3232CE37E00F2975B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E26172292322968700E396CA /* Main.storyboard */; };
 		E2F6C9AD232DE89F00F2975B /* HintView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2F6C9AC232DE89F00F2975B /* HintView.swift */; };
 		E2F6C9AF232DEA1800F2975B /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2F6C9AE232DEA1800F2975B /* Utils.swift */; };
-		E2F6C9B1232E337500F2975B /* OverlayTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2F6C9B0232E337500F2975B /* OverlayTextField.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -155,7 +154,6 @@
 		E2DFF5B82482413400B4090D /* HintModePreferenceViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = HintModePreferenceViewController.xib; sourceTree = "<group>"; };
 		E2F6C9AC232DE89F00F2975B /* HintView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HintView.swift; sourceTree = "<group>"; };
 		E2F6C9AE232DEA1800F2975B /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
-		E2F6C9B0232E337500F2975B /* OverlayTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayTextField.swift; sourceTree = "<group>"; };
 		E3838C26CF2EE35337E477D6 /* Pods_VimacTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_VimacTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -277,7 +275,6 @@
 				E20696FF232A52EA001EFDB2 /* AlphabetHints.swift */,
 				E2F6C9AC232DE89F00F2975B /* HintView.swift */,
 				E2F6C9AE232DEA1800F2975B /* Utils.swift */,
-				E2F6C9B0232E337500F2975B /* OverlayTextField.swift */,
 				E25F8710233222A9007AA958 /* AccessibilityObservables.swift */,
 				E2C29565234DE09C001A38D6 /* ModeCoordinator.swift */,
 				E268A029236D8F6F00EE08CB /* CachedUIElement.swift */,
@@ -606,7 +603,6 @@
 				E2B3F64B24F24B9800FD5594 /* HintModeInputListener.swift in Sources */,
 				E279534F24961DFB006D8D7A /* SmoothScroller.swift in Sources */,
 				E2DFF5AB24815C5800B4090D /* PreferencesPaneIdentifiers.swift in Sources */,
-				E2F6C9B1232E337500F2975B /* OverlayTextField.swift in Sources */,
 				E2C29571234E19E4001A38D6 /* HintModeViewController.swift in Sources */,
 				E279534B2494C534006D8D7A /* InputListener.swift in Sources */,
 				E26981B923C9E31600E46217 /* InputSourceManager.swift in Sources */,
