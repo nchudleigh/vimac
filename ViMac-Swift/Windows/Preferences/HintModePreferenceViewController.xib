@@ -9,6 +9,7 @@
         <customObject id="-2" userLabel="File's Owner" customClass="HintModePreferenceViewController" customModule="Vimac" customModuleProvider="target">
             <connections>
                 <outlet property="customCharactersView" destination="oq5-Ge-dAG" id="1nX-IA-B9f"/>
+                <outlet property="gridView" destination="KNB-GC-OEG" id="BPU-lv-8pU"/>
                 <outlet property="hintModeShortcutView" destination="vkR-Q7-QjE" id="JGJ-cr-lgv"/>
                 <outlet property="textSizeView" destination="DS0-Ia-dR2" id="bi2-Cf-krZ"/>
                 <outlet property="view" destination="esr-w2-vKg" id="5LV-WK-eDC"/>

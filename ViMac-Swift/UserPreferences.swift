@@ -68,6 +68,25 @@ struct UserPreferences {
                 return Float(read())!
             }
         }
+        
+        class ActionsProperty : PreferenceProperty {
+            typealias T = [String]
+            
+            static var key = "HintActions"
+            static var defaultValue = [
+                "AXPress",
+                "AXIncrement",
+                "AXDecrement",
+                "AXConfirm",
+                "AXPick",
+                "AXCancel",
+                "AXRaise",
+            ]
+            
+            static func isValid(value: [String]) -> Bool {
+                return true
+            }
+        }
     }
     
     struct ScrollMode {
