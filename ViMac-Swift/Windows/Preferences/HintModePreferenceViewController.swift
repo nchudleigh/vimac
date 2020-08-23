@@ -12,6 +12,9 @@ final class HintModePreferenceViewController: NSViewController, PreferencePane {
     @IBOutlet weak var hintModeShortcutView: MASShortcutView!
     @IBOutlet weak var customCharactersView: NSTextField!
     @IBOutlet weak var textSizeView: NSTextField!
+    @IBOutlet weak var gridView: NSGridView!
+    
+    var actionCheckboxes: [NSButton]?
     
     let compositeDisposable = CompositeDisposable()
     
@@ -31,6 +34,8 @@ final class HintModePreferenceViewController: NSViewController, PreferencePane {
         compositeDisposable.insert(observeCustomCharactersChange())
         compositeDisposable.insert(observeCustomCharactersValidityChange())
         compositeDisposable.insert(observeTextSizeChange())
+        
+        setupActions()
     }
 
     deinit {
@@ -78,5 +83,53 @@ final class HintModePreferenceViewController: NSViewController, PreferencePane {
         // see: https://stackoverflow.com/a/16489472/10390454
         textField.isEditable = false
         textField.isEditable = true
+    }
+    
+    func setupActions() {
+        let label = NSTextField.init(string: "Shown for actions:")
+        label.isEditable = false
+        label.isSelectable = false
+        label.isBezeled = false
+        label.drawsBackground = false
+
+        let actions = [
+            "AXPress",
+            "AXIncrement",
+            "AXDecrement",
+            "AXConfirm",
+            "AXPick",
+            "AXCancel",
+            "AXRaise",
+            "AXShowMenu"
+        ]
+        
+        let whitelistedActions = UserPreferences.HintMode.ActionsProperty.read()
+
+        let actionCheckboxes = actions.map { action -> NSButton in
+            let checkbox = NSButton.init(checkboxWithTitle: action, target: nil, action: nil)
+            checkbox.state = whitelistedActions.contains(action) ? .on : .off
+            return checkbox
+        }
+        self.actionCheckboxes = actionCheckboxes
+        
+        gridView.addRow(with: [label, actionCheckboxes.first!])
+        for checkbox in actionCheckboxes[1...actionCheckboxes.count-1] {
+            gridView.addRow(with: [NSView(), checkbox])
+        }
+        
+        for checkbox in actionCheckboxes {
+            let disposable = checkbox.rx.state.bind(onNext: { [weak self] state in
+                self?.saveActions()
+            })
+            compositeDisposable.insert(disposable)
+        }
+    }
+    
+    func saveActions() {
+        let enabledActions = actionCheckboxes!
+            .filter { $0.state == .on }
+            .map { $0.title }
+        print(enabledActions)
+        UserPreferences.HintMode.ActionsProperty.save(value: enabledActions)
     }
 }
