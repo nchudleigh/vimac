@@ -8,7 +8,7 @@
 
 import Cocoa
 
-class ModeViewController: NSViewController, OverlayTextFieldDelegate {
+class ModeViewController: NSViewController {
     weak var modeCoordinator: ModeCoordinator?
     
     init() {

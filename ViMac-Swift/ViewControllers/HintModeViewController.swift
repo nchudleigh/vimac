@@ -18,6 +18,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     lazy var inputListeningTextField = instantiateInputListeningTextField()
     var hintViews: [HintView]?
     let compositeDisposable = CompositeDisposable()
+    let inputListener = HintModeInputListener()
     var characterStack: [Character] = [Character]()
     let startTime = CFAbsoluteTimeGetCurrent()
 
@@ -33,13 +34,12 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        attachInputListeningTextField()
+        self.view.addSubview(inputListeningTextField)
         
-        self.compositeDisposable.insert(observeLetterKeyDown())
-        
-        self.compositeDisposable.insert(observeEscKey())
-        self.compositeDisposable.insert(observeDeleteKey())
-        self.compositeDisposable.insert(observeSpaceKey())
+        observeLetterKeyDown()
+        observeEscKey()
+        observeDeleteKey()
+        observeSpaceKey()
         
         self.compositeDisposable.insert(observeElements())
     }
@@ -50,20 +50,6 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
         let extraMenuBarElements = Utils.traverseForExtraMenuBarItems()
         let notificationCenterElements = Utils.traverseForNotificationCenterItems()
         return Observable.merge(windowElements, menuBarElements, extraMenuBarElements, notificationCenterElements)
-    }
-    
-    func observeLetterKeyDown() -> Disposable {
-        let alphabetKeyDownObservable = kbInputObservable()
-            .filter({ event in
-                guard let character = event.charactersIgnoringModifiers?.first else {
-                    return false
-                }
-                return (character.isLetter || character.isNumber) && event.type == .keyDown
-            })
-        return alphabetKeyDownObservable
-            .bind(onNext: { [weak self] event in
-                self?.onLetterKeyDown(event: event)
-            })
     }
     
     func onLetterKeyDown(event: NSEvent) {
@@ -121,38 +107,32 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
         self.updateHints(typed: typed)
     }
     
-    func observeEscKey() -> Disposable {
-        let escapeKeyDownObservable = kbInputObservable().filter({ event in
-            return event.keyCode == kVK_Escape && event.type == .keyDown
+    func observeLetterKeyDown() {
+        inputListener.observeLetterKeyDown(onEvent: { [weak self] event in
+            self?.onLetterKeyDown(event: event)
         })
-        return escapeKeyDownObservable
-            .bind(onNext: { [weak self] _ in
-                self?.onEscape()
-            })
     }
     
-    func observeDeleteKey() -> Disposable {
-        let deleteKeyDownObservable = kbInputObservable().filter({ event in
-            return event.keyCode == kVK_Delete && event.type == .keyDown
+    func observeEscKey() {
+        inputListener.observeEscapeKey(onEvent: { [weak self] _ in
+            self?.onEscape()
         })
-        return deleteKeyDownObservable
-            .bind(onNext: { [weak self] _ in
-                guard let vc = self else {
-                    return
-                }
-                vc.characterStack.popLast()
-                vc.updateHints(typed: String(vc.characterStack))
-            })
     }
     
-    func observeSpaceKey() -> Disposable {
-        let spaceKeyDownObservable = kbInputObservable().filter({ event in
-            return event.keyCode == kVK_Space && event.type == .keyDown
+    func observeDeleteKey() {
+        inputListener.observeDeleteKey(onEvent: { [weak self] _ in
+            guard let vc = self else {
+                return
+            }
+            vc.characterStack.popLast()
+            vc.updateHints(typed: String(vc.characterStack))
         })
-        return spaceKeyDownObservable
-            .bind(onNext: { [weak self] _ in
-                self?.rotateHints()
-            })
+    }
+    
+    func observeSpaceKey() {
+        inputListener.observeSpaceKey(onEvent: { [weak self] _ in
+            self?.rotateHints()
+        })
     }
     
     func observeElements() -> Disposable {
@@ -272,20 +252,10 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
         self.compositeDisposable.dispose()
     }
     
-    func instantiateInputListeningTextField() -> OverlayTextField {
-        let tf = OverlayTextField(frame: NSRect(x: 0, y: 0, width: 0, height: 0))
-        tf.stringValue = ""
-        tf.isEditable = true
-        tf.delegate = self
-        return tf
-    }
-    
-    func attachInputListeningTextField() {
-        inputListeningTextField.overlayTextFieldDelegate = self
-        self.view.addSubview(inputListeningTextField)
-    }
-    
-    func kbInputObservable() -> Observable<NSEvent> {
-        return inputListeningTextField.distinctNSEventObservable
+    func instantiateInputListeningTextField() -> NSTextField {
+        let textField = NSTextField()
+        textField.stringValue = ""
+        textField.isEditable = true
+        return textField
     }
 }
