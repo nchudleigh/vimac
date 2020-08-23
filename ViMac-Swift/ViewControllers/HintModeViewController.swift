@@ -58,7 +58,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
                 guard let character = event.charactersIgnoringModifiers?.first else {
                     return false
                 }
-                return character.isLetter && event.type == .keyDown
+                return (character.isLetter || character.isNumber) && event.type == .keyDown
             })
         return alphabetKeyDownObservable
             .bind(onNext: { [weak self] event in
