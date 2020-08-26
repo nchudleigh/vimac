@@ -221,19 +221,33 @@ class Utils: NSObject {
     }
     
     static func traverseForMenuBarItems(windowElement: UIElement) -> Observable<UIElement> {
-        let application: Observable<UIElement> = getElementAttribute(element: windowElement, attribute: .parent).compactMap({ $0 })
-        return application
-            .flatMap({ app -> Observable<UIElement> in
-                let menuBarObservable: Observable<UIElement?> = getElementAttribute(element: app, attribute: .menuBar)
-                return menuBarObservable.compactMap({ $0 })
+        return Observable.create({ observer in
+            let thread = Thread.init(block: {
+                let applicationOptional: UIElement? = try? windowElement.attribute(.parent)
+                guard let application = applicationOptional else {
+                    observer.onCompleted()
+                    return
+                }
+                let menubarOptional: UIElement? = try? application.attribute(.menuBar)
+                guard let menubar = menubarOptional else {
+                    observer.onCompleted()
+                    return
+                }
+                let menubarItemsOptional: [AXUIElement]? = try? menubar.attribute(.children)
+                guard let menubarItems = menubarItemsOptional else {
+                    observer.onCompleted()
+                    return
+                }
+                for menubarItem in menubarItems {
+                    observer.onNext(UIElement(menubarItem))
+                }
+                observer.onCompleted()
             })
-            .flatMap({ menuBar -> Observable<[CachedUIElement]> in
-                return getChildren(element: menuBar)
-            })
-            .flatMap({ children -> Observable<CachedUIElement> in
-                return Observable.from(children)
-            })
-            .map({ UIElement($0.element) })
+            thread.start()
+            return Disposables.create {
+                thread.cancel()
+            }
+        })
     }
     
     static func traverseForExtraMenuBarItems() -> Observable<UIElement> {
