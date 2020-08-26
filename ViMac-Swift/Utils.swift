@@ -83,62 +83,59 @@ class Utils: NSObject {
         event?.post(tap: .cghidEventTap)
         event2?.post(tap: .cghidEventTap)
     }
-    
-    static func getUIElementChildrenRecursive(element: UIElement, parentContainerFrame: NSRect) -> Observable<UIElement> {
-        return getAttributes(element: element)
-            .flatMap({ attributes -> Observable<UIElement> in
-                let (roleOptional, positionOptional, sizeOptional) = attributes
-                guard let role = roleOptional,
-                    let position = positionOptional,
-                    let size = sizeOptional else {
-                        return Observable.empty()
-                }
+
+    static func getWindowElements(windowElement: UIElement) -> Observable<UIElement> {
+        return Observable.create({ observer in
+            let thread = Thread.init(block: {
+                var stack: [(UIElement, NSRect?)] = [(windowElement, nil)]
                 
-                var newParentContainerFrame: NSRect?
-                
-                // ignore subcomponents of a scrollbar
-                if role == Role.scrollBar.rawValue {
-                    return Observable.empty()
-                }
-                
-                if role == Role.scrollArea.rawValue ||
-                    role == Role.row.rawValue ||
-                    role == "AXPage" ||
-                    role == Role.group.rawValue {
-                    newParentContainerFrame = NSRect(origin: position, size: size)
-                }
-                
-                // append to allowed elements list if element's frame intersect with it's parent container's frame.
-                let frame = NSRect(origin: position, size: size)
-                let includeElement = parentContainerFrame.intersects(frame)
-                
-                if !includeElement {
-                    return Observable.empty()
-                }
-                
-                return getChildren(element: element)
-                    .flatMap({ children -> Observable<UIElement> in
-                        if children.count <= 0 {
-                            return Observable.just(element)
+                while stack.count > 0 {
+                    let (head, parentFrame) = stack.removeFirst()
+                    let valuesOptional = try? head.getMultipleAttributes([.size, .position, .role, .children])
+                    
+                    guard let values = valuesOptional else { continue }
+                    guard let children: [AXUIElement] = values[Attribute.children] as! [AXUIElement]? else { continue }
+
+                    guard let size: NSSize = values[Attribute.size] as! NSSize? else { continue }
+                    guard let position: NSPoint = values[Attribute.position] as! NSPoint? else { continue }
+                    guard let role: String = values[Attribute.role] as! String? else { continue }
+                    let frame = NSRect(origin: position, size: size)
+
+                    if let parentFrame = parentFrame {
+                        if !frame.intersects(parentFrame) {
+                            continue
+                        }
+                    }
+                    
+                    observer.onNext(head)
+                    
+                    let childrenParentFrame: NSRect? = {
+                        let containerRoles = [
+                            Role.scrollArea.rawValue,
+                            Role.row.rawValue,
+                            "AXPage",
+                            Role.group.rawValue
+                        ]
+                        
+                        if containerRoles.contains(role) {
+                            return frame
                         }
                         
-                        return Utils.eagerConcat(observables: [
-                            Observable.just(element),
-                            Utils.eagerConcat(observables: 
-                                children.map({ getUIElementChildrenRecursive(element: $0, parentContainerFrame: newParentContainerFrame ?? parentContainerFrame) })
-                            )
-                        ])
-                    })
+                        return parentFrame
+                    }()
+                    
+                    let childrenElement: [CachedUIElement] = children.map { CachedUIElement($0) }
+                    for child in childrenElement {
+                        stack.insert((child, childrenParentFrame), at: 0)
+                    }
+                }
+                observer.onCompleted()
             })
-    }
-    
-    static func getWindowElements(windowElement: UIElement) -> Observable<UIElement> {
-        guard let windowSize: NSSize = try? windowElement.attribute(.size),
-            let windowPosition: NSPoint = try? windowElement.attribute(.position) else {
-                return Observable.empty()
-        }
-        let windowFrame = NSRect(origin: windowPosition, size: windowSize)
-        return Utils.getUIElementChildrenRecursive(element: windowElement, parentContainerFrame: windowFrame)
+            thread.start()
+            return Disposables.create {
+                thread.cancel()
+            }
+        })
     }
     
     // eagerConcat behaves like concat but all the observables are fired simultaneously instead of only after the previous ones are completed.
