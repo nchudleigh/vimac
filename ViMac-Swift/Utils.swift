@@ -83,54 +83,6 @@ class Utils: NSObject {
         event?.post(tap: .cghidEventTap)
         event2?.post(tap: .cghidEventTap)
     }
-    
-    static func getUIElementChildrenRecursive(element: UIElement, parentContainerFrame: NSRect) -> Observable<UIElement> {
-        return getAttributes(element: element)
-            .flatMap({ attributes -> Observable<UIElement> in
-                let (roleOptional, positionOptional, sizeOptional) = attributes
-                guard let role = roleOptional,
-                    let position = positionOptional,
-                    let size = sizeOptional else {
-                        return Observable.empty()
-                }
-                
-                var newParentContainerFrame: NSRect?
-                
-                // ignore subcomponents of a scrollbar
-                if role == Role.scrollBar.rawValue {
-                    return Observable.empty()
-                }
-                
-                if role == Role.scrollArea.rawValue ||
-                    role == Role.row.rawValue ||
-                    role == "AXPage" ||
-                    role == Role.group.rawValue {
-                    newParentContainerFrame = NSRect(origin: position, size: size)
-                }
-                
-                // append to allowed elements list if element's frame intersect with it's parent container's frame.
-                let frame = NSRect(origin: position, size: size)
-                let includeElement = parentContainerFrame.intersects(frame)
-                
-                if !includeElement {
-                    return Observable.empty()
-                }
-                
-                return getChildren(element: element)
-                    .flatMap({ children -> Observable<UIElement> in
-                        if children.count <= 0 {
-                            return Observable.just(element)
-                        }
-                        
-                        return Utils.eagerConcat(observables: [
-                            Observable.just(element),
-                            Utils.eagerConcat(observables: 
-                                children.map({ getUIElementChildrenRecursive(element: $0, parentContainerFrame: newParentContainerFrame ?? parentContainerFrame) })
-                            )
-                        ])
-                    })
-            })
-    }
 
     static func getWindowElements(windowElement: UIElement) -> Observable<UIElement> {
         return Observable.create({ observer in
