@@ -251,20 +251,28 @@ class Utils: NSObject {
     }
     
     static func traverseForExtraMenuBarItems() -> Observable<UIElement> {
-        let menuBars = eagerConcat(observables: Application.all()
-            .map({ app -> Observable<UIElement> in
-                let menuBarOptional: Observable<UIElement?> = getElementAttribute(element: app, attribute: .extrasMenuBar)
-                return menuBarOptional.compactMap({ $0 })
+        return Observable.create({ observer in
+            let thread = Thread.init(block: {
+                let apps = Application.all()
+                let menubarsOptional: [UIElement?] = apps.map({ try? $0.attribute(.extrasMenuBar) })
+                let menubars = menubarsOptional.compactMap({ $0 })
+                let menubarItemsUnflattened: [[UIElement]] = menubars.map({ menubar in
+                    let AXItems: [AXUIElement]? = try? menubar.attribute(.children)
+                    let items = AXItems?.map { UIElement($0) }
+                    return items ?? []
+                })
+                let menubarItems = Array(menubarItemsUnflattened.joined())
+
+                for menubarItem in menubarItems {
+                    observer.onNext(menubarItem)
+                }
+                observer.onCompleted()
             })
-        )
-        return menuBars
-            .flatMap({ menuBar -> Observable<[CachedUIElement]> in
-                return getChildren(element: menuBar)
-            })
-            .flatMap({ menuBarItems -> Observable<CachedUIElement> in
-                return Observable.from(menuBarItems)
-            })
-            .map({ UIElement($0.element) })
+            thread.start()
+            return Disposables.create {
+                thread.cancel()
+            }
+        })
     }
     
     static func traverseForNotificationCenterItems() -> Observable<UIElement> {
