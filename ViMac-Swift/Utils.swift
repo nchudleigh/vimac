@@ -107,6 +107,7 @@ class Utils: NSObject {
                         }
                     }
                     
+                    try? head.actionsAsStrings()
                     observer.onNext(head)
                     
                     let childrenParentFrame: NSRect? = {

@@ -11,6 +11,7 @@ import AXSwift
 
 class CachedUIElement: UIElement {
     var cache: [Attribute:Any] = [:]
+    var actionsCache: [String]?
     
     required init(_ nativeElement: AXUIElement) {
         super.init(nativeElement)
@@ -42,5 +43,14 @@ class CachedUIElement: UIElement {
             return cache[attribute] as! T?
         }
         return try super.attribute(attribute)
+    }
+    
+    override func actionsAsStrings() throws -> [String] {
+        if let actionsCache = actionsCache {
+            return actionsCache
+        }
+        
+        actionsCache = try! super.actionsAsStrings()
+        return actionsCache!
     }
 }
