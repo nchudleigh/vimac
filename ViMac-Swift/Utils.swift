@@ -87,10 +87,16 @@ class Utils: NSObject {
     static func getWindowElements(windowElement: UIElement) -> Observable<UIElement> {
         return Observable.create({ observer in
             let thread = Thread.init(block: {
-                var stack: [(UIElement, NSRect?)] = [(windowElement, nil)]
+                let windowFrameOptional: NSRect? = try? windowElement.attribute(.frame)
+                guard let windowFrame = windowFrameOptional else {
+                    observer.onCompleted()
+                    return
+                }
+                
+                var stack: [UIElement] = [windowElement]
                 
                 while stack.count > 0 {
-                    let (head, parentFrame) = stack.removeFirst()
+                    let head = stack.removeFirst()
                     let valuesOptional = try? head.getMultipleAttributes([.size, .position, .role, .children])
                     
                     guard let values = valuesOptional else { continue }
@@ -101,33 +107,16 @@ class Utils: NSObject {
                     guard let role: String = values[Attribute.role] as! String? else { continue }
                     let frame = NSRect(origin: position, size: size)
 
-                    if let parentFrame = parentFrame {
-                        if !frame.intersects(parentFrame) {
-                            continue
-                        }
+                    if !frame.intersects(windowFrame) {
+                        continue
                     }
                     
                     try? head.actionsAsStrings()
                     observer.onNext(head)
                     
-                    let childrenParentFrame: NSRect? = {
-                        let containerRoles = [
-                            Role.scrollArea.rawValue,
-                            Role.row.rawValue,
-                            "AXPage",
-                            Role.group.rawValue
-                        ]
-                        
-                        if containerRoles.contains(role) {
-                            return frame
-                        }
-                        
-                        return parentFrame
-                    }()
-                    
                     let childrenElement: [CachedUIElement] = children.map { CachedUIElement($0) }
                     for child in childrenElement {
-                        stack.insert((child, childrenParentFrame), at: 0)
+                        stack.insert(child, at: 0)
                     }
                 }
                 observer.onCompleted()
