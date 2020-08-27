@@ -93,10 +93,10 @@ class Utils: NSObject {
                     return
                 }
                 
-                var stack: [UIElement] = [windowElement]
+                var stack: [(UIElement, NSRect?)] = [(windowElement, nil)]
                 
                 while stack.count > 0 {
-                    let head = stack.removeFirst()
+                    let (head, parentContainerFrameOptional) = stack.removeFirst()
                     let valuesOptional = try? head.getMultipleAttributes([.size, .position, .role, .children])
                     
                     guard let values = valuesOptional else { continue }
@@ -110,13 +110,33 @@ class Utils: NSObject {
                     if !frame.intersects(windowFrame) {
                         continue
                     }
+
+                    if let parentContainerFrame = parentContainerFrameOptional {
+                        if !frame.intersects(parentContainerFrame) {
+                            continue
+                        }
+                    }
+                    
+                    let childrenParentContainerFrame: NSRect? = {
+                        let containerRoles = [
+                            Role.scrollArea.rawValue,
+                            Role.row.rawValue,
+                            "AXPage"
+                        ]
+
+                        if containerRoles.contains(role) || role.lowercased().contains("group") {
+                            return frame
+                        }
+
+                        return parentContainerFrameOptional
+                    }()
                     
                     try? head.actionsAsStrings()
                     observer.onNext(head)
                     
                     let childrenElement: [CachedUIElement] = children.map { CachedUIElement($0) }
                     for child in childrenElement {
-                        stack.insert(child, at: 0)
+                        stack.insert((child, childrenParentContainerFrame), at: 0)
                     }
                 }
                 observer.onCompleted()
