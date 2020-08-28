@@ -322,4 +322,11 @@ class Utils: NSObject {
         
         return try? appOptional?.attribute(.focusedWindow)
     }
+    
+    static func singleToObservable<T>(single: Single<[T]>) -> Observable<T> {
+        return single.asObservable()
+            .flatMap({ elements in
+                return Observable.from(elements)
+            })
+    }
 }
