@@ -54,7 +54,12 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     }
     
     func queryWindowElementsSingle() -> Single<[UIElement]> {
-        return Single.create(subscribe: { event in
+        return Single.create(subscribe: { [weak self] event in
+            guard let self = self else {
+                event(.success([]))
+                return Disposables.create()
+            }
+            
             let thread = Thread.init(block: {
                 let service = QueryWindowService.init(windowElement: self.applicationWindow)
                 let elements = try? service.perform()

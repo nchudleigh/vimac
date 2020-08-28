@@ -7,12 +7,10 @@
 //
 
 import Cocoa
-import RxSwift
 import AXSwift
 
 class QueryWindowService {
     let windowElement: UIElement
-    let disposeBag = DisposeBag()
     
     init(windowElement: UIElement) {
         self.windowElement = windowElement
@@ -64,6 +62,18 @@ class QueryWindowService {
             // this function should be executed in a thread
             // the actions are cached here so that when we ask for actions again in main thread it doesn't block
             try? head.actionsAsStrings()
+            
+            if role == "AXWebArea" {
+                if let parameterizedAttrs = try? head.parameterizedAttributesAsStrings() {
+                    if parameterizedAttrs.contains("AXUIElementsForSearchPredicate") {
+                        let service = QueryWebAreaService.init(webAreaElement: head)
+                        let webAreaElements = try? service.perform()
+                        elements.append(contentsOf: webAreaElements ?? [])
+                        continue
+                    }
+                }
+            }
+            
             elements.append(head)
             
             let childrenElement: [CachedUIElement] = children.map { CachedUIElement($0) }
