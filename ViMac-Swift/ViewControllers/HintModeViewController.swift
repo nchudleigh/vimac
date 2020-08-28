@@ -46,11 +46,30 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     }
     
     func elementObservable() -> Observable<UIElement> {
-        let windowElements = Utils.getWindowElements(windowElement: applicationWindow)
+        let windowElements = Utils.singleToObservable(single: queryWindowElementsSingle())
         let menuBarElements = Utils.traverseForMenuBarItems(windowElement: applicationWindow)
         let extraMenuBarElements = Utils.traverseForExtraMenuBarItems()
         let notificationCenterElements = Utils.traverseForNotificationCenterItems()
         return Observable.merge(windowElements, menuBarElements, extraMenuBarElements, notificationCenterElements)
+    }
+    
+    func queryWindowElementsSingle() -> Single<[UIElement]> {
+        return Single.create(subscribe: { [weak self] event in
+            guard let self = self else {
+                event(.success([]))
+                return Disposables.create()
+            }
+            
+            let thread = Thread.init(block: {
+                let service = QueryWindowService.init(windowElement: self.applicationWindow)
+                let elements = try? service.perform()
+                event(.success(elements ?? []))
+            })
+            thread.start()
+            return Disposables.create {
+                thread.cancel()
+            }
+        })
     }
     
     func onLetterKeyDown(event: NSEvent) {

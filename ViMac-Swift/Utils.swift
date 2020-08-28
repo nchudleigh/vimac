@@ -84,7 +84,7 @@ class Utils: NSObject {
         event2?.post(tap: .cghidEventTap)
     }
 
-    static func getWindowElements(windowElement: UIElement) -> Observable<UIElement> {
+    static func getWindowElementsLegacy(windowElement: UIElement) -> Observable<UIElement> {
         return Observable.create({ observer in
             let thread = Thread.init(block: {
                 let windowFrameOptional: NSRect? = try? windowElement.attribute(.frame)
@@ -293,7 +293,7 @@ class Utils: NSObject {
         }
         
         let windows = (try? notificationAppUIElement.windows()) ?? []
-        return eagerConcat(observables: windows.map({ getWindowElements(windowElement: $0 ) }))
+        return eagerConcat(observables: windows.map({ getWindowElementsLegacy(windowElement: $0 ) }))
     }
     
     // For performance reasons Chromium only makes the webview accessible when there it detects voiceover through the `AXEnhancedUserInterface` attribute on the Chrome application itself:
@@ -321,5 +321,12 @@ class Utils: NSObject {
         }
         
         return try? appOptional?.attribute(.focusedWindow)
+    }
+    
+    static func singleToObservable<T>(single: Single<[T]>) -> Observable<T> {
+        return single.asObservable()
+            .flatMap({ elements in
+                return Observable.from(elements)
+            })
     }
 }
