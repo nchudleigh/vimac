@@ -100,7 +100,8 @@ final class HintModePreferenceViewController: NSViewController, PreferencePane {
             "AXPick",
             "AXCancel",
             "AXRaise",
-            "AXShowMenu"
+            "AXShowMenu",
+            "AXOpen"
         ]
         
         let whitelistedActions = UserPreferences.HintMode.ActionsProperty.read()

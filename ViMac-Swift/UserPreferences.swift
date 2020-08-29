@@ -81,6 +81,7 @@ struct UserPreferences {
                 "AXPick",
                 "AXCancel",
                 "AXRaise",
+                "AXOpen"
             ]
             
             static func isValid(value: [String]) -> Bool {

@@ -24,7 +24,7 @@ class QueryWebAreaService {
             "AXVisibleOnly": true,
             "AXSearchKey": "AXAnyTypeSearchKey"
         ]
-        let rawElements: [AXUIElement]? = try! webAreaElement.parameterizedAttribute("AXUIElementsForSearchPredicate", param: query)
+        let rawElements: [AXUIElement]? = try webAreaElement.parameterizedAttribute("AXUIElementsForSearchPredicate", param: query)
         let elements = rawElements?.map({ UIElement($0) })
         return elements
     }

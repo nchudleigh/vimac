@@ -50,7 +50,7 @@ class CachedUIElement: UIElement {
             return actionsCache
         }
         
-        actionsCache = try! super.actionsAsStrings()
+        actionsCache = try super.actionsAsStrings()
         return actionsCache!
     }
 }

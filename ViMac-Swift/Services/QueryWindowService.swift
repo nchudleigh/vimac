@@ -24,11 +24,13 @@ class QueryWindowService {
         var stack: [(UIElement, NSRect?)] = [(self.windowElement, nil)]
         
         while stack.count > 0 {
-            let (head, parentContainerFrameOptional) = stack.removeFirst()
+            let (head, parentContainerFrameOptional) = stack.popLast()!
             let valuesOptional = try? head.getMultipleAttributes([.size, .position, .role, .children])
             
             guard let values = valuesOptional else { continue }
-            guard let children: [AXUIElement] = values[Attribute.children] as! [AXUIElement]? else { continue }
+            
+            let childrenOptional: [AXUIElement]? = values[Attribute.children] as! [AXUIElement]?
+            let children = childrenOptional ?? []
 
             guard let size: NSSize = values[Attribute.size] as! NSSize? else { continue }
             guard let position: NSPoint = values[Attribute.position] as! NSPoint? else { continue }
@@ -74,11 +76,13 @@ class QueryWindowService {
                 }
             }
             
+            
+            
             elements.append(head)
             
             let childrenElement: [CachedUIElement] = children.map { CachedUIElement($0) }
             for child in childrenElement {
-                stack.insert((child, childrenParentContainerFrame), at: 0)
+                stack.append((child, childrenParentContainerFrame))
             }
         }
         return elements
