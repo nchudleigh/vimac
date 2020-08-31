@@ -43,6 +43,8 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
         observeSpaceKey()
         
         self.compositeDisposable.insert(observeElements())
+        
+        hideMouse()
     }
     
     func elementObservable() -> Observable<UIElement> {
@@ -271,10 +273,20 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
         }
         self.hintViews = shuffledHintViews
     }
+    
+    func hideMouse() {
+        HideCursorGlobally.hide()
+    }
+    
+    func showMouse() {
+        HideCursorGlobally.unhide()
+    }
 
     override func viewDidDisappear() {
         super.viewDidDisappear()
         self.compositeDisposable.dispose()
+
+        showMouse()
     }
     
     func instantiateInputListeningTextField() -> NSTextField {
