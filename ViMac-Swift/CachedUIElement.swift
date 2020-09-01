@@ -40,7 +40,7 @@ class CachedUIElement: UIElement {
     
     override func attribute<T>(_ attribute: Attribute) throws -> T? {
         if cache.keys.contains(attribute) {
-            return cache[attribute] as! T?
+            return cache[attribute] as? T
         }
         return try super.attribute(attribute)
     }

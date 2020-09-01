@@ -29,12 +29,12 @@ class QueryWindowService {
             
             guard let values = valuesOptional else { continue }
             
-            let childrenOptional: [AXUIElement]? = values[Attribute.children] as! [AXUIElement]?
+            let childrenOptional: [AXUIElement]? = values[Attribute.children] as? [AXUIElement]
             let children = childrenOptional ?? []
 
-            guard let size: NSSize = values[Attribute.size] as! NSSize? else { continue }
-            guard let position: NSPoint = values[Attribute.position] as! NSPoint? else { continue }
-            guard let role: String = values[Attribute.role] as! String? else { continue }
+            guard let size: NSSize = values[Attribute.size] as? NSSize else { continue }
+            guard let position: NSPoint = values[Attribute.position] as? NSPoint else { continue }
+            guard let role: String = values[Attribute.role] as? String else { continue }
             let frame = NSRect(origin: position, size: size)
 
             if !frame.intersects(windowFrame) {
