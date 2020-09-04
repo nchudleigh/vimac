@@ -36,11 +36,35 @@ You can cycle through the scroll areas with the TAB key.
 
 ## Building
 
-Add Vimac to the list of Accessibility apps under **System Preferences > Security & Privacy > Accessibility**.
+```
+pod install
+carthage build
+open Vimac.xcworkspace
+```
+
+Modify the Signing and Capabilities to the following (note the `Disable Library Validation` option):
+
+![](misc/remove_signing.png)
+
+Add Vimac and Xcode (for running AppleScript) to the list of Accessibility apps under **System Preferences > Security & Privacy > Accessibility**:
+
+![](misc/vimac_xcode_accessibility.png)
 
 Keep System Preferences open under this section during development with the settings unlocked. This is because the `grant-accessibility-permission-dev.scpt` AppleScript is scheduled to run after each build to re-grant Accessibility permissions.
 
 The AppleScript simply checks and unchecks Vimac to re-grant permissions which are lost after a cleanbuild.
+
+Build Vimac now! You may have to build it several times as the AppleScript may not run well the first time.
+
+At this point running `git status` would bring up:
+
+```
+modified:   ViMac-Swift/ViMac_Swift.entitlements
+modified:   Vimac.xcodeproj/project.pbxproj
+modified:   grant-accessibility-permission-dev.scpt
+```
+
+Avoid committing them.
 
 ## Contributing
 
