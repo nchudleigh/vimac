@@ -125,7 +125,6 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
             }
             
             revertMouseLocation()
-            showMouse()
             return
         }
 
@@ -293,6 +292,8 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     override func viewDidDisappear() {
         super.viewDidDisappear()
         self.compositeDisposable.dispose()
+        
+        showMouse()
     }
     
     func instantiateInputListeningTextField() -> NSTextField {
