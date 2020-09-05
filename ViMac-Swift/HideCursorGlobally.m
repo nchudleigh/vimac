@@ -9,7 +9,12 @@
 #import "HideCursorGlobally.h"
 
 @implementation HideCursorGlobally
+
 + (void) hide {
+    if (!CGCursorIsVisible()) {
+        return;
+    }
+    
     void CGSSetConnectionProperty(int, int, CFStringRef, CFBooleanRef);
     int _CGSDefaultConnection();
     CFStringRef propertyString;
@@ -23,6 +28,10 @@
 }
 
 + (void) unhide {
-    CGDisplayShowCursor(kCGNullDirectDisplay);
+    if (CGCursorIsVisible()) {
+        return;
+    }
+
+    CGDisplayShowCursor(CGMainDisplayID());
 }
 @end

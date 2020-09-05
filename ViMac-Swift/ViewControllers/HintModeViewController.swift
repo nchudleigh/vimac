@@ -21,6 +21,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     let inputListener = HintModeInputListener()
     var characterStack: [Character] = [Character]()
     let whitelistedActions = Set(UserPreferences.HintMode.ActionsProperty.read())
+    let originalMousePosition = NSEvent.mouseLocation
     let startTime = CFAbsoluteTimeGetCurrent()
 
     init(applicationWindow: UIElement) {
@@ -43,6 +44,8 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
         observeSpaceKey()
         
         self.compositeDisposable.insert(observeElements())
+        
+        hideMouse()
     }
     
     func elementObservable() -> Observable<UIElement> {
@@ -120,6 +123,8 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
             } else {
                 Utils.leftClickMouse(position: centerPosition)
             }
+            
+            revertMouseLocation()
             return
         }
 
@@ -271,10 +276,24 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
         }
         self.hintViews = shuffledHintViews
     }
+    
+    func hideMouse() {
+        HideCursorGlobally.hide()
+    }
+    
+    func showMouse() {
+        HideCursorGlobally.unhide()
+    }
+    
+    func revertMouseLocation() {
+        Utils.moveMouse(position: Utils.toOrigin(point: originalMousePosition, size: NSSize.zero))
+    }
 
     override func viewDidDisappear() {
         super.viewDidDisappear()
         self.compositeDisposable.dispose()
+        
+        showMouse()
     }
     
     func instantiateInputListeningTextField() -> NSTextField {
