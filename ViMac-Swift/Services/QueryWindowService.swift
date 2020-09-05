@@ -25,12 +25,9 @@ class QueryWindowService {
         
         while stack.count > 0 {
             let (head, parentContainerFrameOptional) = stack.popLast()!
-            let valuesOptional = try? head.getMultipleAttributes([.size, .position, .role, .children])
+            let valuesOptional = try? head.getMultipleAttributes([.size, .position, .role])
             
             guard let values = valuesOptional else { continue }
-            
-            let childrenOptional: [AXUIElement]? = values[Attribute.children] as! [AXUIElement]?
-            let children = childrenOptional ?? []
 
             guard let size: NSSize = values[Attribute.size] as! NSSize? else { continue }
             guard let position: NSPoint = values[Attribute.position] as! NSPoint? else { continue }
@@ -75,10 +72,18 @@ class QueryWindowService {
                     }
                 }
             }
-            
-            
-            
+
             elements.append(head)
+            
+            let childrenOptional: [AXUIElement]? = {
+                if role == "AXTable" || role == "AXOutline" {
+                    return try? head.attribute(.visibleRows)
+                } else {
+                    return try? head.attribute(.children)
+                }
+            }()
+            
+            let children = childrenOptional ?? []
             
             let childrenElement: [CachedUIElement] = children.map { CachedUIElement($0) }
             for child in childrenElement {
