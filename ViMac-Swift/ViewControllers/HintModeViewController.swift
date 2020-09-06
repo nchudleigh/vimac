@@ -14,7 +14,7 @@ import os
 
 class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     let applicationWindow: UIElement
-    lazy var elements: Single<[UIElement]> = elementObservable().toArray()
+    lazy var elements: Single<[Element]> = elementObservable().toArray()
     lazy var inputListeningTextField = instantiateInputListeningTextField()
     var hintViews: [HintView]?
     let compositeDisposable = CompositeDisposable()
@@ -48,15 +48,15 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
         hideMouse()
     }
     
-    func elementObservable() -> Observable<UIElement> {
+    func elementObservable() -> Observable<Element> {
         let windowElements = Utils.singleToObservable(single: queryWindowElementsSingle())
-        let menuBarElements = Utils.traverseForMenuBarItems(windowElement: applicationWindow)
-        let extraMenuBarElements = Utils.traverseForExtraMenuBarItems()
-        let notificationCenterElements = Utils.traverseForNotificationCenterItems()
-        return Observable.merge(windowElements, menuBarElements, extraMenuBarElements, notificationCenterElements)
+//        let menuBarElements = Utils.traverseForMenuBarItems(windowElement: applicationWindow)
+//        let extraMenuBarElements = Utils.traverseForExtraMenuBarItems()
+//        let notificationCenterElements = Utils.traverseForNotificationCenterItems()
+        return windowElements
     }
     
-    func queryWindowElementsSingle() -> Single<[UIElement]> {
+    func queryWindowElementsSingle() -> Single<[Element]> {
         return Single.create(subscribe: { [weak self] event in
             guard let self = self else {
                 event(.success([]))
@@ -64,7 +64,12 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
             }
             
             let thread = Thread.init(block: {
-                let service = QueryWindowService.init(windowElement: self.applicationWindow)
+                guard let windowElement = Element.initialize(rawElement: self.applicationWindow.element) else {
+                    event(.success([]))
+                    return
+                }
+                
+                let service = QueryWindowService.init(windowElement: windowElement)
                 let elements = try? service.perform()
                 event(.success(elements ?? []))
             })
@@ -96,14 +101,8 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
             let matchingHint = matchingHints.first!
             let button = matchingHint.associatedElement
 
-            let buttonPositionOptional: NSPoint? = try? button.attribute(.position)
-            let buttonSizeOptional: NSSize? = try? button.attribute(.size)
-
-            guard let buttonPosition = buttonPositionOptional,
-                let buttonSize = buttonSizeOptional else {
-                    self.modeCoordinator?.exitMode()
-                    return
-            }
+            let buttonPosition = button.frame.origin
+            let buttonSize = button.frame.size
 
             let centerPositionX = buttonPosition.x + (buttonSize.width / 2)
             let centerPositionY = buttonPosition.y + (buttonSize.height / 2)
@@ -169,14 +168,9 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
                     os_log("[Hint mode] query time: %@", log: Log.accessibility, String(describing: timeElapsed))
                     
                     self?.onElementTraversalComplete(elements: elements.filter({ element in
-                        let actions = try? element.actionsAsStrings()
-                        var isAllowed = false
-
-                        if let actions = actions {
-                            let containsWhitelistedAction = Set(actions).intersection(self!.whitelistedActions).count > 0
-                            isAllowed = containsWhitelistedAction
-                        }
-                        return isAllowed
+                        let actions = element.actions
+                        let containsWhitelistedAction = Set(actions).intersection(self!.whitelistedActions).count > 0
+                        return containsWhitelistedAction
                     }))
                 },
                 onError: { error in
@@ -185,7 +179,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
             )
     }
     
-    func onElementTraversalComplete(elements: [UIElement]) {
+    func onElementTraversalComplete(elements: [Element]) {
         let hintStrings = AlphabetHints().hintStrings(linkCount: elements.count, hintCharacters: UserPreferences.HintMode.CustomCharactersProperty.read())
         
         let textSize = UserPreferences.HintMode.TextSizeProperty.readAsFloat()
@@ -206,15 +200,13 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
         self.inputListeningTextField.becomeFirstResponder()
     }
     
-    func instantiateHintView(associatedElement: UIElement, textSize: CGFloat, text: String) -> HintView? {
+    func instantiateHintView(associatedElement: Element, textSize: CGFloat, text: String) -> HintView? {
         let text = HintView(associatedElement: associatedElement, hintTextSize: CGFloat(textSize), hintText: text, typedHintText: "")
         
         let centerPositionOptional: NSPoint? = {
             do {
-                guard let topLeftPositionFlipped: NSPoint = try associatedElement.attribute(.position),
-                    let buttonSize: NSSize = try associatedElement.attribute(.size) else {
-                    return nil
-                }
+                let topLeftPositionFlipped: NSPoint = associatedElement.frame.origin
+                let buttonSize: NSSize = associatedElement.frame.size
                 let topLeftPositionRelativeToScreen = Utils.toOrigin(point: topLeftPositionFlipped, size: text.frame.size)
                 guard let topLeftPositionRelativeToWindow = self.modeCoordinator?.windowController.window?.convertPoint(fromScreen: topLeftPositionRelativeToScreen) else {
                     return nil

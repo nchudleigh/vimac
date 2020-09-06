@@ -28,6 +28,12 @@
 		E26981B523C99DF900E46217 /* WelcomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26981B423C99DF900E46217 /* WelcomeViewController.swift */; };
 		E26981B923C9E31600E46217 /* InputSourceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26981B823C9E31600E46217 /* InputSourceManager.swift */; };
 		E26981BB23C9E35D00E46217 /* TISInputSourceExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26981BA23C9E35D00E46217 /* TISInputSourceExtension.swift */; };
+		E270F4212503E7A800AD305A /* Element.swift in Sources */ = {isa = PBXBuildFile; fileRef = E270F4202503E7A800AD305A /* Element.swift */; };
+		E270F5C52504D8DE00AD305A /* TraverseElementServiceFinder.swift in Sources */ = {isa = PBXBuildFile; fileRef = E270F5C42504D8DE00AD305A /* TraverseElementServiceFinder.swift */; };
+		E270F5C92504D9AE00AD305A /* TraverseGenericElementService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E270F5C82504D9AE00AD305A /* TraverseGenericElementService.swift */; };
+		E270F5CB2504D9DE00AD305A /* TraverseElementService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E270F5CA2504D9DE00AD305A /* TraverseElementService.swift */; };
+		E270F5CD2504DB5800AD305A /* TraverseRowContainingElementService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E270F5CC2504DB5800AD305A /* TraverseRowContainingElementService.swift */; };
+		E270F5CF2504DC4600AD305A /* TraverseWebAreaElementService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E270F5CE2504DC4600AD305A /* TraverseWebAreaElementService.swift */; };
 		E27776E3240B780D00488320 /* LaunchAtLogin.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E27776E2240B780D00488320 /* LaunchAtLogin.framework */; };
 		E27776E4240B780D00488320 /* LaunchAtLogin.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = E27776E2240B780D00488320 /* LaunchAtLogin.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		E27776E8240B784900488320 /* LaunchAtLogin.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = E27776E7240B784900488320 /* LaunchAtLogin.framework.dSYM */; };
@@ -38,7 +44,6 @@
 		E2795353249633DE006D8D7A /* Scroller.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2795352249633DE006D8D7A /* Scroller.swift */; };
 		E28867F0235F54F2001691A5 /* Vimac.icns in Resources */ = {isa = PBXBuildFile; fileRef = E28867EF235F54F1001691A5 /* Vimac.icns */; };
 		E290EF4B24F93343004B1A83 /* QueryWindowService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E290EF4A24F93342004B1A83 /* QueryWindowService.swift */; };
-		E290EF4D24F93BC1004B1A83 /* QueryWebAreaService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E290EF4C24F93BC1004B1A83 /* QueryWebAreaService.swift */; };
 		E2B3F64B24F24B9800FD5594 /* HintModeInputListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2B3F64A24F24B9800FD5594 /* HintModeInputListener.swift */; };
 		E2C29562234DD7F8001A38D6 /* OverlayWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2C29561234DD7F8001A38D6 /* OverlayWindowController.swift */; };
 		E2C29566234DE09C001A38D6 /* ModeCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2C29565234DE09C001A38D6 /* ModeCoordinator.swift */; };
@@ -133,6 +138,12 @@
 		E26981B423C99DF900E46217 /* WelcomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeViewController.swift; sourceTree = "<group>"; };
 		E26981B823C9E31600E46217 /* InputSourceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputSourceManager.swift; sourceTree = "<group>"; };
 		E26981BA23C9E35D00E46217 /* TISInputSourceExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TISInputSourceExtension.swift; sourceTree = "<group>"; };
+		E270F4202503E7A800AD305A /* Element.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Element.swift; sourceTree = "<group>"; };
+		E270F5C42504D8DE00AD305A /* TraverseElementServiceFinder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TraverseElementServiceFinder.swift; sourceTree = "<group>"; };
+		E270F5C82504D9AE00AD305A /* TraverseGenericElementService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TraverseGenericElementService.swift; sourceTree = "<group>"; };
+		E270F5CA2504D9DE00AD305A /* TraverseElementService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TraverseElementService.swift; sourceTree = "<group>"; };
+		E270F5CC2504DB5800AD305A /* TraverseRowContainingElementService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TraverseRowContainingElementService.swift; sourceTree = "<group>"; };
+		E270F5CE2504DC4600AD305A /* TraverseWebAreaElementService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TraverseWebAreaElementService.swift; sourceTree = "<group>"; };
 		E27776E2240B780D00488320 /* LaunchAtLogin.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = LaunchAtLogin.framework; path = Carthage/Build/Mac/LaunchAtLogin.framework; sourceTree = "<group>"; };
 		E27776E7240B784900488320 /* LaunchAtLogin.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = LaunchAtLogin.framework.dSYM; path = Carthage/Build/Mac/LaunchAtLogin.framework.dSYM; sourceTree = "<group>"; };
 		E279534A2494C534006D8D7A /* InputListener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputListener.swift; sourceTree = "<group>"; };
@@ -142,7 +153,6 @@
 		E2795352249633DE006D8D7A /* Scroller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scroller.swift; sourceTree = "<group>"; };
 		E28867EF235F54F1001691A5 /* Vimac.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Vimac.icns; sourceTree = SOURCE_ROOT; };
 		E290EF4A24F93342004B1A83 /* QueryWindowService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryWindowService.swift; sourceTree = "<group>"; };
-		E290EF4C24F93BC1004B1A83 /* QueryWebAreaService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryWebAreaService.swift; sourceTree = "<group>"; };
 		E2B3F64A24F24B9800FD5594 /* HintModeInputListener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HintModeInputListener.swift; sourceTree = "<group>"; };
 		E2C29561234DD7F8001A38D6 /* OverlayWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayWindowController.swift; sourceTree = "<group>"; };
 		E2C29565234DE09C001A38D6 /* ModeCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModeCoordinator.swift; sourceTree = "<group>"; };
@@ -263,6 +273,7 @@
 		E26172222322968500E396CA /* ViMac-Swift */ = {
 			isa = PBXGroup;
 			children = (
+				E270F41F2503E79900AD305A /* Accessibility */,
 				E290EF4924F93306004B1A83 /* Services */,
 				E28867EF235F54F1001691A5 /* Vimac.icns */,
 				E2C2956F234E0A32001A38D6 /* ViewControllers */,
@@ -326,11 +337,23 @@
 			path = Welcome;
 			sourceTree = "<group>";
 		};
+		E270F41F2503E79900AD305A /* Accessibility */ = {
+			isa = PBXGroup;
+			children = (
+				E270F4202503E7A800AD305A /* Element.swift */,
+			);
+			path = Accessibility;
+			sourceTree = "<group>";
+		};
 		E290EF4924F93306004B1A83 /* Services */ = {
 			isa = PBXGroup;
 			children = (
 				E290EF4A24F93342004B1A83 /* QueryWindowService.swift */,
-				E290EF4C24F93BC1004B1A83 /* QueryWebAreaService.swift */,
+				E270F5C42504D8DE00AD305A /* TraverseElementServiceFinder.swift */,
+				E270F5C82504D9AE00AD305A /* TraverseGenericElementService.swift */,
+				E270F5CA2504D9DE00AD305A /* TraverseElementService.swift */,
+				E270F5CC2504DB5800AD305A /* TraverseRowContainingElementService.swift */,
+				E270F5CE2504DC4600AD305A /* TraverseWebAreaElementService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -612,6 +635,7 @@
 			files = (
 				E261725A2324EC7100E396CA /* OverlayWindow.swift in Sources */,
 				E279535124962E8D006D8D7A /* ChunkyScroller.swift in Sources */,
+				E270F5CF2504DC4600AD305A /* TraverseWebAreaElementService.swift in Sources */,
 				E2795353249633DE006D8D7A /* Scroller.swift in Sources */,
 				E2C3221E23BC828C00508B44 /* HideCursorGlobally.m in Sources */,
 				E2B3F64B24F24B9800FD5594 /* HintModeInputListener.swift in Sources */,
@@ -625,19 +649,23 @@
 				E2F6C9AF232DEA1800F2975B /* Utils.swift in Sources */,
 				E279534D2494CC69006D8D7A /* ScrollModeInputListener.swift in Sources */,
 				E268A02A236D8F6F00EE08CB /* CachedUIElement.swift in Sources */,
+				E270F5CD2504DB5800AD305A /* TraverseRowContainingElementService.swift in Sources */,
 				E26981B523C99DF900E46217 /* WelcomeViewController.swift in Sources */,
+				E270F5C52504D8DE00AD305A /* TraverseElementServiceFinder.swift in Sources */,
 				E2C29568234DE51F001A38D6 /* ModeViewController.swift in Sources */,
+				E270F5C92504D9AE00AD305A /* TraverseGenericElementService.swift in Sources */,
 				E245F9B123941AE8009CA9C6 /* BorderView.swift in Sources */,
 				E290EF4B24F93343004B1A83 /* QueryWindowService.swift in Sources */,
+				E270F5CB2504D9DE00AD305A /* TraverseElementService.swift in Sources */,
 				E25F8711233222A9007AA958 /* AccessibilityObservables.swift in Sources */,
 				E26981BB23C9E35D00E46217 /* TISInputSourceExtension.swift in Sources */,
 				E2DFF5AD24815D3E00B4090D /* GeneralPreferenceViewController.swift in Sources */,
 				E266D916248AAC99005A261F /* UserPreferences.swift in Sources */,
 				E2C29566234DE09C001A38D6 /* ModeCoordinator.swift in Sources */,
-				E290EF4D24F93BC1004B1A83 /* QueryWebAreaService.swift in Sources */,
 				E2C29562234DD7F8001A38D6 /* OverlayWindowController.swift in Sources */,
 				E229E57A2482ABAF00A558D3 /* ScrollModePreferenceViewController.swift in Sources */,
 				E2069700232A52EA001EFDB2 /* AlphabetHints.swift in Sources */,
+				E270F4212503E7A800AD305A /* Element.swift in Sources */,
 				E20696F923290D41001EFDB2 /* Log.swift in Sources */,
 				E225BD1D233292B800ECDEF4 /* StatusItemManager.swift in Sources */,
 				E26981B323C99DBB00E46217 /* WelcomeWindowController.swift in Sources */,
