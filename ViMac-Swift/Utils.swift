@@ -230,61 +230,6 @@ class Utils: NSObject {
         })
     }
     
-    static func traverseForMenuBarItems(windowElement: UIElement) -> Observable<UIElement> {
-        return Observable.create({ observer in
-            let thread = Thread.init(block: {
-                let applicationOptional: UIElement? = try? windowElement.attribute(.parent)
-                guard let application = applicationOptional else {
-                    observer.onCompleted()
-                    return
-                }
-                let menubarOptional: UIElement? = try? application.attribute(.menuBar)
-                guard let menubar = menubarOptional else {
-                    observer.onCompleted()
-                    return
-                }
-                let menubarItemsOptional: [AXUIElement]? = try? menubar.attribute(.children)
-                guard let menubarItems = menubarItemsOptional else {
-                    observer.onCompleted()
-                    return
-                }
-                for menubarItem in menubarItems {
-                    observer.onNext(UIElement(menubarItem))
-                }
-                observer.onCompleted()
-            })
-            thread.start()
-            return Disposables.create {
-                thread.cancel()
-            }
-        })
-    }
-    
-    static func traverseForExtraMenuBarItems() -> Observable<UIElement> {
-        return Observable.create({ observer in
-            let thread = Thread.init(block: {
-                let apps = Application.all()
-                let menubarsOptional: [UIElement?] = apps.map({ try? $0.attribute(.extrasMenuBar) })
-                let menubars = menubarsOptional.compactMap({ $0 })
-                let menubarItemsUnflattened: [[UIElement]] = menubars.map({ menubar in
-                    let AXItems: [AXUIElement]? = try? menubar.attribute(.children)
-                    let items = AXItems?.map { UIElement($0) }
-                    return items ?? []
-                })
-                let menubarItems = Array(menubarItemsUnflattened.joined())
-
-                for menubarItem in menubarItems {
-                    observer.onNext(menubarItem)
-                }
-                observer.onCompleted()
-            })
-            thread.start()
-            return Disposables.create {
-                thread.cancel()
-            }
-        })
-    }
-    
     static func traverseForNotificationCenterItems() -> Observable<UIElement> {
         let notificationAppOptional = NSWorkspace.shared.runningApplications.first(where: { $0.localizedName == "Notification Centre" })
         guard let notificationApp = notificationAppOptional,
