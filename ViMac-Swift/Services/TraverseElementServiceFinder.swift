@@ -16,10 +16,6 @@ class TraverseElementServiceFinder {
     }
     
     func find() -> TraverseElementService.Type {
-        if element.role == "AXTable" || element.role == "AXOutline" {
-            return TraverseRowContainingElementService.self
-        }
-        
         if element.role == "AXWebArea" {
             return TraverseWebAreaElementService.self
         }

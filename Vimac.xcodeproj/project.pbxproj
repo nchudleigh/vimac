@@ -32,7 +32,6 @@
 		E270F5C52504D8DE00AD305A /* TraverseElementServiceFinder.swift in Sources */ = {isa = PBXBuildFile; fileRef = E270F5C42504D8DE00AD305A /* TraverseElementServiceFinder.swift */; };
 		E270F5C92504D9AE00AD305A /* TraverseGenericElementService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E270F5C82504D9AE00AD305A /* TraverseGenericElementService.swift */; };
 		E270F5CB2504D9DE00AD305A /* TraverseElementService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E270F5CA2504D9DE00AD305A /* TraverseElementService.swift */; };
-		E270F5CD2504DB5800AD305A /* TraverseRowContainingElementService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E270F5CC2504DB5800AD305A /* TraverseRowContainingElementService.swift */; };
 		E270F5CF2504DC4600AD305A /* TraverseWebAreaElementService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E270F5CE2504DC4600AD305A /* TraverseWebAreaElementService.swift */; };
 		E27776E3240B780D00488320 /* LaunchAtLogin.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E27776E2240B780D00488320 /* LaunchAtLogin.framework */; };
 		E27776E4240B780D00488320 /* LaunchAtLogin.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = E27776E2240B780D00488320 /* LaunchAtLogin.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -142,7 +141,6 @@
 		E270F5C42504D8DE00AD305A /* TraverseElementServiceFinder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TraverseElementServiceFinder.swift; sourceTree = "<group>"; };
 		E270F5C82504D9AE00AD305A /* TraverseGenericElementService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TraverseGenericElementService.swift; sourceTree = "<group>"; };
 		E270F5CA2504D9DE00AD305A /* TraverseElementService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TraverseElementService.swift; sourceTree = "<group>"; };
-		E270F5CC2504DB5800AD305A /* TraverseRowContainingElementService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TraverseRowContainingElementService.swift; sourceTree = "<group>"; };
 		E270F5CE2504DC4600AD305A /* TraverseWebAreaElementService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TraverseWebAreaElementService.swift; sourceTree = "<group>"; };
 		E27776E2240B780D00488320 /* LaunchAtLogin.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = LaunchAtLogin.framework; path = Carthage/Build/Mac/LaunchAtLogin.framework; sourceTree = "<group>"; };
 		E27776E7240B784900488320 /* LaunchAtLogin.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = LaunchAtLogin.framework.dSYM; path = Carthage/Build/Mac/LaunchAtLogin.framework.dSYM; sourceTree = "<group>"; };
@@ -352,7 +350,6 @@
 				E270F5C42504D8DE00AD305A /* TraverseElementServiceFinder.swift */,
 				E270F5C82504D9AE00AD305A /* TraverseGenericElementService.swift */,
 				E270F5CA2504D9DE00AD305A /* TraverseElementService.swift */,
-				E270F5CC2504DB5800AD305A /* TraverseRowContainingElementService.swift */,
 				E270F5CE2504DC4600AD305A /* TraverseWebAreaElementService.swift */,
 			);
 			path = Services;
@@ -649,7 +646,6 @@
 				E2F6C9AF232DEA1800F2975B /* Utils.swift in Sources */,
 				E279534D2494CC69006D8D7A /* ScrollModeInputListener.swift in Sources */,
 				E268A02A236D8F6F00EE08CB /* CachedUIElement.swift in Sources */,
-				E270F5CD2504DB5800AD305A /* TraverseRowContainingElementService.swift in Sources */,
 				E26981B523C99DF900E46217 /* WelcomeViewController.swift in Sources */,
 				E270F5C52504D8DE00AD305A /* TraverseElementServiceFinder.swift in Sources */,
 				E2C29568234DE51F001A38D6 /* ModeViewController.swift in Sources */,

@@ -14,6 +14,8 @@ class TraverseGenericElementService : TraverseElementService {
     let windowElement: Element
     let containerElement: Element?
     
+    lazy var childContainerElement = computeChildContainerElement()
+    
     required init(element: Element, windowElement: Element, containerElement: Element?) {
         self.element = element
         self.windowElement = windowElement
@@ -33,14 +35,14 @@ class TraverseGenericElementService : TraverseElementService {
     private func traverseElement(_ element: Element) -> ElementTreeNode? {
         TraverseElementServiceFinder
             .init(element).find()
-            .init(element: element, windowElement: windowElement, containerElement: childContainerElement()).perform()
+            .init(element: element, windowElement: windowElement, containerElement: childContainerElement).perform()
     }
     
-    private func childContainerElement() -> Element? {
+    private func computeChildContainerElement() -> Element? {
         let containerRoles = [
             Role.scrollArea.rawValue,
             Role.row.rawValue,
-            "AXPage",   
+            "AXPage",
         ]
 
         if containerRoles.contains(element.role) || element.role.lowercased().contains("group") {
@@ -52,13 +54,18 @@ class TraverseGenericElementService : TraverseElementService {
     
     private func getVisibleChildren(_ element: Element) throws -> [Element]? {
         try getChildren(element)?.filter({ child in
-            (childContainerElement()?.frame.intersects(child.frame) ?? false) &&
+            (childContainerElement?.frame.intersects(child.frame) ?? false) &&
                 child.frame.intersects(windowElement.frame)
         })
     }
     
     private func getChildren(_ element: Element) throws -> [Element]? {
-        let rawElements: [AXUIElement]? = try UIElement(element.rawElement).attribute(.children)
+        let rawElements: [AXUIElement]? = try {
+            if element.role == "AXTable" || element.role == "AXOutline" {
+                return try UIElement(element.rawElement).attribute(.visibleRows)
+            }
+            return try UIElement(element.rawElement).attribute(.children)
+        }()
         return rawElements?
             .map { Element.initialize(rawElement: $0) }
             .compactMap({ $0 })
