@@ -13,14 +13,16 @@ import AXSwift
 
 class TraverseWebAreaElementService : TraverseElementService {
     let element: Element
+    let windowElement: Element
     
-    required init(element: Element) {
+    required init(element: Element, windowElement: Element) {
         self.element = element
+        self.windowElement = windowElement
     }
     
     func perform() -> ElementTreeNode {
         if !supportsChildrenThroughSearchPredicate() {
-            return TraverseGenericElementService.init(element: element).perform()
+            return TraverseGenericElementService.init(element: element, windowElement: windowElement).perform()
         }
         
         let recursiveChildren = try? getRecursiveChildrenThroughSearchPredicate()

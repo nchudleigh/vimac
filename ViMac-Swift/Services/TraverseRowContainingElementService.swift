@@ -11,9 +11,11 @@ import AXSwift
 
 class TraverseRowContainingElementService: TraverseElementService {
     let element: Element
+    let windowElement: Element
     
-    required init(element: Element) {
+    required init(element: Element, windowElement: Element) {
         self.element = element
+        self.windowElement = windowElement
     }
     
     func perform() -> ElementTreeNode {
@@ -29,12 +31,12 @@ class TraverseRowContainingElementService: TraverseElementService {
     private func traverseElement(_ element: Element) -> ElementTreeNode? {
         TraverseElementServiceFinder
             .init(element).find()
-            .init(element: element).perform()
+            .init(element: element, windowElement: windowElement).perform()
     }
     
     private func getVisibleChildren(_ element: Element) throws -> [Element]? {
         try getChildren(element)?.filter({ child in
-            element.frame.intersects(child.frame)
+            child.frame.intersects(element.frame) && child.frame.intersects(windowElement.frame)
         })
     }
     

@@ -18,12 +18,10 @@ class QueryWindowService {
     
     func perform() throws -> [Element] {
         let children = try getChildren()
-        let childrenNodes = children?.map { childOptional -> ElementTreeNode? in
-            guard let child = childOptional else { return nil }
-            
-            return TraverseElementServiceFinder
-                    .init(child).find()
-                    .init(element: child).perform()
+        let childrenNodes = children?.map { child -> ElementTreeNode? in
+            TraverseElementServiceFinder
+                .init(child).find()
+                .init(element: child, windowElement: windowElement).perform()
         }
         
         var elements: [Element] = []
@@ -36,9 +34,11 @@ class QueryWindowService {
         return elements
     }
     
-    private func getChildren() throws -> [Element?]? {
+    private func getChildren() throws -> [Element]? {
         let rawElements: [AXUIElement]? = try UIElement(windowElement.rawElement).attribute(.children)
-        return rawElements?.map { Element.initialize(rawElement: $0) }
+        return rawElements?
+            .map { Element.initialize(rawElement: $0) }
+            .compactMap({ $0 })
     }
     
     private func flattenElementTreeNode(node: ElementTreeNode) -> [Element] {
