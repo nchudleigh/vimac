@@ -23,7 +23,7 @@ class QueryWindowService {
             
             return TraverseElementServiceFinder
                     .init(child).find()
-                    .init(element: child, parent: windowElement).perform()
+                    .init(element: child).perform()
         }
         
         var elements: [Element] = []
@@ -49,9 +49,7 @@ class QueryWindowService {
             elements.append(head.root)
             
             for child in head.children ?? [] {
-                if let child = child {
-                    stack.append(child)
-                }
+                stack.append(child)
             }
         }
         return elements

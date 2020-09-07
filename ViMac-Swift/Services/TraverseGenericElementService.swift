@@ -11,32 +11,37 @@ import AXSwift
 
 class TraverseGenericElementService : TraverseElementService {
     let element: Element
-    let parent: Element
     
-    required init(element: Element, parent: Element) {
+    required init(element: Element) {
         self.element = element
-        self.parent = parent
     }
     
-    func perform() -> ElementTreeNode? {
-        if !element.frame.intersects(parent.frame) {
-            return nil
-            
-        }
+    func perform() -> ElementTreeNode {
+        let children: [Element]? = try? getVisibleChildren(element)
 
-        let children: [Element]? = try? getChildren(element)?.compactMap({ $0 })
+        let childrenNodes = children?
+            .map { traverseElement($0) }
+            .compactMap({ $0 })
 
-        let childrenNodes = children?.map { child in
-            return TraverseElementServiceFinder
-                    .init(child).find()
-                    .init(element: child, parent: element).perform()
-        }
-        
         return ElementTreeNode.init(root: element, children: childrenNodes)
     }
     
-    private func getChildren(_ element: Element) throws -> [Element?]? {
+    private func traverseElement(_ element: Element) -> ElementTreeNode? {
+        TraverseElementServiceFinder
+            .init(element).find()
+            .init(element: element).perform()
+    }
+    
+    private func getVisibleChildren(_ element: Element) throws -> [Element]? {
+        try getChildren(element)?.filter({ child in
+            element.frame.intersects(child.frame)
+        })
+    }
+    
+    private func getChildren(_ element: Element) throws -> [Element]? {
         let rawElements: [AXUIElement]? = try UIElement(element.rawElement).attribute(.children)
-        return rawElements?.map { Element.initialize(rawElement: $0) }
+        return rawElements?
+            .map { Element.initialize(rawElement: $0) }
+            .compactMap({ $0 })
     }
 }

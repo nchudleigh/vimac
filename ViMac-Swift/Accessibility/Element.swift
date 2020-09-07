@@ -36,5 +36,5 @@ struct Element {
 
 struct ElementTreeNode {
     let root: Element
-    let children: [ElementTreeNode?]?
+    let children: [ElementTreeNode]?
 }
