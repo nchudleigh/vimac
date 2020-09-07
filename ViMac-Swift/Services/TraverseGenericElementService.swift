@@ -12,10 +12,12 @@ import AXSwift
 class TraverseGenericElementService : TraverseElementService {
     let element: Element
     let windowElement: Element
+    let containerElement: Element?
     
-    required init(element: Element, windowElement: Element) {
+    required init(element: Element, windowElement: Element, containerElement: Element?) {
         self.element = element
         self.windowElement = windowElement
+        self.containerElement = containerElement
     }
     
     func perform() -> ElementTreeNode {
@@ -31,12 +33,27 @@ class TraverseGenericElementService : TraverseElementService {
     private func traverseElement(_ element: Element) -> ElementTreeNode? {
         TraverseElementServiceFinder
             .init(element).find()
-            .init(element: element, windowElement: windowElement).perform()
+            .init(element: element, windowElement: windowElement, containerElement: childContainerElement()).perform()
+    }
+    
+    private func childContainerElement() -> Element? {
+        let containerRoles = [
+            Role.scrollArea.rawValue,
+            Role.row.rawValue,
+            "AXPage",   
+        ]
+
+        if containerRoles.contains(element.role) || element.role.lowercased().contains("group") {
+            return element
+        }
+
+        return containerElement
     }
     
     private func getVisibleChildren(_ element: Element) throws -> [Element]? {
         try getChildren(element)?.filter({ child in
-            child.frame.intersects(element.frame) && child.frame.intersects(windowElement.frame)
+            (childContainerElement()?.frame.intersects(child.frame) ?? false) &&
+                child.frame.intersects(windowElement.frame)
         })
     }
     
