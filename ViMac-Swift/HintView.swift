@@ -15,10 +15,10 @@ class HintView: NSView {
     static let untypedHintColor = NSColor.black
     static let typedHintColor = NSColor(red: 212 / 255, green: 172 / 255, blue: 58 / 255, alpha: 1)
 
-    let associatedElement: UIElement
+    let associatedElement: Element
     var hintTextView: HintText?
 
-    required init(associatedElement: UIElement, hintTextSize: CGFloat, hintText: String, typedHintText: String) {
+    required init(associatedElement: Element, hintTextSize: CGFloat, hintText: String, typedHintText: String) {
         self.associatedElement = associatedElement
 
         super.init(frame: .zero)
