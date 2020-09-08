@@ -52,7 +52,8 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
         return Utils.eagerConcat(observables: [
             Utils.singleToObservable(single: queryWindowElementsSingle()),
             Utils.singleToObservable(single: queryMenuBarSingle()),
-            Utils.singleToObservable(single: queryMenuBarExtrasSingle())
+            Utils.singleToObservable(single: queryMenuBarExtrasSingle()),
+            Utils.singleToObservable(single: queryNotificationCenterSingle())
         ])
     }
     
@@ -109,6 +110,20 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
         return Single.create(subscribe: { event in
             let thread = Thread.init(block: {
                 let service = QueryMenuBarExtrasService.init()
+                let elements = try? service.perform()
+                event(.success(elements ?? []))
+            })
+            thread.start()
+            return Disposables.create {
+                thread.cancel()
+            }
+        })
+    }
+    
+    func queryNotificationCenterSingle() -> Single<[Element]> {
+        return Single.create(subscribe: { event in
+            let thread = Thread.init(block: {
+                let service = QueryNotificationCenterItemsService.init()
                 let elements = try? service.perform()
                 event(.success(elements ?? []))
             })
