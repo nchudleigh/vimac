@@ -42,16 +42,38 @@ class QueryWindowService {
     }
     
     private func flattenElementTreeNode(node: ElementTreeNode) -> [Element] {
-        var elements: [Element] = []
-        var stack = [node]
-        while stack.count > 0 {
-            let head = stack.popLast()!
-            elements.append(head.root)
-            
-            for child in head.children ?? [] {
-                stack.append(child)
-            }
+        FlattenElementTreeNode(node).perform()
+    }
+}
+
+class FlattenElementTreeNode {
+    let root: ElementTreeNode
+    var result: [Element] = []
+    let whitelistedActions = Set(UserPreferences.HintMode.ActionsProperty.read())
+
+    init(_ root: ElementTreeNode) {
+        self.root = root
+    }
+    
+    func perform() -> [Element] {
+        flatten(root)
+        return result
+    }
+    
+    private func flatten(_ node: ElementTreeNode) -> Int {
+        let children = node.children ?? []
+        let childrenHintableElements = children
+            .map { flatten($0) }
+            .reduce(0, +)
+        
+        let containsWhitelistedAction = Set(node.root.actions).intersection(whitelistedActions).count > 0
+        let isHintable = containsWhitelistedAction || (childrenHintableElements == 0 && node.root.role == "AXRow")
+        
+        if isHintable {
+            result.append(node.root)
+            return childrenHintableElements + 1
         }
-        return elements
+        
+        return childrenHintableElements
     }
 }

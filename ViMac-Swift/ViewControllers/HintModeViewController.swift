@@ -20,7 +20,6 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     let compositeDisposable = CompositeDisposable()
     let inputListener = HintModeInputListener()
     var characterStack: [Character] = [Character]()
-    let whitelistedActions = Set(UserPreferences.HintMode.ActionsProperty.read())
     let originalMousePosition = NSEvent.mouseLocation
     let startTime = CFAbsoluteTimeGetCurrent()
 
@@ -221,11 +220,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
                     let timeElapsed = CFAbsoluteTimeGetCurrent() - self!.startTime
                     os_log("[Hint mode] query time: %@", log: Log.accessibility, String(describing: timeElapsed))
                     
-                    self?.onElementTraversalComplete(elements: elements.filter({ element in
-                        let actions = element.actions
-                        let containsWhitelistedAction = Set(actions).intersection(self!.whitelistedActions).count > 0
-                        return containsWhitelistedAction
-                    }))
+                    self?.onElementTraversalComplete(elements: elements)
                 },
                 onError: { error in
                     print(error)
