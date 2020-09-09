@@ -54,7 +54,7 @@ class TraverseGenericElementService : TraverseElementService {
     
     private func getVisibleChildren(_ element: Element) throws -> [Element]? {
         try getChildren(element)?.filter({ child in
-            (childContainerElement?.frame.intersects(child.frame) ?? false) &&
+            (childContainerElement?.frame.intersects(child.frame) ?? true) &&
                 child.frame.intersects(windowElement.frame)
         })
     }
