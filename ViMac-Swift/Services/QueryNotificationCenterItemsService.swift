@@ -12,7 +12,7 @@ import AXSwift
 class QueryNotificationCenterItemsService {
     func perform() throws -> [Element]? {
         let notificationAppOptional = NSWorkspace.shared.runningApplications
-            .first(where: { $0.localizedName == "Notification Centre" })
+            .first(where: { $0.bundleIdentifier == "com.apple.notificationcenterui" })
         guard let notificationApp = notificationAppOptional,
             let notificationAppUIElement = Application(notificationApp) else {
             return nil
