@@ -134,14 +134,13 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     }
     
     func onLetterKeyDown(event: NSEvent) {
-        guard let character = event.charactersIgnoringModifiers?.first else {
-            return
-        }
+        guard let character = event.charactersIgnoringModifiers?.first else { return }
+        guard let hintViews = self.hintViews else { return }
 
         self.characterStack.append(character)
         let typed = String(self.characterStack)
 
-        let matchingHints = self.hintViews!.filter { hintView in
+        let matchingHints = hintViews.filter { hintView in
             return hintView.hintTextView!.stringValue.starts(with: typed.uppercased())
         }
 
