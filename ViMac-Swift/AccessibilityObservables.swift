@@ -19,36 +19,6 @@ class AccessibilityObservables: NSObject {
         let notification: AXNotification?
     }
     
-    static func createApplicationObservable() -> Observable<Application?> {
-        let nsApplicationObservable: Observable<NSRunningApplication?> = Observable.create { observer in
-            func onApplicationChange() -> Void {
-                observer.on(.next(NSWorkspace.shared.frontmostApplication))
-            }
-            
-            let center = NSWorkspace.shared.notificationCenter
-            center.addObserver(forName: NSWorkspace.didActivateApplicationNotification, object: nil, queue: nil) { notification in
-                onApplicationChange()
-            }
-            center.addObserver(forName: NSWorkspace.didDeactivateApplicationNotification, object: nil, queue: nil) { notification in
-                onApplicationChange()
-            }
-            
-            let cancel = Disposables.create {
-                center.removeObserver(self)
-                os_log("Removed application observer", log: Log.accessibility)
-            }
-            
-            return cancel
-        }.distinctUntilChanged()
-        return nsApplicationObservable
-            .map { nsAppOptional in
-                guard let nsApp = nsAppOptional else {
-                    return nil
-                }
-                return Application.init(nsApp)
-        }
-    }
-    
     static func createApplicationNotificationObservable(applicationObservable: Observable<Application?>, notifications: [AXNotification]) -> Observable<AppNotificationAppPair> {
         return applicationObservable
             .flatMapLatest { appOptional -> Observable<AppNotificationAppPair> in

@@ -43,7 +43,15 @@ import Preferences
         
         Utils.registerDefaults()
         
-        applicationObservable = AccessibilityObservables.createApplicationObservable().share()
+        applicationObservable = Observable.create { observer in
+            let service = ObserveFrontmostApplicationService.init()
+            service.observe({ app in
+                let axSwiftApp = app.map { Application($0) } as? Application
+                observer.onNext(axSwiftApp)
+            })
+            return Disposables.create()
+        }.share()
+
         applicationNotificationObservable = AccessibilityObservables.createApplicationNotificationObservable(applicationObservable: applicationObservable, notifications: AppDelegate.windowEvents + [AXNotification.focusedWindowChanged]).share()
         
         let initialWindowFromApplicationObservable: Observable<UIElement?> = applicationObservable

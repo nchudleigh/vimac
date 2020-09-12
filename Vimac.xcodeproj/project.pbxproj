@@ -19,6 +19,7 @@
 		E23140D825067A46004D1B96 /* QueryMenuBarExtrasService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E23140D725067A46004D1B96 /* QueryMenuBarExtrasService.swift */; };
 		E23140DA2507B2C1004D1B96 /* QueryNotificationCenterItemsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E23140D92507B2C1004D1B96 /* QueryNotificationCenterItemsService.swift */; };
 		E245F9B123941AE8009CA9C6 /* BorderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E245F9B023941AE8009CA9C6 /* BorderView.swift */; };
+		E25BBB5B250CC4AA00D11213 /* ObserveFrontmostApplicationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E25BBB5A250CC4AA00D11213 /* ObserveFrontmostApplicationService.swift */; };
 		E25F8711233222A9007AA958 /* AccessibilityObservables.swift in Sources */ = {isa = PBXBuildFile; fileRef = E25F8710233222A9007AA958 /* AccessibilityObservables.swift */; };
 		E26172242322968500E396CA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26172232322968500E396CA /* AppDelegate.swift */; };
 		E26172282322968600E396CA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E26172272322968600E396CA /* Assets.xcassets */; };
@@ -123,6 +124,7 @@
 		E23140D725067A46004D1B96 /* QueryMenuBarExtrasService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryMenuBarExtrasService.swift; sourceTree = "<group>"; };
 		E23140D92507B2C1004D1B96 /* QueryNotificationCenterItemsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryNotificationCenterItemsService.swift; sourceTree = "<group>"; };
 		E245F9B023941AE8009CA9C6 /* BorderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BorderView.swift; sourceTree = "<group>"; };
+		E25BBB5A250CC4AA00D11213 /* ObserveFrontmostApplicationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObserveFrontmostApplicationService.swift; sourceTree = "<group>"; };
 		E25F8710233222A9007AA958 /* AccessibilityObservables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessibilityObservables.swift; sourceTree = "<group>"; };
 		E26172202322968500E396CA /* Vimac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Vimac.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E26172232322968500E396CA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -266,6 +268,14 @@
 			path = HintMode;
 			sourceTree = "<group>";
 		};
+		E25BBB5E250CCA7900D11213 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				E25BBB5A250CC4AA00D11213 /* ObserveFrontmostApplicationService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
 		E26172172322968500E396CA = {
 			isa = PBXGroup;
 			children = (
@@ -292,6 +302,7 @@
 		E26172222322968500E396CA /* ViMac-Swift */ = {
 			isa = PBXGroup;
 			children = (
+				E25BBB5E250CCA7900D11213 /* Services */,
 				E270F41F2503E79900AD305A /* Accessibility */,
 				E28867EF235F54F1001691A5 /* Vimac.icns */,
 				E2C2956F234E0A32001A38D6 /* ViewControllers */,
@@ -674,6 +685,7 @@
 				E270F4212503E7A800AD305A /* Element.swift in Sources */,
 				E20696F923290D41001EFDB2 /* Log.swift in Sources */,
 				E23140D825067A46004D1B96 /* QueryMenuBarExtrasService.swift in Sources */,
+				E25BBB5B250CC4AA00D11213 /* ObserveFrontmostApplicationService.swift in Sources */,
 				E225BD1D233292B800ECDEF4 /* StatusItemManager.swift in Sources */,
 				E26981B323C99DBB00E46217 /* WelcomeWindowController.swift in Sources */,
 				E26172242322968500E396CA /* AppDelegate.swift in Sources */,
