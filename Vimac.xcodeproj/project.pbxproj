@@ -251,6 +251,21 @@
 			path = Preferences;
 			sourceTree = "<group>";
 		};
+		E25BBB58250CC37600D11213 /* HintMode */ = {
+			isa = PBXGroup;
+			children = (
+				E290EF4A24F93342004B1A83 /* QueryWindowService.swift */,
+				E270F5C42504D8DE00AD305A /* TraverseElementServiceFinder.swift */,
+				E270F5C82504D9AE00AD305A /* TraverseGenericElementService.swift */,
+				E270F5CA2504D9DE00AD305A /* TraverseElementService.swift */,
+				E270F5CE2504DC4600AD305A /* TraverseWebAreaElementService.swift */,
+				E23140D52506781E004D1B96 /* QueryMenuBarItemsService.swift */,
+				E23140D725067A46004D1B96 /* QueryMenuBarExtrasService.swift */,
+				E23140D92507B2C1004D1B96 /* QueryNotificationCenterItemsService.swift */,
+			);
+			path = HintMode;
+			sourceTree = "<group>";
+		};
 		E26172172322968500E396CA = {
 			isa = PBXGroup;
 			children = (
@@ -278,7 +293,6 @@
 			isa = PBXGroup;
 			children = (
 				E270F41F2503E79900AD305A /* Accessibility */,
-				E290EF4924F93306004B1A83 /* Services */,
 				E28867EF235F54F1001691A5 /* Vimac.icns */,
 				E2C2956F234E0A32001A38D6 /* ViewControllers */,
 				E225BD1E233354AD00ECDEF4 /* Windows */,
@@ -344,24 +358,10 @@
 		E270F41F2503E79900AD305A /* Accessibility */ = {
 			isa = PBXGroup;
 			children = (
+				E25BBB58250CC37600D11213 /* HintMode */,
 				E270F4202503E7A800AD305A /* Element.swift */,
 			);
 			path = Accessibility;
-			sourceTree = "<group>";
-		};
-		E290EF4924F93306004B1A83 /* Services */ = {
-			isa = PBXGroup;
-			children = (
-				E290EF4A24F93342004B1A83 /* QueryWindowService.swift */,
-				E270F5C42504D8DE00AD305A /* TraverseElementServiceFinder.swift */,
-				E270F5C82504D9AE00AD305A /* TraverseGenericElementService.swift */,
-				E270F5CA2504D9DE00AD305A /* TraverseElementService.swift */,
-				E270F5CE2504DC4600AD305A /* TraverseWebAreaElementService.swift */,
-				E23140D52506781E004D1B96 /* QueryMenuBarItemsService.swift */,
-				E23140D725067A46004D1B96 /* QueryMenuBarExtrasService.swift */,
-				E23140D92507B2C1004D1B96 /* QueryNotificationCenterItemsService.swift */,
-			);
-			path = Services;
 			sourceTree = "<group>";
 		};
 		E2C2956F234E0A32001A38D6 /* ViewControllers */ = {
