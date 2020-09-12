@@ -20,7 +20,7 @@ class ObserveFrontmostApplicationService {
         disposeBag.insert(disposable)
     }
     
-    func frontmostAppObservable() -> Observable<NSRunningApplication?> {
+    private func frontmostAppObservable() -> Observable<NSRunningApplication?> {
         return Observable.create { observer in
             let center = NSWorkspace.shared.notificationCenter
             center.addObserver(forName: NSWorkspace.didActivateApplicationNotification, object: nil, queue: nil) { notification in

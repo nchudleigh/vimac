@@ -21,7 +21,8 @@ import Preferences
     var permissionPollingTimer: Timer?
     
     let applicationObservable: Observable<Application?>
-    let applicationNotificationObservable: Observable<AccessibilityObservables.AppNotificationAppPair>
+    let applicationNotificationObservable: Observable<FrontmostApplicationService.ApplicationNotification>
+
     let windowObservable: Observable<UIElement?>
     let windowSubject: BehaviorSubject<UIElement?>
     let hintModeShortcutObservable: Observable<Void>
@@ -43,16 +44,24 @@ import Preferences
         
         Utils.registerDefaults()
         
-        applicationObservable = Observable.create { observer in
-            let service = ObserveFrontmostApplicationService.init()
-            service.observe({ app in
-                let axSwiftApp = app.map { Application($0) } as? Application
-                observer.onNext(axSwiftApp)
-            })
-            return Disposables.create()
-        }.share()
+        let frontmostAppService = FrontmostApplicationService.init()
+        applicationObservable =
+            Observable.create { observer in
+                frontmostAppService.observeFrontmostApp({ app in
+                    observer.onNext(
+                        app.map { Application($0) } as? Application
+                    )
+                })
+                return Disposables.create()
+            }
+        applicationNotificationObservable =
+            Observable.create { observer in
+                frontmostAppService.observeAppNotification({ notification in
+                    observer.onNext(notification)
+                })
+                return Disposables.create()
+            }
 
-        applicationNotificationObservable = AccessibilityObservables.createApplicationNotificationObservable(applicationObservable: applicationObservable, notifications: AppDelegate.windowEvents + [AXNotification.focusedWindowChanged]).share()
         
         let initialWindowFromApplicationObservable: Observable<UIElement?> = applicationObservable
             .map { appOptional in
@@ -64,17 +73,14 @@ import Preferences
             }
         
         let windowFromApplicationNotificationObservable: Observable<UIElement?> = applicationNotificationObservable
-            .flatMapLatest { pair in
+            .flatMapLatest { notification in
                 return Observable.create { observer in
-                    guard let notification = pair.notification,
-                        let app = pair.app else {
-                        observer.onNext(nil)
+
+                    if notification.notification != AXNotification.focusedWindowChanged.rawValue {
                         return Disposables.create()
                     }
                     
-                    if notification != .focusedWindowChanged {
-                        return Disposables.create()
-                    }
+                    guard let app = Application(notification.app) else { return Disposables.create() }
                     
                     let windowOptional: UIElement? = try? app.attribute(Attribute.focusedWindow)
                     observer.onNext(windowOptional)
@@ -170,14 +176,8 @@ import Preferences
 
         self.compositeDisposable.insert(applicationNotificationObservable
             .observeOn(MainScheduler.instance)
-            .subscribe(onNext: { pair in
-                if let notification = pair.notification,
-                    let app = pair.app {
-                    
-                    if notification == .focusedWindowChanged {
-                        return
-                    }
-
+            .subscribe(onNext: { notification in
+                if notification.notification != AXNotification.focusedWindowChanged.rawValue {
                     self.modeCoordinator.exitMode()
                 }
             })
