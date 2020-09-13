@@ -21,7 +21,7 @@ import Preferences
     var permissionPollingTimer: Timer?
     
     let applicationObservable: Observable<Application?>
-    let applicationNotificationObservable: Observable<FrontmostApplicationService.ApplicationNotification>
+    let focusedWindowDisturbedObservable: Observable<FrontmostApplicationService.ApplicationNotification>
 
     let windowObservable: Observable<UIElement?>
     let windowSubject: BehaviorSubject<UIElement?>
@@ -54,9 +54,9 @@ import Preferences
                 })
                 return Disposables.create()
             }
-        applicationNotificationObservable =
+        focusedWindowDisturbedObservable =
             Observable.create { observer in
-                frontmostAppService.observeAppNotification({ notification in
+                frontmostAppService.observeFocusedWindowDisturbed({ notification in
                     observer.onNext(notification)
                 })
                 return Disposables.create()
@@ -154,12 +154,10 @@ import Preferences
             })
         )
 
-        self.compositeDisposable.insert(applicationNotificationObservable
+        self.compositeDisposable.insert(focusedWindowDisturbedObservable
             .observeOn(MainScheduler.instance)
             .subscribe(onNext: { notification in
-                if notification.notification != AXNotification.focusedWindowChanged.rawValue {
-                    self.modeCoordinator.exitMode()
-                }
+                self.modeCoordinator.exitMode()
             })
         )
         
