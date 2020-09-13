@@ -20,6 +20,11 @@ class FrontmostApplicationService {
     private let disposeBag = DisposeBag()
     private lazy var frontmostApplicationObservable: Observable<NSRunningApplication?> = createFrontmostApplicationObservable().share()
     private lazy var applicationNotificationObservable: Observable<ApplicationNotification> = createApplicationNotificationObservable().share()
+    private lazy var focusedWindowObservable: Observable<Element?> =
+        Observable.merge([
+            createInitialFocusedWindowObservable(),
+            createFocusedWindowObservable()
+        ]).share()
     
     func observeFrontmostApp(_ onApp: @escaping (NSRunningApplication?) -> ()) {
         let disposable = frontmostApplicationObservable.bind { app in
@@ -31,6 +36,13 @@ class FrontmostApplicationService {
     func observeAppNotification(_ onNotification: @escaping (ApplicationNotification) -> ()) {
         let disposable = applicationNotificationObservable.bind { notification in
             onNotification(notification)
+        }
+        disposeBag.insert(disposable)
+    }
+    
+    func observeFocusedWindow(_ onFocus: @escaping (Element?) -> ()) {
+        let disposable = focusedWindowObservable.bind { window in
+            onFocus(window)
         }
         disposeBag.insert(disposable)
     }
@@ -67,8 +79,27 @@ class FrontmostApplicationService {
                             notification: notification
                         ))
                     })
-                    return Disposables.create { service } 
+                    return Disposables.create { service }
                 }
             })
+    }
+
+    private func createInitialFocusedWindowObservable() -> Observable<Element?> {
+        frontmostApplicationObservable.map { appOptional in
+            guard let app = appOptional else { return nil }
+            let windowOptional: UIElement? = try? Application(app)?.attribute(Attribute.focusedWindow)
+            guard let window = windowOptional else { return nil }
+            return Element.initialize(rawElement: window.element)
+        }
+    }
+    
+    private func createFocusedWindowObservable() -> Observable<Element?> {
+        applicationNotificationObservable
+            .filter { $0.notification == AXNotification.focusedWindowChanged.rawValue }
+            .map { notification in
+                let windowOptional: UIElement? = try? Application(notification.app)?.attribute(Attribute.focusedWindow)
+                guard let window = windowOptional else { return nil }
+                return Element.initialize(rawElement: window.element)
+            }
     }
 }

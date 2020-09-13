@@ -61,34 +61,14 @@ import Preferences
                 })
                 return Disposables.create()
             }
-
         
-        let initialWindowFromApplicationObservable: Observable<UIElement?> = applicationObservable
-            .map { appOptional in
-                guard let app = appOptional else {
-                    return nil
-                }
-                let windowOptional: UIElement? = try? app.attribute(Attribute.focusedWindow)
-                return windowOptional
+        windowObservable =
+            Observable.create { observer in
+                frontmostAppService.observeFocusedWindow({ window in
+                    observer.onNext(window.map({ UIElement($0.rawElement) }))
+                })
+                return Disposables.create()
             }
-        
-        let windowFromApplicationNotificationObservable: Observable<UIElement?> = applicationNotificationObservable
-            .flatMapLatest { notification in
-                return Observable.create { observer in
-
-                    if notification.notification != AXNotification.focusedWindowChanged.rawValue {
-                        return Disposables.create()
-                    }
-                    
-                    guard let app = Application(notification.app) else { return Disposables.create() }
-                    
-                    let windowOptional: UIElement? = try? app.attribute(Attribute.focusedWindow)
-                    observer.onNext(windowOptional)
-                    return Disposables.create()
-                }
-            }
-        
-        windowObservable = Observable.merge([windowFromApplicationNotificationObservable, initialWindowFromApplicationObservable])
         windowSubject = BehaviorSubject(value: nil)
 
         hintModeShortcutObservable = Observable.create { observer in
