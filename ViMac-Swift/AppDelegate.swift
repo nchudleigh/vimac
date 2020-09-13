@@ -10,7 +10,6 @@ import Cocoa
 import AXSwift
 import RxSwift
 import MASShortcut
-import os
 import Sparkle
 import LaunchAtLogin
 import Preferences
@@ -20,11 +19,10 @@ import Preferences
     var welcomeWindowController: NSWindowController?
     var permissionPollingTimer: Timer?
     
-    let applicationObservable: Observable<Application?>
-    let focusedWindowDisturbedObservable: Observable<FrontmostApplicationService.ApplicationNotification>
+    private lazy var applicationObservable: Observable<NSRunningApplication?> = createApplicationObservable()
+    private lazy var focusedWindowDisturbedObservable: Observable<FrontmostApplicationService.ApplicationNotification> = createFocusedWindowDisturbedObservable()
+    private lazy var windowObservable: Observable<Element?> = createFocusedWindowObservable()
 
-    let windowObservable: Observable<UIElement?>
-    let windowSubject: BehaviorSubject<UIElement?>
     let hintModeShortcutObservable: Observable<Void>
     let scrollModeShortcutObservable: Observable<Void>
     
@@ -33,8 +31,8 @@ import Preferences
     
     let modeCoordinator: ModeCoordinator
     let overlayWindowController: OverlayWindowController
-
-    static let windowEvents: [AXNotification] = [.windowMiniaturized, .windowMoved, .windowResized]
+    
+    let frontmostAppService = FrontmostApplicationService.init()
     
     override init() {
         InputSourceManager.initialize()
@@ -43,33 +41,6 @@ import Preferences
         modeCoordinator = ModeCoordinator(windowController: overlayWindowController)
         
         Utils.registerDefaults()
-        
-        let frontmostAppService = FrontmostApplicationService.init()
-        applicationObservable =
-            Observable.create { observer in
-                frontmostAppService.observeFrontmostApp({ app in
-                    observer.onNext(
-                        app.map { Application($0) } as? Application
-                    )
-                })
-                return Disposables.create()
-            }
-        focusedWindowDisturbedObservable =
-            Observable.create { observer in
-                frontmostAppService.observeFocusedWindowDisturbed({ notification in
-                    observer.onNext(notification)
-                })
-                return Disposables.create()
-            }
-        
-        windowObservable =
-            Observable.create { observer in
-                frontmostAppService.observeFocusedWindow({ window in
-                    observer.onNext(window.map({ UIElement($0.rawElement) }))
-                })
-                return Disposables.create()
-            }
-        windowSubject = BehaviorSubject(value: nil)
 
         hintModeShortcutObservable = Observable.create { observer in
             let tempView = MASShortcutView.init()
@@ -116,6 +87,39 @@ import Preferences
         showWelcomeWindowController()
     }
     
+    func createApplicationObservable() -> Observable<NSRunningApplication?> {
+        Observable.create { [weak self] observer in
+            guard let self = self else { return Disposables.create() }
+            
+            self.frontmostAppService.observeFrontmostApp({ app in
+                observer.onNext(app)
+            })
+            return Disposables.create()
+        }
+    }
+    
+    func createFocusedWindowDisturbedObservable() -> Observable<FrontmostApplicationService.ApplicationNotification> {
+        Observable.create { [weak self] observer in
+            guard let self = self else { return Disposables.create() }
+            
+            self.frontmostAppService.observeFocusedWindowDisturbed({ notification in
+                observer.onNext(notification)
+            })
+            return Disposables.create()
+        }
+    }
+    
+    func createFocusedWindowObservable() -> Observable<Element?> {
+        Observable.create { [weak self] observer in
+            guard let self = self else { return Disposables.create() }
+
+            self.frontmostAppService.observeFocusedWindow({ window in
+                observer.onNext(window)
+            })
+            return Disposables.create()
+        }
+    }
+    
     func showWelcomeWindowController() {
         let storyboard = NSStoryboard.init(name: "Main", bundle: nil)
         welcomeWindowController = storyboard.instantiateController(withIdentifier: "WelcomeWindowController") as! NSWindowController
@@ -147,7 +151,6 @@ import Preferences
         self.compositeDisposable.insert(applicationObservable
             .observeOn(MainScheduler.instance)
             .subscribe(onNext: { appOptional in
-                os_log("Current frontmost application: %@", log: Log.accessibility, String(describing: appOptional))
                 if let app = appOptional {
                     Utils.setAccessibilityAttributes(app: app)
                 }
@@ -165,8 +168,6 @@ import Preferences
             .observeOn(MainScheduler.instance)
             .subscribe(onNext: { windowOptional in
                 self.modeCoordinator.exitMode()
-                os_log("Current window: %@", log: Log.accessibility, String(describing: windowOptional))
-                self.windowSubject.onNext(windowOptional)
             })
         )
 

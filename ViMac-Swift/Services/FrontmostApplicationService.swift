@@ -18,13 +18,24 @@ class FrontmostApplicationService {
     }
     
     private let disposeBag = DisposeBag()
-    private lazy var frontmostApplicationObservable: Observable<NSRunningApplication?> = createFrontmostApplicationObservable().share()
+    private lazy var frontmostApplicationObservable: Observable<NSRunningApplication?> =
+        createFrontmostApplicationObservable()
+            .do(onNext: { app in
+                os_log("Current frontmost application: %@", log: Log.accessibility, String(describing: app))
+            })
+            .share()
     private lazy var applicationNotificationObservable: Observable<ApplicationNotification> = createApplicationNotificationObservable().share()
     private lazy var focusedWindowObservable: Observable<Element?> =
-        Observable.merge([
-            createInitialFocusedWindowObservable(),
-            createFocusedWindowObservable()
-        ]).share()
+        Observable
+            .merge([
+                createInitialFocusedWindowObservable(),
+                createFocusedWindowObservable()
+            ])
+            .do(onNext: { window in
+                os_log("Current window: %@", log: Log.accessibility, String(describing: window))
+            })
+            .share()
+
     private lazy var focusedWindowDisturbedObservable: Observable<ApplicationNotification> = createFocusedWindowDisturbedObservable().share()
     
     func observeFrontmostApp(_ onApp: @escaping (NSRunningApplication?) -> ()) {
