@@ -20,7 +20,7 @@ import Preferences
     var welcomeWindowController: NSWindowController?
     var permissionPollingTimer: Timer?
     
-    let applicationObservable: Observable<Application?>
+    let applicationObservable: Observable<NSRunningApplication?>
     let focusedWindowDisturbedObservable: Observable<FrontmostApplicationService.ApplicationNotification>
 
     let windowObservable: Observable<UIElement?>
@@ -48,9 +48,7 @@ import Preferences
         applicationObservable =
             Observable.create { observer in
                 frontmostAppService.observeFrontmostApp({ app in
-                    observer.onNext(
-                        app.map { Application($0) } as? Application
-                    )
+                    observer.onNext(app)
                 })
                 return Disposables.create()
             }
