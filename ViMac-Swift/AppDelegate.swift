@@ -20,10 +20,10 @@ import Preferences
     var welcomeWindowController: NSWindowController?
     var permissionPollingTimer: Timer?
     
-    let applicationObservable: Observable<NSRunningApplication?>
-    let focusedWindowDisturbedObservable: Observable<FrontmostApplicationService.ApplicationNotification>
+    private lazy var applicationObservable: Observable<NSRunningApplication?> = createApplicationObservable()
+    private lazy var focusedWindowDisturbedObservable: Observable<FrontmostApplicationService.ApplicationNotification> = createFocusedWindowDisturbedObservable()
+    private lazy var windowObservable: Observable<Element?> = createFocusedWindowObservable()
 
-    let windowObservable: Observable<Element?>
     let hintModeShortcutObservable: Observable<Void>
     let scrollModeShortcutObservable: Observable<Void>
     
@@ -33,6 +33,8 @@ import Preferences
     let modeCoordinator: ModeCoordinator
     let overlayWindowController: OverlayWindowController
     
+    let frontmostAppService = FrontmostApplicationService.init()
+    
     override init() {
         InputSourceManager.initialize()
         let storyboard = NSStoryboard.init(name: "Main", bundle: nil)
@@ -40,30 +42,6 @@ import Preferences
         modeCoordinator = ModeCoordinator(windowController: overlayWindowController)
         
         Utils.registerDefaults()
-        
-        let frontmostAppService = FrontmostApplicationService.init()
-        applicationObservable =
-            Observable.create { observer in
-                frontmostAppService.observeFrontmostApp({ app in
-                    observer.onNext(app)
-                })
-                return Disposables.create()
-            }
-        focusedWindowDisturbedObservable =
-            Observable.create { observer in
-                frontmostAppService.observeFocusedWindowDisturbed({ notification in
-                    observer.onNext(notification)
-                })
-                return Disposables.create()
-            }
-        
-        windowObservable =
-            Observable.create { observer in
-                frontmostAppService.observeFocusedWindow({ window in
-                    observer.onNext(window)
-                })
-                return Disposables.create()
-            }
 
         hintModeShortcutObservable = Observable.create { observer in
             let tempView = MASShortcutView.init()
@@ -108,6 +86,39 @@ import Preferences
         }
         
         showWelcomeWindowController()
+    }
+    
+    func createApplicationObservable() -> Observable<NSRunningApplication?> {
+        Observable.create { [weak self] observer in
+            guard let self = self else { return Disposables.create() }
+            
+            self.frontmostAppService.observeFrontmostApp({ app in
+                observer.onNext(app)
+            })
+            return Disposables.create()
+        }
+    }
+    
+    func createFocusedWindowDisturbedObservable() -> Observable<FrontmostApplicationService.ApplicationNotification> {
+        Observable.create { [weak self] observer in
+            guard let self = self else { return Disposables.create() }
+            
+            self.frontmostAppService.observeFocusedWindowDisturbed({ notification in
+                observer.onNext(notification)
+            })
+            return Disposables.create()
+        }
+    }
+    
+    func createFocusedWindowObservable() -> Observable<Element?> {
+        Observable.create { [weak self] observer in
+            guard let self = self else { return Disposables.create() }
+
+            self.frontmostAppService.observeFocusedWindow({ window in
+                observer.onNext(window)
+            })
+            return Disposables.create()
+        }
     }
     
     func showWelcomeWindowController() {
