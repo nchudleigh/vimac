@@ -21,7 +21,8 @@ import Preferences
     var permissionPollingTimer: Timer?
     
     let applicationObservable: Observable<Application?>
-    let applicationNotificationObservable: Observable<AccessibilityObservables.AppNotificationAppPair>
+    let focusedWindowDisturbedObservable: Observable<FrontmostApplicationService.ApplicationNotification>
+
     let windowObservable: Observable<UIElement?>
     let windowSubject: BehaviorSubject<UIElement?>
     let hintModeShortcutObservable: Observable<Void>
@@ -43,38 +44,31 @@ import Preferences
         
         Utils.registerDefaults()
         
-        applicationObservable = AccessibilityObservables.createApplicationObservable().share()
-        applicationNotificationObservable = AccessibilityObservables.createApplicationNotificationObservable(applicationObservable: applicationObservable, notifications: AppDelegate.windowEvents + [AXNotification.focusedWindowChanged]).share()
-        
-        let initialWindowFromApplicationObservable: Observable<UIElement?> = applicationObservable
-            .map { appOptional in
-                guard let app = appOptional else {
-                    return nil
-                }
-                let windowOptional: UIElement? = try? app.attribute(Attribute.focusedWindow)
-                return windowOptional
+        let frontmostAppService = FrontmostApplicationService.init()
+        applicationObservable =
+            Observable.create { observer in
+                frontmostAppService.observeFrontmostApp({ app in
+                    observer.onNext(
+                        app.map { Application($0) } as? Application
+                    )
+                })
+                return Disposables.create()
+            }
+        focusedWindowDisturbedObservable =
+            Observable.create { observer in
+                frontmostAppService.observeFocusedWindowDisturbed({ notification in
+                    observer.onNext(notification)
+                })
+                return Disposables.create()
             }
         
-        let windowFromApplicationNotificationObservable: Observable<UIElement?> = applicationNotificationObservable
-            .flatMapLatest { pair in
-                return Observable.create { observer in
-                    guard let notification = pair.notification,
-                        let app = pair.app else {
-                        observer.onNext(nil)
-                        return Disposables.create()
-                    }
-                    
-                    if notification != .focusedWindowChanged {
-                        return Disposables.create()
-                    }
-                    
-                    let windowOptional: UIElement? = try? app.attribute(Attribute.focusedWindow)
-                    observer.onNext(windowOptional)
-                    return Disposables.create()
-                }
+        windowObservable =
+            Observable.create { observer in
+                frontmostAppService.observeFocusedWindow({ window in
+                    observer.onNext(window.map({ UIElement($0.rawElement) }))
+                })
+                return Disposables.create()
             }
-        
-        windowObservable = Observable.merge([windowFromApplicationNotificationObservable, initialWindowFromApplicationObservable])
         windowSubject = BehaviorSubject(value: nil)
 
         hintModeShortcutObservable = Observable.create { observer in
@@ -160,18 +154,10 @@ import Preferences
             })
         )
 
-        self.compositeDisposable.insert(applicationNotificationObservable
+        self.compositeDisposable.insert(focusedWindowDisturbedObservable
             .observeOn(MainScheduler.instance)
-            .subscribe(onNext: { pair in
-                if let notification = pair.notification,
-                    let app = pair.app {
-                    
-                    if notification == .focusedWindowChanged {
-                        return
-                    }
-
-                    self.modeCoordinator.exitMode()
-                }
+            .subscribe(onNext: { notification in
+                self.modeCoordinator.exitMode()
             })
         )
         

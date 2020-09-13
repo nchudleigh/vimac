@@ -19,7 +19,9 @@
 		E23140D825067A46004D1B96 /* QueryMenuBarExtrasService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E23140D725067A46004D1B96 /* QueryMenuBarExtrasService.swift */; };
 		E23140DA2507B2C1004D1B96 /* QueryNotificationCenterItemsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E23140D92507B2C1004D1B96 /* QueryNotificationCenterItemsService.swift */; };
 		E245F9B123941AE8009CA9C6 /* BorderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E245F9B023941AE8009CA9C6 /* BorderView.swift */; };
-		E25F8711233222A9007AA958 /* AccessibilityObservables.swift in Sources */ = {isa = PBXBuildFile; fileRef = E25F8710233222A9007AA958 /* AccessibilityObservables.swift */; };
+		E25BBB5B250CC4AA00D11213 /* ObserveFrontmostApplicationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E25BBB5A250CC4AA00D11213 /* ObserveFrontmostApplicationService.swift */; };
+		E25BBB60250CD28600D11213 /* ObserveApplicationNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E25BBB5F250CD28600D11213 /* ObserveApplicationNotificationService.swift */; };
+		E25BBB62250CF9CC00D11213 /* FrontmostApplicationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E25BBB61250CF9CC00D11213 /* FrontmostApplicationService.swift */; };
 		E26172242322968500E396CA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26172232322968500E396CA /* AppDelegate.swift */; };
 		E26172282322968600E396CA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E26172272322968600E396CA /* Assets.xcassets */; };
 		E26172372322968700E396CA /* ViMac_SwiftTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26172362322968700E396CA /* ViMac_SwiftTests.swift */; };
@@ -123,7 +125,9 @@
 		E23140D725067A46004D1B96 /* QueryMenuBarExtrasService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryMenuBarExtrasService.swift; sourceTree = "<group>"; };
 		E23140D92507B2C1004D1B96 /* QueryNotificationCenterItemsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryNotificationCenterItemsService.swift; sourceTree = "<group>"; };
 		E245F9B023941AE8009CA9C6 /* BorderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BorderView.swift; sourceTree = "<group>"; };
-		E25F8710233222A9007AA958 /* AccessibilityObservables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessibilityObservables.swift; sourceTree = "<group>"; };
+		E25BBB5A250CC4AA00D11213 /* ObserveFrontmostApplicationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObserveFrontmostApplicationService.swift; sourceTree = "<group>"; };
+		E25BBB5F250CD28600D11213 /* ObserveApplicationNotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObserveApplicationNotificationService.swift; sourceTree = "<group>"; };
+		E25BBB61250CF9CC00D11213 /* FrontmostApplicationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrontmostApplicationService.swift; sourceTree = "<group>"; };
 		E26172202322968500E396CA /* Vimac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Vimac.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E26172232322968500E396CA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E26172272322968600E396CA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -251,6 +255,31 @@
 			path = Preferences;
 			sourceTree = "<group>";
 		};
+		E25BBB58250CC37600D11213 /* HintMode */ = {
+			isa = PBXGroup;
+			children = (
+				E290EF4A24F93342004B1A83 /* QueryWindowService.swift */,
+				E270F5C42504D8DE00AD305A /* TraverseElementServiceFinder.swift */,
+				E270F5C82504D9AE00AD305A /* TraverseGenericElementService.swift */,
+				E270F5CA2504D9DE00AD305A /* TraverseElementService.swift */,
+				E270F5CE2504DC4600AD305A /* TraverseWebAreaElementService.swift */,
+				E23140D52506781E004D1B96 /* QueryMenuBarItemsService.swift */,
+				E23140D725067A46004D1B96 /* QueryMenuBarExtrasService.swift */,
+				E23140D92507B2C1004D1B96 /* QueryNotificationCenterItemsService.swift */,
+			);
+			path = HintMode;
+			sourceTree = "<group>";
+		};
+		E25BBB5E250CCA7900D11213 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				E25BBB5A250CC4AA00D11213 /* ObserveFrontmostApplicationService.swift */,
+				E25BBB5F250CD28600D11213 /* ObserveApplicationNotificationService.swift */,
+				E25BBB61250CF9CC00D11213 /* FrontmostApplicationService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
 		E26172172322968500E396CA = {
 			isa = PBXGroup;
 			children = (
@@ -277,8 +306,8 @@
 		E26172222322968500E396CA /* ViMac-Swift */ = {
 			isa = PBXGroup;
 			children = (
+				E25BBB5E250CCA7900D11213 /* Services */,
 				E270F41F2503E79900AD305A /* Accessibility */,
-				E290EF4924F93306004B1A83 /* Services */,
 				E28867EF235F54F1001691A5 /* Vimac.icns */,
 				E2C2956F234E0A32001A38D6 /* ViewControllers */,
 				E225BD1E233354AD00ECDEF4 /* Windows */,
@@ -295,7 +324,6 @@
 				E20696FF232A52EA001EFDB2 /* AlphabetHints.swift */,
 				E2F6C9AC232DE89F00F2975B /* HintView.swift */,
 				E2F6C9AE232DEA1800F2975B /* Utils.swift */,
-				E25F8710233222A9007AA958 /* AccessibilityObservables.swift */,
 				E2C29565234DE09C001A38D6 /* ModeCoordinator.swift */,
 				E268A029236D8F6F00EE08CB /* CachedUIElement.swift */,
 				E245F9B023941AE8009CA9C6 /* BorderView.swift */,
@@ -344,24 +372,10 @@
 		E270F41F2503E79900AD305A /* Accessibility */ = {
 			isa = PBXGroup;
 			children = (
+				E25BBB58250CC37600D11213 /* HintMode */,
 				E270F4202503E7A800AD305A /* Element.swift */,
 			);
 			path = Accessibility;
-			sourceTree = "<group>";
-		};
-		E290EF4924F93306004B1A83 /* Services */ = {
-			isa = PBXGroup;
-			children = (
-				E290EF4A24F93342004B1A83 /* QueryWindowService.swift */,
-				E270F5C42504D8DE00AD305A /* TraverseElementServiceFinder.swift */,
-				E270F5C82504D9AE00AD305A /* TraverseGenericElementService.swift */,
-				E270F5CA2504D9DE00AD305A /* TraverseElementService.swift */,
-				E270F5CE2504DC4600AD305A /* TraverseWebAreaElementService.swift */,
-				E23140D52506781E004D1B96 /* QueryMenuBarItemsService.swift */,
-				E23140D725067A46004D1B96 /* QueryMenuBarExtrasService.swift */,
-				E23140D92507B2C1004D1B96 /* QueryNotificationCenterItemsService.swift */,
-			);
-			path = Services;
 			sourceTree = "<group>";
 		};
 		E2C2956F234E0A32001A38D6 /* ViewControllers */ = {
@@ -639,6 +653,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E25BBB62250CF9CC00D11213 /* FrontmostApplicationService.swift in Sources */,
 				E261725A2324EC7100E396CA /* OverlayWindow.swift in Sources */,
 				E279535124962E8D006D8D7A /* ChunkyScroller.swift in Sources */,
 				E270F5CF2504DC4600AD305A /* TraverseWebAreaElementService.swift in Sources */,
@@ -663,7 +678,6 @@
 				E23140DA2507B2C1004D1B96 /* QueryNotificationCenterItemsService.swift in Sources */,
 				E290EF4B24F93343004B1A83 /* QueryWindowService.swift in Sources */,
 				E270F5CB2504D9DE00AD305A /* TraverseElementService.swift in Sources */,
-				E25F8711233222A9007AA958 /* AccessibilityObservables.swift in Sources */,
 				E26981BB23C9E35D00E46217 /* TISInputSourceExtension.swift in Sources */,
 				E2DFF5AD24815D3E00B4090D /* GeneralPreferenceViewController.swift in Sources */,
 				E266D916248AAC99005A261F /* UserPreferences.swift in Sources */,
@@ -671,9 +685,11 @@
 				E2C29562234DD7F8001A38D6 /* OverlayWindowController.swift in Sources */,
 				E229E57A2482ABAF00A558D3 /* ScrollModePreferenceViewController.swift in Sources */,
 				E2069700232A52EA001EFDB2 /* AlphabetHints.swift in Sources */,
+				E25BBB60250CD28600D11213 /* ObserveApplicationNotificationService.swift in Sources */,
 				E270F4212503E7A800AD305A /* Element.swift in Sources */,
 				E20696F923290D41001EFDB2 /* Log.swift in Sources */,
 				E23140D825067A46004D1B96 /* QueryMenuBarExtrasService.swift in Sources */,
+				E25BBB5B250CC4AA00D11213 /* ObserveFrontmostApplicationService.swift in Sources */,
 				E225BD1D233292B800ECDEF4 /* StatusItemManager.swift in Sources */,
 				E26981B323C99DBB00E46217 /* WelcomeWindowController.swift in Sources */,
 				E26172242322968500E396CA /* AppDelegate.swift in Sources */,
