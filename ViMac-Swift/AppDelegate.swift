@@ -23,8 +23,7 @@ import Preferences
     let applicationObservable: Observable<NSRunningApplication?>
     let focusedWindowDisturbedObservable: Observable<FrontmostApplicationService.ApplicationNotification>
 
-    let windowObservable: Observable<UIElement?>
-    let windowSubject: BehaviorSubject<UIElement?>
+    let windowObservable: Observable<Element?>
     let hintModeShortcutObservable: Observable<Void>
     let scrollModeShortcutObservable: Observable<Void>
     
@@ -33,8 +32,6 @@ import Preferences
     
     let modeCoordinator: ModeCoordinator
     let overlayWindowController: OverlayWindowController
-
-    static let windowEvents: [AXNotification] = [.windowMiniaturized, .windowMoved, .windowResized]
     
     override init() {
         InputSourceManager.initialize()
@@ -63,11 +60,10 @@ import Preferences
         windowObservable =
             Observable.create { observer in
                 frontmostAppService.observeFocusedWindow({ window in
-                    observer.onNext(window.map({ UIElement($0.rawElement) }))
+                    observer.onNext(window)
                 })
                 return Disposables.create()
             }
-        windowSubject = BehaviorSubject(value: nil)
 
         hintModeShortcutObservable = Observable.create { observer in
             let tempView = MASShortcutView.init()
@@ -164,7 +160,6 @@ import Preferences
             .subscribe(onNext: { windowOptional in
                 self.modeCoordinator.exitMode()
                 os_log("Current window: %@", log: Log.accessibility, String(describing: windowOptional))
-                self.windowSubject.onNext(windowOptional)
             })
         )
 
