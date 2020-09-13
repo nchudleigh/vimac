@@ -10,7 +10,6 @@ import Cocoa
 import AXSwift
 import RxSwift
 import MASShortcut
-import os
 import Sparkle
 import LaunchAtLogin
 import Preferences
@@ -152,7 +151,6 @@ import Preferences
         self.compositeDisposable.insert(applicationObservable
             .observeOn(MainScheduler.instance)
             .subscribe(onNext: { appOptional in
-                os_log("Current frontmost application: %@", log: Log.accessibility, String(describing: appOptional))
                 if let app = appOptional {
                     Utils.setAccessibilityAttributes(app: app)
                 }
@@ -170,7 +168,6 @@ import Preferences
             .observeOn(MainScheduler.instance)
             .subscribe(onNext: { windowOptional in
                 self.modeCoordinator.exitMode()
-                os_log("Current window: %@", log: Log.accessibility, String(describing: windowOptional))
             })
         )
 
