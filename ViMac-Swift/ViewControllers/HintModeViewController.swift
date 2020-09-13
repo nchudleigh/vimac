@@ -94,6 +94,22 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
                     return
                 }
                 
+                let pidOptional = try? appUIElement.pid()
+                guard let pid = pidOptional else { return }
+                
+                let nsRunningAppOptional = NSRunningApplication(processIdentifier: pid)
+                guard let nsRunningApp = nsRunningAppOptional else { return }
+                
+                // as of 28e46b9cbe9a38e7c43c1eb1f0d8953d99bc5ef9,
+                // when one activates hint mode when the Vimac preference page is frontmost,
+                // the app crashes with EXC_BAD_INSTRUCTION when retrieving menu bar items attributes through Element.initialize
+                // I suspect that threading is the cause of crashing when reading attributes from your own app
+                let isVimac = nsRunningApp.bundleIdentifier == Bundle.main.bundleIdentifier
+                if isVimac {
+                    event(.success([]))
+                    return
+                }
+                
                 let service = QueryMenuBarItemsService.init(applicationElement: appUIElement.element)
                 let elements = try? service.perform()
                 event(.success(elements ?? []))
