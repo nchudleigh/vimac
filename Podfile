@@ -18,10 +18,4 @@ target 'Vimac' do
     inherit! :search_paths
     # Pods for testing
   end
-
-  target 'VimacUITests' do
-    inherit! :search_paths
-    # Pods for testing
-  end
-
 end
