@@ -65,7 +65,13 @@ class FlattenElementTreeNode {
             .map { flatten($0) }
             .reduce(0, +)
         
-        let isActionable = node.root.actions.count > 0
+        let ignoredActions: Set = [
+            "AXShowMenu",
+            "AXScrollToVisible",
+        ]
+        let actions = Set(node.root.actions).subtracting(ignoredActions)
+        
+        let isActionable = actions.count > 0
         let isRowWithoutActionableChildren = childrenHintableElements == 0 && node.root.role == "AXRow"
         let isHintable = isActionable || isRowWithoutActionableChildren
         
