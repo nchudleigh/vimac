@@ -49,7 +49,6 @@ class QueryWindowService {
 class FlattenElementTreeNode {
     let root: ElementTreeNode
     var result: [Element] = []
-    let whitelistedActions = Set(UserPreferences.HintMode.ActionsProperty.read())
 
     init(_ root: ElementTreeNode) {
         self.root = root
@@ -66,8 +65,9 @@ class FlattenElementTreeNode {
             .map { flatten($0) }
             .reduce(0, +)
         
-        let containsWhitelistedAction = Set(node.root.actions).intersection(whitelistedActions).count > 0
-        let isHintable = containsWhitelistedAction || (childrenHintableElements == 0 && node.root.role == "AXRow")
+        let isActionable = node.root.actions.count > 0
+        let isRowWithoutActionableChildren = childrenHintableElements == 0 && node.root.role == "AXRow"
+        let isHintable = isActionable || isRowWithoutActionableChildren
         
         if isHintable {
             result.append(node.root)
