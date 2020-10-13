@@ -44,7 +44,16 @@ class TraverseWebAreaElementService : TraverseElementService {
             "AXImmediateDescendantsOnly": false,
             "AXResultsLimit": -1,
             "AXVisibleOnly": true,
-            "AXSearchKey": "AXAnyTypeSearchKey"
+            "AXSearchKey": [
+                "AXButtonSearchKey",
+                "AXCheckBoxSearchKey",
+                "AXControlSearchKey",
+                "AXGraphicSearchKey",
+                "AXLinkSearchKey",
+                "AXRadioGroupSearchKey",
+                "AXStaticTextSearchKey",
+                "AXTextFieldSearchKey"
+            ]
         ]
         let rawElements: [AXUIElement]? = try UIElement(element.rawElement).parameterizedAttribute("AXUIElementsForSearchPredicate", param: query)
         let elements = rawElements?
