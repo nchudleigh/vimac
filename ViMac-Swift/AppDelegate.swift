@@ -35,6 +35,9 @@ import Preferences
     let frontmostAppService = FrontmostApplicationService.init()
     
     override init() {
+        
+        UIElement.globalMessagingTimeout = 0.1
+        
         InputSourceManager.initialize()
         let storyboard = NSStoryboard.init(name: "Main", bundle: nil)
         overlayWindowController = storyboard.instantiateController(withIdentifier: "overlayWindowControllerID") as! OverlayWindowController
