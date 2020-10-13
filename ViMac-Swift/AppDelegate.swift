@@ -36,7 +36,7 @@ import Preferences
     
     override init() {
         
-        UIElement.globalMessagingTimeout = 0.1
+        UIElement.globalMessagingTimeout = 1
         
         InputSourceManager.initialize()
         let storyboard = NSStoryboard.init(name: "Main", bundle: nil)
