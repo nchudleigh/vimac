@@ -3,7 +3,7 @@ import RxCocoa
 import RxSwift
 import Preferences
 
-final class ScrollModePreferenceViewController: NSViewController, PreferencePane {
+final class ScrollModePreferenceViewController: NSViewController, NSTextFieldDelegate, PreferencePane {
     let preferencePaneIdentifier = PreferencePane.Identifier.hintMode
     let preferencePaneTitle = "Scroll Mode"
     
@@ -17,10 +17,8 @@ final class ScrollModePreferenceViewController: NSViewController, PreferencePane
 
     let disposeBag = DisposeBag()
     
-    lazy var scrollKeysObservable = scrollModeKeysView.rx.text.map({ $0! })
-    lazy var scrollKeysValidityObservable = scrollKeysObservable
-        .map({ ScrollModePreferenceViewController.isScrollKeysValid(keys: $0) })
-        .distinctUntilChanged()
+    let scrollKeysSubject = PublishSubject<String>()
+    lazy var scrollKeysObservable = scrollKeysSubject.asObserver()
     
     lazy var scrollSensitivityObservable = scrollSensitivityView.rx.value.map({ Int($0) })
     
@@ -29,6 +27,8 @@ final class ScrollModePreferenceViewController: NSViewController, PreferencePane
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        scrollModeKeysView.delegate = self
         
         shortcutView.associatedUserDefaultsKey = Utils.scrollModeShortcutKey
         
@@ -40,38 +40,20 @@ final class ScrollModePreferenceViewController: NSViewController, PreferencePane
         revVerticalScrollView.state = UserPreferences.ScrollMode.ReverseVerticalScrollProperty.read() ? .on : .off
         
         observeScrollModeKeys().disposed(by: disposeBag)
-        observeScrollModeKeysValidity().disposed(by: disposeBag)
         observeScrollSensitivity().disposed(by: disposeBag)
         observeRevHorizontalScroll().disposed(by: disposeBag)
         observeRevVerticalScroll().disposed(by: disposeBag)
     }
     
-    static func isScrollKeysValid(keys: String) -> Bool {
+    func isScrollKeysValid(keys: String) -> Bool {
         let isCountValid = keys.count == 4 || keys.count == 6
         let areKeysUnique = keys.count == Set(keys).count
         return isCountValid && areKeysUnique
-    }
-    
-    func changeScrollKeysFieldBackgroundColor(color: NSColor) {
-        scrollModeKeysView.backgroundColor = color
-        scrollModeKeysView.isEditable = false
-        scrollModeKeysView.isEditable = true
     }
 
     func observeScrollModeKeys() -> Disposable {
         return scrollKeysObservable.bind(onNext: { keys in
             UserPreferences.ScrollMode.ScrollKeysProperty.save(value: keys)
-        })
-    }
-    
-    func observeScrollModeKeysValidity() -> Disposable {
-        return scrollKeysValidityObservable.bind(onNext: { [weak self] isValid in
-            if !isValid {
-                self?.changeScrollKeysFieldBackgroundColor(color: NSColor.init(calibratedRed: 132/255, green: 46/255, blue: 48/255, alpha: 1))
-                return
-            }
-            
-            self?.changeScrollKeysFieldBackgroundColor(color: NSColor.black)
         })
     }
     
@@ -97,5 +79,43 @@ final class ScrollModePreferenceViewController: NSViewController, PreferencePane
         return revVerticalScrollObservable.bind(onNext: { isRev in
             UserPreferences.ScrollMode.ReverseVerticalScrollProperty.save(value: isRev)
         })
+    }
+}
+
+extension ScrollModePreferenceViewController {
+    func controlTextDidChange(_ notification: Notification) {
+        guard let textField = notification.object as? NSTextField else {
+            return
+        }
+        
+        if textField == scrollModeKeysView {
+            scrollKeysSubject.onNext(textField.stringValue)
+        }
+    }
+}
+
+extension ScrollModePreferenceViewController {
+    func controlTextDidEndEditing(_ notification: Notification) {
+        guard let textField = notification.object as? NSTextField else {
+            return
+        }
+        
+        if textField == scrollModeKeysView {
+            let value = textField.stringValue
+            let isValid = isScrollKeysValid(keys: value)
+            
+            if !isValid {
+                showInvalidValueDialog(value)
+            }
+        }
+    }
+    
+    private func showInvalidValueDialog(_ value: String) {
+        let alert = NSAlert()
+        alert.messageText = "The value \"\(value)\" is invalid."
+        alert.informativeText = "Please provide a valid value."
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: "OK")
+        alert.runModal()
     }
 }
