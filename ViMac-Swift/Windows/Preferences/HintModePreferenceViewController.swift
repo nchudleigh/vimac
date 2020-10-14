@@ -82,7 +82,7 @@ extension HintModePreferenceViewController {
             let value = textField.stringValue
             let isValid = UserPreferences.HintMode.CustomCharactersProperty.isValid(value: value)
             
-            if !isValid {
+            if value.count > 0 && !isValid {
                 showInvalidValueDialog(value)
             }
         }
@@ -91,7 +91,7 @@ extension HintModePreferenceViewController {
             let value = textField.stringValue
             let isValid = UserPreferences.HintMode.TextSizeProperty.isValid(value: value)
             
-            if !isValid {
+            if value.count > 0 && !isValid {
                 showInvalidValueDialog(value)
             }
         }

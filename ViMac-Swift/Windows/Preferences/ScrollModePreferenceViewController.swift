@@ -104,7 +104,7 @@ extension ScrollModePreferenceViewController {
             let value = textField.stringValue
             let isValid = isScrollKeysValid(keys: value)
             
-            if !isValid {
+            if value.count > 0 && !isValid {
                 showInvalidValueDialog(value)
             }
         }
