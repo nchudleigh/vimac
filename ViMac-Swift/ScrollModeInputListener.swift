@@ -34,7 +34,7 @@ class ScrollModeInputListenerFactory {
     }
 }
 
-class ScrollModeInputListener: InputListener {
+class ScrollModeInputListener {
     struct ScrollEvent: Equatable {
         let direction: ScrollDirection
         let state: ScrollState
@@ -43,13 +43,14 @@ class ScrollModeInputListener: InputListener {
     private let disposeBag = DisposeBag()
     private let scrollKeyConfig: ScrollKeyConfig
     
+    private let inputListener = InputListener()
+    
     let scrollEventSubject: PublishSubject<ScrollEvent> = PublishSubject()
     let escapeEventSubject: PublishSubject<Void> = PublishSubject()
     let tabEventSubject: PublishSubject<Void> = PublishSubject()
     
     init(scrollKeyConfig: ScrollKeyConfig) {
         self.scrollKeyConfig = scrollKeyConfig
-        super.init()
 
         disposeBag.insert(observeScrollEvent(bindings: scrollKeyConfig.bindings))
         disposeBag.insert(observeEscapeKey())
@@ -69,7 +70,7 @@ class ScrollModeInputListener: InputListener {
     }
     
     func observeEscapeKey() -> Disposable {
-        let escapeEvents = events.filter({ event in
+        let escapeEvents = events().filter({ event in
             event.keyCode == kVK_Escape && event.type == .keyDown
         })
         return escapeEvents.bind(onNext: { [weak self] _ in
@@ -78,7 +79,7 @@ class ScrollModeInputListener: InputListener {
     }
     
     func observeTabKey() -> Disposable {
-        let tabEvents = events.filter({ event in
+        let tabEvents = events().filter({ event in
             event.keyCode == kVK_Tab && event.type == .keyDown
         })
         return tabEvents.bind(onNext: { [weak self] _ in
@@ -103,7 +104,7 @@ class ScrollModeInputListener: InputListener {
     }
 
     func events(character: Character, modifierFlags: NSEvent.ModifierFlags?) -> Observable<NSEvent> {
-        return events
+        return events()
             .filter({ [weak self] event in
                 return self!.doesEventMatchCharacter(event: event, character: character)
             })
@@ -131,5 +132,9 @@ class ScrollModeInputListener: InputListener {
                 // 256 is the rawValue when there are no modifiers
                 NSEvent.ModifierFlags.init(rawValue: 256)
             )
+    }
+    
+    private func events() -> Observable<NSEvent> {
+        return inputListener.events
     }
 }
