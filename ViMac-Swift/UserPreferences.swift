@@ -94,26 +94,26 @@ struct UserPreferences {
                 let scrollHalfUpKey = s.count == 6 ? (s[s.index(s.startIndex, offsetBy: 5)]) : nil
                 
                 var bindings: [ScrollKeyConfig.Binding] = [
-                    .init(key: scrollLeftKey, direction: .left),
-                    .init(key: scrollDownKey, direction: .down),
-                    .init(key: scrollUpKey, direction: .up),
-                    .init(key: scrollRightKey, direction: .right),
+                    .init(keys: String(scrollLeftKey), direction: .left, modifiers: nil),
+                    .init(keys: String(scrollDownKey), direction: .down, modifiers: nil),
+                    .init(keys: String(scrollUpKey), direction: .up, modifiers: nil),
+                    .init(keys: String(scrollRightKey), direction: .right, modifiers: nil),
                     
-                    .init(key: Character(scrollLeftKey.uppercased()), direction: .halfLeft),
-                    .init(key: Character(scrollDownKey.uppercased()), direction: .halfDown),
-                    .init(key: Character(scrollUpKey.uppercased()), direction: .halfUp),
-                    .init(key: Character(scrollRightKey.uppercased()), direction: .halfRight),
+                    .init(keys: scrollLeftKey.uppercased(), direction: .halfLeft, modifiers: .shift),
+                    .init(keys: scrollDownKey.uppercased(), direction: .halfDown, modifiers: .shift),
+                    .init(keys: scrollUpKey.uppercased(), direction: .halfUp, modifiers: .shift),
+                    .init(keys: scrollRightKey.uppercased(), direction: .halfRight, modifiers: .shift),
                 ]
                 
                 if let k = scrollHalfDownKey {
                     bindings.append(
-                        .init(key: k, direction: .halfDown)
+                        .init(keys: String(k), direction: .halfDown, modifiers: nil)
                     )
                 }
                 
                 if let k = scrollHalfUpKey {
                     bindings.append(
-                        .init(key: k, direction: .halfUp)
+                        .init(keys: String(k), direction: .halfUp, modifiers: nil)
                     )
                 }
                 
