@@ -5,7 +5,6 @@ struct ScrollKeyConfig {
     struct Binding {
         let key: Character
         let direction: ScrollDirection
-        let modifiers: NSEvent.ModifierFlags?
     }
     
     let bindings: [Binding]
@@ -107,9 +106,7 @@ class ScrollModeInputListener {
     }
     
     static func doesEventMatchBinding(event: NSEvent, binding: ScrollKeyConfig.Binding) -> Bool {
-        let doesEventMatchCharacter = event.characters == String(binding.key)
-        let doesEventMatchModifiers = event.modifierFlags.intersection(.deviceIndependentFlagsMask) == (binding.modifiers ?? .init())
-        return doesEventMatchCharacter && doesEventMatchModifiers
+        return event.characters == String(binding.key)
     }
     
     private func events() -> Observable<NSEvent> {
