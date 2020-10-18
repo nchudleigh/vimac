@@ -23,15 +23,15 @@ class HintModeInputListener {
         disposeBag.insert(disposable)
     }
     
-    func observeLetterKeyDown(onEvent: @escaping (NSEvent) -> ()) {
-        let alphabetKeyDownObservable = events()
+    func observeKeyDown(onEvent: @escaping (NSEvent) -> ()) {
+        let keyDownObservable = events()
             .filter({ event in
-                guard let character = event.charactersIgnoringModifiers?.first else {
+                if event.charactersIgnoringModifiers == nil {
                     return false
                 }
-                return (character.isLetter || character.isNumber) && event.type == .keyDown
+                return event.type == .keyDown
             })
-        let disposable = alphabetKeyDownObservable.bind(onNext: { event in
+        let disposable = keyDownObservable.bind(onNext: { event in
             onEvent(event)
         })
         disposeBag.insert(disposable)

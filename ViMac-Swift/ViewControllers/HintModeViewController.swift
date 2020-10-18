@@ -200,7 +200,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     }
     
     func observeLetterKeyDown() {
-        inputListener.observeLetterKeyDown(onEvent: { [weak self] event in
+        inputListener.observeKeyDown(onEvent: { [weak self] event in
             self?.onLetterKeyDown(event: event)
         })
     }
