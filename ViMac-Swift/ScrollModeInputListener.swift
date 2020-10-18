@@ -88,7 +88,10 @@ class ScrollModeInputListener {
     }
     
     func scrollEvent(binding: ScrollKeyConfig.Binding) -> Observable<ScrollEvent> {
-        return events(character: binding.key, modifierFlags: binding.modifiers)
+        return events()
+            .filter({ event in
+                return ScrollModeInputListener.doesEventMatchBinding(event: event, binding: binding)
+            })
             .map({ event -> ScrollEvent in
                 if event.type == .keyDown {
                     return ScrollEvent(direction: binding.direction, state: .start)
@@ -102,36 +105,11 @@ class ScrollModeInputListener {
             // this prevents sequential events of the same direction and state from being emitted.
             .distinctUntilChanged()
     }
-
-    func events(character: Character, modifierFlags: NSEvent.ModifierFlags?) -> Observable<NSEvent> {
-        return events()
-            .filter({ [weak self] event in
-                return self!.doesEventMatchCharacter(event: event, character: character)
-            })
-            .filter({ [weak self] event in
-                return
-                    self!.doesEventMatchCharacter(event: event, character: character) &&
-                        event.modifierFlags.intersection(.deviceIndependentFlagsMask) == (modifierFlags ?? .init())
-            })
-    }
     
-    func doesEventMatchBinding(event: NSEvent, binding: ScrollKeyConfig.Binding) -> Bool {
-        return
-            doesEventMatchCharacter(event: event, character: binding.key) &&
-            doesEventMatchModifiers(event: event, modifiers: binding.modifiers)
-    }
-    
-    func doesEventMatchCharacter(event: NSEvent, character: Character) -> Bool {
-        return event.characters == String(character)
-    }
-    
-    func doesEventMatchModifiers(event: NSEvent, modifiers: NSEvent.ModifierFlags?) -> Bool {
-        return event.modifierFlags.intersection(.deviceIndependentFlagsMask) ==
-            (
-                modifiers ??
-                // 256 is the rawValue when there are no modifiers
-                NSEvent.ModifierFlags.init(rawValue: 256)
-            )
+    static func doesEventMatchBinding(event: NSEvent, binding: ScrollKeyConfig.Binding) -> Bool {
+        let doesEventMatchCharacter = event.characters == String(binding.key)
+        let doesEventMatchModifiers = event.modifierFlags.intersection(.deviceIndependentFlagsMask) == (binding.modifiers ?? .init())
+        return doesEventMatchCharacter && doesEventMatchModifiers
     }
     
     private func events() -> Observable<NSEvent> {
