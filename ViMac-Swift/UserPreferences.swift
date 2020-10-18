@@ -94,26 +94,26 @@ struct UserPreferences {
                 let scrollHalfUpKey = s.count == 6 ? (s[s.index(s.startIndex, offsetBy: 5)]) : nil
                 
                 var bindings: [ScrollKeyConfig.Binding] = [
-                    .init(key: scrollLeftKey, direction: .left, modifiers: nil),
-                    .init(key: scrollDownKey, direction: .down, modifiers: nil),
-                    .init(key: scrollUpKey, direction: .up, modifiers: nil),
-                    .init(key: scrollRightKey, direction: .right, modifiers: nil),
+                    .init(key: scrollLeftKey, direction: .left),
+                    .init(key: scrollDownKey, direction: .down),
+                    .init(key: scrollUpKey, direction: .up),
+                    .init(key: scrollRightKey, direction: .right),
                     
-                    .init(key: Character(scrollLeftKey.uppercased()), direction: .halfLeft, modifiers: .shift),
-                    .init(key: Character(scrollDownKey.uppercased()), direction: .halfDown, modifiers: .shift),
-                    .init(key: Character(scrollUpKey.uppercased()), direction: .halfUp, modifiers: .shift),
-                    .init(key: Character(scrollRightKey.uppercased()), direction: .halfRight, modifiers: .shift),
+                    .init(key: Character(scrollLeftKey.uppercased()), direction: .halfLeft),
+                    .init(key: Character(scrollDownKey.uppercased()), direction: .halfDown),
+                    .init(key: Character(scrollUpKey.uppercased()), direction: .halfUp),
+                    .init(key: Character(scrollRightKey.uppercased()), direction: .halfRight),
                 ]
                 
                 if let k = scrollHalfDownKey {
                     bindings.append(
-                        .init(key: k, direction: .halfDown, modifiers: nil)
+                        .init(key: k, direction: .halfDown)
                     )
                 }
                 
                 if let k = scrollHalfUpKey {
                     bindings.append(
-                        .init(key: k, direction: .halfUp, modifiers: nil)
+                        .init(key: k, direction: .halfUp)
                     )
                 }
                 
