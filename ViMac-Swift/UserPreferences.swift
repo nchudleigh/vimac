@@ -103,6 +103,9 @@ struct UserPreferences {
                     .init(keys: scrollDownKey.uppercased(), direction: .halfDown, modifiers: .shift),
                     .init(keys: scrollUpKey.uppercased(), direction: .halfUp, modifiers: .shift),
                     .init(keys: scrollRightKey.uppercased(), direction: .halfRight, modifiers: .shift),
+                    
+                    .init(keys: "gg", direction: .scrollToTop, modifiers: nil),
+                    .init(keys: "G", direction: .scrollToBottom, modifiers: nil)
                 ]
                 
                 if let k = scrollHalfDownKey {
