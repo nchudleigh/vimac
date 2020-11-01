@@ -29,7 +29,10 @@ class HintModeInputListener {
                 if event.charactersIgnoringModifiers == nil {
                     return false
                 }
-                return event.type == .keyDown
+                return event.type == .keyDown &&
+                     event.keyCode != kVK_Delete &&
+                     event.keyCode != kVK_Space &&
+                    event.keyCode != kVK_Escape
             })
         let disposable = keyDownObservable.bind(onNext: { event in
             onEvent(event)
