@@ -94,29 +94,30 @@ struct UserPreferences {
                 let scrollHalfUpKey = s.count == 6 ? (s[s.index(s.startIndex, offsetBy: 5)]) : nil
                 
                 var bindings: [ScrollKeyConfig.Binding] = [
-                    .init(keys: String(scrollLeftKey), direction: .left, modifiers: nil),
-                    .init(keys: String(scrollDownKey), direction: .down, modifiers: nil),
-                    .init(keys: String(scrollUpKey), direction: .up, modifiers: nil),
-                    .init(keys: String(scrollRightKey), direction: .right, modifiers: nil),
+                    .init(keys: String(scrollLeftKey), direction: .left),
+                    .init(keys: String(scrollDownKey), direction: .down),
+                    .init(keys: String(scrollUpKey), direction: .up),
+                    .init(keys: String(scrollRightKey), direction: .right),
                     
-                    .init(keys: scrollLeftKey.uppercased(), direction: .halfLeft, modifiers: .shift),
-                    .init(keys: scrollDownKey.uppercased(), direction: .halfDown, modifiers: .shift),
-                    .init(keys: scrollUpKey.uppercased(), direction: .halfUp, modifiers: .shift),
-                    .init(keys: scrollRightKey.uppercased(), direction: .halfRight, modifiers: .shift),
+                    .init(keys: scrollLeftKey.uppercased(), direction: .halfLeft),
+                    .init(keys: scrollDownKey.uppercased(), direction: .halfDown),
+                    .init(keys: scrollUpKey.uppercased(), direction: .halfUp),
+                    .init(keys: scrollRightKey.uppercased(), direction: .halfRight),
                     
-                    .init(keys: "gg", direction: .scrollToTop, modifiers: nil),
-                    .init(keys: "G", direction: .scrollToBottom, modifiers: nil)
+                    .init(keys: "gg", direction: .scrollToTop),
+                    .init(keys: "g", direction: .scrollToTop),
+                    .init(keys: "G", direction: .scrollToBottom)
                 ]
                 
                 if let k = scrollHalfDownKey {
                     bindings.append(
-                        .init(keys: String(k), direction: .halfDown, modifiers: nil)
+                        .init(keys: String(k), direction: .halfDown)
                     )
                 }
                 
                 if let k = scrollHalfUpKey {
                     bindings.append(
-                        .init(keys: String(k), direction: .halfUp, modifiers: nil)
+                        .init(keys: String(k), direction: .halfUp)
                     )
                 }
                 

@@ -95,8 +95,6 @@ class InputState {
     let enteredKeySequence: [Character] = []
     var listener: (([Character]) -> ())?
 
-    var alerted = false
-
     var commonPrefixTimer: Timer?
 
     init(keySequences: [[Character]], commonPrefixDelaySeconds: Double) {
@@ -105,11 +103,12 @@ class InputState {
         self.trie = Trie(keySequences)
         self.state = trie.root
     }
+    
+    deinit {
+        clearTimer()
+    }
 
     func advance(_ c: Character) -> Bool {
-        if alerted {
-            return false
-        }
 
         clearTimer()
 
@@ -144,7 +143,6 @@ class InputState {
 
     func resetState() {
         clearTimer()
-        self.alerted = false
         self.state = trie.root
     }
 
@@ -165,8 +163,8 @@ class InputState {
     }
 
     private func alertListeners(_ sequence: [Character]) {
-        self.alerted = true
         self.listener?(sequence)
+        resetState()
     }
 
     func registerListener(_ listener: @escaping ([Character]) -> ()) {

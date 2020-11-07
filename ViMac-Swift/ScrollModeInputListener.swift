@@ -8,6 +8,15 @@ struct ScrollKeyConfig {
     }
     
     let bindings: [Binding]
+    
+    func mapKeysToBinding(keys: String) -> Binding? {
+        for binding in bindings {
+            if binding.keys == keys {
+                return binding
+            }
+        }
+        return nil
+    }
 }
 
 enum ScrollDirection {
@@ -45,6 +54,7 @@ class ScrollModeInputListener {
     private let scrollKeyConfig: ScrollKeyConfig
     
     private let inputListener = InputListener()
+    private let inputState: InputState
     
     let scrollEventSubject: PublishSubject<ScrollEvent> = PublishSubject()
     let escapeEventSubject: PublishSubject<Void> = PublishSubject()
@@ -52,14 +62,49 @@ class ScrollModeInputListener {
     
     init(scrollKeyConfig: ScrollKeyConfig) {
         self.scrollKeyConfig = scrollKeyConfig
+        
+        let keyBindings = scrollKeyConfig.bindings.map { Array($0.keys) }
+        self.inputState = InputState(keySequences: keyBindings, commonPrefixDelaySeconds: 0.5)
+        
+        self.inputState.registerListener({ [weak self] keys in
+            self?.onTypedBinding(keys: String(keys))
+        })
 
-        disposeBag.insert(observeScrollEvent(bindings: scrollKeyConfig.bindings))
         disposeBag.insert(observeEscapeKey())
         disposeBag.insert(observeTabKey())
+        disposeBag.insert(observeKeyDown())
+    }
+    
+    func onTypedBinding(keys: String) {
+        guard let binding = scrollKeyConfig.mapKeysToBinding(keys: keys) else {
+            fatalError("keys emitted from InputState does not match a binding")
+        }
+        
+        self.
+        self.onScrollEvent(event: <#T##ScrollModeInputListener.ScrollEvent#>)
     }
     
     func onScrollEvent(event: ScrollEvent) {
         scrollEventSubject.onNext(event)
+    }
+    
+    func observeKeyDown() -> Disposable {
+        let keyDownObservable = events()
+            .filter({ event in
+                if event.charactersIgnoringModifiers == nil {
+                    return false
+                }
+                return event.type == .keyDown
+            })
+        return keyDownObservable.bind(onNext: { [weak self] event in
+            self?.onKeyDown(event: event)
+        })
+    }
+    
+    func onKeyDown(event: NSEvent) {
+        if let c = event.characters?.first {
+          inputState.advance(c)
+        }
     }
     
     func observeScrollEvent(bindings: [ScrollKeyConfig.Binding]) -> Disposable {
@@ -102,18 +147,15 @@ class ScrollModeInputListener {
                     fatalError("An unexpected non-keyDown/keyUp event was received.")
                 }
             })
-            // keyDown events are repeatedly fired when the key is held down.
-            // this prevents sequential events of the same direction and state from being emitted.
-            .distinctUntilChanged()
     }
     
+    func bindingToScrollEvent()
+    
     static func doesEventMatchBinding(event: NSEvent, binding: ScrollKeyConfig.Binding) -> Bool {
-        let doesEventMatchCharacter = event.characters == binding.keys
-        let doesEventMatchModifiers = event.modifierFlags.intersection(.deviceIndependentFlagsMask) == (binding.modifiers ?? .init())
-        return doesEventMatchCharacter && doesEventMatchModifiers
+        return event.characters == binding.keys
     }
     
     private func events() -> Observable<NSEvent> {
-        return inputListener.events
+        return inputListener.nonRepeatEvents
     }
 }

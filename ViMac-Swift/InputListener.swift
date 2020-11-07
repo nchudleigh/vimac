@@ -18,6 +18,8 @@ class InputListener {
         })
         .share()
     
+    lazy var nonRepeatEvents = events.filter { !$0.isARepeat }
+    
     lazy var keyDownEvents: Observable<NSEvent> = events.filter({ event in
         return event.type == .keyDown
     })
