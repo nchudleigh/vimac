@@ -12,6 +12,8 @@
 		DB9977DE63A7DFECC2D9CB88 /* Pods_VimacUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85E207A8CB4C294752F7C738 /* Pods_VimacUITests.framework */; };
 		E20696F923290D41001EFDB2 /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20696F823290D41001EFDB2 /* Log.swift */; };
 		E2069700232A52EA001EFDB2 /* AlphabetHints.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20696FF232A52EA001EFDB2 /* AlphabetHints.swift */; };
+		E20D0CB425581AEF00A5CAEE /* Trie.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20D0CB325581AEF00A5CAEE /* Trie.swift */; };
+		E20D0CB625581B3A00A5CAEE /* TrieTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20D0CB525581B3A00A5CAEE /* TrieTests.swift */; };
 		E225BD1D233292B800ECDEF4 /* StatusItemManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E225BD1C233292B800ECDEF4 /* StatusItemManager.swift */; };
 		E229E57A2482ABAF00A558D3 /* ScrollModePreferenceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E229E5792482ABAF00A558D3 /* ScrollModePreferenceViewController.swift */; };
 		E229E57C2482ABC300A558D3 /* ScrollModePreferenceViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = E229E57B2482ABC300A558D3 /* ScrollModePreferenceViewController.xib */; };
@@ -122,6 +124,8 @@
 		E20696F823290D41001EFDB2 /* Log.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Log.swift; sourceTree = "<group>"; };
 		E20696FC232A0021001EFDB2 /* VimacBridgingHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VimacBridgingHeader.h; sourceTree = "<group>"; };
 		E20696FF232A52EA001EFDB2 /* AlphabetHints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlphabetHints.swift; sourceTree = "<group>"; };
+		E20D0CB325581AEF00A5CAEE /* Trie.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Trie.swift; sourceTree = "<group>"; };
+		E20D0CB525581B3A00A5CAEE /* TrieTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrieTests.swift; sourceTree = "<group>"; };
 		E225BD1C233292B800ECDEF4 /* StatusItemManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusItemManager.swift; sourceTree = "<group>"; };
 		E229E5792482ABAF00A558D3 /* ScrollModePreferenceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollModePreferenceViewController.swift; sourceTree = "<group>"; };
 		E229E57B2482ABC300A558D3 /* ScrollModePreferenceViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ScrollModePreferenceViewController.xib; sourceTree = "<group>"; };
@@ -347,6 +351,7 @@
 				E2795352249633DE006D8D7A /* Scroller.swift */,
 				E2B3F64A24F24B9800FD5594 /* HintModeInputListener.swift */,
 				E267778B256123030034B131 /* String.swift */,
+				E20D0CB325581AEF00A5CAEE /* Trie.swift */,
 			);
 			path = "ViMac-Swift";
 			sourceTree = "<group>";
@@ -356,6 +361,7 @@
 			children = (
 				E26172362322968700E396CA /* ViMac_SwiftTests.swift */,
 				E26172382322968700E396CA /* Info.plist */,
+				E20D0CB525581B3A00A5CAEE /* TrieTests.swift */,
 			);
 			path = "ViMac-SwiftTests";
 			sourceTree = "<group>";
@@ -699,6 +705,7 @@
 				E229E57A2482ABAF00A558D3 /* ScrollModePreferenceViewController.swift in Sources */,
 				E2069700232A52EA001EFDB2 /* AlphabetHints.swift in Sources */,
 				E25BBB60250CD28600D11213 /* ObserveApplicationNotificationService.swift in Sources */,
+				E20D0CB425581AEF00A5CAEE /* Trie.swift in Sources */,
 				E270F4212503E7A800AD305A /* Element.swift in Sources */,
 				E20696F923290D41001EFDB2 /* Log.swift in Sources */,
 				E23140D825067A46004D1B96 /* QueryMenuBarExtrasService.swift in Sources */,
@@ -719,6 +726,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E26172372322968700E396CA /* ViMac_SwiftTests.swift in Sources */,
+				E20D0CB625581B3A00A5CAEE /* TrieTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -938,8 +946,10 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = LQ2VH8VB84;
 				INFOPLIST_FILE = "ViMac-SwiftTests/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -959,8 +969,10 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = LQ2VH8VB84;
 				INFOPLIST_FILE = "ViMac-SwiftTests/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

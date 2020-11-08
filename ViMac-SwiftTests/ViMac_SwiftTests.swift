@@ -7,7 +7,6 @@
 //
 
 import XCTest
-@testable import ViMac_Swift
 
 class ViMac_SwiftTests: XCTestCase {
 
