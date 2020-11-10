@@ -72,21 +72,24 @@ class Trie {
     }
     
     func isPrefix(_ word: [Character]) -> Bool {
-        return _contains(prefix: word, exact: false)
-    }
-    
-    func contains(_ word: [Character]) -> Bool {
-        return _contains(prefix: word, exact: true)
-    }
-    
-    private func _contains(prefix: [Character], exact: Bool) -> Bool {
         var lastNode: TrieNode? = root
-        for c in prefix {
+        for c in word {
             lastNode = lastNode!.getChild(c: c)
             if lastNode == nil {
                 return false
             }
         }
-        return !exact || lastNode!.isTerminating()
+        return true
+    }
+    
+    func contains(_ word: [Character]) -> Bool {
+        var lastNode: TrieNode? = root
+        for c in word {
+            lastNode = lastNode!.getChild(c: c)
+            if lastNode == nil {
+                return false
+            }
+        }
+        return lastNode!.isTerminating()
     }
 }
