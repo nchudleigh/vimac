@@ -92,4 +92,16 @@ class Trie {
         }
         return lastNode!.isTerminating()
     }
+    
+    func doesPrefixWordExist(_ word: [Character]) -> Bool {
+        var lastNode: TrieNode? = root
+        for c in word {
+            let newLastNode = lastNode!.getChild(c: c)
+            if newLastNode == nil {
+                return lastNode!.isTerminating()
+            }
+            lastNode = newLastNode
+        }
+        return lastNode!.isTerminating()
+    }
 }

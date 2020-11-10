@@ -92,5 +92,34 @@ class TrieTests: XCTestCase {
             trie.isPrefix(Array("abcd"))
         )
     }
+    
+    func test_does_terminating_prefix_exist_1() {
+        let trie = Trie()
+        
+        trie.addWord(Array("ab"))
+        
+        XCTAssertTrue(
+            trie.doesPrefixWordExist(Array("abcd"))
+        )
+    }
+    
+    func test_does_terminating_prefix_exist_2() {
+        let trie = Trie()
+        
+        trie.addWord(Array("abc"))
+        
+        XCTAssertFalse(
+            trie.doesPrefixWordExist(Array("abd"))
+        )
+    }
+    
+    func test_does_terminating_prefix_exist_3() {
+        let trie = Trie()
 
+        trie.addWord(Array("abd"))
+        
+        XCTAssertTrue(
+            trie.doesPrefixWordExist(Array("abd"))
+        )
+    }
 }
