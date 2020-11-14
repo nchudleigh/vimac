@@ -15,66 +15,16 @@ class ScrollModeViewController: ModeViewController {
     let inputListener: ScrollModeInputListener = ScrollModeInputListenerFactory.instantiate()
     let borderView: BorderView = ScrollModeViewController.instantiateBorderView()
     let inputListeningTextField: NSTextField = ScrollModeViewController.instantiateInputListeningTextField()
-    let scrollAreas = getScrollAreasByDescendingArea()
+    let scrollAreas: [(NSSize, NSPoint)] = {
+        let windowElement = Utils.currentApplicationWindow()!
+        let scrollAreas = try! QueryScrollAreasService.init(windowElement: windowElement).perform()
+        return scrollAreas.map { ($0.frame.size, $0.frame.origin) }
+    }()
     let activeScrollAreaIndex = BehaviorSubject<Int>(value: 0)
     let originalMousePosition = NSEvent.mouseLocation
     var scroller: Scroller?
     
     let disposeBag = DisposeBag()
-    
-    static func getScrollAreasByDescendingArea() -> [(NSSize, NSPoint)] {
-        let scrollAreas = getScrollAreaElementsByDescendingArea()
-        var sizePositionTuple = scrollAreas.map({ area -> (NSSize, NSPoint) in
-            let size: NSSize? = try? area.attribute(.size)
-            let position: NSPoint? = try? area.attribute(.position)
-            return (size!, position!)
-        })
-        if sizePositionTuple.count == 0 {
-            if let applicationWindow = Utils.getCurrentApplicationWindowManually() {
-                let appSize: NSSize? = try? applicationWindow.attribute(.size)
-                let appPosition: NSPoint? = try? applicationWindow.attribute(.position)
-                sizePositionTuple.append((appSize!, appPosition!))
-            }
-        }
-        return sizePositionTuple
-    }
-    
-    static func getScrollAreaElementsByDescendingArea() -> [CachedUIElement] {
-        guard let applicationWindow = Utils.getCurrentApplicationWindowManually() else {
-            return []
-        }
-        
-        let cachedApplicationWindow = CachedUIElement.init(applicationWindow.element)
-        
-        var scrollAreas = [CachedUIElement]()
-        func populateScrollAreas(element: CachedUIElement) -> Void {
-            _ = try? element.getMultipleAttributes([.role, .position, .size, .children])
-
-            let roleOptional: String? = try? element.attribute(.role);
-            
-            if let role = roleOptional {
-                if role == Role.scrollArea.rawValue {
-                    scrollAreas.append(element)
-                    return
-                }
-            }
-
-            let children = (try? element.attribute(Attribute.children) as [AXUIElement]?) ?? [];
-
-            for child in children {
-                populateScrollAreas(element: CachedUIElement(child))
-            }
-        }
-        populateScrollAreas(element: cachedApplicationWindow)
-        
-        let scrollAreasDescendingArea = scrollAreas.sorted(by: { (scrollAreaA, scrollAreaB) in
-            let sizeA: NSSize = (try? scrollAreaA.attribute(.size)) ?? .zero;
-            let sizeB: NSSize = (try? scrollAreaB.attribute(.size)) ?? .zero;
-            return (sizeA.width * sizeA.height) > (sizeB.width * sizeB.height)
-        })
-        
-        return scrollAreasDescendingArea
-    }
     
     deinit {
         self.scroller?.stop()
