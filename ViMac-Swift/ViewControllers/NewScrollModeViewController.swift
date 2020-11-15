@@ -10,11 +10,17 @@ import Cocoa
 import RxSwift
 
 class NewScrollModeViewController: ModeViewController {
-    let disposeBag = DisposeBag()
+    private let disposeBag = DisposeBag()
+    private let inputListener = InputListener()
+    private var inputListeningTextField: NSTextField?
     
     override func viewWillAppear() {
         setLoadingState()
         observeScrollAreas().disposed(by: disposeBag)
+        observeEscKey().disposed(by: disposeBag)
+        
+        attachInputListeningTextField()
+        
     }
     
     private func setLoadingState() {
@@ -41,8 +47,16 @@ class NewScrollModeViewController: ModeViewController {
         fetchScrollAreas()
             .observeOn(MainScheduler.instance)
             .subscribe(onSuccess: { [weak self] scrollAreas in
-                self?.removeChildViewController()
+
             }, onError: { [weak self] _ in
+                self?.modeCoordinator?.exitMode()
+            })
+    }
+    
+    private func observeEscKey() -> Disposable {
+        let escEvents = inputListener.keyDownEvents.filter { $0.keyCode == kVK_Escape }
+        return escEvents
+            .bind(onNext: { [weak self] _ in
                 self?.modeCoordinator?.exitMode()
             })
     }
@@ -66,5 +80,16 @@ class NewScrollModeViewController: ModeViewController {
                 thread.cancel()
             }
         }
+    }
+    
+    private func attachInputListeningTextField() {
+        let textField = NSTextField()
+        textField.stringValue = ""
+        textField.isEditable = true
+
+        self.view.addSubview(textField)
+        textField.becomeFirstResponder()
+        
+        self.inputListeningTextField = textField
     }
 }
