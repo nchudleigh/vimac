@@ -20,7 +20,6 @@ class NewScrollModeViewController: ModeViewController {
         observeEscKey().disposed(by: disposeBag)
         
         attachInputListeningTextField()
-        
     }
     
     private func setLoadingState() {
