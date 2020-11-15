@@ -32,6 +32,7 @@
 		E2677786256034860034B131 /* ScrollModeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2677785256034860034B131 /* ScrollModeViewController.swift */; };
 		E267778825610C8D0034B131 /* ScrollModeLoadingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E267778725610C8D0034B131 /* ScrollModeLoadingViewController.swift */; };
 		E267778C256123030034B131 /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = E267778B256123030034B131 /* String.swift */; };
+		E267778E25613A900034B131 /* ScrollModeActiveViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E267778D25613A900034B131 /* ScrollModeActiveViewController.swift */; };
 		E268A02A236D8F6F00EE08CB /* CachedUIElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = E268A029236D8F6F00EE08CB /* CachedUIElement.swift */; };
 		E26981B323C99DBB00E46217 /* WelcomeWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26981B223C99DBB00E46217 /* WelcomeWindowController.swift */; };
 		E26981B523C99DF900E46217 /* WelcomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26981B423C99DF900E46217 /* WelcomeViewController.swift */; };
@@ -149,6 +150,7 @@
 		E2677785256034860034B131 /* ScrollModeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollModeViewController.swift; sourceTree = "<group>"; };
 		E267778725610C8D0034B131 /* ScrollModeLoadingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollModeLoadingViewController.swift; sourceTree = "<group>"; };
 		E267778B256123030034B131 /* String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
+		E267778D25613A900034B131 /* ScrollModeActiveViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollModeActiveViewController.swift; sourceTree = "<group>"; };
 		E268A029236D8F6F00EE08CB /* CachedUIElement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CachedUIElement.swift; sourceTree = "<group>"; };
 		E26981B223C99DBB00E46217 /* WelcomeWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeWindowController.swift; sourceTree = "<group>"; };
 		E26981B423C99DF900E46217 /* WelcomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeViewController.swift; sourceTree = "<group>"; };
@@ -393,6 +395,7 @@
 				E2C29570234E19E4001A38D6 /* HintModeViewController.swift */,
 				E2677785256034860034B131 /* ScrollModeViewController.swift */,
 				E267778725610C8D0034B131 /* ScrollModeLoadingViewController.swift */,
+				E267778D25613A900034B131 /* ScrollModeActiveViewController.swift */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -702,6 +705,7 @@
 				E23140D825067A46004D1B96 /* QueryMenuBarExtrasService.swift in Sources */,
 				E25BBB5B250CC4AA00D11213 /* ObserveFrontmostApplicationService.swift in Sources */,
 				E225BD1D233292B800ECDEF4 /* StatusItemManager.swift in Sources */,
+				E267778E25613A900034B131 /* ScrollModeActiveViewController.swift in Sources */,
 				E26981B323C99DBB00E46217 /* WelcomeWindowController.swift in Sources */,
 				E26172242322968500E396CA /* AppDelegate.swift in Sources */,
 				E2677780255FE0420034B131 /* QueryScrollAreasService.swift in Sources */,

@@ -26,13 +26,6 @@ enum ScrollState {
     case stop
 }
 
-class ScrollModeInputListenerFactory {
-    static func instantiate() -> ScrollModeInputListener {
-        let config = UserPreferences.ScrollMode.ScrollKeysProperty.readAsConfig()
-        return ScrollModeInputListener(scrollKeyConfig: config)
-    }
-}
-
 class ScrollModeInputListener {
     struct ScrollEvent: Equatable {
         let direction: ScrollDirection
@@ -42,14 +35,15 @@ class ScrollModeInputListener {
     private let disposeBag = DisposeBag()
     private let scrollKeyConfig: ScrollKeyConfig
     
-    private let inputListener = InputListener()
+    private let inputListener: InputListener
     
     let scrollEventSubject: PublishSubject<ScrollEvent> = PublishSubject()
     let escapeEventSubject: PublishSubject<Void> = PublishSubject()
     let tabEventSubject: PublishSubject<Void> = PublishSubject()
     
-    init(scrollKeyConfig: ScrollKeyConfig) {
+    init(scrollKeyConfig: ScrollKeyConfig, inputListener: InputListener) {
         self.scrollKeyConfig = scrollKeyConfig
+        self.inputListener = inputListener
 
         disposeBag.insert(observeScrollEvent(bindings: scrollKeyConfig.bindings))
         disposeBag.insert(observeEscapeKey())

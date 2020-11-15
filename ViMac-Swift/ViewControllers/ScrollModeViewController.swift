@@ -27,6 +27,11 @@ class ScrollModeViewController: ModeViewController {
         setChildViewController(vc)
     }
     
+    private func setActiveState(scrollAreas: [Element]) {
+        let vc = ScrollModeActiveViewController(scrollAreas: scrollAreas, inputListener: inputListener)
+        setChildViewController(vc)
+    }
+    
     private func setChildViewController(_ vc: NSViewController) {
         assert(self.children.count <= 1)
         removeChildViewController()
@@ -46,7 +51,7 @@ class ScrollModeViewController: ModeViewController {
         fetchScrollAreas()
             .observeOn(MainScheduler.instance)
             .subscribe(onSuccess: { [weak self] scrollAreas in
-
+                self?.setActiveState(scrollAreas: scrollAreas)
             }, onError: { [weak self] _ in
                 self?.modeCoordinator?.exitMode()
             })
@@ -68,7 +73,12 @@ class ScrollModeViewController: ModeViewController {
                         throw "currentApplicationWindow is nil."
                     }
                     
-                    let scrollAreas = try QueryScrollAreasService.init(windowElement: windowElement).perform()
+                    var scrollAreas = try QueryScrollAreasService.init(windowElement: windowElement).perform()
+                    
+                    if scrollAreas.count == 0 {
+                        scrollAreas.append(windowElement)
+                    }
+                    
                     observer(.success(scrollAreas))
                 } catch {
                     observer(.error(error))
