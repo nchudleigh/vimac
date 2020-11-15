@@ -9,7 +9,7 @@
 import Cocoa
 import RxSwift
 
-class NewScrollModeViewController: ModeViewController {
+class ScrollModeViewController: ModeViewController {
     private let disposeBag = DisposeBag()
     private let inputListener = InputListener()
     private var inputListeningTextField: NSTextField?

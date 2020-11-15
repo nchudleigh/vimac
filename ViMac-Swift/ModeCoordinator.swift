@@ -55,7 +55,7 @@ class ModeCoordinator : Coordinator {
             forceKBLayout.select()
         }
         
-        let vc = NewScrollModeViewController.init()
+        let vc = ScrollModeViewController.init()
         self.setViewController(vc: vc)
     }
     

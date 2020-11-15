@@ -193,7 +193,7 @@ import Preferences
             })
             .observeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak self] window in
-                if self?.modeCoordinator.windowController.window?.contentViewController?.className == NewScrollModeViewController.className() {
+                if self?.modeCoordinator.windowController.window?.contentViewController?.className == ScrollModeViewController.className() {
                     self?.modeCoordinator.exitMode()
                 } else {
                     self?.modeCoordinator.setScrollMode()
