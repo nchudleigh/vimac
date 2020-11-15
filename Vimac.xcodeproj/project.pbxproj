@@ -29,6 +29,8 @@
 		E261725A2324EC7100E396CA /* OverlayWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26172592324EC7100E396CA /* OverlayWindow.swift */; };
 		E266D916248AAC99005A261F /* UserPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = E266D915248AAC99005A261F /* UserPreferences.swift */; };
 		E2677780255FE0420034B131 /* QueryScrollAreasService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E267777F255FE0420034B131 /* QueryScrollAreasService.swift */; };
+		E2677786256034860034B131 /* NewScrollModeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2677785256034860034B131 /* NewScrollModeViewController.swift */; };
+		E267778825610C8D0034B131 /* ScrollModeLoadingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E267778725610C8D0034B131 /* ScrollModeLoadingViewController.swift */; };
 		E268A02A236D8F6F00EE08CB /* CachedUIElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = E268A029236D8F6F00EE08CB /* CachedUIElement.swift */; };
 		E26981B323C99DBB00E46217 /* WelcomeWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26981B223C99DBB00E46217 /* WelcomeWindowController.swift */; };
 		E26981B523C99DF900E46217 /* WelcomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26981B423C99DF900E46217 /* WelcomeViewController.swift */; };
@@ -144,6 +146,8 @@
 		E26172592324EC7100E396CA /* OverlayWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayWindow.swift; sourceTree = "<group>"; };
 		E266D915248AAC99005A261F /* UserPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPreferences.swift; sourceTree = "<group>"; };
 		E267777F255FE0420034B131 /* QueryScrollAreasService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryScrollAreasService.swift; sourceTree = "<group>"; };
+		E2677785256034860034B131 /* NewScrollModeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewScrollModeViewController.swift; sourceTree = "<group>"; };
+		E267778725610C8D0034B131 /* ScrollModeLoadingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollModeLoadingViewController.swift; sourceTree = "<group>"; };
 		E268A029236D8F6F00EE08CB /* CachedUIElement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CachedUIElement.swift; sourceTree = "<group>"; };
 		E26981B223C99DBB00E46217 /* WelcomeWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeWindowController.swift; sourceTree = "<group>"; };
 		E26981B423C99DF900E46217 /* WelcomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeViewController.swift; sourceTree = "<group>"; };
@@ -387,6 +391,8 @@
 				E2C29567234DE51F001A38D6 /* ModeViewController.swift */,
 				E2C29570234E19E4001A38D6 /* HintModeViewController.swift */,
 				E2C29572234E2E8B001A38D6 /* ScrollModeViewController.swift */,
+				E2677785256034860034B131 /* NewScrollModeViewController.swift */,
+				E267778725610C8D0034B131 /* ScrollModeLoadingViewController.swift */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -657,6 +663,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E25BBB62250CF9CC00D11213 /* FrontmostApplicationService.swift in Sources */,
+				E267778825610C8D0034B131 /* ScrollModeLoadingViewController.swift in Sources */,
 				E261725A2324EC7100E396CA /* OverlayWindow.swift in Sources */,
 				E279535124962E8D006D8D7A /* ChunkyScroller.swift in Sources */,
 				E270F5CF2504DC4600AD305A /* TraverseWebAreaElementService.swift in Sources */,
@@ -679,6 +686,7 @@
 				E270F5C92504D9AE00AD305A /* TraverseGenericElementService.swift in Sources */,
 				E245F9B123941AE8009CA9C6 /* BorderView.swift in Sources */,
 				E23140DA2507B2C1004D1B96 /* QueryNotificationCenterItemsService.swift in Sources */,
+				E2677786256034860034B131 /* NewScrollModeViewController.swift in Sources */,
 				E290EF4B24F93343004B1A83 /* QueryWindowService.swift in Sources */,
 				E270F5CB2504D9DE00AD305A /* TraverseElementService.swift in Sources */,
 				E26981BB23C9E35D00E46217 /* TISInputSourceExtension.swift in Sources */,
