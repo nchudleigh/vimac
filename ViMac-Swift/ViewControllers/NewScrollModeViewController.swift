@@ -7,10 +7,14 @@
 //
 
 import Cocoa
+import RxSwift
 
 class NewScrollModeViewController: ModeViewController {
+    let disposeBag = DisposeBag()
+    
     override func viewWillAppear() {
         setLoadingState()
+        observeScrollAreas().disposed(by: disposeBag)
     }
     
     private func setLoadingState() {
@@ -31,5 +35,36 @@ class NewScrollModeViewController: ModeViewController {
         guard let childVC = self.children.first else { return }
         childVC.view.removeFromSuperview()
         childVC.removeFromParent()
+    }
+    
+    private func observeScrollAreas() -> Disposable {
+        fetchScrollAreas()
+            .observeOn(MainScheduler.instance)
+            .subscribe(onSuccess: { [weak self] scrollAreas in
+                self?.removeChildViewController()
+            }, onError: { [weak self] _ in
+                self?.modeCoordinator?.exitMode()
+            })
+    }
+    
+    private func fetchScrollAreas() -> Single<[Element]> {
+        return Single.create { observer in
+            let thread = Thread.init {
+                do {
+                    guard let windowElement = Utils.currentApplicationWindow() else {
+                        throw "currentApplicationWindow is nil."
+                    }
+                    
+                    let scrollAreas = try QueryScrollAreasService.init(windowElement: windowElement).perform()
+                    observer(.success(scrollAreas))
+                } catch {
+                    observer(.error(error))
+                }
+            }
+            thread.start()
+            return Disposables.create {
+                thread.cancel()
+            }
+        }
     }
 }
