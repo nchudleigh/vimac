@@ -7,11 +7,13 @@
 //
 
 import Cocoa
+import RxSwift
 
 class ScrollModeActiveViewController: NSViewController {
-    let scrollAreas: [Element]
-    var activeScrollAreaIndex: Int = 0
-    let inputListener: InputListener
+    private let scrollAreas: [Element]
+    private var activeScrollAreaIndex: Int = 0
+    private let inputListener: InputListener
+    private let disposeBag = DisposeBag()
     
     init(scrollAreas: [Element], inputListener: InputListener) {
         assert(scrollAreas.count > 0)
@@ -31,6 +33,20 @@ class ScrollModeActiveViewController: NSViewController {
     
     override func viewDidAppear() {
         setActiveScrollArea(0)
+        observeTabKey().disposed(by: disposeBag)
+    }
+    
+    private func observeTabKey() -> Disposable {
+        let tabEvents = inputListener.keyDownEvents.filter { $0.keyCode == kVK_Tab }
+        return tabEvents
+            .bind(onNext: { [weak self] _ in
+                self?.activateNextScrollArea()
+            })
+    }
+    
+    private func activateNextScrollArea() {
+        activeScrollAreaIndex = (activeScrollAreaIndex + 1) % scrollAreas.count
+        setActiveScrollArea(activeScrollAreaIndex)
     }
     
     private func setActiveScrollArea(_ index: Int) {
