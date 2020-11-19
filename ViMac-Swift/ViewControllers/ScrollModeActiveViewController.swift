@@ -12,7 +12,6 @@ class ScrollModeActiveViewController: NSViewController {
     let scrollAreas: [Element]
     var activeScrollAreaIndex: Int = 0
     let inputListener: InputListener
-    var borderView: BorderView?
     
     init(scrollAreas: [Element], inputListener: InputListener) {
         assert(scrollAreas.count > 0)
@@ -38,20 +37,31 @@ class ScrollModeActiveViewController: NSViewController {
         let scrollArea = scrollAreas[index]
         self.activeScrollAreaIndex = index
         
-        setBorderView(scrollArea)
+        setActiveScrollAreaVC(scrollArea)
     }
     
-    private func setBorderView(_ scrollArea: Element) {
-        if let borderView = borderView {
-            borderView.removeFromSuperview()
-        }
-
+    private func setActiveScrollAreaVC(_ scrollArea: Element) {
         let frame: NSRect = {
             let topLeftPositionRelativeToScreen = Utils.toOrigin(point: scrollArea.frame.origin, size: scrollArea.frame.size)
             let topLeftPositionRelativeToWindow = self.view.window!.convertPoint(fromScreen: topLeftPositionRelativeToScreen)
             return NSRect(origin: topLeftPositionRelativeToWindow, size: scrollArea.frame.size)
         }()
-        self.borderView = BorderView(frame: frame)
-        self.view.addSubview(self.borderView!)
+        let vc = ScrollModeActiveScrollAreaViewController(scrollArea: scrollArea, inputListener: inputListener)
+        vc.view.frame = frame
+        setChildViewController(vc)
+    }
+    
+    private func setChildViewController(_ vc: NSViewController) {
+        assert(self.children.count <= 1)
+        removeChildViewController()
+        
+        self.addChild(vc)
+        self.view.addSubview(vc.view)
+    }
+    
+    private func removeChildViewController() {
+        guard let childVC = self.children.first else { return }
+        childVC.view.removeFromSuperview()
+        childVC.removeFromParent()
     }
 }
