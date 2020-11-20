@@ -30,7 +30,6 @@
 		E266D916248AAC99005A261F /* UserPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = E266D915248AAC99005A261F /* UserPreferences.swift */; };
 		E2677780255FE0420034B131 /* QueryScrollAreasService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E267777F255FE0420034B131 /* QueryScrollAreasService.swift */; };
 		E2677786256034860034B131 /* ScrollModeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2677785256034860034B131 /* ScrollModeViewController.swift */; };
-		E267778825610C8D0034B131 /* ScrollModeLoadingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E267778725610C8D0034B131 /* ScrollModeLoadingViewController.swift */; };
 		E267778C256123030034B131 /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = E267778B256123030034B131 /* String.swift */; };
 		E267778E25613A900034B131 /* ScrollModeActiveViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E267778D25613A900034B131 /* ScrollModeActiveViewController.swift */; };
 		E2677790256187230034B131 /* ScrollModeActiveScrollAreaViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E267778F256187230034B131 /* ScrollModeActiveScrollAreaViewController.swift */; };
@@ -149,7 +148,6 @@
 		E266D915248AAC99005A261F /* UserPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPreferences.swift; sourceTree = "<group>"; };
 		E267777F255FE0420034B131 /* QueryScrollAreasService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryScrollAreasService.swift; sourceTree = "<group>"; };
 		E2677785256034860034B131 /* ScrollModeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollModeViewController.swift; sourceTree = "<group>"; };
-		E267778725610C8D0034B131 /* ScrollModeLoadingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollModeLoadingViewController.swift; sourceTree = "<group>"; };
 		E267778B256123030034B131 /* String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
 		E267778D25613A900034B131 /* ScrollModeActiveViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollModeActiveViewController.swift; sourceTree = "<group>"; };
 		E267778F256187230034B131 /* ScrollModeActiveScrollAreaViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollModeActiveScrollAreaViewController.swift; sourceTree = "<group>"; };
@@ -396,7 +394,6 @@
 				E2C29567234DE51F001A38D6 /* ModeViewController.swift */,
 				E2C29570234E19E4001A38D6 /* HintModeViewController.swift */,
 				E2677785256034860034B131 /* ScrollModeViewController.swift */,
-				E267778725610C8D0034B131 /* ScrollModeLoadingViewController.swift */,
 				E267778D25613A900034B131 /* ScrollModeActiveViewController.swift */,
 				E267778F256187230034B131 /* ScrollModeActiveScrollAreaViewController.swift */,
 			);
@@ -669,7 +666,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				E25BBB62250CF9CC00D11213 /* FrontmostApplicationService.swift in Sources */,
-				E267778825610C8D0034B131 /* ScrollModeLoadingViewController.swift in Sources */,
 				E267778C256123030034B131 /* String.swift in Sources */,
 				E261725A2324EC7100E396CA /* OverlayWindow.swift in Sources */,
 				E279535124962E8D006D8D7A /* ChunkyScroller.swift in Sources */,

@@ -15,18 +15,12 @@ class ScrollModeViewController: ModeViewController {
     private var inputListeningTextField: NSTextField?
     
     override func viewWillAppear() {
-        setLoadingState()
         observeScrollAreas().disposed(by: disposeBag)
         observeEscKey().disposed(by: disposeBag)
         
         attachInputListeningTextField()
     }
-    
-    private func setLoadingState() {
-        let vc = ScrollModeLoadingViewController()
-        setChildViewController(vc)
-    }
-    
+
     private func setActiveState(scrollAreas: [Element]) {
         let vc = ScrollModeActiveViewController(scrollAreas: scrollAreas, inputListener: inputListener)
         setChildViewController(vc)
