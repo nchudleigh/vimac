@@ -193,6 +193,11 @@ class Utils: NSObject {
         return try? app.attribute(.focusedWindow)
     }
     
+    static func currentApplicationWindow() -> Element? {
+        guard let uiElement = getCurrentApplicationWindowManually() else { return nil }
+        return Element.initialize(rawElement: uiElement.element)
+    }
+    
     static func singleToObservable<T>(single: Single<[T]>) -> Observable<T> {
         return single.asObservable()
             .flatMap({ elements in
