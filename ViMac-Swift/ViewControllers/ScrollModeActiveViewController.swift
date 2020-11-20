@@ -14,6 +14,7 @@ class ScrollModeActiveViewController: NSViewController {
     private var activeScrollAreaIndex: Int = 0
     private let inputListener: InputListener
     private let disposeBag = DisposeBag()
+    private let originalMousePosition = NSEvent.mouseLocation
     
     init(scrollAreas: [Element], inputListener: InputListener) {
         assert(scrollAreas.count > 0)
@@ -34,6 +35,12 @@ class ScrollModeActiveViewController: NSViewController {
     override func viewDidAppear() {
         setActiveScrollArea(0)
         observeTabKey().disposed(by: disposeBag)
+        HideCursorGlobally.hide()
+    }
+    
+    override func viewDidDisappear() {
+        revertMouseLocation()
+        HideCursorGlobally.unhide()
     }
     
     private func observeTabKey() -> Disposable {
@@ -79,5 +86,9 @@ class ScrollModeActiveViewController: NSViewController {
         guard let childVC = self.children.first else { return }
         childVC.view.removeFromSuperview()
         childVC.removeFromParent()
+    }
+    
+    private func revertMouseLocation() {
+        Utils.moveMouse(position: Utils.toOrigin(point: originalMousePosition, size: NSSize.zero))
     }
 }
