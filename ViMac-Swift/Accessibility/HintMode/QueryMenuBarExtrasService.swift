@@ -12,7 +12,18 @@ import AXSwift
 class QueryMenuBarExtrasService {
     func perform() throws -> [Element]? {
         let apps = Application.all()
-        let menubarsOptional: [UIElement?] = apps.map({ try? $0.attribute(.extrasMenuBar) })
+        for app in apps {
+            // set the messaging timeout to lower than the global timeout
+            // we are sending mach messages to processes that are not ours.
+            // there is a good chance several non responsive processes exist which could lead to a much slower hint query time.
+            // since extra menu bar items are not as essential as elements on the active window,
+            // we set a lower timeout.
+            app.messagingTimeout = 0.05
+        }
+        
+        let menubarsOptional: [UIElement?] = apps.map({ app in
+            return try? app.attribute(.extrasMenuBar)
+        })
         let menubars = menubarsOptional.compactMap({ $0 })
         let menubarItemsUnflattened: [[AXUIElement]] = menubars.map({ menubar in
             let items: [AXUIElement]? = try? menubar.attribute(.children)
