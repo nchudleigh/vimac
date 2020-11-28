@@ -19,7 +19,7 @@ class ScrollModeInputState {
     }
     
     func registerBinding(binding: ScrollKeyConfig.Binding) throws -> Bool {
-        let success = try inputState.addWord([binding.key])
+        let success = try inputState.addWord(binding.keys)
         if !success {
             return false
         }
@@ -47,7 +47,7 @@ class ScrollModeInputState {
     
     private func mapKeysToScrollDirection(keys: [Character]) -> ScrollDirection {
         for binding in bindings {
-            if [binding.key] == keys {
+            if binding.keys == keys {
                 return binding.direction
             }
         }
