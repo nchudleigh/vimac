@@ -12,7 +12,7 @@ import RxSwift
 class ScrollModeActiveScrollAreaViewController: NSViewController {
     let scrollArea: Element
     let inputListener: InputListener
-    let scrollModeInputListener: ScrollModeInputListener
+    var scrollModeInputState: ScrollModeInputState
     var borderView: BorderView?
     var scroller: Scroller?
     let disposeBag = DisposeBag()
@@ -20,10 +20,8 @@ class ScrollModeActiveScrollAreaViewController: NSViewController {
     init(scrollArea: Element, inputListener: InputListener) {
         self.scrollArea = scrollArea
         self.inputListener = inputListener
-        self.scrollModeInputListener = ScrollModeInputListener(
-            scrollKeyConfig: UserPreferences.ScrollMode.ScrollKeysProperty.readAsConfig(),
-            inputListener: self.inputListener
-        )
+        self.scrollModeInputState = ScrollModeInputState.instantiate()
+        
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -41,8 +39,9 @@ class ScrollModeActiveScrollAreaViewController: NSViewController {
     
     override func viewDidAppear() {
         setBorderView()
-        observeScrollEvents().disposed(by: disposeBag)
         moveMouseToScrollAreaCenter()
+        observeKeyDown().disposed(by: disposeBag)
+        observeKeyUp().disposed(by: disposeBag)
     }
     
     private func setBorderView() {
@@ -54,30 +53,6 @@ class ScrollModeActiveScrollAreaViewController: NSViewController {
         self.view.addSubview(self.borderView!)
     }
     
-    private func observeScrollEvents() -> Disposable {
-        scrollModeInputListener.scrollEventSubject.bind(onNext: { [weak self] event in
-            self?.on(scrollEvent: event)
-        })
-    }
-    
-    private func on(scrollEvent: ScrollModeInputListener.ScrollEvent) {
-        self.scroller?.stop()
-        
-        if scrollEvent.state == .start && [.left, .right, .up, .down].contains(scrollEvent.direction) {
-            self.scroller = SmoothScroller.instantiate(direction: scrollEvent.direction)
-            self.scroller?.start()
-        }
-        
-        if scrollEvent.state == .start && [.halfLeft, .halfRight, .halfUp, .halfDown].contains(scrollEvent.direction) {
-            if [.halfLeft, .halfRight].contains(scrollEvent.direction) {
-                self.scroller = ChunkyScroller.instantiate(direction: scrollEvent.direction, scrollAmount: Int(scrollArea.frame.width / 2))
-            } else {
-                self.scroller = ChunkyScroller.instantiate(direction: scrollEvent.direction, scrollAmount: Int(scrollArea.frame.height / 2))
-            }
-            self.scroller?.start()
-        }
-    }
-    
     private func moveMouseToScrollAreaCenter() {
         let scrollAreaPosition = scrollArea.frame.origin
         let scrollAreaSize = scrollArea.frame.size
@@ -86,5 +61,69 @@ class ScrollModeActiveScrollAreaViewController: NSViewController {
         let positionY = scrollAreaPosition.y + scrollAreaSize.height - (scrollAreaSize.height / 2)
         let position = NSPoint(x: positionX, y: positionY)
         Utils.moveMouse(position: position)
+    }
+    
+    private func observeKeyDown() -> Disposable {
+        return inputListener.keyDownEvents.bind(onNext: { [weak self] event in
+            guard let self = self else { return }
+            guard let characters = event.characters else { return }
+            
+            if self.isScrolling() {
+                return
+            }
+            
+            for c in characters {
+                let status = try! self.scrollModeInputState.advance(key: c)
+                switch status {
+                case .advancable:
+                    break
+                case .deadend:
+                    self.resetInputState()
+                case .match(let scrollDirection):
+                    self.scroll(scrollDirection)
+                    self.resetInputState()
+                    break
+                }
+            }
+        })
+    }
+    
+    private func observeKeyUp() -> Disposable {
+        return inputListener.keyUpEvents.bind(onNext: { [weak self] event in
+            guard let self = self else { return }
+            
+            self.stopScrolling()
+        })
+    }
+    
+    private func scroll(_ direction: ScrollDirection) {
+        if [.left, .right, .up, .down].contains(direction) {
+            self.scroller = SmoothScroller.instantiate(direction: direction)
+            self.scroller?.start()
+            return
+        }
+        
+        if [.halfLeft, .halfRight, .halfUp, .halfDown].contains(direction) {
+            if [.halfLeft, .halfRight].contains(direction) {
+                self.scroller = ChunkyScroller.instantiate(direction: direction, scrollAmount: Int(scrollArea.frame.width / 2))
+            } else {
+                self.scroller = ChunkyScroller.instantiate(direction: direction, scrollAmount: Int(scrollArea.frame.height / 2))
+            }
+            self.scroller?.start()
+            return
+        }
+    }
+    
+    private func resetInputState() {
+        scrollModeInputState = ScrollModeInputState.instantiate()
+    }
+    
+    private func isScrolling() -> Bool {
+        scroller != nil
+    }
+    
+    private func stopScrolling() {
+        scroller?.stop()
+        scroller = nil
     }
 }
