@@ -23,6 +23,7 @@
 		E23140DA2507B2C1004D1B96 /* QueryNotificationCenterItemsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E23140D92507B2C1004D1B96 /* QueryNotificationCenterItemsService.swift */; };
 		E2443FFC25584A9400A23950 /* InputStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2443FFB25584A9400A23950 /* InputStateTests.swift */; };
 		E245F9B123941AE8009CA9C6 /* BorderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E245F9B023941AE8009CA9C6 /* BorderView.swift */; };
+		E24D0BB6256BEEAE0049EA0A /* ScrollModeInputState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E24D0BB5256BEEAE0049EA0A /* ScrollModeInputState.swift */; };
 		E25BBB5B250CC4AA00D11213 /* ObserveFrontmostApplicationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E25BBB5A250CC4AA00D11213 /* ObserveFrontmostApplicationService.swift */; };
 		E25BBB60250CD28600D11213 /* ObserveApplicationNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E25BBB5F250CD28600D11213 /* ObserveApplicationNotificationService.swift */; };
 		E25BBB62250CF9CC00D11213 /* FrontmostApplicationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E25BBB61250CF9CC00D11213 /* FrontmostApplicationService.swift */; };
@@ -137,6 +138,7 @@
 		E23140D92507B2C1004D1B96 /* QueryNotificationCenterItemsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryNotificationCenterItemsService.swift; sourceTree = "<group>"; };
 		E2443FFB25584A9400A23950 /* InputStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputStateTests.swift; sourceTree = "<group>"; };
 		E245F9B023941AE8009CA9C6 /* BorderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BorderView.swift; sourceTree = "<group>"; };
+		E24D0BB5256BEEAE0049EA0A /* ScrollModeInputState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollModeInputState.swift; sourceTree = "<group>"; };
 		E25BBB5A250CC4AA00D11213 /* ObserveFrontmostApplicationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObserveFrontmostApplicationService.swift; sourceTree = "<group>"; };
 		E25BBB5F250CD28600D11213 /* ObserveApplicationNotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObserveApplicationNotificationService.swift; sourceTree = "<group>"; };
 		E25BBB61250CF9CC00D11213 /* FrontmostApplicationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrontmostApplicationService.swift; sourceTree = "<group>"; };
@@ -357,6 +359,7 @@
 				E267778B256123030034B131 /* String.swift */,
 				E20D0CB325581AEF00A5CAEE /* Trie.swift */,
 				E20D0CB725583DD200A5CAEE /* InputState.swift */,
+				E24D0BB5256BEEAE0049EA0A /* ScrollModeInputState.swift */,
 			);
 			path = "ViMac-Swift";
 			sourceTree = "<group>";
@@ -694,6 +697,7 @@
 				E2F6C9AF232DEA1800F2975B /* Utils.swift in Sources */,
 				E279534D2494CC69006D8D7A /* ScrollModeInputListener.swift in Sources */,
 				E268A02A236D8F6F00EE08CB /* CachedUIElement.swift in Sources */,
+				E24D0BB6256BEEAE0049EA0A /* ScrollModeInputState.swift in Sources */,
 				E26981B523C99DF900E46217 /* WelcomeViewController.swift in Sources */,
 				E270F5C52504D8DE00AD305A /* TraverseElementServiceFinder.swift in Sources */,
 				E2C29568234DE51F001A38D6 /* ModeViewController.swift in Sources */,
