@@ -3,7 +3,7 @@ import RxSwift
 
 struct ScrollKeyConfig {
     struct Binding {
-        let key: Character
+        let keys: [Character]
         let direction: ScrollDirection
     }
     
@@ -100,7 +100,7 @@ class ScrollModeInputListener {
     }
     
     static func doesEventMatchBinding(event: NSEvent, binding: ScrollKeyConfig.Binding) -> Bool {
-        return event.characters == String(binding.key)
+        return event.characters == String(binding.keys)
     }
     
     private func events() -> Observable<NSEvent> {

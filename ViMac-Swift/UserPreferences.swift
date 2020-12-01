@@ -94,26 +94,26 @@ struct UserPreferences {
                 let scrollHalfUpKey = s.count == 6 ? (s[s.index(s.startIndex, offsetBy: 5)]) : nil
                 
                 var bindings: [ScrollKeyConfig.Binding] = [
-                    .init(key: scrollLeftKey, direction: .left),
-                    .init(key: scrollDownKey, direction: .down),
-                    .init(key: scrollUpKey, direction: .up),
-                    .init(key: scrollRightKey, direction: .right),
+                    .init(keys: [scrollLeftKey], direction: .left),
+                    .init(keys: [scrollDownKey], direction: .down),
+                    .init(keys: [scrollUpKey], direction: .up),
+                    .init(keys: [scrollRightKey], direction: .right),
                     
-                    .init(key: Character(scrollLeftKey.uppercased()), direction: .halfLeft),
-                    .init(key: Character(scrollDownKey.uppercased()), direction: .halfDown),
-                    .init(key: Character(scrollUpKey.uppercased()), direction: .halfUp),
-                    .init(key: Character(scrollRightKey.uppercased()), direction: .halfRight),
+                    .init(keys: [Character(scrollLeftKey.uppercased())], direction: .halfLeft),
+                    .init(keys: [Character(scrollDownKey.uppercased())], direction: .halfDown),
+                    .init(keys: [Character(scrollUpKey.uppercased())], direction: .halfUp),
+                    .init(keys: [Character(scrollRightKey.uppercased())], direction: .halfRight),
                 ]
                 
                 if let k = scrollHalfDownKey {
                     bindings.append(
-                        .init(key: k, direction: .halfDown)
+                        .init(keys: [k], direction: .halfDown)
                     )
                 }
                 
                 if let k = scrollHalfUpKey {
                     bindings.append(
-                        .init(key: k, direction: .halfUp)
+                        .init(keys: [k], direction: .halfUp)
                     )
                 }
                 
