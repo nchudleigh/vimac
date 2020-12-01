@@ -53,7 +53,6 @@
 		E27776E8240B784900488320 /* LaunchAtLogin.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = E27776E7240B784900488320 /* LaunchAtLogin.framework.dSYM */; };
 		E279534B2494C534006D8D7A /* InputListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = E279534A2494C534006D8D7A /* InputListener.swift */; };
 		E279534D2494CC69006D8D7A /* ScrollModeInputListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = E279534C2494CC69006D8D7A /* ScrollModeInputListener.swift */; };
-		E279534F24961DFB006D8D7A /* SmoothScroller.swift in Sources */ = {isa = PBXBuildFile; fileRef = E279534E24961DFB006D8D7A /* SmoothScroller.swift */; };
 		E279535124962E8D006D8D7A /* ChunkyScroller.swift in Sources */ = {isa = PBXBuildFile; fileRef = E279535024962E8C006D8D7A /* ChunkyScroller.swift */; };
 		E2795353249633DE006D8D7A /* Scroller.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2795352249633DE006D8D7A /* Scroller.swift */; };
 		E28867F0235F54F2001691A5 /* Vimac.icns in Resources */ = {isa = PBXBuildFile; fileRef = E28867EF235F54F1001691A5 /* Vimac.icns */; };
@@ -175,7 +174,6 @@
 		E27776E7240B784900488320 /* LaunchAtLogin.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = LaunchAtLogin.framework.dSYM; path = Carthage/Build/Mac/LaunchAtLogin.framework.dSYM; sourceTree = "<group>"; };
 		E279534A2494C534006D8D7A /* InputListener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputListener.swift; sourceTree = "<group>"; };
 		E279534C2494CC69006D8D7A /* ScrollModeInputListener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollModeInputListener.swift; sourceTree = "<group>"; };
-		E279534E24961DFB006D8D7A /* SmoothScroller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmoothScroller.swift; sourceTree = "<group>"; };
 		E279535024962E8C006D8D7A /* ChunkyScroller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChunkyScroller.swift; sourceTree = "<group>"; };
 		E2795352249633DE006D8D7A /* Scroller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scroller.swift; sourceTree = "<group>"; };
 		E28867EF235F54F1001691A5 /* Vimac.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Vimac.icns; sourceTree = SOURCE_ROOT; };
@@ -352,7 +350,6 @@
 				E266D915248AAC99005A261F /* UserPreferences.swift */,
 				E279534A2494C534006D8D7A /* InputListener.swift */,
 				E279534C2494CC69006D8D7A /* ScrollModeInputListener.swift */,
-				E279534E24961DFB006D8D7A /* SmoothScroller.swift */,
 				E279535024962E8C006D8D7A /* ChunkyScroller.swift */,
 				E2795352249633DE006D8D7A /* Scroller.swift */,
 				E2B3F64A24F24B9800FD5594 /* HintModeInputListener.swift */,
@@ -688,7 +685,6 @@
 				E2795353249633DE006D8D7A /* Scroller.swift in Sources */,
 				E2C3221E23BC828C00508B44 /* HideCursorGlobally.m in Sources */,
 				E2B3F64B24F24B9800FD5594 /* HintModeInputListener.swift in Sources */,
-				E279534F24961DFB006D8D7A /* SmoothScroller.swift in Sources */,
 				E2DFF5AB24815C5800B4090D /* PreferencesPaneIdentifiers.swift in Sources */,
 				E2C29571234E19E4001A38D6 /* HintModeViewController.swift in Sources */,
 				E279534B2494C534006D8D7A /* InputListener.swift in Sources */,

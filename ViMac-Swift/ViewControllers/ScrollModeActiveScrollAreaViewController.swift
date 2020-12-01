@@ -98,7 +98,7 @@ class ScrollModeActiveScrollAreaViewController: NSViewController {
     
     private func scroll(_ direction: ScrollDirection) {
         if [.left, .right, .up, .down].contains(direction) {
-            self.scroller = SmoothScroller.instantiate(direction: direction)
+            self.scroller = ChunkyScroller.instantiateForSmoothScroll(direction: direction)
             self.scroller?.start()
             return
         }
