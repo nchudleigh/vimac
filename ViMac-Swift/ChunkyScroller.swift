@@ -42,6 +42,41 @@ class ChunkyScroller: Scroller {
         return ChunkyScroller.init(frequency: frequency, xAxis: xAxis, yAxis: yAxis)
     }
     
+    static func instantiateForSmoothScroll(direction: ScrollDirection) -> ChunkyScroller {
+        let sensitivity = UserPreferences.ScrollMode.ScrollSensitivityProperty.read()
+        
+        var xAxis = Int64(0)
+        var yAxis = Int64(0)
+        
+        switch direction {
+            case .left:
+                xAxis = Int64(sensitivity)
+            case .right:
+                xAxis = Int64(-sensitivity)
+            case .down:
+                yAxis = Int64(-sensitivity)
+            case .up:
+                yAxis = Int64(sensitivity)
+            default:
+                fatalError("half-<direction> scroll directions should not used for smooth scrolling")
+        }
+        
+        let isHorizontalScrollReversed = UserPreferences.ScrollMode.ReverseHorizontalScrollProperty.read()
+        let isVerticalScrollReversed = UserPreferences.ScrollMode.ReverseVerticalScrollProperty.read()
+        
+        if isHorizontalScrollReversed {
+            xAxis = -xAxis
+        }
+        
+        if isVerticalScrollReversed {
+            yAxis = -yAxis
+        }
+        
+        let frequency = 1.0 / 50.0
+        
+        return ChunkyScroller(frequency: frequency, xAxis: xAxis, yAxis: yAxis)
+    }
+    
     private let frequency: TimeInterval
     private let xAxis: Int64
     private let yAxis: Int64
