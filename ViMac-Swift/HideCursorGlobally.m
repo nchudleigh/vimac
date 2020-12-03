@@ -11,10 +11,6 @@
 @implementation HideCursorGlobally
 
 + (void) hide {
-    if (!CGCursorIsVisible()) {
-        return;
-    }
-    
     void CGSSetConnectionProperty(int, int, CFStringRef, CFBooleanRef);
     int _CGSDefaultConnection();
     CFStringRef propertyString;
@@ -28,10 +24,6 @@
 }
 
 + (void) unhide {
-    if (CGCursorIsVisible()) {
-        return;
-    }
-
     CGDisplayShowCursor(CGMainDisplayID());
 }
 @end
