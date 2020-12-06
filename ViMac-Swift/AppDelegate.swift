@@ -174,14 +174,9 @@ import Preferences
             })
         )
 
-        let windowNoNilObservable = windowObservable.compactMap { $0 }
-        
         self.compositeDisposable.insert(hintModeShortcutObservable
-            .withLatestFrom(windowNoNilObservable, resultSelector: { _, window in
-                return window
-            })
             .observeOn(MainScheduler.instance)
-            .subscribe(onNext: { [weak self] window in
+            .subscribe(onNext: { [weak self] _ in
                 if self?.modeCoordinator.windowController.window?.contentViewController?.className == HintModeViewController.className() {
                     self?.modeCoordinator.exitMode()
                 } else {
@@ -191,11 +186,8 @@ import Preferences
         )
         
         self.compositeDisposable.insert(scrollModeShortcutObservable
-            .withLatestFrom(windowNoNilObservable, resultSelector: { _, window in
-                return window
-            })
             .observeOn(MainScheduler.instance)
-            .subscribe(onNext: { [weak self] window in
+            .subscribe(onNext: { [weak self] _ in
                 if self?.modeCoordinator.windowController.window?.contentViewController?.className == ScrollModeViewController.className() {
                     self?.modeCoordinator.exitMode()
                 } else {
