@@ -28,9 +28,7 @@ class TraverseWebAreaElementService : TraverseElementService {
         }
         
         let recursiveChildren = try? getRecursiveChildrenThroughSearchPredicate()
-        let recursiveChildrenNodes = recursiveChildren?
-            .map { ElementTreeNode(root: $0, children: nil) }
-        return ElementTreeNode(root: element, children: recursiveChildrenNodes)
+        return ElementTreeNode.webArea(webArea: element, elements: recursiveChildren, usedSearchKeys: true)
     }
     
     private func supportsChildrenThroughSearchPredicate() -> Bool {

@@ -34,7 +34,7 @@ struct Element {
     }
 }
 
-struct ElementTreeNode {
-    let root: Element
-    let children: [ElementTreeNode]?
+enum ElementTreeNode {
+    case generic(element: Element, children: [ElementTreeNode]?)
+    case webArea(webArea: Element, elements: [Element]?, usedSearchKeys: Bool)
 }

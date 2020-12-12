@@ -60,7 +60,15 @@ class FlattenElementTreeNode {
     }
     
     private func flatten(_ node: ElementTreeNode) -> Int {
-        let children = node.children ?? []
+        switch node {
+        case .generic(let element, let children):
+            return _flatten(element: element, children: children ?? [])
+        case .webArea(let webArea, let elements, let usedSearchKeys):
+            return _flattenWebArea(webArea: webArea, elements: elements ?? [], usedSearchKeys: usedSearchKeys)
+        }
+    }
+    
+    private func _flatten(element: Element, children: [ElementTreeNode]) -> Int {
         let childrenHintableElements = children
             .map { flatten($0) }
             .reduce(0, +)
@@ -69,17 +77,44 @@ class FlattenElementTreeNode {
             "AXShowMenu",
             "AXScrollToVisible",
         ]
-        let actions = Set(node.root.actions).subtracting(ignoredActions)
+        let actions = Set(element.actions).subtracting(ignoredActions)
         
         let isActionable = actions.count > 0
-        let isRowWithoutActionableChildren = childrenHintableElements == 0 && node.root.role == "AXRow"
+        let isRowWithoutActionableChildren = childrenHintableElements == 0 && element.role == "AXRow"
         let isHintable = isActionable || isRowWithoutActionableChildren
         
         if isHintable {
-            result.append(node.root)
+            result.append(element)
             return childrenHintableElements + 1
         }
         
         return childrenHintableElements
+    }
+    
+    private func _flattenWebArea(webArea: Element, elements: [Element], usedSearchKeys: Bool) -> Int {
+        if usedSearchKeys {
+            for e in elements {
+                result.append(e)
+            }
+            return elements.count
+        }
+        
+        
+        let ignoredActions: Set = [
+            "AXShowMenu",
+            "AXScrollToVisible",
+        ]
+        
+        let hintableElements = elements.filter { element in
+        let actions = Set(element.actions).subtracting(ignoredActions)
+        let isActionable = actions.count > 0
+            return isActionable
+        }
+        
+        for e in hintableElements {
+            result.append(e)
+        }
+        
+        return hintableElements.count
     }
 }

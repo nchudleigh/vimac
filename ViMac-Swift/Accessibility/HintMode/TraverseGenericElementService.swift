@@ -29,7 +29,7 @@ class TraverseGenericElementService : TraverseElementService {
             .map { traverseElement($0) }
             .compactMap({ $0 })
 
-        return ElementTreeNode.init(root: element, children: childrenNodes)
+        return ElementTreeNode.generic(element: element, children: childrenNodes)
     }
     
     private func traverseElement(_ element: Element) -> ElementTreeNode? {
