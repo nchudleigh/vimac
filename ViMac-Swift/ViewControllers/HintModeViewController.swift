@@ -13,7 +13,8 @@ import Carbon.HIToolbox
 import os
 
 class HintModeViewController: ModeViewController, NSTextFieldDelegate {
-    let applicationWindow: UIElement
+    let app: NSRunningApplication
+    let window: Element
     lazy var elements: Single<[Element]> = elementObservable().toArray()
     lazy var inputListeningTextField = instantiateInputListeningTextField()
     var hintViews: [HintView]?
@@ -23,8 +24,9 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     let originalMousePosition = NSEvent.mouseLocation
     let startTime = CFAbsoluteTimeGetCurrent()
 
-    init(applicationWindow: UIElement) {
-        self.applicationWindow = applicationWindow
+    init(app: NSRunningApplication, window: Element) {
+        self.app = app
+        self.window = window
         super.init()
     }
     
@@ -64,12 +66,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
             }
             
             let thread = Thread.init(block: {
-                guard let windowElement = Element.initialize(rawElement: self.applicationWindow.element) else {
-                    event(.success([]))
-                    return
-                }
-                
-                let service = QueryWindowService.init(windowElement: windowElement)
+                let service = QueryWindowService.init(windowElement: self.window)
                 let elements = try? service.perform()
                 event(.success(elements ?? []))
             })
@@ -88,29 +85,17 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
             }
             
             let thread = Thread.init(block: {
-                let appUIElementOptional: UIElement? = try? self.applicationWindow.attribute(.parent)
-                guard let appUIElement = appUIElementOptional else {
-                    event(.success([]))
-                    return
-                }
-                
-                let pidOptional = try? appUIElement.pid()
-                guard let pid = pidOptional else { return }
-                
-                let nsRunningAppOptional = NSRunningApplication(processIdentifier: pid)
-                guard let nsRunningApp = nsRunningAppOptional else { return }
-                
                 // as of 28e46b9cbe9a38e7c43c1eb1f0d8953d99bc5ef9,
                 // when one activates hint mode when the Vimac preference page is frontmost,
                 // the app crashes with EXC_BAD_INSTRUCTION when retrieving menu bar items attributes through Element.initialize
                 // I suspect that threading is the cause of crashing when reading attributes from your own app
-                let isVimac = nsRunningApp.bundleIdentifier == Bundle.main.bundleIdentifier
+                let isVimac = self.app.bundleIdentifier == Bundle.main.bundleIdentifier
                 if isVimac {
                     event(.success([]))
                     return
                 }
                 
-                let service = QueryMenuBarItemsService.init(applicationElement: appUIElement.element)
+                let service = QueryMenuBarItemsService.init(app: self.app)
                 let elements = try? service.perform()
                 event(.success(elements ?? []))
             })

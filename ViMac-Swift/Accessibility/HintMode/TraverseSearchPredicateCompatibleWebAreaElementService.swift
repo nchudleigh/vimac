@@ -22,7 +22,7 @@ class TraverseSearchPredicateCompatibleWebAreaElementService : TraverseElementSe
         self.containerElement = containerElement
     }
     
-    func perform() -> ElementTreeNode {        
+    func perform() -> ElementTreeNode {
         let recursiveChildren = try? getRecursiveChildrenThroughSearchPredicate()
         let recursiveChildrenNodes = recursiveChildren?
             .map { ElementTreeNode(root: $0, children: nil) }
