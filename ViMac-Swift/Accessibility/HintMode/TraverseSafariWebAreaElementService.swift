@@ -42,7 +42,6 @@ class TraverseSafariWebAreaElementService : TraverseElementService {
                 "AXGraphicSearchKey",
                 "AXLinkSearchKey",
                 "AXRadioGroupSearchKey",
-                "AXStaticTextSearchKey",
                 "AXTextFieldSearchKey"
             ]
         ]
