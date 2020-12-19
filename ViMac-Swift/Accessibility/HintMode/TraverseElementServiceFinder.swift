@@ -10,14 +10,20 @@ import Cocoa
 import AXSwift
 
 class TraverseElementServiceFinder {
+    let app: NSRunningApplication
     let element: Element
     
-    init(_ element: Element) {
+    init(app: NSRunningApplication, element: Element) {
+        self.app = app
         self.element = element
     }
     
     func find() -> TraverseElementService.Type {
         if element.role == "AXWebArea" && supportsChildrenThroughSearchPredicate() {
+            if app.bundleIdentifier == "com.apple.Safari" {
+                return TraverseSafariWebAreaElementService.self
+            }
+            
             return TraverseSearchPredicateCompatibleWebAreaElementService.self
         }
         

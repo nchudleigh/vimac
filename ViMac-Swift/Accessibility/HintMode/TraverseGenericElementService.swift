@@ -36,7 +36,7 @@ class TraverseGenericElementService : TraverseElementService {
     
     private func traverseElement(_ element: Element) -> ElementTreeNode? {
         TraverseElementServiceFinder
-            .init(element).find()
+            .init(app: app, element: element).find()
             .init(element: element, app: app, windowElement: windowElement, containerElement: childContainerElement).perform()
     }
     

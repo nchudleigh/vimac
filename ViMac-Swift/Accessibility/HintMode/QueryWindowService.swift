@@ -22,7 +22,7 @@ class QueryWindowService {
         let children = try getChildren()
         let childrenNodes = children?.map { child -> ElementTreeNode? in
             TraverseElementServiceFinder
-                .init(child).find()
+                .init(app: app, element: child).find()
                 .init(element: child, app: app, windowElement: window, containerElement: nil).perform()
         }
         

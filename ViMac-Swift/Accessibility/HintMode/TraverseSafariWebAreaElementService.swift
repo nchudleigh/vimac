@@ -1,15 +1,15 @@
 //
-//  TraverseWebAreaElementService.swift
+//  TraverseSafariWebAreaElementService.swift
 //  Vimac
 //
-//  Created by Dexter Leng on 6/9/20.
+//  Created by Dexter Leng on 19/12/20.
 //  Copyright © 2020 Dexter Leng. All rights reserved.
 //
 
 import Cocoa
 import AXSwift
 
-class TraverseSearchPredicateCompatibleWebAreaElementService : TraverseElementService {
+class TraverseSafariWebAreaElementService : TraverseElementService {
     let element: Element
     let app: NSRunningApplication
     let windowElement: Element
@@ -35,7 +35,16 @@ class TraverseSearchPredicateCompatibleWebAreaElementService : TraverseElementSe
             "AXImmediateDescendantsOnly": false,
             "AXResultsLimit": -1,
             "AXVisibleOnly": true,
-            "AXSearchKey": "AXAnyTypeSearchKey"
+            "AXSearchKey": [
+                "AXButtonSearchKey",
+                "AXCheckBoxSearchKey",
+                "AXControlSearchKey",
+                "AXGraphicSearchKey",
+                "AXLinkSearchKey",
+                "AXRadioGroupSearchKey",
+                "AXStaticTextSearchKey",
+                "AXTextFieldSearchKey"
+            ]
         ]
         let rawElements: [AXUIElement]? = try UIElement(element.rawElement).parameterizedAttribute("AXUIElementsForSearchPredicate", param: query)
         let elements = rawElements?
@@ -44,3 +53,4 @@ class TraverseSearchPredicateCompatibleWebAreaElementService : TraverseElementSe
         return elements
     }
 }
+
