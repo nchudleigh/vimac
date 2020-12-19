@@ -11,7 +11,7 @@ import Cocoa
 import Cocoa
 import AXSwift
 
-class TraverseWebAreaElementService : TraverseElementService {
+class TraverseSearchPredicateCompatibleWebAreaElementService : TraverseElementService {
     let element: Element
     let windowElement: Element
     let containerElement: Element?
@@ -22,20 +22,11 @@ class TraverseWebAreaElementService : TraverseElementService {
         self.containerElement = containerElement
     }
     
-    func perform() -> ElementTreeNode {
-        if !supportsChildrenThroughSearchPredicate() {
-            return TraverseGenericElementService.init(element: element, windowElement: windowElement, containerElement: containerElement).perform()
-        }
-        
+    func perform() -> ElementTreeNode {        
         let recursiveChildren = try? getRecursiveChildrenThroughSearchPredicate()
         let recursiveChildrenNodes = recursiveChildren?
             .map { ElementTreeNode(root: $0, children: nil) }
         return ElementTreeNode(root: element, children: recursiveChildrenNodes)
-    }
-    
-    private func supportsChildrenThroughSearchPredicate() -> Bool {
-        let parameterizedAttrs = try? UIElement(element.rawElement).parameterizedAttributesAsStrings()
-        return parameterizedAttrs?.contains("AXUIElementsForSearchPredicate") ?? false
     }
     
     private func getRecursiveChildrenThroughSearchPredicate() throws -> [Element]? {

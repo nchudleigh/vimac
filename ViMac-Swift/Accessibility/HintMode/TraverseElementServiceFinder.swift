@@ -7,6 +7,7 @@
 //
 
 import Cocoa
+import AXSwift
 
 class TraverseElementServiceFinder {
     let element: Element
@@ -16,11 +17,16 @@ class TraverseElementServiceFinder {
     }
     
     func find() -> TraverseElementService.Type {
-        if element.role == "AXWebArea" {
-            return TraverseWebAreaElementService.self
+        if element.role == "AXWebArea" && supportsChildrenThroughSearchPredicate() {
+            return TraverseSearchPredicateCompatibleWebAreaElementService.self
         }
         
         return TraverseGenericElementService.self
+    }
+    
+    private func supportsChildrenThroughSearchPredicate() -> Bool {
+        let parameterizedAttrs = try? UIElement(element.rawElement).parameterizedAttributesAsStrings()
+        return parameterizedAttrs?.contains("AXUIElementsForSearchPredicate") ?? false
     }
 }
 
