@@ -10,10 +10,12 @@ import Cocoa
 import AXSwift
 
 class QueryWindowService {
-    let windowElement: Element
+    let app: NSRunningApplication
+    let window: Element
     
-    init(windowElement: Element) {
-        self.windowElement = windowElement
+    init(app: NSRunningApplication, window: Element) {
+        self.app = app
+        self.window = window
     }
     
     func perform() throws -> [Element] {
@@ -21,7 +23,7 @@ class QueryWindowService {
         let childrenNodes = children?.map { child -> ElementTreeNode? in
             TraverseElementServiceFinder
                 .init(child).find()
-                .init(element: child, windowElement: windowElement, containerElement: nil).perform()
+                .init(element: child, app: app, windowElement: window, containerElement: nil).perform()
         }
         
         var elements: [Element] = []
@@ -35,7 +37,7 @@ class QueryWindowService {
     }
     
     private func getChildren() throws -> [Element]? {
-        let rawElements: [AXUIElement]? = try UIElement(windowElement.rawElement).attribute(.children)
+        let rawElements: [AXUIElement]? = try UIElement(window.rawElement).attribute(.children)
         return rawElements?
             .map { Element.initialize(rawElement: $0) }
             .compactMap({ $0 })

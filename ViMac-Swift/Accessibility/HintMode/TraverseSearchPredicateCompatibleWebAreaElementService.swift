@@ -13,11 +13,13 @@ import AXSwift
 
 class TraverseSearchPredicateCompatibleWebAreaElementService : TraverseElementService {
     let element: Element
+    let app: NSRunningApplication
     let windowElement: Element
     let containerElement: Element?
     
-    required init(element: Element, windowElement: Element, containerElement: Element?) {
+    required init(element: Element, app: NSRunningApplication, windowElement: Element, containerElement: Element?) {
         self.element = element
+        self.app = app
         self.windowElement = windowElement
         self.containerElement = containerElement
     }

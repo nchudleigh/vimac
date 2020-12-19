@@ -66,7 +66,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
             }
             
             let thread = Thread.init(block: {
-                let service = QueryWindowService.init(windowElement: self.window)
+                let service = QueryWindowService.init(app: self.app, window: self.window)
                 let elements = try? service.perform()
                 event(.success(elements ?? []))
             })
