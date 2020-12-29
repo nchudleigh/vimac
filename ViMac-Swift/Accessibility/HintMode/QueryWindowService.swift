@@ -61,27 +61,14 @@ class FlattenElementTreeNode {
         return result
     }
     
-    private func flatten(_ node: ElementTreeNode) -> Int {
-        let children = node.children ?? []
-        let childrenHintableElements = children
-            .map { flatten($0) }
-            .reduce(0, +)
-        
-        let ignoredActions: Set = [
-            "AXShowMenu",
-            "AXScrollToVisible",
-        ]
-        let actions = Set(node.root.actions).subtracting(ignoredActions)
-        
-        let isActionable = actions.count > 0
-        let isRowWithoutActionableChildren = childrenHintableElements == 0 && node.root.role == "AXRow"
-        let isHintable = isActionable || isRowWithoutActionableChildren
-        
-        if isHintable {
+    private func flatten(_ node: ElementTreeNode) {
+        if node.isHintable() {
             result.append(node.root)
-            return childrenHintableElements + 1
         }
         
-        return childrenHintableElements
+        let children = node.children ?? []
+        for child in children {
+            flatten(child)
+        }
     }
 }

@@ -25,8 +25,8 @@ class TraverseSafariWebAreaElementService : TraverseElementService {
     func perform() -> ElementTreeNode {
         let recursiveChildren = try? getRecursiveChildrenThroughSearchPredicate()
         let recursiveChildrenNodes = recursiveChildren?
-            .map { ElementTreeNode(root: $0, children: nil) }
-        return ElementTreeNode(root: element, children: recursiveChildrenNodes)
+            .map { SafariWebAreaElementTreeNode(root: $0, children: nil) }
+        return SafariWebAreaElementTreeNode(root: element, children: recursiveChildrenNodes)
     }
     
     private func getRecursiveChildrenThroughSearchPredicate() throws -> [Element]? {
