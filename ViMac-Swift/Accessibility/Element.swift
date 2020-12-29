@@ -76,6 +76,6 @@ class ElementTreeNode {
 
 class SafariWebAreaElementTreeNode : ElementTreeNode {
     override func isHintable() -> Bool {
-        return root.actions.count > 0
+        return true
     }
 }
