@@ -1,99 +1,108 @@
 import Cocoa
-import RxCocoa
-import RxSwift
 import Preferences
 
 final class HintModePreferenceViewController: NSViewController, NSTextFieldDelegate, PreferencePane {
     let preferencePaneIdentifier = PreferencePane.Identifier.hintMode
     let preferencePaneTitle = "Hint Mode"
     
-    override var nibName: NSNib.Name? { "HintModePreferenceViewController" }
-
-    @IBOutlet weak var hintModeShortcutView: MASShortcutView!
-    @IBOutlet weak var customCharactersView: NSTextField!
-    @IBOutlet weak var textSizeView: NSTextField!
-    @IBOutlet weak var gridView: NSGridView!
+    private var grid: NSGridView!
+    private var hintModeShortcut: MASShortcutView!
+    private var customCharactersField: NSTextField!
+    private var textSizeField: NSTextField!
     
-    let compositeDisposable = CompositeDisposable()
+    init() {
+        super.init(nibName: nil, bundle: nil)
+    }
     
-    let customCharactersViewSubject = PublishSubject<String>()
-    lazy var customCharactersViewObservable = customCharactersViewSubject.asObserver()
+    required init?(coder: NSCoder) {
+        fatalError()
+    }
     
-    let textSizeSubject = PublishSubject<String>()
-    lazy var textSizeObservable = textSizeSubject.asObserver()
-
+    override func loadView() {
+        self.view = NSView()
+        self.view.translatesAutoresizingMaskIntoConstraints = false
+    }
+    
     override func viewDidLoad() {
-        super.viewDidLoad()
+        grid = NSGridView(numberOfColumns: 2, rows: 1)
+        grid.column(at: 0).xPlacement = .trailing
+        grid.column(at: 1).width = 250
+        grid.translatesAutoresizingMaskIntoConstraints = false
         
-        hintModeShortcutView.associatedUserDefaultsKey = Utils.hintModeShortcutKey
+        let shortcutLabel = NSTextField(labelWithString: "Shortcut:")
+        hintModeShortcut = MASShortcutView()
+        hintModeShortcut.associatedUserDefaultsKey = Utils.hintModeShortcutKey
+        let shortcutRow: [NSView] = [shortcutLabel, hintModeShortcut]
+        grid.addRow(with: shortcutRow)
         
-        customCharactersView.stringValue = UserPreferences.HintMode.CustomCharactersProperty.readUnvalidated() ?? ""
+        let customCharactersLabel = NSTextField(labelWithString: "Custom Characters:")
+        customCharactersField = NSTextField()
+        customCharactersField.delegate = self
+        let customCharactersRow: [NSView] = [customCharactersLabel, customCharactersField]
+        grid.addRow(with: customCharactersRow)
         
-        textSizeView.stringValue = UserPreferences.HintMode.TextSizeProperty.readUnvalidated() ?? ""
+        let customCharactersHint1 = NSTextField(wrappingLabelWithString: "The characters placed beside UI Elements when hint mode is activated.")
+        customCharactersHint1.font = .labelFont(ofSize: 11)
+        customCharactersHint1.textColor = .secondaryLabelColor
+        grid.addRow(with: [NSGridCell.emptyContentView, customCharactersHint1])
         
-        compositeDisposable.insert(observeCustomCharactersChange())
-        compositeDisposable.insert(observeTextSizeChange())
-
-        textSizeView.delegate = self
-        customCharactersView.delegate = self
-    }
-
-    deinit {
-        compositeDisposable.dispose()
+        let customCharactersHint2 = NSTextField(wrappingLabelWithString: "Enter at least 6 unique characters.")
+        customCharactersHint2.font = .labelFont(ofSize: 11)
+        customCharactersHint2.textColor = .secondaryLabelColor
+        grid.addRow(with: [NSGridCell.emptyContentView, customCharactersHint2])
+        
+        let textSizeLabel = NSTextField(labelWithString: "Text Size:")
+        textSizeField = NSTextField()
+        textSizeField.delegate = self
+        textSizeField.placeholderString = UserPreferences.HintMode.TextSizeProperty.defaultValue
+        let textSizeRow: [NSView] = [textSizeLabel, textSizeField]
+        grid.addRow(with: textSizeRow)
+        
+        self.view.addSubview(grid)
+        
+        NSLayoutConstraint.activate([
+            grid.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 50),
+            grid.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -50),
+            grid.topAnchor.constraint(equalTo: view.topAnchor, constant: 20),
+            grid.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -20),
+        ])
     }
     
-    func observeCustomCharactersChange() -> Disposable {
-        return customCharactersViewObservable.bind(onNext: { characters in
-            UserPreferences.HintMode.CustomCharactersProperty.save(value: characters)
-        })
+    func onCustomCharactersFieldEndEditing() {
+        let value = customCharactersField.stringValue
+        let isValid = UserPreferences.HintMode.CustomCharactersProperty.isValid(value: value)
+        
+        if value.count > 0 && !isValid {
+            showInvalidValueDialog(value)
+        } else {
+            UserPreferences.HintMode.CustomCharactersProperty.save(value: value)
+        }
     }
     
-    func observeTextSizeChange() -> Disposable {
-        return textSizeObservable.bind(onNext: { textSize in
-            UserPreferences.HintMode.TextSizeProperty.save(value: textSize)
-        })
-    }
-}
+    func onTextSizeFieldEndEditing() {
+        let value = textSizeField.stringValue
+        let isValid = UserPreferences.HintMode.TextSizeProperty.isValid(value: value)
 
-extension HintModePreferenceViewController {
+        if value.count > 0 && !isValid {
+            showInvalidValueDialog(value)
+        } else {
+            UserPreferences.HintMode.TextSizeProperty.save(value: value)
+        }
+    }
     
-    func controlTextDidChange(_ notification: Notification) {
-        guard let textField = notification.object as? NSTextField else {
-            return
-        }
-        
-        if textField == customCharactersView {
-            customCharactersViewSubject.onNext(textField.stringValue)
-        }
-        
-        if textField == textSizeView {
-            textSizeSubject.onNext(textField.stringValue)
-        }
-    }
-}
-
-extension HintModePreferenceViewController {
     func controlTextDidEndEditing(_ notification: Notification) {
         guard let textField = notification.object as? NSTextField else {
             return
         }
         
-        if textField == customCharactersView {
-            let value = textField.stringValue
-            let isValid = UserPreferences.HintMode.CustomCharactersProperty.isValid(value: value)
-            
-            if value.count > 0 && !isValid {
-                showInvalidValueDialog(value)
-            }
+        if textField == customCharactersField {
+            onCustomCharactersFieldEndEditing()
+            return
         }
-        
-        if textField == textSizeView {
-            let value = textField.stringValue
-            let isValid = UserPreferences.HintMode.TextSizeProperty.isValid(value: value)
-            
-            if value.count > 0 && !isValid {
-                showInvalidValueDialog(value)
-            }
+
+        if textField == textSizeField {
+            onTextSizeFieldEndEditing()
+            return
         }
     }
     
