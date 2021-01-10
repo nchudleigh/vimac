@@ -38,6 +38,7 @@ final class HintModePreferenceViewController: NSViewController, NSTextFieldDeleg
         let customCharactersLabel = NSTextField(labelWithString: "Custom Characters:")
         customCharactersField = NSTextField()
         customCharactersField.delegate = self
+        customCharactersField.stringValue = UserPreferences.HintMode.CustomCharactersProperty.readUnvalidated() ?? ""
         let customCharactersRow: [NSView] = [customCharactersLabel, customCharactersField]
         grid.addRow(with: customCharactersRow)
         
@@ -55,6 +56,7 @@ final class HintModePreferenceViewController: NSViewController, NSTextFieldDeleg
         textSizeField = NSTextField()
         textSizeField.delegate = self
         textSizeField.placeholderString = UserPreferences.HintMode.TextSizeProperty.defaultValue
+        textSizeField.stringValue = UserPreferences.HintMode.TextSizeProperty.readUnvalidated() ?? ""
         let textSizeRow: [NSView] = [textSizeLabel, textSizeField]
         grid.addRow(with: textSizeRow)
         
