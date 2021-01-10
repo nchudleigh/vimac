@@ -1,48 +1,83 @@
 import Cocoa
-import RxCocoa
-import RxSwift
 import Preferences
 
 final class ScrollModePreferenceViewController: NSViewController, NSTextFieldDelegate, PreferencePane {
     let preferencePaneIdentifier = PreferencePane.Identifier.hintMode
     let preferencePaneTitle = "Scroll Mode"
     
-    override var nibName: NSNib.Name? { "ScrollModePreferenceViewController" }
+    private var grid: NSGridView!
+    private var shortcutView: MASShortcutView!
+    private var scrollKeysField: NSTextField!
+    private var scrollSensitivityView: NSSlider!
+    private var revHorizontalScrollView: NSButton!
+    private var revVerticalScrollView: NSButton!
     
-    @IBOutlet weak var shortcutView: MASShortcutView!
-    @IBOutlet weak var scrollModeKeysView: NSTextField!
-    @IBOutlet weak var scrollSensitivityView: NSSlider!
-    @IBOutlet weak var revHorizontalScrollView: NSButton!
-    @IBOutlet weak var revVerticalScrollView: NSButton!
-
-    let disposeBag = DisposeBag()
+    init() {
+        super.init(nibName: nil, bundle: nil)
+    }
     
-    let scrollKeysSubject = PublishSubject<String>()
-    lazy var scrollKeysObservable = scrollKeysSubject.asObserver()
+    required init?(coder: NSCoder) {
+        fatalError()
+    }
     
-    lazy var scrollSensitivityObservable = scrollSensitivityView.rx.value.map({ Int($0) })
+    override func loadView() {
+        self.view = NSView()
+        self.view.translatesAutoresizingMaskIntoConstraints = false
+    }
     
-    lazy var revHorizontalScrollObservable = revHorizontalScrollView.rx.state.map({ $0 == .on })
-    lazy var revVerticalScrollObservable = revVerticalScrollView.rx.state.map({ $0 == .on })
-
     override func viewDidLoad() {
-        super.viewDidLoad()
+        grid = NSGridView(numberOfColumns: 2, rows: 1)
+        grid.column(at: 0).xPlacement = .trailing
+        grid.column(at: 1).width = 250
+        grid.translatesAutoresizingMaskIntoConstraints = false
         
-        scrollModeKeysView.delegate = self
-        
+        let shortcutLabel = NSTextField(labelWithString: "Shortcut:")
+        shortcutView = MASShortcutView()
         shortcutView.associatedUserDefaultsKey = Utils.scrollModeShortcutKey
+        let shortcutRow: [NSView] = [shortcutLabel, shortcutView]
+        grid.addRow(with: shortcutRow)
         
-        scrollModeKeysView.stringValue = UserPreferences.ScrollMode.ScrollKeysProperty.readUnvalidated() ?? ""
+        let scrollKeysLabel = NSTextField(labelWithString: "Scroll Keys:")
+        scrollKeysField = NSTextField()
+        scrollKeysField.delegate = self
+        scrollKeysField.placeholderString = UserPreferences.ScrollMode.ScrollKeysProperty.defaultValue
+        scrollKeysField.stringValue = UserPreferences.ScrollMode.ScrollKeysProperty.readUnvalidated() ?? ""
+        let scrollKeysRow: [NSView] = [scrollKeysLabel, scrollKeysField]
+        grid.addRow(with: scrollKeysRow)
         
+        let scrollKeysHint1 = NSTextField(wrappingLabelWithString: "Format: {left}{down}{up}{right}{half-down}{half-up}")
+        scrollKeysHint1.font = .labelFont(ofSize: 11)
+        scrollKeysHint1.textColor = .secondaryLabelColor
+        grid.addRow(with: [NSGridCell.emptyContentView, scrollKeysHint1])
+        
+        let scrollSensitivityLabel = NSTextField(labelWithString: "Scroll Sensitivity:")
+        scrollSensitivityView = NSSlider()
+        scrollSensitivityView.minValue = 0
+        scrollSensitivityView.maxValue = 100
+        scrollSensitivityView.numberOfTickMarks = 10
         scrollSensitivityView.integerValue = UserPreferences.ScrollMode.ScrollSensitivityProperty.read()
+        scrollSensitivityView.target = self
+        scrollSensitivityView.action = #selector(onScrollSensitivityFieldEdit)
+        grid.addRow(with: [scrollSensitivityLabel, scrollSensitivityView])
         
+        let reverseScrollLabel = NSTextField(labelWithString: "Reverse Scroll:")
+        revHorizontalScrollView = NSButton(checkboxWithTitle: "Horizontal", target: self, action: #selector(onRevHorizontalScrollEdit))
         revHorizontalScrollView.state = UserPreferences.ScrollMode.ReverseHorizontalScrollProperty.read() ? .on : .off
+        grid.addRow(with: [reverseScrollLabel, revHorizontalScrollView])
+
+        revVerticalScrollView = NSButton(checkboxWithTitle: "Vertical", target: self, action: #selector(onRevVerticalScrollEdit))
         revVerticalScrollView.state = UserPreferences.ScrollMode.ReverseVerticalScrollProperty.read() ? .on : .off
+        grid.addRow(with: [NSGridCell.emptyContentView, revVerticalScrollView])
         
-        observeScrollModeKeys().disposed(by: disposeBag)
-        observeScrollSensitivity().disposed(by: disposeBag)
-        observeRevHorizontalScroll().disposed(by: disposeBag)
-        observeRevVerticalScroll().disposed(by: disposeBag)
+
+        self.view.addSubview(grid)
+        
+        NSLayoutConstraint.activate([
+            grid.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 50),
+            grid.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -50),
+            grid.topAnchor.constraint(equalTo: view.topAnchor, constant: 20),
+            grid.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -20),
+        ])
     }
     
     func isScrollKeysValid(keys: String) -> Bool {
@@ -51,62 +86,45 @@ final class ScrollModePreferenceViewController: NSViewController, NSTextFieldDel
         return isCountValid && areKeysUnique
     }
 
-    func observeScrollModeKeys() -> Disposable {
-        return scrollKeysObservable.bind(onNext: { keys in
-            UserPreferences.ScrollMode.ScrollKeysProperty.save(value: keys)
-        })
+    func onScrollKeysFieldEndEditing() {
+        let value = scrollKeysField.stringValue
+        let isValid = isScrollKeysValid(keys: value)
+        
+        if value.count > 0 && !isValid {
+            showInvalidValueDialog(value)
+        } else {
+            UserPreferences.ScrollMode.ScrollKeysProperty.save(value: value)
+        }
     }
     
-    func observeScrollSensitivity() -> Disposable {
-        return scrollSensitivityObservable.bind(onNext: { sensitivity in
-            let isValid = UserPreferences.ScrollMode.ScrollSensitivityProperty.isValid(value: sensitivity)
-            
-            if !isValid {
-                return
-            }
-            
-            UserPreferences.ScrollMode.ScrollSensitivityProperty.save(value: sensitivity)
-        })
-    }
-    
-    func observeRevHorizontalScroll() -> Disposable {
-        return revHorizontalScrollObservable.bind(onNext: { isRev in
-            UserPreferences.ScrollMode.ReverseHorizontalScrollProperty.save(value: isRev)
-        })
-    }
-    
-    func observeRevVerticalScroll() -> Disposable {
-        return revVerticalScrollObservable.bind(onNext: { isRev in
-            UserPreferences.ScrollMode.ReverseVerticalScrollProperty.save(value: isRev)
-        })
-    }
-}
-
-extension ScrollModePreferenceViewController {
-    func controlTextDidChange(_ notification: Notification) {
-        guard let textField = notification.object as? NSTextField else {
+    @objc func onScrollSensitivityFieldEdit() {
+        let value = scrollSensitivityView.integerValue
+        let isValid = UserPreferences.ScrollMode.ScrollSensitivityProperty.isValid(value: value)
+        
+        if !isValid {
             return
         }
-        
-        if textField == scrollModeKeysView {
-            scrollKeysSubject.onNext(textField.stringValue)
-        }
+        UserPreferences.ScrollMode.ScrollSensitivityProperty.save(value: value)
     }
-}
+    
+    @objc func onRevHorizontalScrollEdit() {
+        let value = revHorizontalScrollView.state == .on
+        UserPreferences.ScrollMode.ReverseHorizontalScrollProperty.save(value: value)
+    }
 
-extension ScrollModePreferenceViewController {
+    @objc func onRevVerticalScrollEdit() {
+        let value = revVerticalScrollView.state == .on
+        UserPreferences.ScrollMode.ReverseVerticalScrollProperty.save(value: value)
+    }
+    
     func controlTextDidEndEditing(_ notification: Notification) {
         guard let textField = notification.object as? NSTextField else {
             return
         }
         
-        if textField == scrollModeKeysView {
-            let value = textField.stringValue
-            let isValid = isScrollKeysValid(keys: value)
-            
-            if value.count > 0 && !isValid {
-                showInvalidValueDialog(value)
-            }
+        if textField == scrollKeysField {
+            onScrollKeysFieldEndEditing()
+            return
         }
     }
     
