@@ -41,6 +41,8 @@
 		E26981B523C99DF900E46217 /* WelcomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26981B423C99DF900E46217 /* WelcomeViewController.swift */; };
 		E26981B923C9E31600E46217 /* InputSourceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26981B823C9E31600E46217 /* InputSourceManager.swift */; };
 		E26981BB23C9E35D00E46217 /* TISInputSourceExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26981BA23C9E35D00E46217 /* TISInputSourceExtension.swift */; };
+		E270C0E3259F3B52003A48FB /* GlobalEventTap.swift in Sources */ = {isa = PBXBuildFile; fileRef = E270C0E2259F3B52003A48FB /* GlobalEventTap.swift */; };
+		E270C0E5259F5D98003A48FB /* KeySequenceListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = E270C0E4259F5D98003A48FB /* KeySequenceListener.swift */; };
 		E270F4212503E7A800AD305A /* Element.swift in Sources */ = {isa = PBXBuildFile; fileRef = E270F4202503E7A800AD305A /* Element.swift */; };
 		E270F5C52504D8DE00AD305A /* TraverseElementServiceFinder.swift in Sources */ = {isa = PBXBuildFile; fileRef = E270F5C42504D8DE00AD305A /* TraverseElementServiceFinder.swift */; };
 		E270F5C92504D9AE00AD305A /* TraverseGenericElementService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E270F5C82504D9AE00AD305A /* TraverseGenericElementService.swift */; };
@@ -161,6 +163,8 @@
 		E26981B423C99DF900E46217 /* WelcomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeViewController.swift; sourceTree = "<group>"; };
 		E26981B823C9E31600E46217 /* InputSourceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputSourceManager.swift; sourceTree = "<group>"; };
 		E26981BA23C9E35D00E46217 /* TISInputSourceExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TISInputSourceExtension.swift; sourceTree = "<group>"; };
+		E270C0E2259F3B52003A48FB /* GlobalEventTap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalEventTap.swift; sourceTree = "<group>"; };
+		E270C0E4259F5D98003A48FB /* KeySequenceListener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeySequenceListener.swift; sourceTree = "<group>"; };
 		E270F4202503E7A800AD305A /* Element.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Element.swift; sourceTree = "<group>"; };
 		E270F5C42504D8DE00AD305A /* TraverseElementServiceFinder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TraverseElementServiceFinder.swift; sourceTree = "<group>"; };
 		E270F5C82504D9AE00AD305A /* TraverseGenericElementService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TraverseGenericElementService.swift; sourceTree = "<group>"; };
@@ -351,6 +355,8 @@
 				E20D0CB325581AEF00A5CAEE /* Trie.swift */,
 				E20D0CB725583DD200A5CAEE /* InputState.swift */,
 				E24D0BB5256BEEAE0049EA0A /* ScrollModeInputState.swift */,
+				E270C0E2259F3B52003A48FB /* GlobalEventTap.swift */,
+				E270C0E4259F5D98003A48FB /* KeySequenceListener.swift */,
 			);
 			path = "ViMac-Swift";
 			sourceTree = "<group>";
@@ -712,9 +718,11 @@
 				E267778E25613A900034B131 /* ScrollModeActiveViewController.swift in Sources */,
 				E26981B323C99DBB00E46217 /* WelcomeWindowController.swift in Sources */,
 				E26172242322968500E396CA /* AppDelegate.swift in Sources */,
+				E270C0E3259F3B52003A48FB /* GlobalEventTap.swift in Sources */,
 				E2677790256187230034B131 /* ScrollModeActiveScrollAreaViewController.swift in Sources */,
 				E2B98A46258DF15C00A90B2F /* TraverseSafariWebAreaElementService.swift in Sources */,
 				E2677780255FE0420034B131 /* QueryScrollAreasService.swift in Sources */,
+				E270C0E5259F5D98003A48FB /* KeySequenceListener.swift in Sources */,
 				E23140D62506781E004D1B96 /* QueryMenuBarItemsService.swift in Sources */,
 				E2F6C9AD232DE89F00F2975B /* HintView.swift in Sources */,
 			);
