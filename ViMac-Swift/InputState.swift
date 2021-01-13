@@ -70,7 +70,10 @@ class InputState {
         if state != .matched {
             throw StateMachineError.invalidTransition
         }
-        
+        return typed()
+    }
+    
+    private func typed() -> [Character] {
         var seqRev: [Character] = []
         var s: TrieNode? = self.currentTrieNode
         while s != nil {
