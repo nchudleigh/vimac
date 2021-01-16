@@ -16,15 +16,41 @@ protocol Coordinator {
 }
 
 class ModeCoordinator : Coordinator {
+    let disposeBag = DisposeBag()
+    
     var priorKBLayout: InputSource?
     var forceKBLayout: InputSource?
     var forceKBLayoutObservation: NSKeyValueObservation?
+    
+    let scrollModeKeySequence: [Character] = ["j", "k"]
+    let hintModeKeySequence: [Character] = ["f", "d"]
+    private let keySequenceListener: VimacKeySequenceListener
     
     var windowController: OverlayWindowController
     
     init(windowController: OverlayWindowController) {
         self.windowController = windowController
+
+        self.keySequenceListener = VimacKeySequenceListener()
+        self.keySequenceListener.start()
+        
         self.forceKBLayoutObservation = observeForceKBInputSource()
+        
+        disposeBag.insert(keySequenceListener.scrollMode.bind(onNext: { [weak self] _ in
+            self?.setScrollMode()
+        }))
+        
+        disposeBag.insert(keySequenceListener.hintMode.bind(onNext: { [weak self] _ in
+            self?.setHintMode()
+        }))
+    }
+
+    func onKeySequenceTyped(sequence: [Character]) {
+        if sequence == scrollModeKeySequence {
+            setScrollMode()
+        } else if sequence == hintModeKeySequence {
+            setHintMode()
+        }
     }
     
     func exitMode() {
@@ -39,6 +65,8 @@ class ModeCoordinator : Coordinator {
         vc.view.removeFromSuperview()
         self.windowController.window?.contentViewController = nil
         self.windowController.close()
+        
+        keySequenceListener.start()
     }
     
     func setViewController(vc: ModeViewController, screenFrame: NSRect) {
@@ -48,7 +76,7 @@ class ModeCoordinator : Coordinator {
         self.windowController.showWindow(nil)
         self.windowController.window?.makeKeyAndOrderFront(nil)
     }
-    
+
     func setScrollMode() {
         guard let frontmostApp = NSWorkspace.shared.frontmostApplication,
             let focusedWindow = focusedWindow(app: frontmostApp) else {
@@ -62,9 +90,10 @@ class ModeCoordinator : Coordinator {
         if let forceKBLayout = self.forceKBLayout {
             forceKBLayout.select()
         }
-
         let vc = ScrollModeViewController.init(window: focusedWindow)
         self.setViewController(vc: vc, screenFrame: screenFrame)
+        
+        keySequenceListener.stop()
     }
     
     func setHintMode() {
@@ -83,6 +112,8 @@ class ModeCoordinator : Coordinator {
 
         let vc = HintModeViewController.init(app: frontmostApp, window: focusedWindow)
         self.setViewController(vc: vc, screenFrame: screenFrame)
+        
+        keySequenceListener.stop()
     }
     
     func observeForceKBInputSource() -> NSKeyValueObservation {

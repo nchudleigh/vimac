@@ -16,10 +16,14 @@ class KeySequenceListener {
     private var typed: [CGEvent] = []
     private var sequences: [[Character]] = []
     private var timer: Timer?
-    private let delayResetFreq: TimeInterval = 0.25
+    private let resetDelay: TimeInterval
     
     private let matchRelay: PublishRelay<([Character])> = .init()
     lazy var matchEvents = matchRelay.asObservable()
+    
+    init(resetDelay: TimeInterval = 0.25) {
+        self.resetDelay = resetDelay
+    }
 
     func registerSequence(seq: [Character]) throws -> Bool {
         let success = try inputState.addWord(seq)
@@ -28,6 +32,11 @@ class KeySequenceListener {
         }
         sequences.append(seq)
         return true
+    }
+    
+    func started() -> Bool {
+        guard let eventTap = eventTap else { return false }
+        return eventTap.enabled()
     }
     
     func start() {
@@ -43,27 +52,28 @@ class KeySequenceListener {
     
     func stop() {
         eventTap?.disable()
+        eventTap = nil
     }
     
     private func onEvent(event: CGEvent) -> CGEvent? {
         guard let nsEvent = NSEvent(cgEvent: event) else {
-            reset()
+            resetInput()
             return event
         }
         
         let modifiersPresent = nsEvent.modifierFlags.rawValue != 256
         if modifiersPresent {
-            reset()
+            resetInput()
             return event
         }
 
         guard let c = nsEvent.characters?.first else {
-            reset()
+            resetInput()
             return event
         }
         
         if nsEvent.isARepeat {
-            reset()
+            resetInput()
             return event
         }
 
@@ -75,17 +85,17 @@ class KeySequenceListener {
             return nil
         } else if inputState.state == .matched {
             onMatch()
-            reset()
+            resetInput()
             return nil
         } else if inputState.state == .deadend {
             // returning the event to the tap should be faster than emitting it.
             if typed.count == 1 {
                 let e = typed.first!
-                reset()
+                resetInput()
                 return e
             }
             emitTyped()
-            reset()
+            resetInput()
             return nil
         } else {
             fatalError()
@@ -107,18 +117,18 @@ class KeySequenceListener {
         }
     }
     
-    private func reset() {
+    private func resetInput() {
         typed = []
-        inputState.reset()
+        inputState.resetInput()
         timer?.invalidate()
     }
     
     @objc private func onTimeout() {
         emitTyped()
-        reset()
+        resetInput()
     }
     
     private func setTimeout() {
-        self.timer = Timer.scheduledTimer(timeInterval: delayResetFreq, target: self, selector: #selector(onTimeout), userInfo: nil, repeats: false)
+        self.timer = Timer.scheduledTimer(timeInterval: resetDelay, target: self, selector: #selector(onTimeout), userInfo: nil, repeats: false)
     }
 }

@@ -56,6 +56,7 @@
 		E279535124962E8D006D8D7A /* ChunkyScroller.swift in Sources */ = {isa = PBXBuildFile; fileRef = E279535024962E8C006D8D7A /* ChunkyScroller.swift */; };
 		E2795353249633DE006D8D7A /* Scroller.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2795352249633DE006D8D7A /* Scroller.swift */; };
 		E28867F0235F54F2001691A5 /* Vimac.icns in Resources */ = {isa = PBXBuildFile; fileRef = E28867EF235F54F1001691A5 /* Vimac.icns */; };
+		E28CB6A825B02A8200554D00 /* VimacKeySequenceListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = E28CB6A725B02A8200554D00 /* VimacKeySequenceListener.swift */; };
 		E290EF4B24F93343004B1A83 /* QueryWindowService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E290EF4A24F93342004B1A83 /* QueryWindowService.swift */; };
 		E2B3F64B24F24B9800FD5594 /* HintModeInputListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2B3F64A24F24B9800FD5594 /* HintModeInputListener.swift */; };
 		E2B98A46258DF15C00A90B2F /* TraverseSafariWebAreaElementService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2B98A45258DF15C00A90B2F /* TraverseSafariWebAreaElementService.swift */; };
@@ -177,6 +178,7 @@
 		E279535024962E8C006D8D7A /* ChunkyScroller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChunkyScroller.swift; sourceTree = "<group>"; };
 		E2795352249633DE006D8D7A /* Scroller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scroller.swift; sourceTree = "<group>"; };
 		E28867EF235F54F1001691A5 /* Vimac.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Vimac.icns; sourceTree = SOURCE_ROOT; };
+		E28CB6A725B02A8200554D00 /* VimacKeySequenceListener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VimacKeySequenceListener.swift; sourceTree = "<group>"; };
 		E290EF4A24F93342004B1A83 /* QueryWindowService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryWindowService.swift; sourceTree = "<group>"; };
 		E2B3F64A24F24B9800FD5594 /* HintModeInputListener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HintModeInputListener.swift; sourceTree = "<group>"; };
 		E2B98A45258DF15C00A90B2F /* TraverseSafariWebAreaElementService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TraverseSafariWebAreaElementService.swift; sourceTree = "<group>"; };
@@ -357,6 +359,7 @@
 				E24D0BB5256BEEAE0049EA0A /* ScrollModeInputState.swift */,
 				E270C0E2259F3B52003A48FB /* GlobalEventTap.swift */,
 				E270C0E4259F5D98003A48FB /* KeySequenceListener.swift */,
+				E28CB6A725B02A8200554D00 /* VimacKeySequenceListener.swift */,
 			);
 			path = "ViMac-Swift";
 			sourceTree = "<group>";
@@ -706,6 +709,7 @@
 				E266D916248AAC99005A261F /* UserPreferences.swift in Sources */,
 				E2C29566234DE09C001A38D6 /* ModeCoordinator.swift in Sources */,
 				E2C29562234DD7F8001A38D6 /* OverlayWindowController.swift in Sources */,
+				E28CB6A825B02A8200554D00 /* VimacKeySequenceListener.swift in Sources */,
 				E229E57A2482ABAF00A558D3 /* ScrollModePreferenceViewController.swift in Sources */,
 				E2069700232A52EA001EFDB2 /* AlphabetHints.swift in Sources */,
 				E25BBB60250CD28600D11213 /* ObserveApplicationNotificationService.swift in Sources */,
