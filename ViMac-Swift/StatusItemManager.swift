@@ -16,6 +16,7 @@ class StatusItemManager: NSMenu, NSMenuDelegate {
     lazy var controller = PreferencesWindowController(
         preferencePanes: [
             GeneralPreferenceViewController(),
+            BindingsPreferenceViewController(),
             HintModePreferenceViewController(),
             ScrollModePreferenceViewController(),
         ],

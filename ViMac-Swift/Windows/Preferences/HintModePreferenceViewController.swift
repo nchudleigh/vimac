@@ -6,7 +6,6 @@ final class HintModePreferenceViewController: NSViewController, NSTextFieldDeleg
     let preferencePaneTitle = "Hint Mode"
     
     private var grid: NSGridView!
-    private var hintModeShortcut: MASShortcutView!
     private var customCharactersField: NSTextField!
     private var textSizeField: NSTextField!
     
@@ -28,12 +27,6 @@ final class HintModePreferenceViewController: NSViewController, NSTextFieldDeleg
         grid.column(at: 0).xPlacement = .trailing
         grid.column(at: 1).width = 250
         grid.translatesAutoresizingMaskIntoConstraints = false
-        
-        let shortcutLabel = NSTextField(labelWithString: "Shortcut:")
-        hintModeShortcut = MASShortcutView()
-        hintModeShortcut.associatedUserDefaultsKey = Utils.hintModeShortcutKey
-        let shortcutRow: [NSView] = [shortcutLabel, hintModeShortcut]
-        grid.addRow(with: shortcutRow)
         
         let customCharactersLabel = NSTextField(labelWithString: "Custom Characters:")
         customCharactersField = NSTextField()

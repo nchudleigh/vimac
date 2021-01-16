@@ -65,6 +65,7 @@
 		E2DFF5AB24815C5800B4090D /* PreferencesPaneIdentifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2DFF5AA24815C5800B4090D /* PreferencesPaneIdentifiers.swift */; };
 		E2DFF5AD24815D3E00B4090D /* GeneralPreferenceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2DFF5AC24815D3E00B4090D /* GeneralPreferenceViewController.swift */; };
 		E2DFF5B12481693800B4090D /* HintModePreferenceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2DFF5B02481693800B4090D /* HintModePreferenceViewController.swift */; };
+		E2F15BBF25B2D65000E2F29E /* BindingsPreferenceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2F15BBE25B2D65000E2F29E /* BindingsPreferenceViewController.swift */; };
 		E2F6C9A3232CE37E00F2975B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E26172292322968700E396CA /* Main.storyboard */; };
 		E2F6C9AD232DE89F00F2975B /* HintView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2F6C9AC232DE89F00F2975B /* HintView.swift */; };
 		E2F6C9AF232DEA1800F2975B /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2F6C9AE232DEA1800F2975B /* Utils.swift */; };
@@ -184,6 +185,7 @@
 		E2DFF5AA24815C5800B4090D /* PreferencesPaneIdentifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesPaneIdentifiers.swift; sourceTree = "<group>"; };
 		E2DFF5AC24815D3E00B4090D /* GeneralPreferenceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneralPreferenceViewController.swift; sourceTree = "<group>"; };
 		E2DFF5B02481693800B4090D /* HintModePreferenceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HintModePreferenceViewController.swift; sourceTree = "<group>"; };
+		E2F15BBE25B2D65000E2F29E /* BindingsPreferenceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BindingsPreferenceViewController.swift; sourceTree = "<group>"; };
 		E2F6C9AC232DE89F00F2975B /* HintView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HintView.swift; sourceTree = "<group>"; };
 		E2F6C9AE232DEA1800F2975B /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		E3838C26CF2EE35337E477D6 /* Pods_VimacTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_VimacTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -258,6 +260,7 @@
 				E2DFF5AC24815D3E00B4090D /* GeneralPreferenceViewController.swift */,
 				E2DFF5B02481693800B4090D /* HintModePreferenceViewController.swift */,
 				E229E5792482ABAF00A558D3 /* ScrollModePreferenceViewController.swift */,
+				E2F15BBE25B2D65000E2F29E /* BindingsPreferenceViewController.swift */,
 			);
 			path = Preferences;
 			sourceTree = "<group>";
@@ -676,6 +679,7 @@
 				E2DFF5AB24815C5800B4090D /* PreferencesPaneIdentifiers.swift in Sources */,
 				E2C29571234E19E4001A38D6 /* HintModeViewController.swift in Sources */,
 				E279534B2494C534006D8D7A /* InputListener.swift in Sources */,
+				E2F15BBF25B2D65000E2F29E /* BindingsPreferenceViewController.swift in Sources */,
 				E26981B923C9E31600E46217 /* InputSourceManager.swift in Sources */,
 				E2DFF5B12481693800B4090D /* HintModePreferenceViewController.swift in Sources */,
 				E2F6C9AF232DEA1800F2975B /* Utils.swift in Sources */,
