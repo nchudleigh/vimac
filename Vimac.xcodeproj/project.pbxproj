@@ -17,7 +17,6 @@
 		E20D0CB825583DD200A5CAEE /* InputState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20D0CB725583DD200A5CAEE /* InputState.swift */; };
 		E225BD1D233292B800ECDEF4 /* StatusItemManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E225BD1C233292B800ECDEF4 /* StatusItemManager.swift */; };
 		E229E57A2482ABAF00A558D3 /* ScrollModePreferenceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E229E5792482ABAF00A558D3 /* ScrollModePreferenceViewController.swift */; };
-		E229E57C2482ABC300A558D3 /* ScrollModePreferenceViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = E229E57B2482ABC300A558D3 /* ScrollModePreferenceViewController.xib */; };
 		E23140D62506781E004D1B96 /* QueryMenuBarItemsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E23140D52506781E004D1B96 /* QueryMenuBarItemsService.swift */; };
 		E23140D825067A46004D1B96 /* QueryMenuBarExtrasService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E23140D725067A46004D1B96 /* QueryMenuBarExtrasService.swift */; };
 		E23140DA2507B2C1004D1B96 /* QueryNotificationCenterItemsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E23140D92507B2C1004D1B96 /* QueryNotificationCenterItemsService.swift */; };
@@ -65,9 +64,7 @@
 		E2C3221E23BC828C00508B44 /* HideCursorGlobally.m in Sources */ = {isa = PBXBuildFile; fileRef = E2C3221D23BC828C00508B44 /* HideCursorGlobally.m */; };
 		E2DFF5AB24815C5800B4090D /* PreferencesPaneIdentifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2DFF5AA24815C5800B4090D /* PreferencesPaneIdentifiers.swift */; };
 		E2DFF5AD24815D3E00B4090D /* GeneralPreferenceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2DFF5AC24815D3E00B4090D /* GeneralPreferenceViewController.swift */; };
-		E2DFF5AF2481638F00B4090D /* GeneralPreferenceViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = E2DFF5AE2481638F00B4090D /* GeneralPreferenceViewController.xib */; };
 		E2DFF5B12481693800B4090D /* HintModePreferenceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2DFF5B02481693800B4090D /* HintModePreferenceViewController.swift */; };
-		E2DFF5B92482413400B4090D /* HintModePreferenceViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = E2DFF5B82482413400B4090D /* HintModePreferenceViewController.xib */; };
 		E2F6C9A3232CE37E00F2975B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E26172292322968700E396CA /* Main.storyboard */; };
 		E2F6C9AD232DE89F00F2975B /* HintView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2F6C9AC232DE89F00F2975B /* HintView.swift */; };
 		E2F6C9AF232DEA1800F2975B /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2F6C9AE232DEA1800F2975B /* Utils.swift */; };
@@ -131,7 +128,6 @@
 		E20D0CB725583DD200A5CAEE /* InputState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputState.swift; sourceTree = "<group>"; };
 		E225BD1C233292B800ECDEF4 /* StatusItemManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusItemManager.swift; sourceTree = "<group>"; };
 		E229E5792482ABAF00A558D3 /* ScrollModePreferenceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollModePreferenceViewController.swift; sourceTree = "<group>"; };
-		E229E57B2482ABC300A558D3 /* ScrollModePreferenceViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ScrollModePreferenceViewController.xib; sourceTree = "<group>"; };
 		E23140D52506781E004D1B96 /* QueryMenuBarItemsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryMenuBarItemsService.swift; sourceTree = "<group>"; };
 		E23140D725067A46004D1B96 /* QueryMenuBarExtrasService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryMenuBarExtrasService.swift; sourceTree = "<group>"; };
 		E23140D92507B2C1004D1B96 /* QueryNotificationCenterItemsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryNotificationCenterItemsService.swift; sourceTree = "<group>"; };
@@ -187,9 +183,7 @@
 		E2C3221D23BC828C00508B44 /* HideCursorGlobally.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HideCursorGlobally.m; sourceTree = "<group>"; };
 		E2DFF5AA24815C5800B4090D /* PreferencesPaneIdentifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesPaneIdentifiers.swift; sourceTree = "<group>"; };
 		E2DFF5AC24815D3E00B4090D /* GeneralPreferenceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneralPreferenceViewController.swift; sourceTree = "<group>"; };
-		E2DFF5AE2481638F00B4090D /* GeneralPreferenceViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = GeneralPreferenceViewController.xib; sourceTree = "<group>"; };
 		E2DFF5B02481693800B4090D /* HintModePreferenceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HintModePreferenceViewController.swift; sourceTree = "<group>"; };
-		E2DFF5B82482413400B4090D /* HintModePreferenceViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = HintModePreferenceViewController.xib; sourceTree = "<group>"; };
 		E2F6C9AC232DE89F00F2975B /* HintView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HintView.swift; sourceTree = "<group>"; };
 		E2F6C9AE232DEA1800F2975B /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		E3838C26CF2EE35337E477D6 /* Pods_VimacTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_VimacTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -262,11 +256,8 @@
 			children = (
 				E2DFF5AA24815C5800B4090D /* PreferencesPaneIdentifiers.swift */,
 				E2DFF5AC24815D3E00B4090D /* GeneralPreferenceViewController.swift */,
-				E2DFF5AE2481638F00B4090D /* GeneralPreferenceViewController.xib */,
 				E2DFF5B02481693800B4090D /* HintModePreferenceViewController.swift */,
-				E2DFF5B82482413400B4090D /* HintModePreferenceViewController.xib */,
 				E229E5792482ABAF00A558D3 /* ScrollModePreferenceViewController.swift */,
-				E229E57B2482ABC300A558D3 /* ScrollModePreferenceViewController.xib */,
 			);
 			path = Preferences;
 			sourceTree = "<group>";
@@ -525,9 +516,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E2DFF5AF2481638F00B4090D /* GeneralPreferenceViewController.xib in Resources */,
-				E229E57C2482ABC300A558D3 /* ScrollModePreferenceViewController.xib in Resources */,
-				E2DFF5B92482413400B4090D /* HintModePreferenceViewController.xib in Resources */,
 				E26172282322968600E396CA /* Assets.xcassets in Resources */,
 				E28867F0235F54F2001691A5 /* Vimac.icns in Resources */,
 				E2F6C9A3232CE37E00F2975B /* Main.storyboard in Resources */,

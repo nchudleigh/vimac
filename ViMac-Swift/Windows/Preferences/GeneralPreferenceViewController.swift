@@ -6,29 +6,59 @@ import LaunchAtLogin
 final class GeneralPreferenceViewController: NSViewController, PreferencePane {
     let preferencePaneIdentifier = PreferencePane.Identifier.general
     let preferencePaneTitle = "General"
-
-    override var nibName: NSNib.Name? { "GeneralPreferenceViewController" }
-
-    @IBOutlet weak var forceKBLayoutView: NSPopUpButton!
-    @IBOutlet weak var launchAtLoginView: NSButton!
+    
+    private var grid: NSGridView!
+    private var forceKBLayoutView: NSPopUpButton!
+    private var launchAtLoginView: NSButton!
     
     let inputSources = InputSourceManager.inputSources
-    
-    let disposeBag = DisposeBag()
-    
-    lazy var launchAtLoginObservable = launchAtLoginView.rx.state.map({ $0 == .on })
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        setupForceKeyboardLayoutMenu()
-        
-        launchAtLoginView.state = readShouldLaunchAtLogin() ? .on : .off
-        
-        observeLaunchAtLogin().disposed(by: disposeBag)
+    init() {
+        super.init(nibName: nil, bundle: nil)
     }
     
-    func setupForceKeyboardLayoutMenu() {
+    required init?(coder: NSCoder) {
+        fatalError()
+    }
+    
+    override func loadView() {
+        self.view = NSView()
+        self.view.translatesAutoresizingMaskIntoConstraints = false
+    }
+    
+    override func viewDidLoad() {
+        grid = NSGridView(numberOfColumns: 2, rows: 1)
+        grid.column(at: 0).xPlacement = .trailing
+        grid.column(at: 1).width = 250
+        grid.translatesAutoresizingMaskIntoConstraints = false
+        
+        populateGrid()
+        
+        self.view.addSubview(grid)
+        
+        NSLayoutConstraint.activate([
+            grid.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 50),
+            grid.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -50),
+            grid.topAnchor.constraint(equalTo: view.topAnchor, constant: 20),
+            grid.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -20),
+        ])
+    }
+    
+    private func populateGrid() {
+        let forceKBLayoutLabel = NSTextField(labelWithString: "Force Keyboard Layout:")
+        forceKBLayoutView = createForceKBLayoutView()
+        forceKBLayoutView.action = #selector(onForceKBLayoutChange)
+        selectActiveForceKBLayout()
+        grid.addRow(with: [forceKBLayoutLabel, forceKBLayoutView])
+        
+        let launchAtLoginLabel = NSTextField(labelWithString: "Startup:")
+        launchAtLoginView = NSButton(checkboxWithTitle: "Launch at Login", target: self, action: #selector(onLaunchAtLoginChange))
+        launchAtLoginView.state = readShouldLaunchAtLogin() ? .on : .off
+        grid.addRow(with: [launchAtLoginLabel, launchAtLoginView])
+    }
+    
+    private func createForceKBLayoutView() -> NSPopUpButton {
+        let view = NSPopUpButton()
         // represents disabled
         let emptyMenuItem = NSMenuItem.init()
         emptyMenuItem.title = ""
@@ -41,13 +71,13 @@ final class GeneralPreferenceViewController: NSViewController, PreferencePane {
         })
         
         for menu in [emptyMenuItem] + menuItems {
-            forceKBLayoutView.menu?.addItem(menu)
+            view.menu?.addItem(menu)
         }
-        
-        selectActiveForceKBLayout()
+
+        return view
     }
     
-    func selectActiveForceKBLayout() {
+    private func selectActiveForceKBLayout() {
         let currentForcedKeyboardLayoutId = readForceKeyboardLayoutId()
         
         if currentForcedKeyboardLayoutId == nil {
@@ -64,16 +94,6 @@ final class GeneralPreferenceViewController: NSViewController, PreferencePane {
         }
         
         forceKBLayoutView.selectItem(at: i)
-    }
-    
-    func readShouldLaunchAtLogin() -> Bool {
-        return UserDefaults.standard.bool(forKey: Utils.shouldLaunchOnStartupKey)
-    }
-    
-    func saveShouldLaunchAtLogin(enabled: Bool) {
-        UserDefaults.standard.set(enabled, forKey: Utils.shouldLaunchOnStartupKey)
-        
-        LaunchAtLogin.isEnabled = enabled
     }
     
     func readForceKeyboardLayoutId() -> String? {
@@ -93,16 +113,24 @@ final class GeneralPreferenceViewController: NSViewController, PreferencePane {
     func saveForceKBLayoutId(id: String?) {
         UserDefaults.standard.set(id, forKey: Utils.forceKeyboardLayoutKey)
     }
+    
+    func readShouldLaunchAtLogin() -> Bool {
+        return UserDefaults.standard.bool(forKey: Utils.shouldLaunchOnStartupKey)
+    }
+    
+    func saveShouldLaunchAtLogin(enabled: Bool) {
+        UserDefaults.standard.set(enabled, forKey: Utils.shouldLaunchOnStartupKey)
+        LaunchAtLogin.isEnabled = enabled
+    }
 
-    @IBAction func onForceKBLayoutChange(_ sender: Any) {
+    @objc func onForceKBLayoutChange() {
         let newInputSource = forceKBLayoutView.selectedItem?.representedObject as? InputSource?
         let newInputSourceId = newInputSource??.id
         saveForceKBLayoutId(id: newInputSourceId)
     }
     
-    func observeLaunchAtLogin() -> Disposable {
-        return launchAtLoginObservable.bind(onNext: { [weak self] enabled in
-            self?.saveShouldLaunchAtLogin(enabled: enabled)
-        })
+    @objc func onLaunchAtLoginChange() {
+        let enabled = launchAtLoginView.state == .on
+        saveShouldLaunchAtLogin(enabled: enabled)
     }
 }
