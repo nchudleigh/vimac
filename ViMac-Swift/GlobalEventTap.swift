@@ -23,6 +23,11 @@ class GlobalEventTap {
         selfPtr = Unmanaged.passRetained(self)
     }
     
+    func enabled() -> Bool {
+        guard let tap = eventTap else { return false }
+        return CGEvent.tapIsEnabled(tap: tap)
+    }
+    
     func enable() {
         if let tap = eventTap {
             if CGEvent.tapIsEnabled(tap: tap) {
@@ -34,9 +39,9 @@ class GlobalEventTap {
                 self.runLoopSource = nil
             }
         }
-        
+
         self.eventTap = createEventTap()
-        let runLoopSource = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, eventTap, 0)
+        self.runLoopSource = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, eventTap, 0)
         CFRunLoopAddSource(CFRunLoopGetCurrent(), runLoopSource, .commonModes)
         CGEvent.tapEnable(tap: self.eventTap!, enable: true)
     }
@@ -74,7 +79,6 @@ class GlobalEventTap {
             return mySelf.eventTapCallback(proxy: proxy, type: type, event: event, refcon: refcon)
         },
         userInfo: selfPtr.toOpaque())!
-        
         return eventTap
     }
 }
