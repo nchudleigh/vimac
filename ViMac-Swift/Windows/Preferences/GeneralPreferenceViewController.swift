@@ -6,6 +6,7 @@ import LaunchAtLogin
 final class GeneralPreferenceViewController: NSViewController, PreferencePane {
     let preferencePaneIdentifier = PreferencePane.Identifier.general
     let preferencePaneTitle = "General"
+    let toolbarItemIcon: NSImage = NSImage(named: NSImage.preferencesGeneralName)!
     
     private var grid: NSGridView!
     private var forceKBLayoutView: NSPopUpButton!
@@ -29,7 +30,6 @@ final class GeneralPreferenceViewController: NSViewController, PreferencePane {
     override func viewDidLoad() {
         grid = NSGridView(numberOfColumns: 2, rows: 1)
         grid.column(at: 0).xPlacement = .trailing
-        grid.column(at: 1).width = 250
         grid.translatesAutoresizingMaskIntoConstraints = false
         
         populateGrid()

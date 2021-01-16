@@ -4,6 +4,7 @@ import Preferences
 final class HintModePreferenceViewController: NSViewController, NSTextFieldDelegate, PreferencePane {
     let preferencePaneIdentifier = PreferencePane.Identifier.hintMode
     let preferencePaneTitle = "Hint Mode"
+    let toolbarItemIcon: NSImage = NSImage(named: "NSFontPanel")!
     
     private var grid: NSGridView!
     private var customCharactersField: NSTextField!
@@ -25,7 +26,6 @@ final class HintModePreferenceViewController: NSViewController, NSTextFieldDeleg
     override func viewDidLoad() {
         grid = NSGridView(numberOfColumns: 2, rows: 1)
         grid.column(at: 0).xPlacement = .trailing
-        grid.column(at: 1).width = 250
         grid.translatesAutoresizingMaskIntoConstraints = false
         
         let customCharactersLabel = NSTextField(labelWithString: "Custom Characters:")

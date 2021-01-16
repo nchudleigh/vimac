@@ -12,6 +12,7 @@ import Preferences
 class BindingsPreferenceViewController: NSViewController, PreferencePane {
     let preferencePaneIdentifier = PreferencePane.Identifier.bindings
     let preferencePaneTitle = "Bindings"
+    let toolbarItemIcon: NSImage = NSImage(named: NSImage.advancedName)!
     
     private var grid: NSGridView!
     private var hintModeShortcut: MASShortcutView!
@@ -33,7 +34,6 @@ class BindingsPreferenceViewController: NSViewController, PreferencePane {
     override func viewDidLoad() {
         grid = NSGridView(numberOfColumns: 2, rows: 1)
         grid.column(at: 0).xPlacement = .trailing
-        grid.column(at: 1).width = 250
         grid.translatesAutoresizingMaskIntoConstraints = false
         
         populateGrid()
