@@ -254,7 +254,6 @@
 			isa = PBXGroup;
 			children = (
 				E26981B123C99CA900E46217 /* Welcome */,
-				E225BD20233354E900ECDEF4 /* Preferences */,
 			);
 			path = Windows;
 			sourceTree = "<group>";
@@ -322,6 +321,7 @@
 		E26172222322968500E396CA /* ViMac-Swift */ = {
 			isa = PBXGroup;
 			children = (
+				E225BD20233354E900ECDEF4 /* Preferences */,
 				E25BBB5E250CCA7900D11213 /* Services */,
 				E270F41F2503E79900AD305A /* Accessibility */,
 				E28867EF235F54F1001691A5 /* Vimac.icns */,
