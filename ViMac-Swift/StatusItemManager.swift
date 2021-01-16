@@ -16,10 +16,11 @@ class StatusItemManager: NSMenu, NSMenuDelegate {
     lazy var controller = PreferencesWindowController(
         preferencePanes: [
             GeneralPreferenceViewController(),
+            BindingsPreferenceViewController(),
             HintModePreferenceViewController(),
             ScrollModePreferenceViewController(),
         ],
-        style: .segmentedControl
+        style: .toolbarItems
     )
     
     override func awakeFromNib() {

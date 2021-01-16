@@ -2,11 +2,11 @@ import Cocoa
 import Preferences
 
 final class ScrollModePreferenceViewController: NSViewController, NSTextFieldDelegate, PreferencePane {
-    let preferencePaneIdentifier = PreferencePane.Identifier.hintMode
+    let preferencePaneIdentifier = PreferencePane.Identifier.scrollMode
     let preferencePaneTitle = "Scroll Mode"
+    let toolbarItemIcon: NSImage = NSImage(named: "NSColorPanel")!
     
     private var grid: NSGridView!
-    private var shortcutView: MASShortcutView!
     private var scrollKeysField: NSTextField!
     private var scrollSensitivityView: NSSlider!
     private var revHorizontalScrollView: NSButton!
@@ -28,14 +28,7 @@ final class ScrollModePreferenceViewController: NSViewController, NSTextFieldDel
     override func viewDidLoad() {
         grid = NSGridView(numberOfColumns: 2, rows: 1)
         grid.column(at: 0).xPlacement = .trailing
-        grid.column(at: 1).width = 250
         grid.translatesAutoresizingMaskIntoConstraints = false
-        
-        let shortcutLabel = NSTextField(labelWithString: "Shortcut:")
-        shortcutView = MASShortcutView()
-        shortcutView.associatedUserDefaultsKey = Utils.scrollModeShortcutKey
-        let shortcutRow: [NSView] = [shortcutLabel, shortcutView]
-        grid.addRow(with: shortcutRow)
         
         let scrollKeysLabel = NSTextField(labelWithString: "Scroll Keys:")
         scrollKeysField = NSTextField()

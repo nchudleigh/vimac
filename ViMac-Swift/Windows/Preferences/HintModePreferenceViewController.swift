@@ -4,9 +4,9 @@ import Preferences
 final class HintModePreferenceViewController: NSViewController, NSTextFieldDelegate, PreferencePane {
     let preferencePaneIdentifier = PreferencePane.Identifier.hintMode
     let preferencePaneTitle = "Hint Mode"
+    let toolbarItemIcon: NSImage = NSImage(named: "NSFontPanel")!
     
     private var grid: NSGridView!
-    private var hintModeShortcut: MASShortcutView!
     private var customCharactersField: NSTextField!
     private var textSizeField: NSTextField!
     
@@ -26,14 +26,7 @@ final class HintModePreferenceViewController: NSViewController, NSTextFieldDeleg
     override func viewDidLoad() {
         grid = NSGridView(numberOfColumns: 2, rows: 1)
         grid.column(at: 0).xPlacement = .trailing
-        grid.column(at: 1).width = 250
         grid.translatesAutoresizingMaskIntoConstraints = false
-        
-        let shortcutLabel = NSTextField(labelWithString: "Shortcut:")
-        hintModeShortcut = MASShortcutView()
-        hintModeShortcut.associatedUserDefaultsKey = Utils.hintModeShortcutKey
-        let shortcutRow: [NSView] = [shortcutLabel, hintModeShortcut]
-        grid.addRow(with: shortcutRow)
         
         let customCharactersLabel = NSTextField(labelWithString: "Custom Characters:")
         customCharactersField = NSTextField()
