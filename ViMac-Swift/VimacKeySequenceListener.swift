@@ -94,15 +94,15 @@ class VimacKeySequenceListener {
         _enabled.distinctUntilChanged()
     }
     
-    func createKeySequenceListener(config: BindingsConfig) -> KeySequenceListener {
-        let listener = KeySequenceListener(resetDelay: config.resetDelay)
-        
+    func createKeySequenceListener(config: BindingsConfig) -> KeySequenceListener? {
+        var sequences: [[Character]] = []
         if config.hintModeKeySequenceEnabled {
-            try! listener.registerSequence(seq: Array(config.hintModeKeySequence))
+            sequences.append(Array(config.hintModeKeySequence))
         }
         if config.scrollModeKeySequenceEnabled {
-            try! listener.registerSequence(seq: Array(config.scrollModeKeySequence))
+            sequences.append(Array(config.scrollModeKeySequence))
         }
-        return listener
+        
+        return KeySequenceListener(sequences: sequences, resetDelay: config.resetDelay)
     }
 }

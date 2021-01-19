@@ -12,7 +12,7 @@ import RxRelay
 class KeySequenceListener {
     let mask = CGEventMask(1 << CGEventType.keyDown.rawValue)
     var eventTap: GlobalEventTap?
-    private let inputState = InputState()
+    private let inputState: InputState
     private var typed: [CGEvent] = []
     private var sequences: [[Character]] = []
     private var timer: Timer?
@@ -21,11 +21,25 @@ class KeySequenceListener {
     private let matchRelay: PublishRelay<([Character])> = .init()
     lazy var matchEvents = matchRelay.asObservable()
     
-    init(resetDelay: TimeInterval = 0.25) {
+    init?(sequences: [[Character]], resetDelay: TimeInterval = 0.25) {
         self.resetDelay = resetDelay
+        self.inputState = InputState()
+        self.sequences = sequences
+        
+        var registeredSequences = 0
+        for seq in sequences {
+            let success = try! registerSequence(seq: seq)
+            if success {
+                registeredSequences += 1
+            }
+        }
+        
+        if registeredSequences == 0 {
+            return nil
+        }
     }
 
-    func registerSequence(seq: [Character]) throws -> Bool {
+    private func registerSequence(seq: [Character]) throws -> Bool {
         let success = try inputState.addWord(seq)
         if !success {
             return false
