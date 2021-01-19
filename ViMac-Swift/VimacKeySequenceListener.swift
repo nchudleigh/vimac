@@ -11,16 +11,8 @@ import RxSwift
 import RxRelay
 
 class VimacKeySequenceListener {
-    struct KeySequenceConfig {
-        let hintModeEnabled: Bool
-        let hintModeSequence: [Character]
-        let scrollModeEnabled: Bool
-        let scrollModeSequence: [Character]
-        let resetDelay: TimeInterval
-    }
-    
     struct State {
-        let config: KeySequenceConfig
+        let config: BindingsConfig
         let enabled: Bool
     }
     
@@ -34,6 +26,8 @@ class VimacKeySequenceListener {
     
     private let scrollModeRelay: PublishRelay<Void> = .init()
     lazy var scrollMode = scrollModeRelay.asObservable()
+    
+    private let configRepo = BindingsRepository()
     
     init() {
         let model = modelObservable(configObservable: configObservable(), enabledObservable: enabledObservable())
@@ -68,6 +62,10 @@ class VimacKeySequenceListener {
         if !enabled {
             return
         }
+        
+        if !config.hintModeKeySequenceEnabled && !config.scrollModeKeySequenceEnabled {
+            return
+        }
 
         listener = createKeySequenceListener(config: config)
         listener?.start()
@@ -75,38 +73,35 @@ class VimacKeySequenceListener {
         listener?.matchEvents.bind(onNext: { [weak self] sequence in
             guard let self = self else { return }
             
-            if sequence == config.hintModeSequence {
+            if String(sequence) == config.hintModeKeySequence {
                 self.onHintModeSequenceTyped()
-            } else if sequence == config.scrollModeSequence {
+            } else if String(sequence) == config.scrollModeKeySequence {
                 self.onScrollModeSequenceTyped()
             }
         }).disposed(by: disposeBag)
     }
     
-    private func modelObservable(configObservable: Observable<KeySequenceConfig>, enabledObservable: Observable<Bool>) -> Observable<State> {
+    private func modelObservable(configObservable: Observable<BindingsConfig>, enabledObservable: Observable<Bool>) -> Observable<State> {
         Observable.combineLatest(configObservable, enabledObservable)
             .map({ State.init(config: $0, enabled: $1) })
     }
     
-    private func configObservable() -> Observable<KeySequenceConfig> {
-        Observable.create { observer in
-            observer.onNext(.init(hintModeEnabled: true, hintModeSequence: ["f", "d"], scrollModeEnabled: true, scrollModeSequence: ["j", "k"], resetDelay: 0.25))
-            return Disposables.create()
-        }
+    private func configObservable() -> Observable<BindingsConfig> {
+        configRepo.readLive()
     }
     
     private func enabledObservable() -> Observable<Bool> {
         _enabled.distinctUntilChanged()
     }
     
-    func createKeySequenceListener(config: KeySequenceConfig) -> KeySequenceListener {
+    func createKeySequenceListener(config: BindingsConfig) -> KeySequenceListener {
         let listener = KeySequenceListener(resetDelay: config.resetDelay)
         
-        if config.hintModeEnabled {
-            try! listener.registerSequence(seq: config.hintModeSequence)
+        if config.hintModeKeySequenceEnabled {
+            try! listener.registerSequence(seq: Array(config.hintModeKeySequence))
         }
-        if config.scrollModeEnabled {
-            try! listener.registerSequence(seq: config.scrollModeSequence)
+        if config.scrollModeKeySequenceEnabled {
+            try! listener.registerSequence(seq: Array(config.scrollModeKeySequence))
         }
         return listener
     }
