@@ -181,23 +181,6 @@ class Utils: NSObject {
         _ = try? Application(app)?.setAttribute("AXManualAccessibility", value: true)
     }
     
-    static func getCurrentApplicationWindowManually() -> UIElement? {
-        guard let nsApplication = NSWorkspace.shared.frontmostApplication else {
-            return nil
-        }
-        let appOptional = Application.init(nsApplication)
-        guard let app = appOptional else { return nil }
-        
-        Utils.setAccessibilityAttributes(app: nsApplication)
-        
-        return try? app.attribute(.focusedWindow)
-    }
-    
-    static func currentApplicationWindow() -> Element? {
-        guard let uiElement = getCurrentApplicationWindowManually() else { return nil }
-        return Element.initialize(rawElement: uiElement.element)
-    }
-    
     static func singleToObservable<T>(single: Single<[T]>) -> Observable<T> {
         return single.asObservable()
             .flatMap({ elements in
