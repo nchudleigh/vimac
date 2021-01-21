@@ -11,13 +11,15 @@ import AXSwift
 
 class TraverseGenericElementService : TraverseElementService {
     let element: Element
+    let app: NSRunningApplication
     let windowElement: Element
     let containerElement: Element?
     
     lazy var childContainerElement = computeChildContainerElement()
     
-    required init(element: Element, windowElement: Element, containerElement: Element?) {
+    required init(element: Element, app: NSRunningApplication, windowElement: Element, containerElement: Element?) {
         self.element = element
+        self.app = app
         self.windowElement = windowElement
         self.containerElement = containerElement
     }
@@ -34,8 +36,8 @@ class TraverseGenericElementService : TraverseElementService {
     
     private func traverseElement(_ element: Element) -> ElementTreeNode? {
         TraverseElementServiceFinder
-            .init(element).find()
-            .init(element: element, windowElement: windowElement, containerElement: childContainerElement).perform()
+            .init(app: app, element: element).find()
+            .init(element: element, app: app, windowElement: windowElement, containerElement: childContainerElement).perform()
     }
     
     private func computeChildContainerElement() -> Element? {

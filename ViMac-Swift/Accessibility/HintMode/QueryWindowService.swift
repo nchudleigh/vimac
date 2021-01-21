@@ -10,18 +10,20 @@ import Cocoa
 import AXSwift
 
 class QueryWindowService {
-    let windowElement: Element
+    let app: NSRunningApplication
+    let window: Element
     
-    init(windowElement: Element) {
-        self.windowElement = windowElement
+    init(app: NSRunningApplication, window: Element) {
+        self.app = app
+        self.window = window
     }
     
     func perform() throws -> [Element] {
         let children = try getChildren()
         let childrenNodes = children?.map { child -> ElementTreeNode? in
             TraverseElementServiceFinder
-                .init(child).find()
-                .init(element: child, windowElement: windowElement, containerElement: nil).perform()
+                .init(app: app, element: child).find()
+                .init(element: child, app: app, windowElement: window, containerElement: nil).perform()
         }
         
         var elements: [Element] = []
@@ -35,7 +37,7 @@ class QueryWindowService {
     }
     
     private func getChildren() throws -> [Element]? {
-        let rawElements: [AXUIElement]? = try UIElement(windowElement.rawElement).attribute(.children)
+        let rawElements: [AXUIElement]? = try UIElement(window.rawElement).attribute(.children)
         return rawElements?
             .map { Element.initialize(rawElement: $0) }
             .compactMap({ $0 })
@@ -59,27 +61,14 @@ class FlattenElementTreeNode {
         return result
     }
     
-    private func flatten(_ node: ElementTreeNode) -> Int {
-        let children = node.children ?? []
-        let childrenHintableElements = children
-            .map { flatten($0) }
-            .reduce(0, +)
-        
-        let ignoredActions: Set = [
-            "AXShowMenu",
-            "AXScrollToVisible",
-        ]
-        let actions = Set(node.root.actions).subtracting(ignoredActions)
-        
-        let isActionable = actions.count > 0
-        let isRowWithoutActionableChildren = childrenHintableElements == 0 && node.root.role == "AXRow"
-        let isHintable = isActionable || isRowWithoutActionableChildren
-        
-        if isHintable {
+    private func flatten(_ node: ElementTreeNode) {
+        if node.isHintable() {
             result.append(node.root)
-            return childrenHintableElements + 1
         }
         
-        return childrenHintableElements
+        let children = node.children ?? []
+        for child in children {
+            flatten(child)
+        }
     }
 }

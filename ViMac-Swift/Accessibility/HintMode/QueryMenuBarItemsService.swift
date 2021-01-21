@@ -10,14 +10,14 @@ import Cocoa
 import AXSwift
 
 class QueryMenuBarItemsService {
-    let applicationElement: AXUIElement
+    let app: NSRunningApplication
 
-    init(applicationElement: AXUIElement) {
-        self.applicationElement = applicationElement
+    init(app: NSRunningApplication) {
+        self.app = app
     }
     
     func perform() throws -> [Element]? {
-        let appUIElement = UIElement(applicationElement)
+        guard let appUIElement = Application(app) else { return nil }
         
         let menuBarOptional: UIElement? = try appUIElement.attribute(.menuBar)
         guard let menuBar = menuBarOptional else { return nil }

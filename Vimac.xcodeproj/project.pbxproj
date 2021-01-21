@@ -46,7 +46,7 @@
 		E270F5C52504D8DE00AD305A /* TraverseElementServiceFinder.swift in Sources */ = {isa = PBXBuildFile; fileRef = E270F5C42504D8DE00AD305A /* TraverseElementServiceFinder.swift */; };
 		E270F5C92504D9AE00AD305A /* TraverseGenericElementService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E270F5C82504D9AE00AD305A /* TraverseGenericElementService.swift */; };
 		E270F5CB2504D9DE00AD305A /* TraverseElementService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E270F5CA2504D9DE00AD305A /* TraverseElementService.swift */; };
-		E270F5CF2504DC4600AD305A /* TraverseWebAreaElementService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E270F5CE2504DC4600AD305A /* TraverseWebAreaElementService.swift */; };
+		E270F5CF2504DC4600AD305A /* TraverseSearchPredicateCompatibleWebAreaElementService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E270F5CE2504DC4600AD305A /* TraverseSearchPredicateCompatibleWebAreaElementService.swift */; };
 		E27776E3240B780D00488320 /* LaunchAtLogin.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E27776E2240B780D00488320 /* LaunchAtLogin.framework */; };
 		E27776E4240B780D00488320 /* LaunchAtLogin.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = E27776E2240B780D00488320 /* LaunchAtLogin.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		E27776E8240B784900488320 /* LaunchAtLogin.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = E27776E7240B784900488320 /* LaunchAtLogin.framework.dSYM */; };
@@ -57,6 +57,7 @@
 		E28867F0235F54F2001691A5 /* Vimac.icns in Resources */ = {isa = PBXBuildFile; fileRef = E28867EF235F54F1001691A5 /* Vimac.icns */; };
 		E290EF4B24F93343004B1A83 /* QueryWindowService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E290EF4A24F93342004B1A83 /* QueryWindowService.swift */; };
 		E2B3F64B24F24B9800FD5594 /* HintModeInputListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2B3F64A24F24B9800FD5594 /* HintModeInputListener.swift */; };
+		E2B98A46258DF15C00A90B2F /* TraverseSafariWebAreaElementService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2B98A45258DF15C00A90B2F /* TraverseSafariWebAreaElementService.swift */; };
 		E2C29562234DD7F8001A38D6 /* OverlayWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2C29561234DD7F8001A38D6 /* OverlayWindowController.swift */; };
 		E2C29566234DE09C001A38D6 /* ModeCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2C29565234DE09C001A38D6 /* ModeCoordinator.swift */; };
 		E2C29568234DE51F001A38D6 /* ModeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2C29567234DE51F001A38D6 /* ModeViewController.swift */; };
@@ -166,7 +167,7 @@
 		E270F5C42504D8DE00AD305A /* TraverseElementServiceFinder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TraverseElementServiceFinder.swift; sourceTree = "<group>"; };
 		E270F5C82504D9AE00AD305A /* TraverseGenericElementService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TraverseGenericElementService.swift; sourceTree = "<group>"; };
 		E270F5CA2504D9DE00AD305A /* TraverseElementService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TraverseElementService.swift; sourceTree = "<group>"; };
-		E270F5CE2504DC4600AD305A /* TraverseWebAreaElementService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TraverseWebAreaElementService.swift; sourceTree = "<group>"; };
+		E270F5CE2504DC4600AD305A /* TraverseSearchPredicateCompatibleWebAreaElementService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TraverseSearchPredicateCompatibleWebAreaElementService.swift; sourceTree = "<group>"; };
 		E27776E2240B780D00488320 /* LaunchAtLogin.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = LaunchAtLogin.framework; path = Carthage/Build/Mac/LaunchAtLogin.framework; sourceTree = "<group>"; };
 		E27776E7240B784900488320 /* LaunchAtLogin.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = LaunchAtLogin.framework.dSYM; path = Carthage/Build/Mac/LaunchAtLogin.framework.dSYM; sourceTree = "<group>"; };
 		E279534A2494C534006D8D7A /* InputListener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputListener.swift; sourceTree = "<group>"; };
@@ -176,6 +177,7 @@
 		E28867EF235F54F1001691A5 /* Vimac.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Vimac.icns; sourceTree = SOURCE_ROOT; };
 		E290EF4A24F93342004B1A83 /* QueryWindowService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryWindowService.swift; sourceTree = "<group>"; };
 		E2B3F64A24F24B9800FD5594 /* HintModeInputListener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HintModeInputListener.swift; sourceTree = "<group>"; };
+		E2B98A45258DF15C00A90B2F /* TraverseSafariWebAreaElementService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TraverseSafariWebAreaElementService.swift; sourceTree = "<group>"; };
 		E2C29561234DD7F8001A38D6 /* OverlayWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayWindowController.swift; sourceTree = "<group>"; };
 		E2C29565234DE09C001A38D6 /* ModeCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModeCoordinator.swift; sourceTree = "<group>"; };
 		E2C29567234DE51F001A38D6 /* ModeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModeViewController.swift; sourceTree = "<group>"; };
@@ -272,10 +274,11 @@
 				E270F5C42504D8DE00AD305A /* TraverseElementServiceFinder.swift */,
 				E270F5C82504D9AE00AD305A /* TraverseGenericElementService.swift */,
 				E270F5CA2504D9DE00AD305A /* TraverseElementService.swift */,
-				E270F5CE2504DC4600AD305A /* TraverseWebAreaElementService.swift */,
+				E270F5CE2504DC4600AD305A /* TraverseSearchPredicateCompatibleWebAreaElementService.swift */,
 				E23140D52506781E004D1B96 /* QueryMenuBarItemsService.swift */,
 				E23140D725067A46004D1B96 /* QueryMenuBarExtrasService.swift */,
 				E23140D92507B2C1004D1B96 /* QueryNotificationCenterItemsService.swift */,
+				E2B98A45258DF15C00A90B2F /* TraverseSafariWebAreaElementService.swift */,
 			);
 			path = HintMode;
 			sourceTree = "<group>";
@@ -672,7 +675,7 @@
 				E267778C256123030034B131 /* String.swift in Sources */,
 				E261725A2324EC7100E396CA /* OverlayWindow.swift in Sources */,
 				E279535124962E8D006D8D7A /* ChunkyScroller.swift in Sources */,
-				E270F5CF2504DC4600AD305A /* TraverseWebAreaElementService.swift in Sources */,
+				E270F5CF2504DC4600AD305A /* TraverseSearchPredicateCompatibleWebAreaElementService.swift in Sources */,
 				E2795353249633DE006D8D7A /* Scroller.swift in Sources */,
 				E2C3221E23BC828C00508B44 /* HideCursorGlobally.m in Sources */,
 				E2B3F64B24F24B9800FD5594 /* HintModeInputListener.swift in Sources */,
@@ -714,6 +717,7 @@
 				E26981B323C99DBB00E46217 /* WelcomeWindowController.swift in Sources */,
 				E26172242322968500E396CA /* AppDelegate.swift in Sources */,
 				E2677790256187230034B131 /* ScrollModeActiveScrollAreaViewController.swift in Sources */,
+				E2B98A46258DF15C00A90B2F /* TraverseSafariWebAreaElementService.swift in Sources */,
 				E2677780255FE0420034B131 /* QueryScrollAreasService.swift in Sources */,
 				E23140D62506781E004D1B96 /* QueryMenuBarItemsService.swift in Sources */,
 				E2F6C9AD232DE89F00F2975B /* HintView.swift in Sources */,

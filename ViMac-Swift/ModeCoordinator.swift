@@ -60,8 +60,8 @@ class ModeCoordinator : Coordinator {
     }
     
     func setHintMode() {
-        guard let applicationWindow = Utils.getCurrentApplicationWindowManually(),
-            let window = self.windowController.window else {
+        guard let frontmostApp = NSWorkspace.shared.frontmostApplication,
+            let focusedWindow = focusedWindow(app: frontmostApp) else {
             self.exitMode()
             return
         }
@@ -71,7 +71,7 @@ class ModeCoordinator : Coordinator {
             forceKBLayout.select()
         }
 
-        let vc = HintModeViewController.init(applicationWindow: applicationWindow)
+        let vc = HintModeViewController.init(app: frontmostApp, window: focusedWindow)
         self.setViewController(vc: vc)
     }
     
@@ -85,6 +85,16 @@ class ModeCoordinator : Coordinator {
             self?.forceKBLayout = inputSource
         })
         return observation
+    }
+    
+    private func focusedWindow(app: NSRunningApplication) -> Element? {
+        let axAppOptional = Application.init(app)
+        guard let axApp = axAppOptional else { return nil }
+        
+        let axWindowOptional: UIElement? = try? axApp.attribute(.focusedWindow)
+        guard let axWindow = axWindowOptional else { return nil }
+        
+        return Element.initialize(rawElement: axWindow.element)
     }
 }
 
