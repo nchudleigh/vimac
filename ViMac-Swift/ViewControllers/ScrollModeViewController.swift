@@ -13,6 +13,16 @@ class ScrollModeViewController: ModeViewController {
     private let disposeBag = DisposeBag()
     private let inputListener = InputListener()
     private var inputListeningTextField: NSTextField?
+    private let window: Element
+    
+    init(window: Element) {
+        self.window = window
+        super.init()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError()
+    }
     
     override func viewWillAppear() {
         observeScrollAreas().disposed(by: disposeBag)
@@ -63,14 +73,10 @@ class ScrollModeViewController: ModeViewController {
         return Single.create { observer in
             let thread = Thread.init {
                 do {
-                    guard let windowElement = Utils.currentApplicationWindow() else {
-                        throw "currentApplicationWindow is nil."
-                    }
-                    
-                    var scrollAreas = try QueryScrollAreasService.init(windowElement: windowElement).perform()
+                    var scrollAreas = try QueryScrollAreasService.init(windowElement: self.window).perform()
                     
                     if scrollAreas.count == 0 {
-                        scrollAreas.append(windowElement)
+                        scrollAreas.append(self.window)
                     }
                     
                     observer(.success(scrollAreas))

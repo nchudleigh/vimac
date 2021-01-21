@@ -102,70 +102,7 @@ class Utils: NSObject {
             return Observable.from(sortedO)
         })
     }
-    
-    static func getAttributes(element: UIElement) -> Observable<(String?, NSPoint?, NSSize?)> {
-        return getMultipleElementAttribute(element: element, attributes: [.role, .position, .size])
-            .map({ valuesOptional in
-                guard let values = valuesOptional else {
-                    return nil
-                }
-                do {
-                    let role = values[0] as! String?
-                    let position = values[1] as! NSPoint?
-                    let size = values[2] as! NSSize?
-                    return (role, position, size)
-                } catch {
 
-                }
-                return nil
-            })
-            .compactMap({ $0 })
-    }
-    
-    static func getMultipleElementAttribute(element: UIElement, attributes: [Attribute]) -> Observable<[Any?]?> {
-        return Observable.create({ observer in
-            DispatchQueue.global().async {
-                do {
-                    let valueByAttribute = try element.getMultipleAttributes(attributes)
-                    let values = attributes.map({ valueByAttribute[$0] })
-                    observer.onNext(values)
-                } catch {
-                    observer.onNext(nil)
-                }
-                observer.onCompleted()
-            }
-            return Disposables.create()
-        })
-    }
-    
-    static func getElementAttribute<T>(element: UIElement, attribute: Attribute) -> Observable<T?> {
-        return Observable.create({ observer in
-            DispatchQueue.global().async {
-                let value: T? = try? element.attribute(attribute)
-                observer.onNext(value)
-                observer.onCompleted()
-            }
-            return Disposables.create()
-        })
-    }
-    
-    static func getChildren(element: UIElement) -> Observable<[CachedUIElement]> {
-        return Observable.create({ observer in
-            DispatchQueue.global().async {
-                let children: [CachedUIElement] = {
-                    let childrenOptional = try? element.attribute(Attribute.children) as [AXUIElement]?;
-                    guard let children = childrenOptional else {
-                        return []
-                    }
-                    return children.map({ CachedUIElement($0) })
-                }()
-                observer.onNext(children)
-                observer.onCompleted()
-            }
-            return Disposables.create()
-        })
-    }
-    
     // For performance reasons Chromium only makes the webview accessible when there it detects voiceover through the `AXEnhancedUserInterface` attribute on the Chrome application itself:
     // http://dev.chromium.org/developers/design-documents/accessibility
     // Similarly, electron uses `AXManualAccessibility`:
@@ -179,23 +116,6 @@ class Utils: NSObject {
 //        }
         
         _ = try? Application(app)?.setAttribute("AXManualAccessibility", value: true)
-    }
-    
-    static func getCurrentApplicationWindowManually() -> UIElement? {
-        guard let nsApplication = NSWorkspace.shared.frontmostApplication else {
-            return nil
-        }
-        let appOptional = Application.init(nsApplication)
-        guard let app = appOptional else { return nil }
-        
-        Utils.setAccessibilityAttributes(app: nsApplication)
-        
-        return try? app.attribute(.focusedWindow)
-    }
-    
-    static func currentApplicationWindow() -> Element? {
-        guard let uiElement = getCurrentApplicationWindowManually() else { return nil }
-        return Element.initialize(rawElement: uiElement.element)
     }
     
     static func singleToObservable<T>(single: Single<[T]>) -> Observable<T> {

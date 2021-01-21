@@ -37,7 +37,6 @@
 		E267778C256123030034B131 /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = E267778B256123030034B131 /* String.swift */; };
 		E267778E25613A900034B131 /* ScrollModeActiveViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E267778D25613A900034B131 /* ScrollModeActiveViewController.swift */; };
 		E2677790256187230034B131 /* ScrollModeActiveScrollAreaViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E267778F256187230034B131 /* ScrollModeActiveScrollAreaViewController.swift */; };
-		E268A02A236D8F6F00EE08CB /* CachedUIElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = E268A029236D8F6F00EE08CB /* CachedUIElement.swift */; };
 		E26981B323C99DBB00E46217 /* WelcomeWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26981B223C99DBB00E46217 /* WelcomeWindowController.swift */; };
 		E26981B523C99DF900E46217 /* WelcomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26981B423C99DF900E46217 /* WelcomeViewController.swift */; };
 		E26981B923C9E31600E46217 /* InputSourceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26981B823C9E31600E46217 /* InputSourceManager.swift */; };
@@ -158,7 +157,6 @@
 		E267778B256123030034B131 /* String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
 		E267778D25613A900034B131 /* ScrollModeActiveViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollModeActiveViewController.swift; sourceTree = "<group>"; };
 		E267778F256187230034B131 /* ScrollModeActiveScrollAreaViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollModeActiveScrollAreaViewController.swift; sourceTree = "<group>"; };
-		E268A029236D8F6F00EE08CB /* CachedUIElement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CachedUIElement.swift; sourceTree = "<group>"; };
 		E26981B223C99DBB00E46217 /* WelcomeWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeWindowController.swift; sourceTree = "<group>"; };
 		E26981B423C99DF900E46217 /* WelcomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeViewController.swift; sourceTree = "<group>"; };
 		E26981B823C9E31600E46217 /* InputSourceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputSourceManager.swift; sourceTree = "<group>"; };
@@ -338,7 +336,6 @@
 				E2F6C9AC232DE89F00F2975B /* HintView.swift */,
 				E2F6C9AE232DEA1800F2975B /* Utils.swift */,
 				E2C29565234DE09C001A38D6 /* ModeCoordinator.swift */,
-				E268A029236D8F6F00EE08CB /* CachedUIElement.swift */,
 				E245F9B023941AE8009CA9C6 /* BorderView.swift */,
 				E2C3221C23BC828C00508B44 /* HideCursorGlobally.h */,
 				E2C3221D23BC828C00508B44 /* HideCursorGlobally.m */,
@@ -687,7 +684,6 @@
 				E2DFF5B12481693800B4090D /* HintModePreferenceViewController.swift in Sources */,
 				E2F6C9AF232DEA1800F2975B /* Utils.swift in Sources */,
 				E279534D2494CC69006D8D7A /* ScrollModeInputListener.swift in Sources */,
-				E268A02A236D8F6F00EE08CB /* CachedUIElement.swift in Sources */,
 				E24D0BB6256BEEAE0049EA0A /* ScrollModeInputState.swift in Sources */,
 				E26981B523C99DF900E46217 /* WelcomeViewController.swift in Sources */,
 				E270F5C52504D8DE00AD305A /* TraverseElementServiceFinder.swift in Sources */,

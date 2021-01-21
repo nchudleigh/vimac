@@ -41,22 +41,28 @@ class ModeCoordinator : Coordinator {
         self.windowController.close()
     }
     
-    func setViewController(vc: ModeViewController) {
+    func setViewController(vc: ModeViewController, screenFrame: NSRect) {
         vc.modeCoordinator = self
         self.windowController.window?.contentViewController = vc
-        self.windowController.fitScreen()
+        self.windowController.fitToFrame(screenFrame)
         self.windowController.showWindow(nil)
         self.windowController.window?.makeKeyAndOrderFront(nil)
     }
     
     func setScrollMode() {
+        guard let frontmostApp = NSWorkspace.shared.frontmostApplication,
+            let focusedWindow = focusedWindow(app: frontmostApp) else {
+            self.exitMode()
+            return
+        }
+        
         self.priorKBLayout = InputSourceManager.currentInputSource()
         if let forceKBLayout = self.forceKBLayout {
             forceKBLayout.select()
         }
-        
-        let vc = ScrollModeViewController.init()
-        self.setViewController(vc: vc)
+
+        let vc = ScrollModeViewController.init(window: focusedWindow)
+        self.setViewController(vc: vc, screenFrame: focusedWindow.frame)
     }
     
     func setHintMode() {
@@ -72,7 +78,7 @@ class ModeCoordinator : Coordinator {
         }
 
         let vc = HintModeViewController.init(app: frontmostApp, window: focusedWindow)
-        self.setViewController(vc: vc)
+        self.setViewController(vc: vc, screenFrame: focusedWindow.frame)
     }
     
     func observeForceKBInputSource() -> NSKeyValueObservation {
@@ -95,6 +101,18 @@ class ModeCoordinator : Coordinator {
         guard let axWindow = axWindowOptional else { return nil }
         
         return Element.initialize(rawElement: axWindow.element)
+    }
+    
+    private func activeScreenFrame(frontmostWindowFrame: NSRect) -> NSRect {
+        // When the focused window is in full screen mode in a secondary display,
+        // NSScreen.main will point to the primary display.
+        // this is a workaround.
+        for screen in NSScreen.screens {
+            if screen.frame.contains(frontmostWindowFrame) {
+                return screen.frame
+            }
+        }
+        return NSScreen.main!.frame
     }
 }
 
