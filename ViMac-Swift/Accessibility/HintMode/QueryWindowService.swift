@@ -33,8 +33,6 @@ class QueryWindowService {
             }
         }
         
-        print(elements.count)
-        
         return elements
     }
     
