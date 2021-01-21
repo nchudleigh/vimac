@@ -104,6 +104,9 @@ class ModeCoordinator : Coordinator {
     }
     
     private func activeScreenFrame(frontmostWindowFrame: NSRect) -> NSRect {
+        // When the focused window is in full screen mode in a secondary display,
+        // NSScreen.main will point to the primary display.
+        // this is a workaround.
         for screen in NSScreen.screens {
             if screen.frame.contains(frontmostWindowFrame) {
                 return screen.frame
