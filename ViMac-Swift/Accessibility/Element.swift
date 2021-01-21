@@ -45,7 +45,7 @@ class ElementTreeNode {
     }
     
     func isHintable() -> Bool {
-        isActionable() || isRowWithoutActionableChildren()
+        isActionable() || isRowWithoutHintableChildren()
     }
     
     private func isActionable() -> Bool {
@@ -57,7 +57,7 @@ class ElementTreeNode {
         return actions.count > 0
     }
     
-    private func isRowWithoutActionableChildren() -> Bool {
+    private func isRowWithoutHintableChildren() -> Bool {
         hintableChildrenCount() == 0 && root.role == "AXRow"
     }
     
