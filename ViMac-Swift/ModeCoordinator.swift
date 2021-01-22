@@ -56,13 +56,15 @@ class ModeCoordinator : Coordinator {
             return
         }
         
+        let screenFrame = activeScreenFrame(focusedWindowFrame: focusedWindow.frame)
+        
         self.priorKBLayout = InputSourceManager.currentInputSource()
         if let forceKBLayout = self.forceKBLayout {
             forceKBLayout.select()
         }
 
         let vc = ScrollModeViewController.init(window: focusedWindow)
-        self.setViewController(vc: vc, screenFrame: focusedWindow.frame)
+        self.setViewController(vc: vc, screenFrame: screenFrame)
     }
     
     func setHintMode() {
@@ -72,13 +74,15 @@ class ModeCoordinator : Coordinator {
             return
         }
         
+        let screenFrame = activeScreenFrame(focusedWindowFrame: focusedWindow.frame)
+        
         self.priorKBLayout = InputSourceManager.currentInputSource()
         if let forceKBLayout = self.forceKBLayout {
             forceKBLayout.select()
         }
 
         let vc = HintModeViewController.init(app: frontmostApp, window: focusedWindow)
-        self.setViewController(vc: vc, screenFrame: focusedWindow.frame)
+        self.setViewController(vc: vc, screenFrame: screenFrame)
     }
     
     func observeForceKBInputSource() -> NSKeyValueObservation {
@@ -103,16 +107,21 @@ class ModeCoordinator : Coordinator {
         return Element.initialize(rawElement: axWindow.element)
     }
     
-    private func activeScreenFrame(frontmostWindowFrame: NSRect) -> NSRect {
+    private func activeScreenFrame(focusedWindowFrame: NSRect) -> NSRect {
         // When the focused window is in full screen mode in a secondary display,
         // NSScreen.main will point to the primary display.
         // this is a workaround.
+        var activeScreen = NSScreen.main!
+        var maxArea: CGFloat = 0
         for screen in NSScreen.screens {
-            if screen.frame.contains(frontmostWindowFrame) {
-                return screen.frame
+            let intersection = screen.frame.intersection(focusedWindowFrame)
+            let area = intersection.width * intersection.height
+            if area > maxArea {
+                maxArea = area
+                activeScreen = screen
             }
         }
-        return NSScreen.main!.frame
+        return activeScreen.frame
     }
 }
 
