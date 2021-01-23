@@ -23,14 +23,13 @@ class TraverseSearchPredicateCompatibleWebAreaElementService : TraverseElementSe
     }
     
     func perform() -> ElementTreeNode? {
-        print(clipBounds)
         if !isElementVisible() {
             return nil
         }
         
         let children = try? getRecursiveChildrenThroughSearchPredicate()
         let visibleChildren = children?.filter { child in
-            return childrenClipBounds().intersects(child.frame)
+            return elementClipBounds().intersects(child.frame)
         }
         let recursiveChildrenNodes = visibleChildren?
             .map { ElementTreeNode(root: $0, children: nil) }
@@ -46,7 +45,7 @@ class TraverseSearchPredicateCompatibleWebAreaElementService : TraverseElementSe
         return true
     }
     
-    private func childrenClipBounds() -> NSRect {
+    private func elementClipBounds() -> NSRect {
         if let clipBounds = clipBounds {
             return clipBounds.intersection(element.frame)
         }

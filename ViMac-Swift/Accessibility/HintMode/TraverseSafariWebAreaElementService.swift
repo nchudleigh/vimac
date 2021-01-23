@@ -27,10 +27,13 @@ class TraverseSafariWebAreaElementService : TraverseElementService {
             return nil
         }
         
-        let recursiveChildren = try? getRecursiveChildrenThroughSearchPredicate()
-        let recursiveChildrenNodes = recursiveChildren?
+        let children = try? getRecursiveChildrenThroughSearchPredicate()
+        let visibleChildren = children?.filter { child in
+            return elementClipBounds().intersects(child.frame)
+        }
+        let childrenNodes = visibleChildren?
             .map { SafariWebAreaElementTreeNode(root: $0, children: nil) }
-        return SafariWebAreaElementTreeNode(root: element, children: recursiveChildrenNodes)
+        return SafariWebAreaElementTreeNode(root: element, children: childrenNodes)
     }
     
     private func isElementVisible() -> Bool {
@@ -40,6 +43,13 @@ class TraverseSafariWebAreaElementService : TraverseElementService {
             }
         }
         return true
+    }
+    
+    private func elementClipBounds() -> NSRect {
+        if let clipBounds = clipBounds {
+            return clipBounds.intersection(element.frame)
+        }
+        return element.frame
     }
     
     private func getRecursiveChildrenThroughSearchPredicate() throws -> [Element]? {
