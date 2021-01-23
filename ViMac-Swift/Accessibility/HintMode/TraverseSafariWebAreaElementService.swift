@@ -13,13 +13,13 @@ class TraverseSafariWebAreaElementService : TraverseElementService {
     let element: Element
     let app: NSRunningApplication
     let windowElement: Element
-    let containerElement: Element?
+    let clipBounds: NSRect?
     
-    required init(element: Element, app: NSRunningApplication, windowElement: Element, containerElement: Element?) {
+    required init(element: Element, app: NSRunningApplication, windowElement: Element, clipBounds: NSRect?) {
         self.element = element
         self.app = app
         self.windowElement = windowElement
-        self.containerElement = containerElement
+        self.clipBounds = clipBounds
     }
     
     func perform() -> ElementTreeNode? {
@@ -34,7 +34,12 @@ class TraverseSafariWebAreaElementService : TraverseElementService {
     }
     
     private func isElementVisible() -> Bool {
-        containerElement?.frame.intersects(element.frame) ?? true
+        if let clipBounds = clipBounds {
+            if !clipBounds.intersects(element.frame) {
+                return false
+            }
+        }
+        return true
     }
     
     private func getRecursiveChildrenThroughSearchPredicate() throws -> [Element]? {

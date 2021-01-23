@@ -13,15 +13,13 @@ class TraverseGenericElementService : TraverseElementService {
     let element: Element
     let app: NSRunningApplication
     let windowElement: Element
-    let containerElement: Element?
+    let clipBounds: NSRect?
     
-    lazy var childContainerElement = computeChildContainerElement()
-    
-    required init(element: Element, app: NSRunningApplication, windowElement: Element, containerElement: Element?) {
+    required init(element: Element, app: NSRunningApplication, windowElement: Element, clipBounds: NSRect?) {
         self.element = element
         self.app = app
         self.windowElement = windowElement
-        self.containerElement = containerElement
+        self.clipBounds = clipBounds
     }
     
     func perform() -> ElementTreeNode? {
@@ -39,27 +37,25 @@ class TraverseGenericElementService : TraverseElementService {
     }
     
     private func isElementVisible() -> Bool {
-        containerElement?.frame.intersects(element.frame) ?? true
+        if let clipBounds = clipBounds {
+            if !clipBounds.intersects(element.frame) {
+                return false
+            }
+        }
+        return true
+    }
+    
+    private func childrenClipBounds() -> NSRect {
+        if let clipBounds = clipBounds {
+            return clipBounds.intersection(element.frame)
+        }
+        return element.frame
     }
     
     private func traverseElement(_ element: Element) -> ElementTreeNode? {
         TraverseElementServiceFinder
             .init(app: app, element: element).find()
-            .init(element: element, app: app, windowElement: windowElement, containerElement: childContainerElement).perform()
-    }
-    
-    private func computeChildContainerElement() -> Element? {
-        let containerRoles = [
-            Role.scrollArea.rawValue,
-            Role.row.rawValue,
-            "AXPage",
-        ]
-
-        if containerRoles.contains(element.role) || element.role.lowercased().contains("group") {
-            return element
-        }
-
-        return containerElement
+            .init(element: element, app: app, windowElement: windowElement, clipBounds: childrenClipBounds()).perform()
     }
 
     private func getChildren(_ element: Element) throws -> [Element]? {

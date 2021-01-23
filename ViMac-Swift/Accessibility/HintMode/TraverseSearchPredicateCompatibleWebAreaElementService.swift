@@ -13,28 +13,44 @@ class TraverseSearchPredicateCompatibleWebAreaElementService : TraverseElementSe
     let element: Element
     let app: NSRunningApplication
     let windowElement: Element
-    let containerElement: Element?
+    let clipBounds: NSRect?
     
-    required init(element: Element, app: NSRunningApplication, windowElement: Element, containerElement: Element?) {
+    required init(element: Element, app: NSRunningApplication, windowElement: Element, clipBounds: NSRect?) {
         self.element = element
         self.app = app
         self.windowElement = windowElement
-        self.containerElement = containerElement
+        self.clipBounds = clipBounds
     }
     
     func perform() -> ElementTreeNode? {
+        print(clipBounds)
         if !isElementVisible() {
             return nil
         }
         
-        let recursiveChildren = try? getRecursiveChildrenThroughSearchPredicate()
-        let recursiveChildrenNodes = recursiveChildren?
+        let children = try? getRecursiveChildrenThroughSearchPredicate()
+        let visibleChildren = children?.filter { child in
+            return childrenClipBounds().intersects(child.frame)
+        }
+        let recursiveChildrenNodes = visibleChildren?
             .map { ElementTreeNode(root: $0, children: nil) }
         return ElementTreeNode(root: element, children: recursiveChildrenNodes)
     }
     
     private func isElementVisible() -> Bool {
-        containerElement?.frame.intersects(element.frame) ?? true
+        if let clipBounds = clipBounds {
+            if !clipBounds.intersects(element.frame) {
+                return false
+            }
+        }
+        return true
+    }
+    
+    private func childrenClipBounds() -> NSRect {
+        if let clipBounds = clipBounds {
+            return clipBounds.intersection(element.frame)
+        }
+        return element.frame
     }
     
     private func getRecursiveChildrenThroughSearchPredicate() throws -> [Element]? {
