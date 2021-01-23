@@ -27,6 +27,8 @@ class TraverseGenericElementService : TraverseElementService {
             return nil
         }
         
+        element.setClippedFrame(elementClippedBounds())
+        
         let children: [Element]? = try? getChildren(element)
 
         let childrenNodes = children?
@@ -45,7 +47,7 @@ class TraverseGenericElementService : TraverseElementService {
         return true
     }
     
-    private func childrenClipBounds() -> NSRect {
+    private func elementClippedBounds() -> NSRect {
         if let clipBounds = clipBounds {
             return clipBounds.intersection(element.frame)
         }
@@ -55,7 +57,7 @@ class TraverseGenericElementService : TraverseElementService {
     private func traverseElement(_ element: Element) -> ElementTreeNode? {
         TraverseElementServiceFinder
             .init(app: app, element: element).find()
-            .init(element: element, app: app, windowElement: windowElement, clipBounds: childrenClipBounds()).perform()
+            .init(element: element, app: app, windowElement: windowElement, clipBounds: elementClippedBounds()).perform()
     }
 
     private func getChildren(_ element: Element) throws -> [Element]? {

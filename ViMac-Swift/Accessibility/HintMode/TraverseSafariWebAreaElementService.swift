@@ -27,11 +27,20 @@ class TraverseSafariWebAreaElementService : TraverseElementService {
             return nil
         }
         
+        element.setClippedFrame(elementClipBounds())
+        
         let children = try? getRecursiveChildrenThroughSearchPredicate()
-        let visibleChildren = children?.filter { child in
-            return elementClipBounds().intersects(child.frame)
+        
+        var visibleChildren: [Element] = []
+        for child in children ?? [] {
+            let clipBounds = elementClipBounds().intersection(child.frame)
+            if (!clipBounds.isEmpty) {
+                child.setClippedFrame(clipBounds)
+                visibleChildren.append(child)
+            }
         }
-        let childrenNodes = visibleChildren?
+        
+        let childrenNodes = visibleChildren
             .map { SafariWebAreaElementTreeNode(root: $0, children: nil) }
         return SafariWebAreaElementTreeNode(root: element, children: childrenNodes)
     }

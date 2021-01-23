@@ -27,11 +27,20 @@ class TraverseSearchPredicateCompatibleWebAreaElementService : TraverseElementSe
             return nil
         }
         
+        element.setClippedFrame(elementClipBounds())
+        
         let children = try? getRecursiveChildrenThroughSearchPredicate()
-        let visibleChildren = children?.filter { child in
-            return elementClipBounds().intersects(child.frame)
+
+        var visibleChildren: [Element] = []
+        for child in children ?? [] {
+            let clipBounds = elementClipBounds().intersection(child.frame)
+            if (!clipBounds.isEmpty) {
+                child.setClippedFrame(clipBounds)
+                visibleChildren.append(child)
+            }
         }
-        let recursiveChildrenNodes = visibleChildren?
+
+        let recursiveChildrenNodes = visibleChildren
             .map { ElementTreeNode(root: $0, children: nil) }
         return ElementTreeNode(root: element, children: recursiveChildrenNodes)
     }

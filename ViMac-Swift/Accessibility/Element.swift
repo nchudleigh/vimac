@@ -9,11 +9,13 @@
 import Cocoa
 import AXSwift
 
-struct Element {
+class Element {
     let rawElement: AXUIElement
     let frame: NSRect
     let actions: [String]
     let role: String
+    
+    var clippedFrame: NSRect?
     
     static func initialize(rawElement: AXUIElement) -> Element? {
         let uiElement = UIElement.init(rawElement)
@@ -31,5 +33,16 @@ struct Element {
         guard let actions = try? uiElement.actionsAsStrings() else { return nil }
         
         return Element.init(rawElement: rawElement, frame: frame, actions: actions, role: role)
+    }
+    
+    init(rawElement: AXUIElement, frame: NSRect, actions: [String], role: String) {
+        self.rawElement = rawElement
+        self.frame = frame
+        self.actions = actions
+        self.role = role
+    }
+    
+    func setClippedFrame(_ clippedFrame: NSRect) {
+        self.clippedFrame = clippedFrame
     }
 }
