@@ -22,11 +22,19 @@ class TraverseSafariWebAreaElementService : TraverseElementService {
         self.containerElement = containerElement
     }
     
-    func perform() -> ElementTreeNode {
+    func perform() -> ElementTreeNode? {
+        if !isElementVisible() {
+            return nil
+        }
+        
         let recursiveChildren = try? getRecursiveChildrenThroughSearchPredicate()
         let recursiveChildrenNodes = recursiveChildren?
             .map { SafariWebAreaElementTreeNode(root: $0, children: nil) }
         return SafariWebAreaElementTreeNode(root: element, children: recursiveChildrenNodes)
+    }
+    
+    private func isElementVisible() -> Bool {
+        containerElement?.frame.intersects(element.frame) ?? true
     }
     
     private func getRecursiveChildrenThroughSearchPredicate() throws -> [Element]? {

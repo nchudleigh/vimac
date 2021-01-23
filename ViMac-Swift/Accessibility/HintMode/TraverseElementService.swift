@@ -10,5 +10,5 @@ import Cocoa
 
 protocol TraverseElementService {
     init(element: Element, app: NSRunningApplication, windowElement: Element, containerElement: Element?)
-    func perform() -> ElementTreeNode
+    func perform() -> ElementTreeNode?
 }

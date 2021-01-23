@@ -24,14 +24,22 @@ class TraverseGenericElementService : TraverseElementService {
         self.containerElement = containerElement
     }
     
-    func perform() -> ElementTreeNode {
-        let children: [Element]? = try? getVisibleChildren(element)
+    func perform() -> ElementTreeNode? {
+        if !isElementVisible() {
+            return nil
+        }
+        
+        let children: [Element]? = try? getChildren(element)
 
         let childrenNodes = children?
             .map { traverseElement($0) }
             .compactMap({ $0 })
 
         return ElementTreeNode.init(root: element, children: childrenNodes)
+    }
+    
+    private func isElementVisible() -> Bool {
+        containerElement?.frame.intersects(element.frame) ?? true
     }
     
     private func traverseElement(_ element: Element) -> ElementTreeNode? {
@@ -53,14 +61,7 @@ class TraverseGenericElementService : TraverseElementService {
 
         return containerElement
     }
-    
-    private func getVisibleChildren(_ element: Element) throws -> [Element]? {
-        try getChildren(element)?.filter({ child in
-            (childContainerElement?.frame.intersects(child.frame) ?? true) &&
-                child.frame.intersects(windowElement.frame)
-        })
-    }
-    
+
     private func getChildren(_ element: Element) throws -> [Element]? {
         let rawElements: [AXUIElement]? = try {
             if element.role == "AXTable" || element.role == "AXOutline" {
