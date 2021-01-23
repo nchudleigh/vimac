@@ -17,6 +17,7 @@ class FlattenElementTreeNode {
     }
     
     func perform() -> [Element] {
+        assert(root.root.role == "AXWindow")
         flatten(root)
         return result
     }

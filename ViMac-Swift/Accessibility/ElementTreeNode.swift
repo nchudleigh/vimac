@@ -20,7 +20,11 @@ class ElementTreeNode {
     }
     
     func isHintable() -> Bool {
-        isActionable() || isRowWithoutHintableChildren()
+        if root.role == "AXWindow" {
+            return false
+        }
+        
+        return isActionable() || isRowWithoutHintableChildren()
     }
     
     private func isActionable() -> Bool {
