@@ -68,6 +68,7 @@
 		E2C29571234E19E4001A38D6 /* HintModeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2C29570234E19E4001A38D6 /* HintModeViewController.swift */; };
 		E2C3221E23BC828C00508B44 /* HideCursorGlobally.m in Sources */ = {isa = PBXBuildFile; fileRef = E2C3221D23BC828C00508B44 /* HideCursorGlobally.m */; };
 		E2D7B12425BBF71000EA2531 /* FlattenElementTreeNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2D7B12325BBF71000EA2531 /* FlattenElementTreeNode.swift */; };
+		E2D7B12625BBF75E00EA2531 /* ElementTreeNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2D7B12525BBF75E00EA2531 /* ElementTreeNode.swift */; };
 		E2DFF5AB24815C5800B4090D /* PreferencesPaneIdentifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2DFF5AA24815C5800B4090D /* PreferencesPaneIdentifiers.swift */; };
 		E2DFF5AD24815D3E00B4090D /* GeneralPreferenceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2DFF5AC24815D3E00B4090D /* GeneralPreferenceViewController.swift */; };
 		E2DFF5B12481693800B4090D /* HintModePreferenceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2DFF5B02481693800B4090D /* HintModePreferenceViewController.swift */; };
@@ -196,6 +197,7 @@
 		E2C3221C23BC828C00508B44 /* HideCursorGlobally.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HideCursorGlobally.h; sourceTree = "<group>"; };
 		E2C3221D23BC828C00508B44 /* HideCursorGlobally.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HideCursorGlobally.m; sourceTree = "<group>"; };
 		E2D7B12325BBF71000EA2531 /* FlattenElementTreeNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlattenElementTreeNode.swift; sourceTree = "<group>"; };
+		E2D7B12525BBF75E00EA2531 /* ElementTreeNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElementTreeNode.swift; sourceTree = "<group>"; };
 		E2DFF5AA24815C5800B4090D /* PreferencesPaneIdentifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesPaneIdentifiers.swift; sourceTree = "<group>"; };
 		E2DFF5AC24815D3E00B4090D /* GeneralPreferenceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneralPreferenceViewController.swift; sourceTree = "<group>"; };
 		E2DFF5B02481693800B4090D /* HintModePreferenceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HintModePreferenceViewController.swift; sourceTree = "<group>"; };
@@ -410,6 +412,7 @@
 				E267777F255FE0420034B131 /* QueryScrollAreasService.swift */,
 				E25BBB58250CC37600D11213 /* HintMode */,
 				E270F4202503E7A800AD305A /* Element.swift */,
+				E2D7B12525BBF75E00EA2531 /* ElementTreeNode.swift */,
 			);
 			path = Accessibility;
 			sourceTree = "<group>";
@@ -741,6 +744,7 @@
 				E25BBB60250CD28600D11213 /* ObserveApplicationNotificationService.swift in Sources */,
 				E20D0CB425581AEF00A5CAEE /* Trie.swift in Sources */,
 				E270F4212503E7A800AD305A /* Element.swift in Sources */,
+				E2D7B12625BBF75E00EA2531 /* ElementTreeNode.swift in Sources */,
 				E20696F923290D41001EFDB2 /* Log.swift in Sources */,
 				E23140D825067A46004D1B96 /* QueryMenuBarExtrasService.swift in Sources */,
 				E25BBB5B250CC4AA00D11213 /* ObserveFrontmostApplicationService.swift in Sources */,
