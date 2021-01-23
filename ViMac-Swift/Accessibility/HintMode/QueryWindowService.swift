@@ -34,28 +34,3 @@ class QueryWindowService {
         FlattenElementTreeNode(node).perform()
     }
 }
-
-class FlattenElementTreeNode {
-    let root: ElementTreeNode
-    var result: [Element] = []
-
-    init(_ root: ElementTreeNode) {
-        self.root = root
-    }
-    
-    func perform() -> [Element] {
-        flatten(root)
-        return result
-    }
-    
-    private func flatten(_ node: ElementTreeNode) {
-        if node.isHintable() {
-            result.append(node.root)
-        }
-        
-        let children = node.children ?? []
-        for child in children {
-            flatten(child)
-        }
-    }
-}
