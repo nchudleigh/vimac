@@ -39,7 +39,7 @@ class BindingsPreferenceViewController: NSViewController, PreferencePane, NSText
     
     override func viewDidLoad() {
         grid = NSGridView(numberOfColumns: 2, rows: 1)
-        grid.column(at: 0).xPlacement = .trailing
+        grid.column(at: 0).xPlacement = .leading
         grid.translatesAutoresizingMaskIntoConstraints = false
         
         populateGrid()
@@ -51,6 +51,7 @@ class BindingsPreferenceViewController: NSViewController, PreferencePane, NSText
             grid.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -50),
             grid.topAnchor.constraint(equalTo: view.topAnchor, constant: 20),
             grid.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -20),
+            grid.widthAnchor.constraint(lessThanOrEqualToConstant: 500)
         ])
     }
     
@@ -64,6 +65,35 @@ class BindingsPreferenceViewController: NSViewController, PreferencePane, NSText
         scrollModeShortcut = MASShortcutView()
         scrollModeShortcut.associatedUserDefaultsKey = Utils.scrollModeShortcutKey
         grid.addRow(with: [scrollModeShortcutLabel, scrollModeShortcut])
+        
+        let keySequenceHeaderLabel = NSTextField(labelWithString: "Key Sequence Activation")
+        keySequenceHeaderLabel.font = .boldSystemFont(ofSize: 13)
+        grid.addRow(with: [keySequenceHeaderLabel])
+        
+        let keySequenceHeaderHint1 = NSTextField(wrappingLabelWithString: "Activate Vimac by typing key-sequences")
+        keySequenceHeaderHint1.font = .labelFont(ofSize: 13)
+        keySequenceHeaderHint1.textColor = .secondaryLabelColor
+        grid.addRow(with: [keySequenceHeaderHint1])
+        spanCellVertically(
+            cell: grid.cell(for: keySequenceHeaderHint1)!,
+            length: 2
+        )
+
+        let keySequenceHeaderHint2 = NSTextField(wrappingLabelWithString: "You will need to enable Input Monitoring permissions under System Preferences > Security & Privacy > Privacy > Input Monitoring")
+        keySequenceHeaderHint2.font = .labelFont(ofSize: 13)
+        keySequenceHeaderHint2.textColor = .secondaryLabelColor
+        grid.addRow(with: [keySequenceHeaderHint2])
+        spanCellVertically(
+            cell: grid.cell(for: keySequenceHeaderHint2)!,
+            length: 2
+        )
+        
+        let openSystemPreferencesSecurityButton = NSButton(title: "Open Security & Privacy System Preferences", target: self, action: #selector(openSystemPreferencesSecurity))
+        grid.addRow(with: [openSystemPreferencesSecurityButton])
+        spanCellVertically(
+            cell: grid.cell(for: openSystemPreferencesSecurityButton)!,
+            length: 2
+        )
         
         let hintModeKeySequenceLabel = NSTextField(labelWithString: "Hint Mode Key Sequence:")
         hintModeKeySequenceEnabledCheckbox = NSButton(checkboxWithTitle: "Enabled", target: self, action: #selector(onHintModeKeySequenceCheckboxClick))
@@ -90,6 +120,19 @@ class BindingsPreferenceViewController: NSViewController, PreferencePane, NSText
         grid.addRow(with: [resetDelayLabel, resetDelayTextField])
         
         fillFields()
+    }
+    
+    private func spanCellVertically(cell: NSGridCell, length: Int) {
+        let row = grid.index(of: cell.row!)
+        grid.mergeCells(
+            inHorizontalRange: .init(location: 0, length: 2),
+            verticalRange: .init(location: row, length: 1)
+        )
+    }
+    
+    @objc private func openSystemPreferencesSecurity() {
+        let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_ListenEvent")!
+        NSWorkspace.shared.open(url)
     }
     
     private func fillFields() {
