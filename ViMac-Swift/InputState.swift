@@ -21,7 +21,7 @@ class InputState {
         case invalidTransition
     }
     
-    private let trie: Trie
+    private var trie: Trie
     private var currentTrieNode: TrieNode
     private(set) public var state: State
     
@@ -70,7 +70,10 @@ class InputState {
         if state != .matched {
             throw StateMachineError.invalidTransition
         }
-        
+        return typed()
+    }
+    
+    private func typed() -> [Character] {
         var seqRev: [Character] = []
         var s: TrieNode? = self.currentTrieNode
         while s != nil {
@@ -82,7 +85,7 @@ class InputState {
         return seqRev.reversed()
     }
 
-    func reset() {
+    func resetInput() {
         self.currentTrieNode = self.trie.root
         self.state = .wordsAdded
     }
