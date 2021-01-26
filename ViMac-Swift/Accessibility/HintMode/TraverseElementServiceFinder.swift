@@ -19,11 +19,7 @@ class TraverseElementServiceFinder {
     }
     
     func find() -> TraverseElementService.Type {
-        if element.role == "AXWebArea" && supportsChildrenThroughSearchPredicate() {
-            if app.bundleIdentifier == "com.apple.Safari" {
-                return TraverseSafariWebAreaElementService.self
-            }
-            
+        if element.role == "AXWebArea" && supportsChildrenThroughSearchPredicate() {            
             return TraverseSearchPredicateCompatibleWebAreaElementService.self
         }
         

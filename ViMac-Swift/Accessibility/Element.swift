@@ -9,11 +9,13 @@
 import Cocoa
 import AXSwift
 
-struct Element {
+class Element {
     let rawElement: AXUIElement
     let frame: NSRect
     let actions: [String]
     let role: String
+    
+    var clippedFrame: NSRect?
     
     static func initialize(rawElement: AXUIElement) -> Element? {
         let uiElement = UIElement.init(rawElement)
@@ -32,50 +34,15 @@ struct Element {
         
         return Element.init(rawElement: rawElement, frame: frame, actions: actions, role: role)
     }
-}
-
-class ElementTreeNode {
-    let root: Element
-    let children: [ElementTreeNode]?
-    private var cachedHintableChildrenCount: Int?
     
-    init(root: Element, children: [ElementTreeNode]?) {
-        self.root = root
-        self.children = children
+    init(rawElement: AXUIElement, frame: NSRect, actions: [String], role: String) {
+        self.rawElement = rawElement
+        self.frame = frame
+        self.actions = actions
+        self.role = role
     }
     
-    func isHintable() -> Bool {
-        isActionable() || isRowWithoutHintableChildren()
-    }
-    
-    private func isActionable() -> Bool {
-        let ignoredActions: Set = [
-            "AXShowMenu",
-            "AXScrollToVisible",
-        ]
-        let actions = Set(root.actions).subtracting(ignoredActions)
-        return actions.count > 0
-    }
-    
-    private func isRowWithoutHintableChildren() -> Bool {
-        hintableChildrenCount() == 0 && root.role == "AXRow"
-    }
-    
-    private func hintableChildrenCount() -> Int {
-        if let hintableChildrenCount = cachedHintableChildrenCount {
-            return hintableChildrenCount
-        }
-        let children = self.children ?? []
-        let hintableChildrenCount = children
-            .map { $0.hintableChildrenCount() }
-            .reduce(0, +)
-        self.cachedHintableChildrenCount = hintableChildrenCount
-        return hintableChildrenCount
-    }
-}
-
-class SafariWebAreaElementTreeNode : ElementTreeNode {
-    override func isHintable() -> Bool {
-        return true
+    func setClippedFrame(_ clippedFrame: NSRect) {
+        self.clippedFrame = clippedFrame
     }
 }

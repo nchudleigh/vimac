@@ -61,12 +61,13 @@
 		E28CB6A825B02A8200554D00 /* VimacKeySequenceListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = E28CB6A725B02A8200554D00 /* VimacKeySequenceListener.swift */; };
 		E290EF4B24F93343004B1A83 /* QueryWindowService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E290EF4A24F93342004B1A83 /* QueryWindowService.swift */; };
 		E2B3F64B24F24B9800FD5594 /* HintModeInputListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2B3F64A24F24B9800FD5594 /* HintModeInputListener.swift */; };
-		E2B98A46258DF15C00A90B2F /* TraverseSafariWebAreaElementService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2B98A45258DF15C00A90B2F /* TraverseSafariWebAreaElementService.swift */; };
 		E2C29562234DD7F8001A38D6 /* OverlayWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2C29561234DD7F8001A38D6 /* OverlayWindowController.swift */; };
 		E2C29566234DE09C001A38D6 /* ModeCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2C29565234DE09C001A38D6 /* ModeCoordinator.swift */; };
 		E2C29568234DE51F001A38D6 /* ModeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2C29567234DE51F001A38D6 /* ModeViewController.swift */; };
 		E2C29571234E19E4001A38D6 /* HintModeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2C29570234E19E4001A38D6 /* HintModeViewController.swift */; };
 		E2C3221E23BC828C00508B44 /* HideCursorGlobally.m in Sources */ = {isa = PBXBuildFile; fileRef = E2C3221D23BC828C00508B44 /* HideCursorGlobally.m */; };
+		E2D7B12425BBF71000EA2531 /* FlattenElementTreeNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2D7B12325BBF71000EA2531 /* FlattenElementTreeNode.swift */; };
+		E2D7B12625BBF75E00EA2531 /* ElementTreeNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2D7B12525BBF75E00EA2531 /* ElementTreeNode.swift */; };
 		E2DFF5AB24815C5800B4090D /* PreferencesPaneIdentifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2DFF5AA24815C5800B4090D /* PreferencesPaneIdentifiers.swift */; };
 		E2DFF5AD24815D3E00B4090D /* GeneralPreferenceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2DFF5AC24815D3E00B4090D /* GeneralPreferenceViewController.swift */; };
 		E2DFF5B12481693800B4090D /* HintModePreferenceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2DFF5B02481693800B4090D /* HintModePreferenceViewController.swift */; };
@@ -187,13 +188,14 @@
 		E28CB6A725B02A8200554D00 /* VimacKeySequenceListener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VimacKeySequenceListener.swift; sourceTree = "<group>"; };
 		E290EF4A24F93342004B1A83 /* QueryWindowService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryWindowService.swift; sourceTree = "<group>"; };
 		E2B3F64A24F24B9800FD5594 /* HintModeInputListener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HintModeInputListener.swift; sourceTree = "<group>"; };
-		E2B98A45258DF15C00A90B2F /* TraverseSafariWebAreaElementService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TraverseSafariWebAreaElementService.swift; sourceTree = "<group>"; };
 		E2C29561234DD7F8001A38D6 /* OverlayWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayWindowController.swift; sourceTree = "<group>"; };
 		E2C29565234DE09C001A38D6 /* ModeCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModeCoordinator.swift; sourceTree = "<group>"; };
 		E2C29567234DE51F001A38D6 /* ModeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModeViewController.swift; sourceTree = "<group>"; };
 		E2C29570234E19E4001A38D6 /* HintModeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HintModeViewController.swift; sourceTree = "<group>"; };
 		E2C3221C23BC828C00508B44 /* HideCursorGlobally.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HideCursorGlobally.h; sourceTree = "<group>"; };
 		E2C3221D23BC828C00508B44 /* HideCursorGlobally.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HideCursorGlobally.m; sourceTree = "<group>"; };
+		E2D7B12325BBF71000EA2531 /* FlattenElementTreeNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlattenElementTreeNode.swift; sourceTree = "<group>"; };
+		E2D7B12525BBF75E00EA2531 /* ElementTreeNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElementTreeNode.swift; sourceTree = "<group>"; };
 		E2DFF5AA24815C5800B4090D /* PreferencesPaneIdentifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesPaneIdentifiers.swift; sourceTree = "<group>"; };
 		E2DFF5AC24815D3E00B4090D /* GeneralPreferenceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneralPreferenceViewController.swift; sourceTree = "<group>"; };
 		E2DFF5B02481693800B4090D /* HintModePreferenceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HintModePreferenceViewController.swift; sourceTree = "<group>"; };
@@ -289,7 +291,7 @@
 				E23140D52506781E004D1B96 /* QueryMenuBarItemsService.swift */,
 				E23140D725067A46004D1B96 /* QueryMenuBarExtrasService.swift */,
 				E23140D92507B2C1004D1B96 /* QueryNotificationCenterItemsService.swift */,
-				E2B98A45258DF15C00A90B2F /* TraverseSafariWebAreaElementService.swift */,
+				E2D7B12325BBF71000EA2531 /* FlattenElementTreeNode.swift */,
 			);
 			path = HintMode;
 			sourceTree = "<group>";
@@ -407,6 +409,7 @@
 				E267777F255FE0420034B131 /* QueryScrollAreasService.swift */,
 				E25BBB58250CC37600D11213 /* HintMode */,
 				E270F4202503E7A800AD305A /* Element.swift */,
+				E2D7B12525BBF75E00EA2531 /* ElementTreeNode.swift */,
 			);
 			path = Accessibility;
 			sourceTree = "<group>";
@@ -728,6 +731,7 @@
 				E270F5CB2504D9DE00AD305A /* TraverseElementService.swift in Sources */,
 				E26981BB23C9E35D00E46217 /* TISInputSourceExtension.swift in Sources */,
 				E2DFF5AD24815D3E00B4090D /* GeneralPreferenceViewController.swift in Sources */,
+				E2D7B12425BBF71000EA2531 /* FlattenElementTreeNode.swift in Sources */,
 				E266D916248AAC99005A261F /* UserPreferences.swift in Sources */,
 				E2C29566234DE09C001A38D6 /* ModeCoordinator.swift in Sources */,
 				E2C29562234DD7F8001A38D6 /* OverlayWindowController.swift in Sources */,
@@ -737,6 +741,7 @@
 				E25BBB60250CD28600D11213 /* ObserveApplicationNotificationService.swift in Sources */,
 				E20D0CB425581AEF00A5CAEE /* Trie.swift in Sources */,
 				E270F4212503E7A800AD305A /* Element.swift in Sources */,
+				E2D7B12625BBF75E00EA2531 /* ElementTreeNode.swift in Sources */,
 				E20696F923290D41001EFDB2 /* Log.swift in Sources */,
 				E23140D825067A46004D1B96 /* QueryMenuBarExtrasService.swift in Sources */,
 				E25BBB5B250CC4AA00D11213 /* ObserveFrontmostApplicationService.swift in Sources */,
@@ -748,7 +753,6 @@
 				E270C0E3259F3B52003A48FB /* GlobalEventTap.swift in Sources */,
 				E21D74AE25B45A9E00159E73 /* BindingsUserDefaults.swift in Sources */,
 				E2677790256187230034B131 /* ScrollModeActiveScrollAreaViewController.swift in Sources */,
-				E2B98A46258DF15C00A90B2F /* TraverseSafariWebAreaElementService.swift in Sources */,
 				E2677780255FE0420034B131 /* QueryScrollAreasService.swift in Sources */,
 				E270C0E5259F5D98003A48FB /* KeySequenceListener.swift in Sources */,
 				E23140D62506781E004D1B96 /* QueryMenuBarItemsService.swift in Sources */,

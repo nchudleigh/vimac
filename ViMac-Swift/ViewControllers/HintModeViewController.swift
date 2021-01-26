@@ -152,13 +152,14 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
 
         if matchingHints.count == 1 {
             let matchingHint = matchingHints.first!
-            let button = matchingHint.associatedElement
+            let element = matchingHint.associatedElement
 
-            let buttonPosition = button.frame.origin
-            let buttonSize = button.frame.size
+            let frame = element.clippedFrame ?? element.frame
+            let position = frame.origin
+            let size = frame.size
 
-            let centerPositionX = buttonPosition.x + (buttonSize.width / 2)
-            let centerPositionY = buttonPosition.y + (buttonSize.height / 2)
+            let centerPositionX = position.x + (size.width / 2)
+            let centerPositionY = position.y + (size.height / 2)
             let centerPosition = NSPoint(x: centerPositionX, y: centerPositionY)
 
             // close the window before performing click(s)
@@ -254,8 +255,9 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
         
         let centerPositionOptional: NSPoint? = {
             do {
-                let topLeftPositionFlipped: NSPoint = associatedElement.frame.origin
-                let buttonSize: NSSize = associatedElement.frame.size
+                let frame = associatedElement.clippedFrame ?? associatedElement.frame
+                let topLeftPositionFlipped: NSPoint = frame.origin
+                let buttonSize: NSSize = frame.size
                 let topLeftPositionRelativeToScreen = Utils.toOrigin(point: topLeftPositionFlipped, size: text.frame.size)
                 guard let topLeftPositionRelativeToWindow = self.modeCoordinator?.windowController.window?.convertPoint(fromScreen: topLeftPositionRelativeToScreen) else {
                     return nil
