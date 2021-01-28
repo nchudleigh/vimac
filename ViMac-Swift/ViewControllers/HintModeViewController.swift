@@ -271,7 +271,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
                     return nil
                 }
                 
-                return NSPoint(x: x + textOffset.x, y: y + textOffset.y)
+                return NSPoint(x: x + textOffset.x, y: y - textOffset.y)
             } catch {
                 return nil
             }

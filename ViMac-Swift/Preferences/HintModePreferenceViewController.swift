@@ -62,7 +62,7 @@ final class HintModePreferenceViewController: NSViewController, NSTextFieldDeleg
         let textOffstRow: [NSView] = [textOffsetLabel, textOffsetField]
         grid.addRow(with: textOffstRow)
         
-        let customCharactersHint3 = NSTextField(wrappingLabelWithString: "Format: {x},{y}.")
+        let customCharactersHint3 = NSTextField(wrappingLabelWithString: "Format: {left},{up}. Position hint in center and transfer the offset")
         customCharactersHint3.font = .labelFont(ofSize: 11)
         customCharactersHint3.textColor = .secondaryLabelColor
         grid.addRow(with: [NSGridCell.emptyContentView, customCharactersHint3])

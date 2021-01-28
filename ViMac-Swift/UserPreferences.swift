@@ -73,7 +73,7 @@ struct UserPreferences {
             typealias T = String
             
             static var key = "HintOffsetSize"
-            static var defaultValue = "0, -10"
+            static var defaultValue = "0, 0"
             
             static func isValid(value: String) -> Bool {
                 
