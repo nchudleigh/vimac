@@ -68,6 +68,35 @@ struct UserPreferences {
                 return Float(read())!
             }
         }
+        
+        class TextOffsetProperty : PreferenceProperty {
+            typealias T = String
+            
+            static var key = "HintOffsetSize"
+            static var defaultValue = "0, -10"
+            
+            static func isValid(value: String) -> Bool {
+                
+                let numbers = value.components(separatedBy: ",")
+                    .lazy
+                    .compactMap { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+                    .compactMap { Float($0) }
+                    .compactMap { CGFloat($0) }
+                
+                return numbers.count >= 2
+            }
+            
+            static func readAsPoint() -> CGPoint {
+                
+                let numbers = read().components(separatedBy: ",")
+                    .lazy
+                    .compactMap { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+                    .compactMap { Float($0) }
+                    .compactMap { CGFloat($0) }
+                
+                return CGPoint(x: numbers[0], y: numbers[1])
+            }
+        }
     }
     
     struct ScrollMode {

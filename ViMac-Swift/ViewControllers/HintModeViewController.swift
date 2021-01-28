@@ -233,11 +233,12 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
         let hintStrings = AlphabetHints().hintStrings(linkCount: elements.count, hintCharacters: UserPreferences.HintMode.CustomCharactersProperty.read())
         
         let textSize = UserPreferences.HintMode.TextSizeProperty.readAsFloat()
+        let textOffset = UserPreferences.HintMode.TextOffsetProperty.readAsPoint()
 
         let hintViews: [HintView] = elements
             .enumerated()
             .map ({ (index, element) in
-                return instantiateHintView(associatedElement: element, textSize: CGFloat(textSize), text: hintStrings[index])
+                return instantiateHintView(associatedElement: element, textSize: CGFloat(textSize), textOffset: textOffset, text: hintStrings[index])
             })
             .compactMap({ $0 })
         
@@ -250,7 +251,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
         self.inputListeningTextField.becomeFirstResponder()
     }
     
-    func instantiateHintView(associatedElement: Element, textSize: CGFloat, text: String) -> HintView? {
+    func instantiateHintView(associatedElement: Element, textSize: CGFloat, textOffset: CGPoint, text: String) -> HintView? {
         let text = HintView(associatedElement: associatedElement, hintTextSize: CGFloat(textSize), hintText: text, typedHintText: "")
         
         let centerPositionOptional: NSPoint? = {
@@ -270,7 +271,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
                     return nil
                 }
                 
-                return NSPoint(x: x, y: y)
+                return NSPoint(x: x + textOffset.x, y: y + textOffset.y)
             } catch {
                 return nil
             }

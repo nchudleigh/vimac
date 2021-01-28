@@ -9,6 +9,7 @@ final class HintModePreferenceViewController: NSViewController, NSTextFieldDeleg
     private var grid: NSGridView!
     private var customCharactersField: NSTextField!
     private var textSizeField: NSTextField!
+    private var textOffsetField: NSTextField!
     
     init() {
         super.init(nibName: nil, bundle: nil)
@@ -53,6 +54,19 @@ final class HintModePreferenceViewController: NSViewController, NSTextFieldDeleg
         let textSizeRow: [NSView] = [textSizeLabel, textSizeField]
         grid.addRow(with: textSizeRow)
         
+        let textOffsetLabel = NSTextField(labelWithString: "Text Offset:")
+        textOffsetField = NSTextField()
+        textOffsetField.delegate = self
+        textOffsetField.placeholderString = UserPreferences.HintMode.TextOffsetProperty.defaultValue
+        textOffsetField.stringValue = UserPreferences.HintMode.TextOffsetProperty.readUnvalidated() ?? ""
+        let textOffstRow: [NSView] = [textOffsetLabel, textOffsetField]
+        grid.addRow(with: textOffstRow)
+        
+        let customCharactersHint3 = NSTextField(wrappingLabelWithString: "Format: {x},{y}.")
+        customCharactersHint3.font = .labelFont(ofSize: 11)
+        customCharactersHint3.textColor = .secondaryLabelColor
+        grid.addRow(with: [NSGridCell.emptyContentView, customCharactersHint3])
+        
         self.view.addSubview(grid)
         
         NSLayoutConstraint.activate([
@@ -85,6 +99,17 @@ final class HintModePreferenceViewController: NSViewController, NSTextFieldDeleg
         }
     }
     
+    func onTextOffsetFieldEndEditing() {
+        let value = textOffsetField.stringValue
+        let isValid = UserPreferences.HintMode.TextOffsetProperty.isValid(value: value)
+
+        if value.count > 0 && !isValid {
+            showInvalidValueDialog(value)
+        } else {
+            UserPreferences.HintMode.TextOffsetProperty.save(value: value)
+        }
+    }
+    
     func controlTextDidEndEditing(_ notification: Notification) {
         guard let textField = notification.object as? NSTextField else {
             return
@@ -97,6 +122,11 @@ final class HintModePreferenceViewController: NSViewController, NSTextFieldDeleg
 
         if textField == textSizeField {
             onTextSizeFieldEndEditing()
+            return
+        }
+        
+        if textField == textOffsetField {
+            onTextOffsetFieldEndEditing()
             return
         }
     }
