@@ -14,20 +14,20 @@ class ScrollModeViewController: ModeViewController {
     private let inputListener = InputListener()
     private var inputListeningTextField: NSTextField?
     private let window: Element
-    
+
     init(window: Element) {
         self.window = window
         super.init()
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError()
     }
-    
+
     override func viewWillAppear() {
         observeScrollAreas().disposed(by: disposeBag)
         observeEscKey().disposed(by: disposeBag)
-        
+
         attachInputListeningTextField()
     }
 
@@ -35,22 +35,22 @@ class ScrollModeViewController: ModeViewController {
         let vc = ScrollModeActiveViewController(scrollAreas: scrollAreas, inputListener: inputListener)
         setChildViewController(vc)
     }
-    
+
     private func setChildViewController(_ vc: NSViewController) {
         assert(self.children.count <= 1)
         removeChildViewController()
-        
+
         self.addChild(vc)
         vc.view.frame = self.view.frame
         self.view.addSubview(vc.view)
     }
-    
+
     private func removeChildViewController() {
         guard let childVC = self.children.first else { return }
         childVC.view.removeFromSuperview()
         childVC.removeFromParent()
     }
-    
+
     private func observeScrollAreas() -> Disposable {
         fetchScrollAreas()
             .observeOn(MainScheduler.instance)
@@ -60,7 +60,7 @@ class ScrollModeViewController: ModeViewController {
                 self?.modeCoordinator?.exitMode()
             })
     }
-    
+
     private func observeEscKey() -> Disposable {
         let escEvents = inputListener.keyDownEvents.filter { $0.keyCode == kVK_Escape }
         return escEvents
@@ -68,17 +68,15 @@ class ScrollModeViewController: ModeViewController {
                 self?.modeCoordinator?.exitMode()
             })
     }
-    
+
     private func fetchScrollAreas() -> Single<[Element]> {
         return Single.create { observer in
             let thread = Thread.init {
                 do {
                     var scrollAreas = try QueryScrollAreasService.init(windowElement: self.window).perform()
-                    
-                    if scrollAreas.count == 0 {
-                        scrollAreas.append(self.window)
-                    }
-                    
+
+                    scrollAreas.append(self.window)
+
                     observer(.success(scrollAreas))
                 } catch {
                     observer(.error(error))
@@ -90,7 +88,7 @@ class ScrollModeViewController: ModeViewController {
             }
         }
     }
-    
+
     private func attachInputListeningTextField() {
         let textField = NSTextField()
         textField.stringValue = ""
@@ -98,7 +96,7 @@ class ScrollModeViewController: ModeViewController {
 
         self.view.addSubview(textField)
         textField.becomeFirstResponder()
-        
+
         self.inputListeningTextField = textField
     }
 }
