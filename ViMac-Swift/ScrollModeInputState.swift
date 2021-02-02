@@ -14,7 +14,7 @@ class ScrollModeInputState {
         let config = UserPreferences.ScrollMode.ScrollKeysProperty.readAsConfig()
         
         for binding in config.bindings {
-            try! scrollModeInputState.registerBinding(binding: binding)
+            try! _ = scrollModeInputState.registerBinding(binding: binding)
         }
         
         return scrollModeInputState

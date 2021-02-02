@@ -91,7 +91,7 @@ class FrontmostApplicationService {
                             notification: notification
                         ))
                     })
-                    return Disposables.create { service /* keeping a reference here to prevent the service from being GC'd */ }
+                    return Disposables.create { _ = service /* keeping a reference here to prevent the service from being GC'd */ }
                 }
             })
     }
