@@ -4,7 +4,7 @@ import Preferences
 import LaunchAtLogin
 
 final class GeneralPreferenceViewController: NSViewController, PreferencePane {
-    let preferencePaneIdentifier = PreferencePane.Identifier.general
+    let preferencePaneIdentifier = Preferences.PaneIdentifier.general
     let preferencePaneTitle = "General"
     let toolbarItemIcon: NSImage = NSImage(named: NSImage.preferencesGeneralName)!
     

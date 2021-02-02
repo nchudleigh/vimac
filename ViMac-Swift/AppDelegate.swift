@@ -125,7 +125,7 @@ import Preferences
     
     func showWelcomeWindowController() {
         let storyboard = NSStoryboard.init(name: "Main", bundle: nil)
-        welcomeWindowController = storyboard.instantiateController(withIdentifier: "WelcomeWindowController") as! NSWindowController
+        welcomeWindowController = storyboard.instantiateController(withIdentifier: "WelcomeWindowController") as? NSWindowController
         NSApp.activate(ignoringOtherApps: true)
         welcomeWindowController?.showWindow(nil)
         welcomeWindowController?.window?.makeKeyAndOrderFront(nil)
@@ -151,7 +151,7 @@ import Preferences
     }
     
     func setupWindowEventAndShortcutObservables() {
-        self.compositeDisposable.insert(applicationObservable
+        _ = self.compositeDisposable.insert(applicationObservable
             .observeOn(MainScheduler.instance)
             .subscribe(onNext: { appOptional in
                 if let app = appOptional {
@@ -160,21 +160,21 @@ import Preferences
             })
         )
 
-        self.compositeDisposable.insert(focusedWindowDisturbedObservable
+        _ = self.compositeDisposable.insert(focusedWindowDisturbedObservable
             .observeOn(MainScheduler.instance)
             .subscribe(onNext: { notification in
                 self.modeCoordinator.exitMode()
             })
         )
         
-        self.compositeDisposable.insert(windowObservable
+        _ = self.compositeDisposable.insert(windowObservable
             .observeOn(MainScheduler.instance)
             .subscribe(onNext: { windowOptional in
                 self.modeCoordinator.exitMode()
             })
         )
 
-        self.compositeDisposable.insert(hintModeShortcutObservable
+        _ = self.compositeDisposable.insert(hintModeShortcutObservable
             .observeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak self] _ in
                 if self?.modeCoordinator.windowController.window?.contentViewController?.className == HintModeViewController.className() {
@@ -185,7 +185,7 @@ import Preferences
             })
         )
         
-        self.compositeDisposable.insert(scrollModeShortcutObservable
+        _ = self.compositeDisposable.insert(scrollModeShortcutObservable
             .observeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak self] _ in
                 if self?.modeCoordinator.windowController.window?.contentViewController?.className == ScrollModeViewController.className() {

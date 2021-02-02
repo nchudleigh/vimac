@@ -61,7 +61,7 @@ class KeySequenceListener {
             })
         }
         
-        eventTap?.enable()
+        _ = eventTap?.enable()
     }
     
     func stop() {

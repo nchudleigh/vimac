@@ -12,7 +12,7 @@
 
 + (void) hide {
     void CGSSetConnectionProperty(int, int, CFStringRef, CFBooleanRef);
-    int _CGSDefaultConnection();
+    int _CGSDefaultConnection(void);
     CFStringRef propertyString;
 
     // Hack to make background cursor setting work

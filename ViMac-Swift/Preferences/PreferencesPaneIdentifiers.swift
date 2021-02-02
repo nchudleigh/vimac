@@ -1,8 +1,8 @@
 import Preferences
 
-extension PreferencePane.Identifier {
-    static let general = Identifier("general")
-    static let bindings = Identifier("bindings")
-    static let hintMode = Identifier("hint_mode")
-    static let scrollMode = Identifier("scroll_mode")
+extension Preferences.PaneIdentifier {
+    static let general = Self("general")
+    static let bindings = Self("bindings")
+    static let hintMode = Self("hint_mode")
+    static let scrollMode = Self("scroll_mode")
 }

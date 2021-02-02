@@ -2,7 +2,7 @@ import Cocoa
 import Preferences
 
 final class ScrollModePreferenceViewController: NSViewController, NSTextFieldDelegate, PreferencePane {
-    let preferencePaneIdentifier = PreferencePane.Identifier.scrollMode
+    let preferencePaneIdentifier = Preferences.PaneIdentifier.scrollMode
     let preferencePaneTitle = "Scroll Mode"
     let toolbarItemIcon: NSImage = NSImage(named: "NSColorPanel")!
     

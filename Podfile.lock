@@ -1,14 +1,14 @@
 PODS:
-  - AXSwift (0.2.3)
+  - AXSwift (0.3.1)
   - MASShortcut (2.4.0)
-  - Preferences (1.0.1)
+  - Preferences (2.2.0)
   - RxCocoa (5.1.1):
     - RxRelay (~> 5)
     - RxSwift (~> 5)
   - RxRelay (5.1.1):
     - RxSwift (~> 5)
   - RxSwift (5.1.1)
-  - Sparkle (1.23.0)
+  - Sparkle (1.24.0)
 
 DEPENDENCIES:
   - AXSwift (~> 0.2)
@@ -29,14 +29,14 @@ SPEC REPOS:
     - Sparkle
 
 SPEC CHECKSUMS:
-  AXSwift: d49fe05ca04f983196c5caedfc88f617922ae671
+  AXSwift: 24508e48dd103399d5e495201a8157a663029b92
   MASShortcut: d9e4909e878661cc42877cc9d6efbe638273ab57
-  Preferences: a5afbe0ae3e6bd886328b1960f4998e65d58f2c4
+  Preferences: 4894cc28df3557336b0b72440c893d95203d3e33
   RxCocoa: 32065309a38d29b5b0db858819b5bf9ef038b601
   RxRelay: d77f7d771495f43c556cbc43eebd1bb54d01e8e9
   RxSwift: 81470a2074fa8780320ea5fe4102807cb7118178
-  Sparkle: 55b1a87ba69d56913375a281546b7c82dec95bb0
+  Sparkle: 270cd27377bf04e9c128af06e3a22d0f572d6ee3
 
-PODFILE CHECKSUM: 7b6ba65266337439d7050314252aa63d075aba9b
+PODFILE CHECKSUM: 60185d08a9ac934c3139d555113b4e852360fdd8
 
-COCOAPODS: 1.9.2
+COCOAPODS: 1.10.1

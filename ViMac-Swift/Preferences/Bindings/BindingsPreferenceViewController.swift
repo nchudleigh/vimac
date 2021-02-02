@@ -10,7 +10,7 @@ import Cocoa
 import Preferences
 
 class BindingsPreferenceViewController: NSViewController, PreferencePane, NSTextFieldDelegate {
-    let preferencePaneIdentifier = PreferencePane.Identifier.bindings
+    let preferencePaneIdentifier = Preferences.PaneIdentifier.bindings
     let preferencePaneTitle = "Bindings"
     let toolbarItemIcon: NSImage = NSImage(named: NSImage.advancedName)!
     

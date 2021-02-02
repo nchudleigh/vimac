@@ -12,7 +12,7 @@ import AXSwift
 class WelcomeViewController: NSViewController {
 
     @IBAction func onGrantPermissionButtonClick(_ sender: Any) {
-        UIElement.isProcessTrusted(withPrompt: true)
+        _ = UIElement.isProcessTrusted(withPrompt: true)
     }
     
     override func viewDidLoad() {

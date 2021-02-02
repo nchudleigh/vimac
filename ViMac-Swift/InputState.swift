@@ -81,7 +81,7 @@ class InputState {
             s = s!.parent
         }
         // pop root node's garbage character
-        seqRev.popLast()
+        _ = seqRev.popLast()
         return seqRev.reversed()
     }
 
