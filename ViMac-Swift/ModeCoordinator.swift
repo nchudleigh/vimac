@@ -128,6 +128,7 @@ class ModeCoordinator : Coordinator {
         return observation
     }
     
+    // fun fact, focusedWindow need not return "AXWindow"...
     private func focusedWindow(app: NSRunningApplication) -> Element? {
         let axAppOptional = Application.init(app)
         guard let axApp = axAppOptional else { return nil }
