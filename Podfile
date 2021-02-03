@@ -1,5 +1,5 @@
 # Uncomment the next line to define a global platform for your project
-platform :osx, '11.1'
+platform :osx, '10.14'
 
 target 'Vimac' do
   # Comment the next line if you don't want to use dynamic frameworks
