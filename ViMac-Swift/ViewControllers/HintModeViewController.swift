@@ -44,7 +44,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
         observeDeleteKey()
         observeSpaceKey()
         
-        self.compositeDisposable.insert(observeElements())
+        _ = self.compositeDisposable.insert(observeElements())
         
         hideMouse()
     }
@@ -202,7 +202,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
             guard let vc = self else {
                 return
             }
-            vc.characterStack.popLast()
+            _ = vc.characterStack.popLast()
             vc.updateHints(typed: String(vc.characterStack))
         })
     }
@@ -271,9 +271,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
                 }
                 
                 return NSPoint(x: x, y: y)
-            } catch {
-                return nil
-            }
+            } 
         }()
 
         guard let centerPosition = centerPositionOptional else {

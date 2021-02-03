@@ -2,7 +2,7 @@ import Cocoa
 import Preferences
 
 final class HintModePreferenceViewController: NSViewController, NSTextFieldDelegate, PreferencePane {
-    let preferencePaneIdentifier = PreferencePane.Identifier.hintMode
+    let preferencePaneIdentifier = Preferences.PaneIdentifier.hintMode
     let preferencePaneTitle = "Hint Mode"
     let toolbarItemIcon: NSImage = NSImage(named: "NSFontPanel")!
     
