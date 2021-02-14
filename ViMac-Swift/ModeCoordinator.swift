@@ -84,7 +84,13 @@ class ModeCoordinator : Coordinator {
             return
         }
         
-        let screenFrame = activeScreenFrame(focusedWindowFrame: focusedWindow.frame)
+        let focusedWindowFrame: NSRect = {
+            let topLeftRelativeToTopLeftMenuBar = focusedWindow.frame.origin
+            let topLeftRelativeToGlobalOrigin = NSPoint(x: topLeftRelativeToTopLeftMenuBar.x, y: NSScreen.main!.frame.height - topLeftRelativeToTopLeftMenuBar.y)
+            let bottomLeftRelativeToGlobalOrigin = NSPoint(x: topLeftRelativeToGlobalOrigin.x, y: topLeftRelativeToGlobalOrigin.y - focusedWindow.frame.height)
+            return NSRect(origin: bottomLeftRelativeToGlobalOrigin, size: focusedWindow.frame.size)
+        }()
+        let screenFrame = activeScreenFrame(focusedWindowFrame: focusedWindowFrame)
         
         self.priorKBLayout = InputSourceManager.currentInputSource()
         if let forceKBLayout = self.forceKBLayout {
@@ -103,7 +109,13 @@ class ModeCoordinator : Coordinator {
             return
         }
         
-        let screenFrame = activeScreenFrame(focusedWindowFrame: focusedWindow.frame)
+        let focusedWindowFrame: NSRect = {
+            let topLeftRelativeToTopLeftMenuBar = focusedWindow.frame.origin
+            let topLeftRelativeToGlobalOrigin = NSPoint(x: topLeftRelativeToTopLeftMenuBar.x, y: NSScreen.main!.frame.height - topLeftRelativeToTopLeftMenuBar.y)
+            let bottomLeftRelativeToGlobalOrigin = NSPoint(x: topLeftRelativeToGlobalOrigin.x, y: topLeftRelativeToGlobalOrigin.y - focusedWindow.frame.height)
+            return NSRect(origin: bottomLeftRelativeToGlobalOrigin, size: focusedWindow.frame.size)
+        }()
+        let screenFrame = activeScreenFrame(focusedWindowFrame: focusedWindowFrame)
         
         self.priorKBLayout = InputSourceManager.currentInputSource()
         if let forceKBLayout = self.forceKBLayout {

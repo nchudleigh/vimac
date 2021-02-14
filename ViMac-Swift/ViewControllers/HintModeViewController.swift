@@ -255,15 +255,25 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
         
         let centerPositionOptional: NSPoint? = {
             do {
-                let frame = associatedElement.clippedFrame ?? associatedElement.frame
-                let topLeftPositionFlipped: NSPoint = frame.origin
-                let buttonSize: NSSize = frame.size
-                let topLeftPositionRelativeToScreen = Utils.toOrigin(point: topLeftPositionFlipped, size: text.frame.size)
-                guard let topLeftPositionRelativeToWindow = self.modeCoordinator?.windowController.window?.convertPoint(fromScreen: topLeftPositionRelativeToScreen) else {
-                    return nil
-                }
-                let x = (topLeftPositionRelativeToWindow.x + (buttonSize.width / 2)) - (text.frame.size.width / 2)
-                let y = (topLeftPositionRelativeToWindow.y - (buttonSize.height) / 2) + (text.frame.size.height / 2)
+                let frame = associatedElement.frame
+                let size: NSSize = frame.size
+
+                let menuBarScreen = NSScreen.screens.first!
+                
+                let topLeftRelativeToTopLeftMenuBar: NSPoint = NSPoint(
+                    x: frame.origin.x,
+                    y: -frame.origin.y
+                )
+                let topLeftMenuBarPosition = NSPoint(x: menuBarScreen.frame.origin.x, y: menuBarScreen.frame.origin.y + menuBarScreen.frame.height)
+                let topLeftRelativeToGlobalOrigin = changeOrigin(topLeftRelativeToTopLeftMenuBar,
+                                                                 fromOrigin: topLeftMenuBarPosition,
+                                                                 toOrigin: menuBarScreen.frame.origin)
+                // this window is framed to fit the screen of the target window
+                let screenOrigin = self.view.window!.frame.origin
+                let topLeftRelativeToScreen = changeOrigin(topLeftRelativeToGlobalOrigin, fromOrigin: menuBarScreen.frame.origin, toOrigin: screenOrigin)
+                
+                let x = (topLeftRelativeToScreen.x + (size.width / 2)) - (text.frame.size.width / 2)
+                let y = (topLeftRelativeToScreen.y - (size.height) / 2) - (text.frame.size.height / 2)
                 
                 // buttonSize.width/height and topLeftPositionRelativeToScreen.x/y can be NaN
                 if x.isNaN || y.isNaN {
@@ -277,10 +287,17 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
         guard let centerPosition = centerPositionOptional else {
             return nil
         }
-        
         text.frame.origin = centerPosition
         
         return text
+    }
+    
+    func changeOrigin(_ point: NSPoint, fromOrigin: NSPoint, toOrigin: NSPoint) -> NSPoint {
+        let deltaX = toOrigin.x - fromOrigin.x
+        let deltaY = toOrigin.y - fromOrigin.y
+        let x = point.x - deltaX
+        let y = point.y - deltaY
+        return NSPoint(x: x, y: y)
     }
     
     func updateHints(typed: String) {
