@@ -23,15 +23,6 @@ class Utils: NSObject {
         ])
     }
     
-    // This function returns the position of the point after the y-axis is flipped.
-    // We need this because accessing the position of a AXUIElement gives us the position from top-left,
-    // but the coordinate system in macOS starts from bottom-left.
-    // https://developer.apple.com/documentation/applicationservices/kaxpositionattribute?language=objc
-    static func toOrigin(point: CGPoint, size: CGSize) -> CGPoint {
-        let screenHeight = NSScreen.screens.first!.frame.height
-        return CGPoint(x: point.x, y: screenHeight - size.height - point.y)
-    }
-    
     static func moveMouse(position: CGPoint) {
         let moveEvent = CGEvent(mouseEventSource: nil, mouseType: .mouseMoved, mouseCursorPosition: position, mouseButton: .left)
         moveEvent?.post(tap: .cghidEventTap)

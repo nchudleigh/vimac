@@ -324,8 +324,14 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
         HideCursorGlobally.unhide()
     }
     
-    func revertMouseLocation() {
-        Utils.moveMouse(position: Utils.toOrigin(point: originalMousePosition, size: NSSize.zero))
+    private func revertMouseLocation() {
+        let frame = GeometryUtils.convertAXFrameToGlobal(
+            NSRect(
+                origin: originalMousePosition,
+                size: NSSize.zero
+            )
+        )
+        Utils.moveMouse(position: frame.origin)
     }
 
     override func viewDidDisappear() {
