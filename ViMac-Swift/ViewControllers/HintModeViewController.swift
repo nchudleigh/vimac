@@ -255,29 +255,27 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
         
         let centerPositionOptional: NSPoint? = {
             do {
-                let frame = associatedElement.clippedFrame ?? associatedElement.frame
-                let topLeftPositionFlipped: NSPoint = frame.origin
-                let buttonSize: NSSize = frame.size
-                let topLeftPositionRelativeToScreen = Utils.toOrigin(point: topLeftPositionFlipped, size: text.frame.size)
-                guard let topLeftPositionRelativeToWindow = self.modeCoordinator?.windowController.window?.convertPoint(fromScreen: topLeftPositionRelativeToScreen) else {
+                let globalElementFrame = GeometryUtils.convertAXFrameToGlobal(associatedElement.frame)
+                let screenOrigin = self.view.window!.frame.origin
+                let elementFrameRelativeToScreen = GeometryUtils.convertGlobalFrame(globalElementFrame, relativeTo: screenOrigin)
+                let elementCenter: NSPoint = GeometryUtils.center(elementFrameRelativeToScreen)
+                
+                let hintOrigin = NSPoint(
+                    x: elementCenter.x - (text.frame.size.width / 2),
+                    y: elementCenter.y - (text.frame.size.height / 2)
+                )
+
+                if hintOrigin.x.isNaN || hintOrigin.y.isNaN {
                     return nil
                 }
-                let x = (topLeftPositionRelativeToWindow.x + (buttonSize.width / 2)) - (text.frame.size.width / 2)
-                let y = (topLeftPositionRelativeToWindow.y - (buttonSize.height) / 2) + (text.frame.size.height / 2)
                 
-                // buttonSize.width/height and topLeftPositionRelativeToScreen.x/y can be NaN
-                if x.isNaN || y.isNaN {
-                    return nil
-                }
-                
-                return NSPoint(x: x, y: y)
+                return hintOrigin
             } 
         }()
 
         guard let centerPosition = centerPositionOptional else {
             return nil
         }
-        
         text.frame.origin = centerPosition
         
         return text
@@ -326,8 +324,14 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
         HideCursorGlobally.unhide()
     }
     
-    func revertMouseLocation() {
-        Utils.moveMouse(position: Utils.toOrigin(point: originalMousePosition, size: NSSize.zero))
+    private func revertMouseLocation() {
+        let frame = GeometryUtils.convertAXFrameToGlobal(
+            NSRect(
+                origin: originalMousePosition,
+                size: NSSize.zero
+            )
+        )
+        Utils.moveMouse(position: frame.origin)
     }
 
     override func viewDidDisappear() {

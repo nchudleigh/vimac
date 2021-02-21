@@ -84,7 +84,8 @@ class ModeCoordinator : Coordinator {
             return
         }
         
-        let screenFrame = activeScreenFrame(focusedWindowFrame: focusedWindow.frame)
+        let focusedWindowFrame = GeometryUtils.convertAXFrameToGlobal(focusedWindow.frame)
+        let screenFrame = activeScreenFrame(focusedWindowFrame: focusedWindowFrame)
         
         self.priorKBLayout = InputSourceManager.currentInputSource()
         if let forceKBLayout = self.forceKBLayout {
@@ -103,7 +104,8 @@ class ModeCoordinator : Coordinator {
             return
         }
         
-        let screenFrame = activeScreenFrame(focusedWindowFrame: focusedWindow.frame)
+        let focusedWindowFrame: NSRect = GeometryUtils.convertAXFrameToGlobal(focusedWindow.frame)
+        let screenFrame = activeScreenFrame(focusedWindowFrame: focusedWindowFrame)
         
         self.priorKBLayout = InputSourceManager.currentInputSource()
         if let forceKBLayout = self.forceKBLayout {

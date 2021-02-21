@@ -65,9 +65,8 @@ class ScrollModeActiveViewController: NSViewController {
     
     private func setActiveScrollAreaVC(_ scrollArea: Element) {
         let frame: NSRect = {
-            let topLeftPositionRelativeToScreen = Utils.toOrigin(point: scrollArea.frame.origin, size: scrollArea.frame.size)
-            let topLeftPositionRelativeToWindow = self.view.window!.convertPoint(fromScreen: topLeftPositionRelativeToScreen)
-            return NSRect(origin: topLeftPositionRelativeToWindow, size: scrollArea.frame.size)
+            let frameRelativeToScreen = GeometryUtils.convertAXFrameToGlobal(scrollArea.frame)
+            return self.view.window!.convertFromScreen(frameRelativeToScreen)
         }()
         let vc = ScrollModeActiveScrollAreaViewController(scrollArea: scrollArea, inputListener: inputListener)
         vc.view.frame = frame
@@ -89,6 +88,12 @@ class ScrollModeActiveViewController: NSViewController {
     }
     
     private func revertMouseLocation() {
-        Utils.moveMouse(position: Utils.toOrigin(point: originalMousePosition, size: NSSize.zero))
+        let frame = GeometryUtils.convertAXFrameToGlobal(
+            NSRect(
+                origin: originalMousePosition,
+                size: NSSize.zero
+            )
+        )
+        Utils.moveMouse(position: frame.origin)
     }
 }
