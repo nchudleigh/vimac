@@ -65,9 +65,8 @@ class ScrollModeActiveViewController: NSViewController {
     
     private func setActiveScrollAreaVC(_ scrollArea: Element) {
         let frame: NSRect = {
-            let bottomLeftPositionRelativeToScreen = GeometryUtils.convertAXFrameToGlobal(scrollArea.frame).origin
-            let bottomLeftPositionRelativeToWindow = self.view.window!.convertPoint(fromScreen: bottomLeftPositionRelativeToScreen)
-            return NSRect(origin: bottomLeftPositionRelativeToWindow, size: scrollArea.frame.size)
+            let frameRelativeToScreen = GeometryUtils.convertAXFrameToGlobal(scrollArea.frame)
+            return self.view.window!.convertFromScreen(frameRelativeToScreen)
         }()
         let vc = ScrollModeActiveScrollAreaViewController(scrollArea: scrollArea, inputListener: inputListener)
         vc.view.frame = frame
