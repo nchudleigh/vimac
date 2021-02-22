@@ -12,6 +12,11 @@ import RxSwift
 import Carbon.HIToolbox
 import os
 
+struct Hint {
+    let element: Element
+    let text: String
+}
+
 class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     let app: NSRunningApplication
     let window: Element
@@ -233,12 +238,13 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
         let hintStrings = AlphabetHints().hintStrings(linkCount: elements.count, hintCharacters: UserPreferences.HintMode.CustomCharactersProperty.read())
         
         let textSize = UserPreferences.HintMode.TextSizeProperty.readAsFloat()
-
-        let hintViews: [HintView] = elements
+        
+        let hints = elements
             .enumerated()
-            .map ({ (index, element) in
-                return instantiateHintView(associatedElement: element, textSize: CGFloat(textSize), text: hintStrings[index])
-            })
+            .map({ (i, e) in Hint(element: e, text: hintStrings[i]) })
+
+        let hintViews: [HintView] = hints
+            .map({ instantiateHintView(hint: $0, textSize: CGFloat(textSize)) })
             .compactMap({ $0 })
         
         self.hintViews = hintViews
@@ -250,12 +256,12 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
         self.inputListeningTextField.becomeFirstResponder()
     }
     
-    func instantiateHintView(associatedElement: Element, textSize: CGFloat, text: String) -> HintView? {
-        let text = HintView(associatedElement: associatedElement, hintTextSize: CGFloat(textSize), hintText: text, typedHintText: "")
+    func instantiateHintView(hint: Hint, textSize: CGFloat) -> HintView? {
+        let text = HintView(associatedElement: hint.element, hintTextSize: CGFloat(textSize), hintText: hint.text, typedHintText: "")
         
         let centerPositionOptional: NSPoint? = {
             do {
-                let globalElementFrame = GeometryUtils.convertAXFrameToGlobal(associatedElement.frame)
+                let globalElementFrame = GeometryUtils.convertAXFrameToGlobal(hint.element.frame)
                 let screenOrigin = self.view.window!.frame.origin
                 let elementFrameRelativeToScreen = GeometryUtils.convertGlobalFrame(globalElementFrame, relativeTo: screenOrigin)
                 let elementCenter: NSPoint = GeometryUtils.center(elementFrameRelativeToScreen)
