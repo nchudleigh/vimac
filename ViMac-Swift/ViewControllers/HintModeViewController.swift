@@ -20,8 +20,6 @@ struct Hint {
 class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     let app: NSRunningApplication
     let window: Element
-
-    var state: HintModeState
     
     lazy var inputListeningTextField = instantiateInputListeningTextField()
     var hintViews: [HintView]?
@@ -40,7 +38,6 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     init(app: NSRunningApplication, window: Element) {
         self.app = app
         self.window = window
-        state = .initial
         super.init()
     }
     
