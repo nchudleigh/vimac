@@ -20,18 +20,27 @@ struct Hint {
 class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     let app: NSRunningApplication
     let window: Element
-    lazy var elements: Single<[Element]> = elementObservable().toArray()
+
+    var state: HintModeState
+    
     lazy var inputListeningTextField = instantiateInputListeningTextField()
     var hintViews: [HintView]?
-    let compositeDisposable = CompositeDisposable()
     let inputListener = HintModeInputListener()
+    
     var characterStack: [Character] = [Character]()
     let originalMousePosition = NSEvent.mouseLocation
     let startTime = CFAbsoluteTimeGetCurrent()
-
+    
+    // preferences
+    let possibleHintCharacters = UserPreferences.HintMode.CustomCharactersProperty.read()
+    let textSize = UserPreferences.HintMode.TextSizeProperty.readAsFloat()
+    
+    let disposeBag = DisposeBag()
+    
     init(app: NSRunningApplication, window: Element) {
         self.app = app
         self.window = window
+        state = .initial
         super.init()
     }
     
@@ -49,9 +58,27 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
         observeDeleteKey()
         observeSpaceKey()
         
-        _ = self.compositeDisposable.insert(observeElements())
-        
         hideMouse()
+
+        elementObservable().toArray()
+            .observeOn(MainScheduler.instance)
+            .subscribeOn(ConcurrentDispatchQueueScheduler.init(qos: .userInitiated, leeway: .nanoseconds(0)))
+            .do(onSuccess: { _ in self.logQueryTime() })
+            .do(onError: { e in self.logError(e) })
+            .subscribe(
+                onSuccess: { self.onElementTraversalComplete(elements: $0) },
+                onError: { _ in self.modeCoordinator?.exitMode()}
+            )
+            .disposed(by: disposeBag)
+    }
+    
+    func logQueryTime() {
+        let timeElapsed = CFAbsoluteTimeGetCurrent() - self.startTime
+        os_log("[Hint mode] query time: %@", log: Log.accessibility, String(describing: timeElapsed))
+    }
+    
+    func logError(_ e: Error) {
+        os_log("[Hint mode] query error: %@", log: Log.accessibility, String(describing: e))
     }
     
     func elementObservable() -> Observable<Element> {
@@ -218,26 +245,8 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
         })
     }
     
-    func observeElements() -> Disposable {
-        return elements
-            .observeOn(MainScheduler.instance)
-            .subscribe(
-                onSuccess: { [weak self] elements in
-                    let timeElapsed = CFAbsoluteTimeGetCurrent() - self!.startTime
-                    os_log("[Hint mode] query time: %@", log: Log.accessibility, String(describing: timeElapsed))
-                    
-                    self?.onElementTraversalComplete(elements: elements)
-                },
-                onError: { error in
-                    print(error)
-                }
-            )
-    }
-    
     func onElementTraversalComplete(elements: [Element]) {
-        let hintStrings = AlphabetHints().hintStrings(linkCount: elements.count, hintCharacters: UserPreferences.HintMode.CustomCharactersProperty.read())
-        
-        let textSize = UserPreferences.HintMode.TextSizeProperty.readAsFloat()
+        let hintStrings = AlphabetHints().hintStrings(linkCount: elements.count, hintCharacters: possibleHintCharacters)
         
         let hints = elements
             .enumerated()
@@ -342,7 +351,6 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
 
     override func viewDidDisappear() {
         super.viewDidDisappear()
-        self.compositeDisposable.dispose()
         
         showMouse()
     }
