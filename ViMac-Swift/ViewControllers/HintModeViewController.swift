@@ -59,7 +59,6 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
 
         elementObservable().toArray()
             .observeOn(MainScheduler.instance)
-            .subscribeOn(ConcurrentDispatchQueueScheduler.init(qos: .userInitiated, leeway: .nanoseconds(0)))
             .do(onSuccess: { _ in self.logQueryTime() })
             .do(onError: { e in self.logError(e) })
             .subscribe(
@@ -268,7 +267,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
         let centerPositionOptional: NSPoint? = {
             do {
                 let globalElementFrame = GeometryUtils.convertAXFrameToGlobal(hint.element.frame)
-                let screenOrigin = self.view.window!.frame.origin
+                guard let screenOrigin = self.view.window?.frame.origin else { return nil }
                 let elementFrameRelativeToScreen = GeometryUtils.convertGlobalFrame(globalElementFrame, relativeTo: screenOrigin)
                 let elementCenter: NSPoint = GeometryUtils.center(elementFrameRelativeToScreen)
                 
