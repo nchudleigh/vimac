@@ -21,8 +21,10 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     let app: NSRunningApplication
     let window: Element
     
+    var hints: [Hint]?
+    var hintsViewController: HintsViewController?
+    
     lazy var inputListeningTextField = instantiateInputListeningTextField()
-    var hintViews: [HintView]?
     let inputListener = HintModeInputListener()
     
     var characterStack: [Character] = [Character]()
@@ -164,15 +166,13 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     
     func onLetterKeyDown(event: NSEvent) {
         guard let character = event.charactersIgnoringModifiers?.first else { return }
-        guard let hintViews = self.hintViews else { return }
-
+        guard let hints = hints else { return }
+        
         self.characterStack.append(character)
         let typed = String(self.characterStack)
 
-        let matchingHints = hintViews.filter { hintView in
-            return hintView.hintTextView!.stringValue.starts(with: typed.uppercased())
-        }
-
+        let matchingHints = hints.filter { $0.text.starts(with: typed.uppercased()) }
+    
         if matchingHints.count == 0 && typed.count > 0 {
             self.modeCoordinator?.exitMode()
             return
@@ -180,7 +180,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
 
         if matchingHints.count == 1 {
             let matchingHint = matchingHints.first!
-            let element = matchingHint.associatedElement
+            let element = matchingHint.element
 
             let frame = element.clippedFrame ?? element.frame
             let position = frame.origin
@@ -243,88 +243,35 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     
     func onElementTraversalComplete(elements: [Element]) {
         let hintStrings = AlphabetHints().hintStrings(linkCount: elements.count, hintCharacters: possibleHintCharacters)
-        
-        let hints = elements
+        self.hints = elements
             .enumerated()
             .map({ (i, e) in Hint(element: e, text: hintStrings[i]) })
-
-        let hintViews: [HintView] = hints
-            .map({ instantiateHintView(hint: $0, textSize: CGFloat(textSize)) })
-            .compactMap({ $0 })
         
-        self.hintViews = hintViews
+        self.hintsViewController = HintsViewController(hints: self.hints!, textSize: CGFloat(textSize), hintCharacters: possibleHintCharacters)
+        self.addChild(hintsViewController!)
+        hintsViewController!.view.frame = self.view.frame
+        self.view.addSubview(hintsViewController!.view)
 
-        for hintView in hintViews {
-            self.view.addSubview(hintView)
-        }
-        
         self.inputListeningTextField.becomeFirstResponder()
     }
-    
-    func instantiateHintView(hint: Hint, textSize: CGFloat) -> HintView? {
-        let text = HintView(associatedElement: hint.element, hintTextSize: CGFloat(textSize), hintText: hint.text, typedHintText: "")
-        
-        let centerPositionOptional: NSPoint? = {
-            do {
-                let globalElementFrame = GeometryUtils.convertAXFrameToGlobal(hint.element.frame)
-                guard let screenOrigin = self.view.window?.frame.origin else { return nil }
-                let elementFrameRelativeToScreen = GeometryUtils.convertGlobalFrame(globalElementFrame, relativeTo: screenOrigin)
-                let elementCenter: NSPoint = GeometryUtils.center(elementFrameRelativeToScreen)
-                
-                let hintOrigin = NSPoint(
-                    x: elementCenter.x - (text.frame.size.width / 2),
-                    y: elementCenter.y - (text.frame.size.height / 2)
-                )
 
-                if hintOrigin.x.isNaN || hintOrigin.y.isNaN {
-                    return nil
-                }
-                
-                return hintOrigin
-            } 
-        }()
-
-        guard let centerPosition = centerPositionOptional else {
-            return nil
+    private func removeChildViewController(_ vc: NSViewController) {
+        if !self.children.contains(vc) {
+            return
         }
-        text.frame.origin = centerPosition
         
-        return text
+        vc.view.removeFromSuperview()
+        vc.removeFromParent()
     }
     
     func updateHints(typed: String) {
-        guard let hintViews = self.hintViews else {
-            self.modeCoordinator?.exitMode()
-            return
-        }
-
-        hintViews.forEach { hintView in
-            hintView.isHidden = true
-            if hintView.hintTextView!.stringValue.starts(with: typed.uppercased()) {
-                hintView.updateTypedText(typed: typed)
-                hintView.isHidden = false
-            }
-        }
+        guard let hintsVC = hintsViewController else { return }
+        hintsVC.updateTyped(typed: typed)
     }
     
-    // randomly rotate hints
-    // ideally we group them into clusters of intersecting hints and rotate within those clusters
-    // but this is just a quick fast hack
     func rotateHints() {
-        guard let hintViews = self.hintViews else {
-            self.modeCoordinator?.exitMode()
-            return
-        }
-        
-        for hintView in hintViews {
-            hintView.removeFromSuperview()
-        }
-        
-        let shuffledHintViews = hintViews.shuffled()
-        for hintView in shuffledHintViews {
-            self.view.addSubview(hintView)
-        }
-        self.hintViews = shuffledHintViews
+        guard let hintsVC = hintsViewController else { return }
+        hintsVC.rotateHints()
     }
     
     func hideMouse() {

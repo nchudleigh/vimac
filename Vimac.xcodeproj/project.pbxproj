@@ -22,6 +22,7 @@
 		E23140D62506781E004D1B96 /* QueryMenuBarItemsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E23140D52506781E004D1B96 /* QueryMenuBarItemsService.swift */; };
 		E23140D825067A46004D1B96 /* QueryMenuBarExtrasService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E23140D725067A46004D1B96 /* QueryMenuBarExtrasService.swift */; };
 		E23140DA2507B2C1004D1B96 /* QueryNotificationCenterItemsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E23140D92507B2C1004D1B96 /* QueryNotificationCenterItemsService.swift */; };
+		E23A1A8025E62DEA00D71D6E /* HintsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E23A1A7F25E62DEA00D71D6E /* HintsViewController.swift */; };
 		E2443FFC25584A9400A23950 /* InputStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2443FFB25584A9400A23950 /* InputStateTests.swift */; };
 		E245F9B123941AE8009CA9C6 /* BorderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E245F9B023941AE8009CA9C6 /* BorderView.swift */; };
 		E24D0BB6256BEEAE0049EA0A /* ScrollModeInputState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E24D0BB5256BEEAE0049EA0A /* ScrollModeInputState.swift */; };
@@ -143,6 +144,7 @@
 		E23140D52506781E004D1B96 /* QueryMenuBarItemsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryMenuBarItemsService.swift; sourceTree = "<group>"; };
 		E23140D725067A46004D1B96 /* QueryMenuBarExtrasService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryMenuBarExtrasService.swift; sourceTree = "<group>"; };
 		E23140D92507B2C1004D1B96 /* QueryNotificationCenterItemsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryNotificationCenterItemsService.swift; sourceTree = "<group>"; };
+		E23A1A7F25E62DEA00D71D6E /* HintsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HintsViewController.swift; sourceTree = "<group>"; };
 		E2443FFB25584A9400A23950 /* InputStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputStateTests.swift; sourceTree = "<group>"; };
 		E245F9B023941AE8009CA9C6 /* BorderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BorderView.swift; sourceTree = "<group>"; };
 		E24D0BB5256BEEAE0049EA0A /* ScrollModeInputState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollModeInputState.swift; sourceTree = "<group>"; };
@@ -425,6 +427,7 @@
 				E2677785256034860034B131 /* ScrollModeViewController.swift */,
 				E267778D25613A900034B131 /* ScrollModeActiveViewController.swift */,
 				E267778F256187230034B131 /* ScrollModeActiveScrollAreaViewController.swift */,
+				E23A1A7F25E62DEA00D71D6E /* HintsViewController.swift */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -736,6 +739,7 @@
 				E26981BB23C9E35D00E46217 /* TISInputSourceExtension.swift in Sources */,
 				E2DFF5AD24815D3E00B4090D /* GeneralPreferenceViewController.swift in Sources */,
 				E2D7B12425BBF71000EA2531 /* FlattenElementTreeNode.swift in Sources */,
+				E23A1A8025E62DEA00D71D6E /* HintsViewController.swift in Sources */,
 				E266D916248AAC99005A261F /* UserPreferences.swift in Sources */,
 				E2C29566234DE09C001A38D6 /* ModeCoordinator.swift in Sources */,
 				E2C29562234DD7F8001A38D6 /* OverlayWindowController.swift in Sources */,
