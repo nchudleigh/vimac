@@ -17,6 +17,12 @@ struct Hint {
     let text: String
 }
 
+enum HintAction {
+    case leftClick
+    case rightClick
+    case doubleLeftClick
+}
+
 class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     let app: NSRunningApplication
     let window: Element
@@ -28,7 +34,6 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     let inputListener = HintModeInputListener()
     
     var characterStack: [Character] = [Character]()
-    let originalMousePosition = NSEvent.mouseLocation
     let startTime = CFAbsoluteTimeGetCurrent()
     
     // preferences
@@ -179,38 +184,61 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
         }
 
         if matchingHints.count == 1 {
-            let matchingHint = matchingHints.first!
-            let element = matchingHint.element
-
-            let frame = element.clippedFrame ?? element.frame
-            let position = frame.origin
-            let size = frame.size
-
-            let centerPositionX = position.x + (size.width / 2)
-            let centerPositionY = position.y + (size.height / 2)
-            let centerPosition = NSPoint(x: centerPositionX, y: centerPositionY)
-
+            let hint = matchingHints.first!
+            
             // close the window before performing click(s)
             // Chrome's bookmark bar doesn't let you right click if Chrome is not the active window
             self.modeCoordinator?.exitMode()
+
+            let originalMousePosition: NSPoint = {
+                let invertedPos = NSEvent.mouseLocation
+                let frame = GeometryUtils.convertAXFrameToGlobal(
+                    NSRect(
+                        origin: invertedPos,
+                        size: NSSize.zero
+                    )
+                )
+                return frame.origin
+            }()
+            let action: HintAction = {
+                if (event.modifierFlags.rawValue & NSEvent.ModifierFlags.shift.rawValue == NSEvent.ModifierFlags.shift.rawValue) {
+                    return .rightClick
+                } else if (event.modifierFlags.rawValue & NSEvent.ModifierFlags.command.rawValue == NSEvent.ModifierFlags.command.rawValue) {
+                    return .doubleLeftClick
+                } else {
+                    return .leftClick
+                }
+            }()
+            performHintAction(hint, action: action)
             
-            Utils.moveMouse(position: centerPosition)
-            
-            if (event.modifierFlags.rawValue & NSEvent.ModifierFlags.shift.rawValue == NSEvent.ModifierFlags.shift.rawValue) {
-                Utils.rightClickMouse(position: centerPosition)
-            } else if (event.modifierFlags.rawValue & NSEvent.ModifierFlags.command.rawValue == NSEvent.ModifierFlags.command.rawValue) {
-                Utils.doubleLeftClickMouse(position: centerPosition)
-            } else if (event.modifierFlags.rawValue & NSEvent.ModifierFlags.control.rawValue == NSEvent.ModifierFlags.control.rawValue) {
-            } else {
-                Utils.leftClickMouse(position: centerPosition)
-            }
-            
-            revertMouseLocation()
-            return
+            Utils.moveMouse(position: originalMousePosition)
         }
 
         // update hints to reflect new typed text
         self.updateHints(typed: typed)
+    }
+    
+    func performHintAction(_ hint: Hint, action: HintAction) {
+        let element = hint.element
+
+        let frame = element.clippedFrame ?? element.frame
+        let position = frame.origin
+        let size = frame.size
+
+        let centerPositionX = position.x + (size.width / 2)
+        let centerPositionY = position.y + (size.height / 2)
+        let centerPosition = NSPoint(x: centerPositionX, y: centerPositionY)
+
+        Utils.moveMouse(position: centerPosition)
+        
+        switch action {
+        case .leftClick:
+            Utils.leftClickMouse(position: centerPosition)
+        case .rightClick:
+            Utils.rightClickMouse(position: centerPosition)
+        case .doubleLeftClick:
+            Utils.doubleLeftClickMouse(position: centerPosition)
+        }
     }
     
     func observeLetterKeyDown() {
@@ -280,16 +308,6 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     
     func showMouse() {
         HideCursorGlobally.unhide()
-    }
-    
-    private func revertMouseLocation() {
-        let frame = GeometryUtils.convertAXFrameToGlobal(
-            NSRect(
-                origin: originalMousePosition,
-                size: NSSize.zero
-            )
-        )
-        Utils.moveMouse(position: frame.origin)
     }
 
     override func viewDidDisappear() {
