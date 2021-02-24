@@ -64,12 +64,13 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
         
         hideMouse()
 
-        elementObservable().toArray()
+        HintModeQueryService.init(app: app, window: window, hintCharacters: possibleHintCharacters).perform()
+            .toArray()
             .observeOn(MainScheduler.instance)
             .do(onSuccess: { _ in self.logQueryTime() })
             .do(onError: { e in self.logError(e) })
             .subscribe(
-                onSuccess: { self.onElementTraversalComplete(elements: $0) },
+                onSuccess: { self.onHintQueryCompleted(hints: $0) },
                 onError: { _ in self.modeCoordinator?.exitMode()}
             )
             .disposed(by: disposeBag)
@@ -83,92 +84,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     func logError(_ e: Error) {
         os_log("[Hint mode] query error: %@", log: Log.accessibility, String(describing: e))
     }
-    
-    func elementObservable() -> Observable<Element> {
-        return Utils.eagerConcat(observables: [
-            Utils.singleToObservable(single: queryWindowElementsSingle()),
-            Utils.singleToObservable(single: queryMenuBarSingle()),
-            Utils.singleToObservable(single: queryMenuBarExtrasSingle()),
-            Utils.singleToObservable(single: queryNotificationCenterSingle())
-        ])
-    }
-    
-    func queryWindowElementsSingle() -> Single<[Element]> {
-        return Single.create(subscribe: { [weak self] event in
-            guard let self = self else {
-                event(.success([]))
-                return Disposables.create()
-            }
-            
-            let thread = Thread.init(block: {
-                let service = QueryWindowService.init(app: self.app, window: self.window)
-                let elements = try? service.perform()
-                event(.success(elements ?? []))
-            })
-            thread.start()
-            return Disposables.create {
-                thread.cancel()
-            }
-        })
-    }
-    
-    func queryMenuBarSingle() -> Single<[Element]> {
-        return Single.create(subscribe: { [weak self] event in
-            guard let self = self else {
-                event(.success([]))
-                return Disposables.create()
-            }
-            
-            let thread = Thread.init(block: {
-                // as of 28e46b9cbe9a38e7c43c1eb1f0d8953d99bc5ef9,
-                // when one activates hint mode when the Vimac preference page is frontmost,
-                // the app crashes with EXC_BAD_INSTRUCTION when retrieving menu bar items attributes through Element.initialize
-                // I suspect that threading is the cause of crashing when reading attributes from your own app
-                let isVimac = self.app.bundleIdentifier == Bundle.main.bundleIdentifier
-                if isVimac {
-                    event(.success([]))
-                    return
-                }
-                
-                let service = QueryMenuBarItemsService.init(app: self.app)
-                let elements = try? service.perform()
-                event(.success(elements ?? []))
-            })
-            thread.start()
-            return Disposables.create {
-                thread.cancel()
-            }
-        })
-    }
-    
-    func queryMenuBarExtrasSingle() -> Single<[Element]> {
-        return Single.create(subscribe: { event in
-            let thread = Thread.init(block: {
-                let service = QueryMenuBarExtrasService.init()
-                let elements = try? service.perform()
-                event(.success(elements ?? []))
-            })
-            thread.start()
-            return Disposables.create {
-                thread.cancel()
-            }
-        })
-    }
-    
-    func queryNotificationCenterSingle() -> Single<[Element]> {
-        return Single.create(subscribe: { event in
-            let thread = Thread.init(block: {
-                let service = QueryNotificationCenterItemsService.init()
-                let elements = try? service.perform()
-                event(.success(elements ?? []))
-            })
-            thread.start()
-            return Disposables.create {
-                thread.cancel()
-            }
-        })
-    }
-    
+
     func onLetterKeyDown(event: NSEvent) {
         guard let character = event.charactersIgnoringModifiers?.first else { return }
         guard let hints = hints else { return }
@@ -269,12 +185,9 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
         })
     }
     
-    func onElementTraversalComplete(elements: [Element]) {
-        let hintStrings = AlphabetHints().hintStrings(linkCount: elements.count, hintCharacters: possibleHintCharacters)
-        self.hints = elements
-            .enumerated()
-            .map({ (i, e) in Hint(element: e, text: hintStrings[i]) })
-        
+    func onHintQueryCompleted(hints: [Hint]) {
+        self.hints = hints
+
         self.hintsViewController = HintsViewController(hints: self.hints!, textSize: CGFloat(textSize), hintCharacters: possibleHintCharacters)
         self.addChild(hintsViewController!)
         hintsViewController!.view.frame = self.view.frame
