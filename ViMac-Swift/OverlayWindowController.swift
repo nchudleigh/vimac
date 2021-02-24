@@ -9,6 +9,14 @@
 import Cocoa
 
 class OverlayWindowController: NSWindowController {
+    
+    init() {
+        super.init(window: OverlayWindow())
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError()
+    }
 
     override func windowDidLoad() {
         super.windowDidLoad()
@@ -17,5 +25,6 @@ class OverlayWindowController: NSWindowController {
     func fitToFrame(_ frame: NSRect) {
         self.window?.setFrame(frame, display: true, animate: false)
     }
+    
 }
     
