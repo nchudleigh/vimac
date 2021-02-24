@@ -79,7 +79,6 @@ class FrontmostApplicationService {
                 let windowNotifications: [AXNotification] = [
                     .windowMiniaturized,
                     .windowMoved,
-                    .windowResized,
                     .focusedWindowChanged
                 ]
                 let windowNotificationsStr = windowNotifications.map({ $0.rawValue })
@@ -121,7 +120,6 @@ class FrontmostApplicationService {
                 let disturbedNotifications: [AXNotification] = [
                     .windowMiniaturized,
                     .windowMoved,
-                    .windowResized,
                 ]
                 let disturbedNotificationsStr = disturbedNotifications.map({ $0.rawValue })
                 return disturbedNotificationsStr.contains(notification.notification)
