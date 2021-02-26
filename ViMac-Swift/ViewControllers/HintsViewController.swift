@@ -71,10 +71,10 @@ class HintsViewController: NSViewController {
         let view = HintView(associatedElement: hint.element, hintTextSize: CGFloat(textSize), hintText: hint.text, typedHintText: "")
         guard let elementFrame = self.elementFrame(hint.element) else { return nil }
         let elementCenter: NSPoint = GeometryUtils.center(elementFrame)
-        
+
         let hintOrigin = NSPoint(
-            x: elementCenter.x - (view.frame.size.width / 2),
-            y: elementCenter.y - (view.frame.size.height / 2)
+            x: elementCenter.x - (view.intrinsicContentSize.width / 2),
+            y: elementCenter.y - (view.intrinsicContentSize.height / 2)
         )
 
         if hintOrigin.x.isNaN || hintOrigin.y.isNaN {

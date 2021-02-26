@@ -10,36 +10,63 @@ import Cocoa
 import AXSwift
 
 class HintView: NSView {
-    static let borderColor = NSColor(red: 212 / 255, green: 172 / 255, blue: 58 / 255, alpha: 1)
+    static let borderColor = NSColor.darkGray
     static let backgroundColor = NSColor(red: 255 / 255, green: 224 / 255, blue: 112 / 255, alpha: 1)
     static let untypedHintColor = NSColor.black
     static let typedHintColor = NSColor(red: 212 / 255, green: 172 / 255, blue: 58 / 255, alpha: 1)
 
     let associatedElement: Element
     var hintTextView: HintText?
+    
+    let borderWidth: CGFloat = 1.0
+    let cornerRadius: CGFloat = 3.0
 
     required init(associatedElement: Element, hintTextSize: CGFloat, hintText: String, typedHintText: String) {
         self.associatedElement = associatedElement
-
         super.init(frame: .zero)
 
-        setTheme()
+        self.hintTextView = HintText(hintTextSize: hintTextSize, hintText: hintText, typedHintText: typedHintText)
+        self.subviews.append(hintTextView!)
 
-        addHintText(hintTextSize: hintTextSize, hintText: hintText, typedHintText: typedHintText)
-        self.frame = self.hintTextView!.frame
+        self.wantsLayer = true
+        
+        
+        self.layer?.borderWidth = borderWidth
+        
+        self.layer?.backgroundColor = HintView.backgroundColor.cgColor
+        self.layer?.borderColor = HintView.borderColor.cgColor
+        self.layer?.cornerRadius = cornerRadius
+
+        self.translatesAutoresizingMaskIntoConstraints = false
+        
+        self.hintTextView!.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true
+        self.hintTextView!.centerXAnchor.constraint(equalTo: self.centerXAnchor).isActive = true
+        
+        self.widthAnchor.constraint(equalToConstant: width()).isActive = true
+        self.heightAnchor.constraint(equalToConstant: height()).isActive = true
+    }
+    
+    private func width() -> CGFloat {
+        return self.hintTextView!.intrinsicContentSize.width + 2 * borderWidth
+    }
+    
+    private func height() -> CGFloat {
+        self.hintTextView!.intrinsicContentSize.height + 2 * borderWidth
     }
 
     required init?(coder: NSCoder) {
         fatalError()
     }
-
-    func setTheme() {
-        self.wantsLayer = true
-
-        self.layer?.backgroundColor = HintView.backgroundColor.cgColor
-        self.layer?.borderColor = HintView.borderColor.cgColor
-        self.layer?.cornerRadius = 3
-        self.layer?.borderWidth = 1
+    
+    override init(frame frameRect: NSRect) {
+        fatalError()
+    }
+    
+    override var intrinsicContentSize: NSSize {
+        return .init(
+            width: width(),
+            height: height()
+        )
     }
 
     func addHintText(hintTextSize: CGFloat, hintText: String, typedHintText: String) {
@@ -56,7 +83,7 @@ class HintText: NSTextField {
 
     required init(hintTextSize: CGFloat, hintText: String, typedHintText: String) {
         super.init(frame: .zero)
-        
+        self.translatesAutoresizingMaskIntoConstraints = false
         self.setup(hintTextSize: hintTextSize, hintText: hintText, typedHintText: typedHintText)
     }
 
@@ -80,7 +107,7 @@ class HintText: NSTextField {
         // fixes blurry text
         self.canDrawSubviewsIntoLayer = true
         
-        self.sizeToFit()
+        self.isEditable = false
     }
     
     func updateTypedText(typed: String) {

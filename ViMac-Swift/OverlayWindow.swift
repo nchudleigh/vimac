@@ -16,6 +16,8 @@ class OverlayWindow: NSPanel {
         self.backgroundColor = NSColor.clear
         self.level = .popUpMenu
         self.ignoresMouseEvents = true
+        
+        self.hasShadow = false
     }
 
     override var canBecomeKey: Bool {

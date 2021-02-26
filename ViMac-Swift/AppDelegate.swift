@@ -40,7 +40,7 @@ import Preferences
         
         InputSourceManager.initialize()
         let storyboard = NSStoryboard.init(name: "Main", bundle: nil)
-        overlayWindowController = storyboard.instantiateController(withIdentifier: "overlayWindowControllerID") as! OverlayWindowController
+        overlayWindowController = OverlayWindowController()
         modeCoordinator = ModeCoordinator(windowController: overlayWindowController)
         
         Utils.registerDefaults()

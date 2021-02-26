@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="15705" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="15705"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17701"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -681,23 +681,6 @@
                 <customObject id="XaW-Fn-b3C" customClass="StatusItemManager" customModule="Vimac" customModuleProvider="target"/>
             </objects>
             <point key="canvasLocation" x="62" y="-82"/>
-        </scene>
-        <!--Window Controller-->
-        <scene sceneID="79a-OA-79s">
-            <objects>
-                <windowController storyboardIdentifier="overlayWindowControllerID" id="8mH-dK-Dlx" customClass="OverlayWindowController" customModule="Vimac" customModuleProvider="target" sceneMemberID="viewController">
-                    <window key="window" title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" hasShadow="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="qOo-UR-Afh" customClass="OverlayWindow" customModule="Vimac" customModuleProvider="target">
-                        <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-                        <rect key="contentRect" x="294" y="313" width="480" height="360"/>
-                        <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
-                        <connections>
-                            <outlet property="delegate" destination="8mH-dK-Dlx" id="S1X-DY-787"/>
-                        </connections>
-                    </window>
-                </windowController>
-                <customObject id="33m-7L-qa5" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="1904" y="-628"/>
         </scene>
         <!--Window Controller-->
         <scene sceneID="F6e-st-0kW">
