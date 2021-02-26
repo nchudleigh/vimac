@@ -30,7 +30,6 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     var hints: [Hint]?
     var hintsViewController: HintsViewController?
     
-    lazy var inputListeningTextField = instantiateInputListeningTextField()
     let inputListener = HintModeInputListener()
     
     var characterStack: [Character] = [Character]()
@@ -54,8 +53,6 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        self.view.addSubview(inputListeningTextField)
         
         observeLetterKeyDown()
         observeEscKey()
@@ -192,8 +189,6 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
         self.addChild(hintsViewController!)
         hintsViewController!.view.frame = self.view.frame
         self.view.addSubview(hintsViewController!.view)
-
-        self.inputListeningTextField.becomeFirstResponder()
     }
 
     private func removeChildViewController(_ vc: NSViewController) {
@@ -227,12 +222,5 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
         super.viewDidDisappear()
         
         showMouse()
-    }
-    
-    func instantiateInputListeningTextField() -> NSTextField {
-        let textField = NSTextField()
-        textField.stringValue = ""
-        textField.isEditable = true
-        return textField
     }
 }
