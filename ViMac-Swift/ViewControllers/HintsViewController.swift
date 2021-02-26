@@ -89,7 +89,7 @@ class HintsViewController: NSViewController {
         guard let window = self.view.window else { return nil }
 
         let globalFrame = GeometryUtils.convertAXFrameToGlobal(
-            element.frame)
+            element.clippedFrame ?? element.frame)
         let windowFrame = window.convertFromScreen(globalFrame)
         return window.contentView?.convert(windowFrame, to: self.view)
     }
