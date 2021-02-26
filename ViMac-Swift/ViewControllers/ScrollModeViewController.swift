@@ -12,7 +12,6 @@ import RxSwift
 class ScrollModeViewController: ModeViewController {
     private let disposeBag = DisposeBag()
     private let inputListener = InputListener()
-    private var inputListeningTextField: NSTextField?
     private let window: Element
 
     init(window: Element) {
@@ -27,8 +26,6 @@ class ScrollModeViewController: ModeViewController {
     override func viewWillAppear() {
         observeScrollAreas().disposed(by: disposeBag)
         observeEscKey().disposed(by: disposeBag)
-
-        attachInputListeningTextField()
     }
 
     private func setActiveState(scrollAreas: [Element]) {
@@ -87,16 +84,5 @@ class ScrollModeViewController: ModeViewController {
                 thread.cancel()
             }
         }
-    }
-
-    private func attachInputListeningTextField() {
-        let textField = NSTextField()
-        textField.stringValue = ""
-        textField.isEditable = true
-
-        self.view.addSubview(textField)
-        textField.becomeFirstResponder()
-
-        self.inputListeningTextField = textField
     }
 }
