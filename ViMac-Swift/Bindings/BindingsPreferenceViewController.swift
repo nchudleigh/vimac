@@ -58,12 +58,12 @@ class BindingsPreferenceViewController: NSViewController, PreferencePane, NSText
     private func populateGrid() {
         let hintModeShortcutLabel = NSTextField(labelWithString: "Hint Mode Shortcut:")
         hintModeShortcut = MASShortcutView()
-        hintModeShortcut.associatedUserDefaultsKey = Utils.hintModeShortcutKey
+        hintModeShortcut.associatedUserDefaultsKey = KeyboardShortcuts.shared.hintModeShortcutKey
         grid.addRow(with: [hintModeShortcutLabel, hintModeShortcut])
         
         let scrollModeShortcutLabel = NSTextField(labelWithString: "Scroll Mode Shortcut:")
         scrollModeShortcut = MASShortcutView()
-        scrollModeShortcut.associatedUserDefaultsKey = Utils.scrollModeShortcutKey
+        scrollModeShortcut.associatedUserDefaultsKey = KeyboardShortcuts.shared.scrollModeShortcutKey
         grid.addRow(with: [scrollModeShortcutLabel, scrollModeShortcut])
         
         let keySequenceHeaderLabel = NSTextField(labelWithString: "Key Sequence Activation")

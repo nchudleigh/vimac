@@ -16,6 +16,7 @@
 		E20D0CB625581B3A00A5CAEE /* TrieTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20D0CB525581B3A00A5CAEE /* TrieTests.swift */; };
 		E20D0CB825583DD200A5CAEE /* InputState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20D0CB725583DD200A5CAEE /* InputState.swift */; };
 		E20DF9DE25E671F20065711A /* HintModeQueryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20DF9DD25E671F20065711A /* HintModeQueryService.swift */; };
+		E20DF9EC25EA74360065711A /* KeyboardShortcuts.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20DF9EB25EA74360065711A /* KeyboardShortcuts.swift */; };
 		E21D74AE25B45A9E00159E73 /* BindingsUserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = E21D74AD25B45A9E00159E73 /* BindingsUserDefaults.swift */; };
 		E21D74B025B45BB500159E73 /* UserDefaultsProperty.swift in Sources */ = {isa = PBXBuildFile; fileRef = E21D74AF25B45BB500159E73 /* UserDefaultsProperty.swift */; };
 		E225BD1D233292B800ECDEF4 /* StatusItemManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E225BD1C233292B800ECDEF4 /* StatusItemManager.swift */; };
@@ -139,6 +140,7 @@
 		E20D0CB525581B3A00A5CAEE /* TrieTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrieTests.swift; sourceTree = "<group>"; };
 		E20D0CB725583DD200A5CAEE /* InputState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputState.swift; sourceTree = "<group>"; };
 		E20DF9DD25E671F20065711A /* HintModeQueryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HintModeQueryService.swift; sourceTree = "<group>"; };
+		E20DF9EB25EA74360065711A /* KeyboardShortcuts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardShortcuts.swift; sourceTree = "<group>"; };
 		E21D74AD25B45A9E00159E73 /* BindingsUserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BindingsUserDefaults.swift; sourceTree = "<group>"; };
 		E21D74AF25B45BB500159E73 /* UserDefaultsProperty.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsProperty.swift; sourceTree = "<group>"; };
 		E225BD1C233292B800ECDEF4 /* StatusItemManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusItemManager.swift; sourceTree = "<group>"; };
@@ -277,7 +279,6 @@
 		E225BD20233354E900ECDEF4 /* Preferences */ = {
 			isa = PBXGroup;
 			children = (
-				E2F15BC025B30A1D00E2F29E /* Bindings */,
 				E2DFF5AA24815C5800B4090D /* PreferencesPaneIdentifiers.swift */,
 				E2DFF5AC24815D3E00B4090D /* GeneralPreferenceViewController.swift */,
 				E2DFF5B02481693800B4090D /* HintModePreferenceViewController.swift */,
@@ -339,6 +340,7 @@
 		E26172222322968500E396CA /* ViMac-Swift */ = {
 			isa = PBXGroup;
 			children = (
+				E2F15BC025B30A1D00E2F29E /* Bindings */,
 				E225BD20233354E900ECDEF4 /* Preferences */,
 				E25BBB5E250CCA7900D11213 /* Services */,
 				E270F41F2503E79900AD305A /* Accessibility */,
@@ -443,6 +445,7 @@
 				E2F15BC625B30C4E00E2F29E /* BindingsRepository.swift */,
 				E21D74AD25B45A9E00159E73 /* BindingsUserDefaults.swift */,
 				E21D74AF25B45BB500159E73 /* UserDefaultsProperty.swift */,
+				E20DF9EB25EA74360065711A /* KeyboardShortcuts.swift */,
 			);
 			path = Bindings;
 			sourceTree = "<group>";
@@ -724,6 +727,7 @@
 				E2F15BBF25B2D65000E2F29E /* BindingsPreferenceViewController.swift in Sources */,
 				E26981B923C9E31600E46217 /* InputSourceManager.swift in Sources */,
 				E2DFF5B12481693800B4090D /* HintModePreferenceViewController.swift in Sources */,
+				E20DF9EC25EA74360065711A /* KeyboardShortcuts.swift in Sources */,
 				E2F6C9AF232DEA1800F2975B /* Utils.swift in Sources */,
 				E21D74B025B45BB500159E73 /* UserDefaultsProperty.swift in Sources */,
 				E279534D2494CC69006D8D7A /* ScrollModeInputListener.swift in Sources */,
