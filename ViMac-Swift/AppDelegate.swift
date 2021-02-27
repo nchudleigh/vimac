@@ -42,9 +42,11 @@ import Preferences
         overlayWindowController = OverlayWindowController()
         modeCoordinator = ModeCoordinator(windowController: overlayWindowController)
         
-        Utils.registerDefaults()
-        
         LaunchAtLogin.isEnabled = UserDefaults.standard.bool(forKey: Utils.shouldLaunchOnStartupKey)
+        KeyboardShortcuts.shared.registerDefaults()
+        UserDefaults.standard.register(defaults: [
+            Utils.shouldLaunchOnStartupKey: false,
+        ])
         
         self.compositeDisposable = CompositeDisposable()
         

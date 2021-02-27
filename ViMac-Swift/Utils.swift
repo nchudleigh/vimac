@@ -13,14 +13,6 @@ class Utils: NSObject {
     static let forceKeyboardLayoutKey = "ForceKeyboardLayout"
     static let shouldLaunchOnStartupKey = "ShouldLaunchOnStartupKey"
     
-    static func registerDefaults() {
-        KeyboardShortcuts.shared.registerDefaults()
-        
-        UserDefaults.standard.register(defaults: [
-            Utils.shouldLaunchOnStartupKey: false,
-        ])
-    }
-    
     static func moveMouse(position: CGPoint) {
         let moveEvent = CGEvent(mouseEventSource: nil, mouseType: .mouseMoved, mouseCursorPosition: position, mouseButton: .left)
         moveEvent?.post(tap: .cghidEventTap)
