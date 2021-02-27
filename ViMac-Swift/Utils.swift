@@ -10,8 +10,8 @@ import MASShortcut
 import RxSwift
 
 class Utils: NSObject {
-    static let defaultHintShortcut = MASShortcut.init(keyCode: kVK_Space, modifierFlags: [.control])
-    static let defaultScrollShortcut = MASShortcut.init(keyCode: kVK_ANSI_S, modifierFlags: [.control])
+    static let defaultHintShortcut = MASShortcut.init(keyCode: kVK_ANSI_F, modifierFlags: [.control])
+    static let defaultScrollShortcut = MASShortcut.init(keyCode: kVK_ANSI_J, modifierFlags: [.control])
     static let hintModeShortcutKey = "HintModeShortcut"
     static let scrollModeShortcutKey = "ScrollModeShortcut"
     static let forceKeyboardLayoutKey = "ForceKeyboardLayout"
