@@ -23,8 +23,8 @@ import Preferences
     private lazy var focusedWindowDisturbedObservable: Observable<FrontmostApplicationService.ApplicationNotification> = createFocusedWindowDisturbedObservable()
     private lazy var windowObservable: Observable<Element?> = createFocusedWindowObservable()
 
-    let hintModeShortcutObservable: Observable<Void>
-    let scrollModeShortcutObservable: Observable<Void>
+    let hintModeShortcutObservable: Observable<Void> = KeyboardShortcuts.shared.hintModeShortcutActivation()
+    let scrollModeShortcutObservable: Observable<Void> = KeyboardShortcuts.shared.scrollModeShortcutActivation()
     
     var compositeDisposable: CompositeDisposable
     var scrollModeDisposable: CompositeDisposable? = CompositeDisposable()
@@ -39,41 +39,14 @@ import Preferences
         UIElement.globalMessagingTimeout = 1
         
         InputSourceManager.initialize()
-        let storyboard = NSStoryboard.init(name: "Main", bundle: nil)
         overlayWindowController = OverlayWindowController()
         modeCoordinator = ModeCoordinator(windowController: overlayWindowController)
         
-        Utils.registerDefaults()
-
-        hintModeShortcutObservable = Observable.create { observer in
-            let tempView = MASShortcutView.init()
-            tempView.associatedUserDefaultsKey = Utils.hintModeShortcutKey
-            if tempView.shortcutValue == nil {
-                tempView.shortcutValue = Utils.defaultHintShortcut
-            }
-            
-            MASShortcutBinder.shared()
-                .bindShortcut(withDefaultsKey: Utils.hintModeShortcutKey, toAction: {
-                    observer.onNext(Void())
-                })
-            return Disposables.create()
-        }
-        
-        scrollModeShortcutObservable = Observable.create { observer in
-            let tempView = MASShortcutView.init()
-            tempView.associatedUserDefaultsKey = Utils.scrollModeShortcutKey
-            if tempView.shortcutValue == nil {
-                tempView.shortcutValue = Utils.defaultScrollShortcut
-            }
-            
-            MASShortcutBinder.shared()
-                .bindShortcut(withDefaultsKey: Utils.scrollModeShortcutKey, toAction: {
-                    observer.onNext(Void())
-                })
-            return Disposables.create()
-        }
-        
         LaunchAtLogin.isEnabled = UserDefaults.standard.bool(forKey: Utils.shouldLaunchOnStartupKey)
+        KeyboardShortcuts.shared.registerDefaults()
+        UserDefaults.standard.register(defaults: [
+            Utils.shouldLaunchOnStartupKey: false,
+        ])
         
         self.compositeDisposable = CompositeDisposable()
         

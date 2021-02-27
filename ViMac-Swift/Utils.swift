@@ -10,18 +10,8 @@ import MASShortcut
 import RxSwift
 
 class Utils: NSObject {
-    static let defaultHintShortcut = MASShortcut.init(keyCode: kVK_ANSI_F, modifierFlags: [.control])
-    static let defaultScrollShortcut = MASShortcut.init(keyCode: kVK_ANSI_J, modifierFlags: [.control])
-    static let hintModeShortcutKey = "HintModeShortcut"
-    static let scrollModeShortcutKey = "ScrollModeShortcut"
     static let forceKeyboardLayoutKey = "ForceKeyboardLayout"
     static let shouldLaunchOnStartupKey = "ShouldLaunchOnStartupKey"
-    
-    static func registerDefaults() {
-        UserDefaults.standard.register(defaults: [
-            Utils.shouldLaunchOnStartupKey: false,
-        ])
-    }
     
     static func moveMouse(position: CGPoint) {
         let moveEvent = CGEvent(mouseEventSource: nil, mouseType: .mouseMoved, mouseCursorPosition: position, mouseButton: .left)
