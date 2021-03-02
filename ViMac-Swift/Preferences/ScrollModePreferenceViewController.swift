@@ -72,10 +72,12 @@ final class ScrollModePreferenceViewController: NSViewController, NSTextFieldDel
         self.view.addSubview(grid)
         
         NSLayoutConstraint.activate([
-            grid.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 50),
-            grid.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -50),
+            view.widthAnchor.constraint(equalToConstant: 600),
+            grid.widthAnchor.constraint(equalTo: view.widthAnchor, constant: -200),
             grid.topAnchor.constraint(equalTo: view.topAnchor, constant: 20),
             grid.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -20),
+            grid.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            grid.centerYAnchor.constraint(equalTo: view.centerYAnchor),
         ])
     }
     
