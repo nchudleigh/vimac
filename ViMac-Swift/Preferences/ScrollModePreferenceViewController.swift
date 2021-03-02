@@ -4,7 +4,7 @@ import Preferences
 final class ScrollModePreferenceViewController: NSViewController, NSTextFieldDelegate, PreferencePane {
     let preferencePaneIdentifier = Preferences.PaneIdentifier.scrollMode
     let preferencePaneTitle = "Scroll Mode"
-    let toolbarItemIcon: NSImage = NSImage(named: "NSColorPanel")!
+    let toolbarItemIcon: NSImage
     
     private var grid: NSGridView!
     private var scrollKeysField: NSTextField!
@@ -13,6 +13,12 @@ final class ScrollModePreferenceViewController: NSViewController, NSTextFieldDel
     private var revVerticalScrollView: NSButton!
     
     init() {
+        if #available(OSX 11.0, *) {
+            self.toolbarItemIcon = NSImage(systemSymbolName: "dpad", accessibilityDescription: nil)!
+        } else {
+            self.toolbarItemIcon = NSImage(named: "NSColorPanel")!
+        }
+        
         super.init(nibName: nil, bundle: nil)
     }
     
