@@ -53,11 +53,13 @@ class BindingsPreferenceViewController: NSViewController, PreferencePane, NSText
         self.view.addSubview(grid)
         
         NSLayoutConstraint.activate([
-            grid.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 50),
-            grid.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -50),
+            view.widthAnchor.constraint(equalToConstant: 600),
+            grid.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            grid.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             grid.topAnchor.constraint(equalTo: view.topAnchor, constant: 20),
             grid.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -20),
-            grid.widthAnchor.constraint(lessThanOrEqualToConstant: 500)
+            grid.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            grid.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ])
     }
     
@@ -80,7 +82,7 @@ class BindingsPreferenceViewController: NSViewController, PreferencePane, NSText
         keySequenceHeaderHint1.font = .labelFont(ofSize: 13)
         keySequenceHeaderHint1.textColor = .secondaryLabelColor
         grid.addRow(with: [keySequenceHeaderHint1])
-        spanCellVertically(
+        spanCellHorizontally(
             cell: grid.cell(for: keySequenceHeaderHint1)!,
             length: 2
         )
@@ -89,14 +91,14 @@ class BindingsPreferenceViewController: NSViewController, PreferencePane, NSText
         keySequenceHeaderHint2.font = .labelFont(ofSize: 13)
         keySequenceHeaderHint2.textColor = .secondaryLabelColor
         grid.addRow(with: [keySequenceHeaderHint2])
-        spanCellVertically(
+        spanCellHorizontally(
             cell: grid.cell(for: keySequenceHeaderHint2)!,
             length: 2
         )
         
         let openSystemPreferencesSecurityButton = NSButton(title: "Open Security & Privacy System Preferences", target: self, action: #selector(openSystemPreferencesSecurity))
         grid.addRow(with: [openSystemPreferencesSecurityButton])
-        spanCellVertically(
+        spanCellHorizontally(
             cell: grid.cell(for: openSystemPreferencesSecurityButton)!,
             length: 2
         )
@@ -128,10 +130,10 @@ class BindingsPreferenceViewController: NSViewController, PreferencePane, NSText
         fillFields()
     }
     
-    private func spanCellVertically(cell: NSGridCell, length: Int) {
+    private func spanCellHorizontally(cell: NSGridCell, length: Int) {
         let row = grid.index(of: cell.row!)
         grid.mergeCells(
-            inHorizontalRange: .init(location: 0, length: 2),
+            inHorizontalRange: .init(location: 0, length: length),
             verticalRange: .init(location: row, length: 1)
         )
     }
