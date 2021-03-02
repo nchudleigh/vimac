@@ -12,7 +12,7 @@ import Preferences
 class BindingsPreferenceViewController: NSViewController, PreferencePane, NSTextFieldDelegate {
     let preferencePaneIdentifier = Preferences.PaneIdentifier.bindings
     let preferencePaneTitle = "Bindings"
-    let toolbarItemIcon: NSImage = NSImage(named: NSImage.advancedName)!
+    let toolbarItemIcon: NSImage
     
     private var grid: NSGridView!
     private var hintModeShortcut: MASShortcutView!
@@ -25,6 +25,12 @@ class BindingsPreferenceViewController: NSViewController, PreferencePane, NSText
     private var resetDelayTextField: NSTextField!
     
     init() {
+        if #available(OSX 11.0, *) {
+            self.toolbarItemIcon = NSImage(systemSymbolName: "keyboard", accessibilityDescription: nil)!
+        } else {
+            self.toolbarItemIcon = NSImage(named: NSImage.advancedName)!
+        }
+        
         super.init(nibName: nil, bundle: nil)
     }
     

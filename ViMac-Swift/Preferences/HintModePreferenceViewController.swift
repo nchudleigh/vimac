@@ -4,13 +4,19 @@ import Preferences
 final class HintModePreferenceViewController: NSViewController, NSTextFieldDelegate, PreferencePane {
     let preferencePaneIdentifier = Preferences.PaneIdentifier.hintMode
     let preferencePaneTitle = "Hint Mode"
-    let toolbarItemIcon: NSImage = NSImage(named: "NSFontPanel")!
+    let toolbarItemIcon: NSImage
     
     private var grid: NSGridView!
     private var customCharactersField: NSTextField!
     private var textSizeField: NSTextField!
     
     init() {
+        if #available(OSX 11.0, *) {
+            self.toolbarItemIcon = NSImage(systemSymbolName: "cursorarrow.motionlines", accessibilityDescription: nil)!
+        } else {
+            self.toolbarItemIcon = NSImage(named: "NSFontPanel")!
+        }
+        
         super.init(nibName: nil, bundle: nil)
     }
     

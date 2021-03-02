@@ -6,7 +6,7 @@ import LaunchAtLogin
 final class GeneralPreferenceViewController: NSViewController, PreferencePane {
     let preferencePaneIdentifier = Preferences.PaneIdentifier.general
     let preferencePaneTitle = "General"
-    let toolbarItemIcon: NSImage = NSImage(named: NSImage.preferencesGeneralName)!
+    let toolbarItemIcon: NSImage
     
     private var grid: NSGridView!
     private var forceKBLayoutView: NSPopUpButton!
@@ -15,6 +15,12 @@ final class GeneralPreferenceViewController: NSViewController, PreferencePane {
     let inputSources = InputSourceManager.inputSources
 
     init() {
+        if #available(OSX 11.0, *) {
+            self.toolbarItemIcon = NSImage(systemSymbolName: "gearshape", accessibilityDescription: nil)!
+        } else {
+            self.toolbarItemIcon = NSImage(named: NSImage.preferencesGeneralName)!
+        }
+        
         super.init(nibName: nil, bundle: nil)
     }
     
