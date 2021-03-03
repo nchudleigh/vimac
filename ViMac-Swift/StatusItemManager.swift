@@ -20,7 +20,8 @@ class StatusItemManager: NSMenu, NSMenuDelegate {
             HintModePreferenceViewController(),
             ScrollModePreferenceViewController(),
         ],
-        style: .toolbarItems
+        style: .toolbarItems,
+        animated: true
     )
     
     override func awakeFromNib() {
