@@ -89,14 +89,14 @@ class Utils: NSObject {
     // Similarly, electron uses `AXManualAccessibility`:
     // https://electronjs.org/docs/tutorial/accessibility#assistive-technology
     // AXEnhancedUserInterface breaks window managers, so it's removed for now.
-    static func setAccessibilityAttributes(app: NSRunningApplication) {
+    static func setAccessibilityAttributes(app: NSRunningApplication, value: Bool) {
 //        do {
 //            try app.setAttribute("AXEnhancedUserInterface", value: true)
 //        } catch {
 //
 //        }
         
-        _ = try? Application(app)?.setAttribute("AXManualAccessibility", value: true)
+        _ = try? Application(app)?.setAttribute("AXManualAccessibility", value: value)
     }
     
     static func singleToObservable<T>(single: Single<[T]>) -> Observable<T> {

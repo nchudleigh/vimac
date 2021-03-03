@@ -125,13 +125,23 @@ import Preferences
     
     func setupWindowEventAndShortcutObservables() {
         _ = self.compositeDisposable.insert(applicationObservable
+            .withPrevious()
             .observeOn(MainScheduler.instance)
-            .subscribe(onNext: { appOptional in
-                if let app = appOptional {
-                    Utils.setAccessibilityAttributes(app: app)
+            .subscribe(onNext: { (__previousApp, currentApp) in
+                
+                if let _previousApp = __previousApp {
+                    if let previousApp = _previousApp {
+                        Utils.setAccessibilityAttributes(app: previousApp, value: false)
+                    }
+                }
+                
+                if let currentApp = currentApp {
+                    Utils.setAccessibilityAttributes(app: currentApp, value: true)
                 }
             })
         )
+        
+        
 
         _ = self.compositeDisposable.insert(focusedWindowDisturbedObservable
             .observeOn(MainScheduler.instance)
