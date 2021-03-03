@@ -6,4 +6,5 @@ extension Preferences.PaneIdentifier {
     static let hintMode = Self("hint_mode")
     static let scrollMode = Self("scroll_mode")
     static let experimental = Self("experimental")
+    static let about = Self("about")
 }
