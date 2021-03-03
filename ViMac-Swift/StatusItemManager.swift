@@ -10,19 +10,29 @@ import Cocoa
 import Sparkle
 import Preferences
 
-class StatusItemManager: NSMenu, NSMenuDelegate {
+class StatusItemManager: NSMenu, NSMenuDelegate, NSWindowDelegate {
     static let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
+    let preferencesWindowController: PreferencesWindowController
     
-    lazy var controller = PreferencesWindowController(
-        preferencePanes: [
-            GeneralPreferenceViewController(),
-            BindingsPreferenceViewController(),
-            HintModePreferenceViewController(),
-            ScrollModePreferenceViewController(),
-        ],
-        style: .toolbarItems,
-        animated: true
-    )
+    override init(title: String) {
+        self.preferencesWindowController = PreferencesWindowController(
+            preferencePanes: [
+                GeneralPreferenceViewController(),
+                BindingsPreferenceViewController(),
+                HintModePreferenceViewController(),
+                ScrollModePreferenceViewController(),
+            ],
+            style: .toolbarItems,
+            animated: true
+        )
+        super.init(title: title)
+        
+        self.preferencesWindowController.window?.delegate = self
+    }
+    
+    required init(coder: NSCoder) {
+        fatalError()
+    }
     
     override func awakeFromNib() {
         guard let button = StatusItemManager.statusItem.button else {
@@ -44,7 +54,7 @@ class StatusItemManager: NSMenu, NSMenuDelegate {
     }
     
     @objc func preferencesClick() {
-        controller.show()
+        preferencesWindowController.show()
     }
     
     @objc func checkForUpdatesClick() {
@@ -53,5 +63,21 @@ class StatusItemManager: NSMenu, NSMenuDelegate {
     
     @objc func quitClick() {
         NSApplication.shared.terminate(self)
+    }
+}
+
+// Show Vimac in the Dock when Preferences are open, and revert back to hidden when closed
+// Vimac starts in the background because of LSUIElement = true in Info.plist
+extension StatusItemManager {
+    func windowDidBecomeMain(_ notification: Notification) {
+        let transformState = ProcessApplicationTransformState(kProcessTransformToForegroundApplication)
+        var psn = ProcessSerialNumber(highLongOfPSN: 0, lowLongOfPSN: UInt32(kCurrentProcess))
+        TransformProcessType(&psn, transformState)
+    }
+    
+    func windowWillClose(_ notification: Notification) {
+        let transformState = ProcessApplicationTransformState(kProcessTransformToUIElementApplication)
+        var psn = ProcessSerialNumber(highLongOfPSN: 0, lowLongOfPSN: UInt32(kCurrentProcess))
+        TransformProcessType(&psn, transformState)
     }
 }
