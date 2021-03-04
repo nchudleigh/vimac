@@ -150,11 +150,12 @@ import Preferences
         _ = self.compositeDisposable.insert(hintModeShortcutObservable
             .observeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak self] _ in
-                if self?.modeCoordinator.windowController.window?.contentViewController?.className == HintModeViewController.className() {
-                    self?.modeCoordinator.exitMode()
-                } else {
-                    self?.modeCoordinator.setHintMode()
-                }
+                self?.modeCoordinator.setHintMode()
+//                if self?.modeCoordinator.windowController.window?.contentViewController?.className == HintModeViewController.className() {
+//                    self?.modeCoordinator.exitMode()
+//                } else {
+//                    self?.modeCoordinator.setHintMode()
+//                }
             })
         )
         

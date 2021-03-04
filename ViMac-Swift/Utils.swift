@@ -14,6 +14,7 @@ class Utils: NSObject {
     static let shouldLaunchOnStartupKey = "ShouldLaunchOnStartupKey"
     
     static func moveMouse(position: CGPoint) {
+        print("move to \(position)")
         let moveEvent = CGEvent(mouseEventSource: nil, mouseType: .mouseMoved, mouseCursorPosition: position, mouseButton: .left)
         moveEvent?.post(tap: .cghidEventTap)
     }

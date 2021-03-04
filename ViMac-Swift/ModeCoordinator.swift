@@ -26,6 +26,8 @@ class ModeCoordinator : Coordinator {
     let hintModeKeySequence: [Character] = ["f", "d"]
     private let keySequenceListener: VimacKeySequenceListener
     
+    var hintMode: HintMode?
+    
     var windowController: OverlayWindowController
     
     init(windowController: OverlayWindowController) {
@@ -104,16 +106,14 @@ class ModeCoordinator : Coordinator {
             return
         }
         
-        let focusedWindowFrame: NSRect = GeometryUtils.convertAXFrameToGlobal(focusedWindow.frame)
-        let screenFrame = activeScreenFrame(focusedWindowFrame: focusedWindowFrame)
-        
         self.priorKBLayout = InputSourceManager.currentInputSource()
         if let forceKBLayout = self.forceKBLayout {
             forceKBLayout.select()
         }
 
-        let vc = HintModeViewController.init(app: frontmostApp, window: focusedWindow)
-        self.setViewController(vc: vc, screenFrame: screenFrame)
+        self.hintMode?.deactivate()
+        self.hintMode = HintMode.init(app: frontmostApp, window: focusedWindow)
+        hintMode?.activate()
         
         keySequenceListener.stop()
     }
