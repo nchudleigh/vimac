@@ -297,21 +297,9 @@ class HintMode: NSObject, NSWindowDelegate {
     }
 }
 
-extension HintMode {
-    func windowDidBecomeKey(_ notification: Notification) {
-        print("windowDidBecomeKey")
-    }
-    
-    func windowDidBecomeMain(_ notification: Notification) {
-        print("windowDidBecomeMain")
-    }
-    
-    func windowDidResignMain(_ notification: Notification) {
-        print("windowDidResignMain")
-    }
-    
+extension HintMode {    
     func windowDidResignKey(_ notification: Notification) {
-        print("windowDidResignKey")
+        self.deactivate()
     }
 }
 
