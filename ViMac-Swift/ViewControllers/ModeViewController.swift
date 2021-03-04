@@ -22,8 +22,4 @@ class ModeViewController: NSViewController {
     override func loadView() {
         self.view = NSView()
     }
-    
-    func onEscape() {
-        self.modeCoordinator?.exitMode()
-    }
 }
