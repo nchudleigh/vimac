@@ -30,7 +30,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     var hints: [Hint]?
     var hintsViewController: HintsViewController?
     
-    let inputListener = HintModeInputListener()
+    let inputIntents = HintModeInputIntent.fromInputMonitor()
     
     var characterStack: [Character] = [Character]()
     let startTime = CFAbsoluteTimeGetCurrent()
@@ -54,11 +54,6 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        observeLetterKeyDown()
-        observeEscKey()
-        observeDeleteKey()
-        observeSpaceKey()
-        
         hideMouse()
 
         HintModeQueryService.init(app: app, window: window, hintCharacters: possibleHintCharacters).perform()
@@ -69,6 +64,13 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
             .subscribe(
                 onSuccess: { self.onHintQueryCompleted(hints: $0) },
                 onError: { _ in self.modeCoordinator?.exitMode()}
+            )
+            .disposed(by: disposeBag)
+        
+        inputIntents
+            .observeOn(MainScheduler.instance)
+            .subscribe(
+                onNext: { self.onInputIntent($0) }
             )
             .disposed(by: disposeBag)
     }
@@ -82,8 +84,8 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
         os_log("[Hint mode] query error: %@", log: Log.accessibility, String(describing: e))
     }
 
-    func onLetterKeyDown(event: NSEvent) {
-        guard let character = event.charactersIgnoringModifiers?.first else { return }
+    func advance(characters: String, action: HintAction) {
+        guard let character = characters.first else { return }
         guard let hints = hints else { return }
         
         self.characterStack.append(character)
@@ -113,15 +115,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
                 )
                 return frame.origin
             }()
-            let action: HintAction = {
-                if (event.modifierFlags.rawValue & NSEvent.ModifierFlags.shift.rawValue == NSEvent.ModifierFlags.shift.rawValue) {
-                    return .rightClick
-                } else if (event.modifierFlags.rawValue & NSEvent.ModifierFlags.command.rawValue == NSEvent.ModifierFlags.command.rawValue) {
-                    return .doubleLeftClick
-                } else {
-                    return .leftClick
-                }
-            }()
+
             performHintAction(hint, action: action)
             
             Utils.moveMouse(position: originalMousePosition)
@@ -154,32 +148,22 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
         }
     }
     
-    func observeLetterKeyDown() {
-        inputListener.observeKeyDown(onEvent: { [weak self] event in
-            self?.onLetterKeyDown(event: event)
-        })
+    func onInputIntent(_ intent: HintModeInputIntent) {
+        switch intent {
+        case .exit:
+            self.modeCoordinator?.exitMode()
+        case .rotate:
+            self.rotateHints()
+        case .backspace:
+            self.backspace()
+        case .advance(let characters, let action):
+            self.advance(characters: characters, action: action)
+        }
     }
     
-    func observeEscKey() {
-        inputListener.observeEscapeKey(onEvent: { [weak self] _ in
-            self?.onEscape()
-        })
-    }
-    
-    func observeDeleteKey() {
-        inputListener.observeDeleteKey(onEvent: { [weak self] _ in
-            guard let vc = self else {
-                return
-            }
-            _ = vc.characterStack.popLast()
-            vc.updateHints(typed: String(vc.characterStack))
-        })
-    }
-    
-    func observeSpaceKey() {
-        inputListener.observeSpaceKey(onEvent: { [weak self] _ in
-            self?.rotateHints()
-        })
+    func backspace() {
+        _ = characterStack.popLast()
+        updateHints(typed: String(characterStack))
     }
     
     func onHintQueryCompleted(hints: [Hint]) {
