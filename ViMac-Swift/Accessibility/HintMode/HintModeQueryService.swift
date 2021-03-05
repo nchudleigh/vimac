@@ -34,10 +34,10 @@ class HintModeQueryService {
     
     private func elementObservable() -> Observable<Element> {
         return Utils.eagerConcat(observables: [
-            Utils.singleToObservable(single: queryWindowElementsSingle()),
             Utils.singleToObservable(single: queryMenuBarSingle()),
             Utils.singleToObservable(single: queryMenuBarExtrasSingle()),
-            Utils.singleToObservable(single: queryNotificationCenterSingle())
+            Utils.singleToObservable(single: queryNotificationCenterSingle()),
+            Utils.singleToObservable(single: queryWindowElementsSingle())
         ])
     }
     
