@@ -282,6 +282,8 @@
 			isa = PBXGroup;
 			children = (
 				E21A66FB25F1491600185098 /* HintModeInputIntent.swift */,
+				E2C29570234E19E4001A38D6 /* HintModeViewController.swift */,
+				E23A1A7F25E62DEA00D71D6E /* HintsViewController.swift */,
 			);
 			path = HintMode;
 			sourceTree = "<group>";
@@ -447,11 +449,9 @@
 			isa = PBXGroup;
 			children = (
 				E2C29567234DE51F001A38D6 /* ModeViewController.swift */,
-				E2C29570234E19E4001A38D6 /* HintModeViewController.swift */,
 				E2677785256034860034B131 /* ScrollModeViewController.swift */,
 				E267778D25613A900034B131 /* ScrollModeActiveViewController.swift */,
 				E267778F256187230034B131 /* ScrollModeActiveScrollAreaViewController.swift */,
-				E23A1A7F25E62DEA00D71D6E /* HintsViewController.swift */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
