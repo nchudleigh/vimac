@@ -705,7 +705,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [ \"$BUILD_ENV\" != 'CI' ]; then\n    osascript grant-accessibility-permission-dev.scpt;\nfi\n";
+			shellScript = "#if [ \"$BUILD_ENV\" != 'CI' ]; then\n#    osascript grant-accessibility-permission-dev.scpt;\n#fi\n";
 		};
 		E27776E1240B765E00488320 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
