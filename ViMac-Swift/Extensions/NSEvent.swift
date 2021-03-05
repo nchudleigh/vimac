@@ -10,9 +10,9 @@ import Cocoa
 import RxSwift
 
 extension NSEvent {
-    static func localEventMonitor() -> Observable<NSEvent> {
+    static func localEventMonitor(matching: EventTypeMask) -> Observable<NSEvent> {
         Observable.create({ observer in
-            let keyMonitor = NSEvent.addLocalMonitorForEvents(matching: NSEvent.EventTypeMask.keyDown.union(.keyUp), handler: { event -> NSEvent? in
+            let keyMonitor = NSEvent.addLocalMonitorForEvents(matching: matching, handler: { event -> NSEvent? in
                 observer.onNext(event)
                 // return nil to prevent the event from being dispatched
                 // this removes the "doot doot" sound when typing with CMD / CTRL held down

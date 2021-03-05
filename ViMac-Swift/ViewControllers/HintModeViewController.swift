@@ -30,7 +30,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     var hints: [Hint]?
     var hintsViewController: HintsViewController?
     
-    let inputIntents = HintModeInputIntent.fromInputMonitor()
+    let inputIntents = HintModeInputIntent.from(NSEvent.localEventMonitor(matching: .keyDown))
     
     var characterStack: [Character] = [Character]()
     let startTime = CFAbsoluteTimeGetCurrent()

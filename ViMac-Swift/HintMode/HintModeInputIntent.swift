@@ -15,8 +15,8 @@ enum HintModeInputIntent {
     case backspace
     case advance(characters: String, action: HintAction)
     
-    static func fromInputMonitor(_ monitor: Observable<NSEvent> = NSEvent.localEventMonitor()) -> Observable<HintModeInputIntent> {
-        monitor
+    static func from(_ events: Observable<NSEvent>) -> Observable<HintModeInputIntent> {
+        events
             .map { event in
                 if event.type != .keyDown { return nil }
                 if event.keyCode == kVK_Escape { return .exit }
