@@ -27,10 +27,11 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     let app: NSRunningApplication
     let window: Element
     
-    var hints: [Hint]?
+    var _hints: [Hint]?
     var hintsViewController: HintsViewController?
     
-    let inputIntents = HintModeInputIntent.from(NSEvent.localEventMonitor(matching: .keyDown))
+    let hints: Observable<Hint>
+    let inputIntents: Observable<HintModeInputIntent>
     
     var characterStack: [Character] = [Character]()
     let startTime = CFAbsoluteTimeGetCurrent()
@@ -44,6 +45,10 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     init(app: NSRunningApplication, window: Element) {
         self.app = app
         self.window = window
+        
+        self.hints = HintModeQueryService.init(app: app, window: window, hintCharacters: possibleHintCharacters).perform()
+        self.inputIntents = HintModeInputIntent.from(NSEvent.localEventMonitor(matching: .keyDown))
+        
         super.init()
     }
     
@@ -56,7 +61,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
         
         hideMouse()
 
-        HintModeQueryService.init(app: app, window: window, hintCharacters: possibleHintCharacters).perform()
+        hints
             .toArray()
             .observeOn(MainScheduler.instance)
             .do(onSuccess: { _ in self.logQueryTime() })
@@ -64,13 +69,6 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
             .subscribe(
                 onSuccess: { self.onHintQueryCompleted(hints: $0) },
                 onError: { _ in self.modeCoordinator?.exitMode()}
-            )
-            .disposed(by: disposeBag)
-        
-        inputIntents
-            .observeOn(MainScheduler.instance)
-            .subscribe(
-                onNext: { [weak self] in self?.onInputIntent($0) }
             )
             .disposed(by: disposeBag)
     }
@@ -86,7 +84,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
 
     func advance(characters: String, action: HintAction) {
         guard let character = characters.first else { return }
-        guard let hints = hints else { return }
+        guard let hints = _hints else { return }
         
         self.characterStack.append(character)
         let typed = String(self.characterStack)
@@ -167,9 +165,16 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     }
     
     func onHintQueryCompleted(hints: [Hint]) {
-        self.hints = hints
+        self._hints = hints
+        
+        inputIntents
+            .observeOn(MainScheduler.instance)
+            .subscribe(
+                onNext: { [weak self] in self?.onInputIntent($0) }
+            )
+            .disposed(by: disposeBag)
 
-        self.hintsViewController = HintsViewController(hints: self.hints!, textSize: CGFloat(textSize), hintCharacters: possibleHintCharacters)
+        self.hintsViewController = HintsViewController(hints: self._hints!, textSize: CGFloat(textSize), hintCharacters: possibleHintCharacters)
         self.addChild(hintsViewController!)
         hintsViewController!.view.frame = self.view.frame
         self.view.addSubview(hintsViewController!.view)
