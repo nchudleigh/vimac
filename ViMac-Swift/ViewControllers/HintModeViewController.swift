@@ -70,7 +70,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
         inputIntents
             .observeOn(MainScheduler.instance)
             .subscribe(
-                onNext: { self.onInputIntent($0) }
+                onNext: { [weak self] in self?.onInputIntent($0) }
             )
             .disposed(by: disposeBag)
     }
