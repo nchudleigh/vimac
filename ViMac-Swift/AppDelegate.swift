@@ -56,6 +56,11 @@ import Preferences
     }
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
+        if isDuplicateAppInstance() {
+            NSApp.terminate(self)
+            return
+        }
+        
         setupPreferences()
         setupStatusItem()
         
@@ -67,6 +72,14 @@ import Preferences
         }
         
         showWelcomeWindowController()
+    }
+        
+    func isDuplicateAppInstance() -> Bool {
+        let bundleId = Bundle.main.bundleIdentifier
+        let instances = NSWorkspace.shared.runningApplications
+            .filter({ $0.bundleIdentifier == bundleId })
+            .count
+        return instances > 1
     }
         
     func setupPreferences() {

@@ -19,7 +19,7 @@
 		E20DF9EC25EA74360065711A /* KeyboardShortcuts.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20DF9EB25EA74360065711A /* KeyboardShortcuts.swift */; };
 		E21D74AE25B45A9E00159E73 /* BindingsUserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = E21D74AD25B45A9E00159E73 /* BindingsUserDefaults.swift */; };
 		E21D74B025B45BB500159E73 /* UserDefaultsProperty.swift in Sources */ = {isa = PBXBuildFile; fileRef = E21D74AF25B45BB500159E73 /* UserDefaultsProperty.swift */; };
-		E225BD1D233292B800ECDEF4 /* OldStatusItemManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E225BD1C233292B800ECDEF4 /* OldStatusItemManager.swift */; };
+		E225BD1D233292B800ECDEF4 /* StatusItemManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E225BD1C233292B800ECDEF4 /* StatusItemManager.swift */; };
 		E229E57A2482ABAF00A558D3 /* ScrollModePreferenceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E229E5792482ABAF00A558D3 /* ScrollModePreferenceViewController.swift */; };
 		E23140D62506781E004D1B96 /* QueryMenuBarItemsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E23140D52506781E004D1B96 /* QueryMenuBarItemsService.swift */; };
 		E23140D825067A46004D1B96 /* QueryMenuBarExtrasService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E23140D725067A46004D1B96 /* QueryMenuBarExtrasService.swift */; };
@@ -143,7 +143,7 @@
 		E20DF9EB25EA74360065711A /* KeyboardShortcuts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardShortcuts.swift; sourceTree = "<group>"; };
 		E21D74AD25B45A9E00159E73 /* BindingsUserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BindingsUserDefaults.swift; sourceTree = "<group>"; };
 		E21D74AF25B45BB500159E73 /* UserDefaultsProperty.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsProperty.swift; sourceTree = "<group>"; };
-		E225BD1C233292B800ECDEF4 /* OldStatusItemManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OldStatusItemManager.swift; sourceTree = "<group>"; };
+		E225BD1C233292B800ECDEF4 /* StatusItemManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusItemManager.swift; sourceTree = "<group>"; };
 		E229E5792482ABAF00A558D3 /* ScrollModePreferenceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollModePreferenceViewController.swift; sourceTree = "<group>"; };
 		E23140D52506781E004D1B96 /* QueryMenuBarItemsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryMenuBarItemsService.swift; sourceTree = "<group>"; };
 		E23140D725067A46004D1B96 /* QueryMenuBarExtrasService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryMenuBarExtrasService.swift; sourceTree = "<group>"; };
@@ -348,7 +348,7 @@
 				E2C2956F234E0A32001A38D6 /* ViewControllers */,
 				E225BD1E233354AD00ECDEF4 /* Windows */,
 				E26172232322968500E396CA /* AppDelegate.swift */,
-				E225BD1C233292B800ECDEF4 /* OldStatusItemManager.swift */,
+				E225BD1C233292B800ECDEF4 /* StatusItemManager.swift */,
 				E26172272322968600E396CA /* Assets.xcassets */,
 				E26172292322968700E396CA /* Main.storyboard */,
 				E2C29561234DD7F8001A38D6 /* OverlayWindowController.swift */,
@@ -761,7 +761,7 @@
 				E20696F923290D41001EFDB2 /* Log.swift in Sources */,
 				E23140D825067A46004D1B96 /* QueryMenuBarExtrasService.swift in Sources */,
 				E25BBB5B250CC4AA00D11213 /* ObserveFrontmostApplicationService.swift in Sources */,
-				E225BD1D233292B800ECDEF4 /* OldStatusItemManager.swift in Sources */,
+				E225BD1D233292B800ECDEF4 /* StatusItemManager.swift in Sources */,
 				E267778E25613A900034B131 /* ScrollModeActiveViewController.swift in Sources */,
 				E2F15BC525B30A9D00E2F29E /* BindingsConfig.swift in Sources */,
 				E26981B323C99DBB00E46217 /* WelcomeWindowController.swift in Sources */,
