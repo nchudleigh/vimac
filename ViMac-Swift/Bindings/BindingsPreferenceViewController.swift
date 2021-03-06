@@ -143,41 +143,41 @@ class BindingsPreferenceViewController: NSViewController, PreferencePane, NSText
     }
     
     private func fillFields() {
-        let hintModeKeySequenceEnabled = BindingsUserDefaults.keySequenceHintModeEnabled.read()
+        let hintModeKeySequenceEnabled = UserDefaultsProperties.keySequenceHintModeEnabled.read()
         hintModeKeySequenceEnabledCheckbox.state = hintModeKeySequenceEnabled ? .on : .off
-        hintModeKeySequenceTextField.stringValue = BindingsUserDefaults.keySequenceHintMode.read()
+        hintModeKeySequenceTextField.stringValue = UserDefaultsProperties.keySequenceHintMode.read()
         hintModeKeySequenceTextField.isEnabled = hintModeKeySequenceEnabled
 
-        let scrollModeKeySequenceEnabled = BindingsUserDefaults.keySequenceScrollModeEnabled.read()
+        let scrollModeKeySequenceEnabled = UserDefaultsProperties.keySequenceScrollModeEnabled.read()
         scrollModeKeySequenceEnabledCheckbox.state = scrollModeKeySequenceEnabled ? .on : .off
-        scrollModeKeySequenceTextField.stringValue = BindingsUserDefaults.keySequenceScrollMode.read()
+        scrollModeKeySequenceTextField.stringValue = UserDefaultsProperties.keySequenceScrollMode.read()
         scrollModeKeySequenceTextField.isEnabled = scrollModeKeySequenceEnabled
         
-        resetDelayTextField.stringValue = String(BindingsUserDefaults.keySequenceResetDelay.read())
+        resetDelayTextField.stringValue = String(UserDefaultsProperties.keySequenceResetDelay.read())
     }
     
     @objc private func onHintModeKeySequenceCheckboxClick() {
         let enabled = hintModeKeySequenceEnabledCheckbox.state == .on
         hintModeKeySequenceTextField.isEnabled = enabled
         
-        BindingsUserDefaults.keySequenceHintModeEnabled.write(enabled)
+        UserDefaultsProperties.keySequenceHintModeEnabled.write(enabled)
     }
     
     @objc private func onScrollModeKeySequenceCheckboxClick() {
         let enabled = scrollModeKeySequenceEnabledCheckbox.state == .on
         scrollModeKeySequenceTextField.isEnabled = enabled
         
-        BindingsUserDefaults.keySequenceScrollModeEnabled.write(enabled)
+        UserDefaultsProperties.keySequenceScrollModeEnabled.write(enabled)
     }
     
     private func onHintModeKeySequenceTextFieldEndEditing() {
         let value = hintModeKeySequenceTextField.stringValue
-        BindingsUserDefaults.keySequenceHintMode.write(value)
+        UserDefaultsProperties.keySequenceHintMode.write(value)
     }
     
     private func onScrollModeKeySequenceTextFieldEndEditing() {
         let value = scrollModeKeySequenceTextField.stringValue
-        BindingsUserDefaults.keySequenceScrollMode.write(value)
+        UserDefaultsProperties.keySequenceScrollMode.write(value)
     }
     
     private func onResetDelayTextFieldEndEditing() {
@@ -187,7 +187,7 @@ class BindingsPreferenceViewController: NSViewController, PreferencePane, NSText
             return
         }
 
-        BindingsUserDefaults.keySequenceResetDelay.write(value)
+        UserDefaultsProperties.keySequenceResetDelay.write(value)
     }
     
     func controlTextDidEndEditing(_ notification: Notification) {

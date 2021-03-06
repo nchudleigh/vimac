@@ -30,4 +30,3 @@ public struct UserDefaultsProperty<ValueType: Any> {
         UserDefaults.standard.rx.observe(Any.self, self.key).map({ ($0 as? ValueType) ?? self.defaultValue })
     }
 }
-
