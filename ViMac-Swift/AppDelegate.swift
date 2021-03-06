@@ -31,6 +31,8 @@ import Preferences
     
     let modeCoordinator: ModeCoordinator
     let overlayWindowController: OverlayWindowController
+    var preferencesWindowController: PreferencesWindowController!
+    var statusItemManager: StatusItemManager!
     
     let frontmostAppService = FrontmostApplicationService.init()
     
@@ -54,13 +56,41 @@ import Preferences
     }
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
+        setupPreferences()
+        setupStatusItem()
+        
         if self.isAccessibilityPermissionsGranted() {
             self.checkForUpdatesInBackground()
             self.setupWindowEventAndShortcutObservables()
+            self.openPreferences()
             return
         }
         
         showWelcomeWindowController()
+    }
+        
+    func setupPreferences() {
+        if self.preferencesWindowController == nil {
+            self.preferencesWindowController = PreferencesWindowController(
+                preferencePanes: [
+                    GeneralPreferenceViewController(),
+                    BindingsPreferenceViewController(),
+                    HintModePreferenceViewController(),
+                    ScrollModePreferenceViewController(),
+                ],
+                style: .toolbarItems,
+                animated: true
+            )
+            self.preferencesWindowController.window?.delegate = self
+        }
+    }
+        
+    func openPreferences() {
+        self.preferencesWindowController.show()
+    }
+        
+    func setupStatusItem() {
+        self.statusItemManager = StatusItemManager.init(preferencesWindowController: self.preferencesWindowController)
     }
     
     func createApplicationObservable() -> Observable<NSRunningApplication?> {
@@ -182,6 +212,20 @@ import Preferences
 
     func applicationWillTerminate(_ aNotification: Notification) {
         self.compositeDisposable.dispose()
+    }
+}
+
+extension AppDelegate : NSWindowDelegate {
+    func windowDidBecomeMain(_ notification: Notification) {
+        let transformState = ProcessApplicationTransformState(kProcessTransformToForegroundApplication)
+        var psn = ProcessSerialNumber(highLongOfPSN: 0, lowLongOfPSN: UInt32(kCurrentProcess))
+        TransformProcessType(&psn, transformState)
+    }
+    
+    func windowWillClose(_ notification: Notification) {
+        let transformState = ProcessApplicationTransformState(kProcessTransformToUIElementApplication)
+        var psn = ProcessSerialNumber(highLongOfPSN: 0, lowLongOfPSN: UInt32(kCurrentProcess))
+        TransformProcessType(&psn, transformState)
     }
 }
 
