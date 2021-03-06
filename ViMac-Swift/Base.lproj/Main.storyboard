@@ -678,7 +678,6 @@
                 <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="Vimac" customModuleProvider="target"/>
                 <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
                 <customObject id="Ady-hI-5gd" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
-                <customObject id="XaW-Fn-b3C" customClass="OldStatusItemManager" customModule="Vimac" customModuleProvider="target"/>
             </objects>
             <point key="canvasLocation" x="62" y="-82"/>
         </scene>
