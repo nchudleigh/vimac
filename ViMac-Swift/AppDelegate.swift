@@ -74,6 +74,11 @@ import Preferences
         showWelcomeWindowController()
     }
         
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        openPreferences()
+        return true
+    }
+        
     func isDuplicateAppInstance() -> Bool {
         let bundleId = Bundle.main.bundleIdentifier
         let instances = NSWorkspace.shared.runningApplications
