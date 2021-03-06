@@ -10,7 +10,7 @@ import Cocoa
 import Sparkle
 import Preferences
 
-class StatusItemManager: NSMenu, NSMenuDelegate, NSWindowDelegate {
+class OldStatusItemManager: NSMenu, NSMenuDelegate, NSWindowDelegate {
     let statusItem: NSStatusItem
     let preferencesWindowController: PreferencesWindowController
     
@@ -64,7 +64,7 @@ class StatusItemManager: NSMenu, NSMenuDelegate, NSWindowDelegate {
 
 // Show Vimac in the Dock when Preferences are open, and revert back to hidden when closed
 // Vimac starts in the background because of LSUIElement = true in Info.plist
-extension StatusItemManager {
+extension OldStatusItemManager {
     func windowDidBecomeMain(_ notification: Notification) {
         let transformState = ProcessApplicationTransformState(kProcessTransformToForegroundApplication)
         var psn = ProcessSerialNumber(highLongOfPSN: 0, lowLongOfPSN: UInt32(kCurrentProcess))
