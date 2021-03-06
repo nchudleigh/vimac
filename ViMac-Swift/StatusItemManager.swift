@@ -11,7 +11,7 @@ import Sparkle
 import Preferences
 
 class StatusItemManager: NSMenu, NSMenuDelegate, NSWindowDelegate {
-    let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
+    let statusItem: NSStatusItem
     let preferencesWindowController: PreferencesWindowController
     
     override init(title: String) {
@@ -25,22 +25,18 @@ class StatusItemManager: NSMenu, NSMenuDelegate, NSWindowDelegate {
             style: .toolbarItems,
             animated: true
         )
-        super.init(title: title)
+        self.statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
+        self.statusItem.button?.image = NSImage(named: "StatusBarButtonImage")
         
+        super.init(title: title)
+
         self.preferencesWindowController.window?.delegate = self
+        self.statusItem.menu = self
+        self.statusItem.menu?.delegate = self
     }
     
     required init(coder: NSCoder) {
         fatalError()
-    }
-    
-    override func awakeFromNib() {
-        guard let button = statusItem.button else {
-            return
-        }
-        button.image = NSImage(named: "StatusBarButtonImage")
-        statusItem.menu = self
-        statusItem.menu?.delegate = self
     }
     
     func menuWillOpen(_ _menu: NSMenu) {
