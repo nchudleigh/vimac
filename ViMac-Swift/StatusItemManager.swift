@@ -32,7 +32,7 @@ class StatusItemManager: NSMenu, NSMenuDelegate, NSWindowDelegate {
 
         self.preferencesWindowController.window?.delegate = self
         self.statusItem.menu = self
-        self.statusItem.menu?.delegate = self
+        self.delegate = self
     }
     
     required init(coder: NSCoder) {
