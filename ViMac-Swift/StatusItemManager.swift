@@ -11,7 +11,7 @@ import Sparkle
 import Preferences
 
 class StatusItemManager: NSMenu, NSMenuDelegate, NSWindowDelegate {
-    static let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
+    let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
     let preferencesWindowController: PreferencesWindowController
     
     override init(title: String) {
@@ -35,16 +35,16 @@ class StatusItemManager: NSMenu, NSMenuDelegate, NSWindowDelegate {
     }
     
     override func awakeFromNib() {
-        guard let button = StatusItemManager.statusItem.button else {
+        guard let button = statusItem.button else {
             return
         }
         button.image = NSImage(named: "StatusBarButtonImage")
-        StatusItemManager.statusItem.menu = self
-        StatusItemManager.statusItem.menu?.delegate = self
+        statusItem.menu = self
+        statusItem.menu?.delegate = self
     }
     
     func menuWillOpen(_ _menu: NSMenu) {
-        if let menu = StatusItemManager.statusItem.menu {
+        if let menu = statusItem.menu {
             menu.removeAllItems()
             menu.addItem(withTitle: "Preferences", action: #selector(preferencesClick), keyEquivalent: "").target = self
             menu.addItem(withTitle: "Check for updates", action: #selector(checkForUpdatesClick), keyEquivalent: "").target = self
