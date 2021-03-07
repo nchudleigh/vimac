@@ -12,21 +12,21 @@ import RxSwift
 class BindingsRepository {
     func read() -> BindingsConfig {
         BindingsConfig.init(
-            hintModeKeySequenceEnabled: BindingsUserDefaults.keySequenceHintModeEnabled.read(),
-            hintModeKeySequence: BindingsUserDefaults.keySequenceHintMode.read(),
-            scrollModeKeySequenceEnabled: BindingsUserDefaults.keySequenceScrollModeEnabled.read(),
-            scrollModeKeySequence: BindingsUserDefaults.keySequenceScrollMode.read(),
-            resetDelay: BindingsUserDefaults.keySequenceResetDelay.read()
+            hintModeKeySequenceEnabled: UserDefaultsProperties.keySequenceHintModeEnabled.read(),
+            hintModeKeySequence: UserDefaultsProperties.keySequenceHintMode.read(),
+            scrollModeKeySequenceEnabled: UserDefaultsProperties.keySequenceScrollModeEnabled.read(),
+            scrollModeKeySequence: UserDefaultsProperties.keySequenceScrollMode.read(),
+            resetDelay: UserDefaultsProperties.keySequenceResetDelay.read()
         )
     }
     
     func readLive() -> Observable<BindingsConfig> {
         Observable.combineLatest(
-            BindingsUserDefaults.keySequenceHintModeEnabled.readLive(),
-            BindingsUserDefaults.keySequenceHintMode.readLive(),
-            BindingsUserDefaults.keySequenceScrollModeEnabled.readLive(),
-            BindingsUserDefaults.keySequenceScrollMode.readLive(),
-            BindingsUserDefaults.keySequenceResetDelay.readLive()
+            UserDefaultsProperties.keySequenceHintModeEnabled.readLive(),
+            UserDefaultsProperties.keySequenceHintMode.readLive(),
+            UserDefaultsProperties.keySequenceScrollModeEnabled.readLive(),
+            UserDefaultsProperties.keySequenceScrollMode.readLive(),
+            UserDefaultsProperties.keySequenceResetDelay.readLive()
         ).map({ _ in self.read() })
     }
 }

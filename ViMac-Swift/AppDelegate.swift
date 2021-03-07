@@ -19,7 +19,6 @@ import Preferences
     var welcomeWindowController: NSWindowController?
     var permissionPollingTimer: Timer?
     
-    private lazy var applicationObservable: Observable<NSRunningApplication?> = createApplicationObservable()
     private lazy var focusedWindowDisturbedObservable: Observable<FrontmostApplicationService.ApplicationNotification> = createFocusedWindowDisturbedObservable()
     private lazy var windowObservable: Observable<Element?> = createFocusedWindowObservable()
 
@@ -67,6 +66,7 @@ import Preferences
         if self.isAccessibilityPermissionsGranted() {
             self.checkForUpdatesInBackground()
             self.setupWindowEventAndShortcutObservables()
+            self.setupAXAttributeObservables()
             self.openPreferences()
             return
         }
@@ -95,6 +95,7 @@ import Preferences
                     BindingsPreferenceViewController(),
                     HintModePreferenceViewController(),
                     ScrollModePreferenceViewController(),
+                    ExperimentalPreferenceViewController()
                 ],
                 style: .toolbarItems,
                 animated: true
@@ -170,17 +171,71 @@ import Preferences
             self.setupWindowEventAndShortcutObservables()
         }
     }
+        
+    func setupAXAttributeObservables() {
+        let axWorker = ConcurrentDispatchQueueScheduler.init(qos: .default)
+        let frontmostAppChange = createApplicationObservable().withPrevious().share()
+
+        let isAXManualAccessibilityEnabled = UserDefaultsProperties.AXManualAccessibilityEnabled.readLive()
+        let AXManualAccessibilityDisabled: Observable<Void> = isAXManualAccessibilityEnabled
+            .filter({ !$0 })
+            .map({ _ in Void() })
+        
+        _ = self.compositeDisposable.insert(
+            AXManualAccessibilityDisabled
+                .observeOn(axWorker)
+                .subscribe(onNext: {
+                    AXManualAccessibilityActivator.deactivateAll()
+                })
+        )
+        
+        _ = self.compositeDisposable.insert(
+            frontmostAppChange.onlyWhen(isAXManualAccessibilityEnabled)
+                .observeOn(axWorker)
+                .subscribe(onNext: { (__previousApp, currentApp) in
+                    if let _previousApp = __previousApp {
+                        if let previousApp = _previousApp {
+                            AXManualAccessibilityActivator.deactivate(previousApp)
+                        }
+                    }
+
+                    if let currentApp = currentApp {
+                        AXManualAccessibilityActivator.activate(currentApp)
+                    }
+                })
+        )
+        
+        let isAXEnhancedUserInterfaceEnabled = UserDefaultsProperties.AXEnhancedUserInterfaceEnabled.readLive()
+        let AXEnhancedUserInterfaceDisabled: Observable<Void> = isAXEnhancedUserInterfaceEnabled
+            .filter({ !$0 })
+            .map({ _ in Void() })
+        
+        _ = self.compositeDisposable.insert(
+            AXEnhancedUserInterfaceDisabled
+                .observeOn(axWorker)
+                .subscribe(onNext: {
+                    AXEnhancedUserInterfaceActivator.deactivateAll()
+                })
+        )
+        
+        _ = self.compositeDisposable.insert(
+            frontmostAppChange.onlyWhen(isAXEnhancedUserInterfaceEnabled)
+                .observeOn(axWorker)
+                .subscribe(onNext: { (__previousApp, currentApp) in
+                    if let _previousApp = __previousApp {
+                        if let previousApp = _previousApp {
+                            AXEnhancedUserInterfaceActivator.deactivate(previousApp)
+                        }
+                    }
+
+                    if let currentApp = currentApp {
+                        AXEnhancedUserInterfaceActivator.activate(currentApp)
+                    }
+                })
+        )
+    }
     
     func setupWindowEventAndShortcutObservables() {
-        _ = self.compositeDisposable.insert(applicationObservable
-            .observeOn(MainScheduler.instance)
-            .subscribe(onNext: { appOptional in
-                if let app = appOptional {
-                    Utils.setAccessibilityAttributes(app: app)
-                }
-            })
-        )
-
         _ = self.compositeDisposable.insert(focusedWindowDisturbedObservable
             .observeOn(MainScheduler.instance)
             .subscribe(onNext: { notification in
@@ -230,6 +285,9 @@ import Preferences
 
     func applicationWillTerminate(_ aNotification: Notification) {
         self.compositeDisposable.dispose()
+        
+        AXEnhancedUserInterfaceActivator.deactivateAll()
+        AXManualAccessibilityActivator.deactivateAll()
     }
 }
 

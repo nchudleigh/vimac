@@ -83,21 +83,6 @@ class Utils: NSObject {
             return Observable.from(sortedO)
         })
     }
-
-    // For performance reasons Chromium only makes the webview accessible when there it detects voiceover through the `AXEnhancedUserInterface` attribute on the Chrome application itself:
-    // http://dev.chromium.org/developers/design-documents/accessibility
-    // Similarly, electron uses `AXManualAccessibility`:
-    // https://electronjs.org/docs/tutorial/accessibility#assistive-technology
-    // AXEnhancedUserInterface breaks window managers, so it's removed for now.
-    static func setAccessibilityAttributes(app: NSRunningApplication) {
-//        do {
-//            try app.setAttribute("AXEnhancedUserInterface", value: true)
-//        } catch {
-//
-//        }
-        
-        _ = try? Application(app)?.setAttribute("AXManualAccessibility", value: true)
-    }
     
     static func singleToObservable<T>(single: Single<[T]>) -> Observable<T> {
         return single.asObservable()
