@@ -95,7 +95,8 @@ import Preferences
                     BindingsPreferenceViewController(),
                     HintModePreferenceViewController(),
                     ScrollModePreferenceViewController(),
-                    ExperimentalPreferenceViewController()
+                    ExperimentalPreferenceViewController(),
+                    AboutPreferencesViewController()
                 ],
                 style: .toolbarItems,
                 animated: true
