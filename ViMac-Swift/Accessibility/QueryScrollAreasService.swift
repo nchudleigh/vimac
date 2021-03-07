@@ -37,6 +37,11 @@ class QueryScrollAreasService {
                 continue
             }
             
+            // web areas do not have scroll area children
+            if element.role == "AXWebArea" {
+                continue
+            }
+            
             let children = try fetchChildren(element) ?? []
             for child in children {
                 stack.append(child)
