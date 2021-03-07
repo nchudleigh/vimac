@@ -41,19 +41,25 @@ class ExperimentalPreferenceViewController: NSViewController, NSTextFieldDelegat
         grid.column(at: 0).xPlacement = .trailing
         grid.translatesAutoresizingMaskIntoConstraints = false
         
-        let electronSupportLabel = NSTextField(labelWithString: "Electron Support (AXManualAccessibility):")
+        let electronSupportLabel = NSTextField(labelWithString: "Electron Support:")
         electronSupportView = NSButton(checkboxWithTitle: "Enabled", target: self, action: #selector(onElectronSupportChange))
         electronSupportView.state = UserDefaultsProperties.AXManualAccessibilityEnabled.read() ? .on : .off
         grid.addRow(with: [electronSupportLabel, electronSupportView])
+        
+        let electronSupportLabelHint = NSTextField(wrappingLabelWithString: "Sets the AXManualAccessibility attribute on applications. May lead to slow performance and high CPU usage.")
+        electronSupportLabelHint.font = .labelFont(ofSize: 11)
+        electronSupportLabelHint.textColor = .secondaryLabelColor
+        grid.addRow(with: [NSGridCell.emptyContentView, electronSupportLabelHint])
         
         self.view.addSubview(grid)
         
         NSLayoutConstraint.activate([
             view.widthAnchor.constraint(equalToConstant: 600),
+            grid.widthAnchor.constraint(equalTo: view.widthAnchor, constant: -200),
             grid.topAnchor.constraint(equalTo: view.topAnchor, constant: 20),
             grid.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -20),
             grid.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            grid.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+            grid.centerYAnchor.constraint(equalTo: view.centerYAnchor),
         ])
     }
     
