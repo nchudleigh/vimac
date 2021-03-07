@@ -285,6 +285,9 @@ import Preferences
 
     func applicationWillTerminate(_ aNotification: Notification) {
         self.compositeDisposable.dispose()
+        
+        AXEnhancedUserInterfaceActivator.deactivateAll()
+        AXManualAccessibilityActivator.deactivateAll()
     }
 }
 
