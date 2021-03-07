@@ -66,7 +66,7 @@ import Preferences
         if self.isAccessibilityPermissionsGranted() {
             self.checkForUpdatesInBackground()
             self.setupWindowEventAndShortcutObservables()
-            self.setupAXManualAccessibilityObservables()
+            self.setupAXAttributeObservables()
             self.openPreferences()
             return
         }
@@ -172,18 +172,18 @@ import Preferences
         }
     }
         
-    func setupAXManualAccessibilityObservables() {
-        let frontmostAppChange = createApplicationObservable().withPrevious()
+    func setupAXAttributeObservables() {
+        let axWorker = ConcurrentDispatchQueueScheduler.init(qos: .default)
+        let frontmostAppChange = createApplicationObservable().withPrevious().share()
+
         let isAXManualAccessibilityEnabled = UserDefaultsProperties.AXManualAccessibilityEnabled.readLive()
         let AXManualAccessibilityDisabled: Observable<Void> = isAXManualAccessibilityEnabled
             .filter({ !$0 })
             .map({ _ in Void() })
         
-        let scheduler = ConcurrentDispatchQueueScheduler.init(qos: .default)
-        
         _ = self.compositeDisposable.insert(
             AXManualAccessibilityDisabled
-                .observeOn(scheduler)
+                .observeOn(axWorker)
                 .subscribe(onNext: {
                     AXManualAccessibilityActivator.deactivateAll()
                 })
@@ -191,7 +191,7 @@ import Preferences
         
         _ = self.compositeDisposable.insert(
             frontmostAppChange.onlyWhen(isAXManualAccessibilityEnabled)
-                .observeOn(scheduler)
+                .observeOn(axWorker)
                 .subscribe(onNext: { (__previousApp, currentApp) in
                     if let _previousApp = __previousApp {
                         if let previousApp = _previousApp {
@@ -201,6 +201,35 @@ import Preferences
 
                     if let currentApp = currentApp {
                         AXManualAccessibilityActivator.activate(currentApp)
+                    }
+                })
+        )
+        
+        let isAXEnhancedUserInterfaceEnabled = UserDefaultsProperties.AXEnhancedUserInterfaceEnabled.readLive()
+        let AXEnhancedUserInterfaceDisabled: Observable<Void> = isAXEnhancedUserInterfaceEnabled
+            .filter({ !$0 })
+            .map({ _ in Void() })
+        
+        _ = self.compositeDisposable.insert(
+            AXEnhancedUserInterfaceDisabled
+                .observeOn(axWorker)
+                .subscribe(onNext: {
+                    AXEnhancedUserInterfaceActivator.deactivateAll()
+                })
+        )
+        
+        _ = self.compositeDisposable.insert(
+            frontmostAppChange.onlyWhen(isAXEnhancedUserInterfaceEnabled)
+                .observeOn(axWorker)
+                .subscribe(onNext: { (__previousApp, currentApp) in
+                    if let _previousApp = __previousApp {
+                        if let previousApp = _previousApp {
+                            AXEnhancedUserInterfaceActivator.deactivate(previousApp)
+                        }
+                    }
+
+                    if let currentApp = currentApp {
+                        AXEnhancedUserInterfaceActivator.activate(currentApp)
                     }
                 })
         )

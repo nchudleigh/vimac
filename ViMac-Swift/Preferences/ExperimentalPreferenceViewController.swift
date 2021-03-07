@@ -16,6 +16,7 @@ class ExperimentalPreferenceViewController: NSViewController, NSTextFieldDelegat
     
     private var grid: NSGridView!
     private var electronSupportView: NSButton!
+    private var nonNativeSupportView: NSButton!
     
     init() {
         if #available(OSX 11.0, *) {
@@ -41,15 +42,40 @@ class ExperimentalPreferenceViewController: NSViewController, NSTextFieldDelegat
         grid.column(at: 0).xPlacement = .trailing
         grid.translatesAutoresizingMaskIntoConstraints = false
         
+        let nonNativeSupportLabel = NSTextField(labelWithString: "Non-native Support:")
+        nonNativeSupportView = NSButton(checkboxWithTitle: "Enabled", target: self, action: #selector(onNonNativeSupportChange))
+        nonNativeSupportView.state = UserDefaultsProperties.AXEnhancedUserInterfaceEnabled.read() ? .on : .off
+        grid.addRow(with: [nonNativeSupportLabel, nonNativeSupportView])
+        
+        let nonNativeSupportLabelHint = NSTextField(wrappingLabelWithString: "Allow Hint-mode to work on non-native applications such as Google Chrome and Visual Studio Code.")
+        nonNativeSupportLabelHint.font = .labelFont(ofSize: 11)
+        nonNativeSupportLabelHint.textColor = .secondaryLabelColor
+        grid.addRow(with: [NSGridCell.emptyContentView, nonNativeSupportLabelHint])
+        
+        let nonNativeSupportLabelHint2 = NSTextField(wrappingLabelWithString: "Sets the AXEnhancedUserInterface attribute on applications. May lead to slow performance and high CPU usage.")
+        nonNativeSupportLabelHint2.font = .labelFont(ofSize: 11)
+        nonNativeSupportLabelHint2.textColor = .secondaryLabelColor
+        grid.addRow(with: [NSGridCell.emptyContentView, nonNativeSupportLabelHint2])
+        
+        let nonNativeSupportLabelHint3 = NSTextField(wrappingLabelWithString: "Enabling this option breaks window managers that do not handle the AXEnhancedUserInterface edge case. Please use a compatible window manager like Rectangle.")
+        nonNativeSupportLabelHint3.font = .labelFont(ofSize: 11)
+        nonNativeSupportLabelHint3.textColor = .secondaryLabelColor
+        grid.addRow(with: [NSGridCell.emptyContentView, nonNativeSupportLabelHint3])
+        
         let electronSupportLabel = NSTextField(labelWithString: "Electron Support:")
         electronSupportView = NSButton(checkboxWithTitle: "Enabled", target: self, action: #selector(onElectronSupportChange))
         electronSupportView.state = UserDefaultsProperties.AXManualAccessibilityEnabled.read() ? .on : .off
         grid.addRow(with: [electronSupportLabel, electronSupportView])
         
-        let electronSupportLabelHint = NSTextField(wrappingLabelWithString: "Sets the AXManualAccessibility attribute on applications. May lead to slow performance and high CPU usage.")
+        let electronSupportLabelHint = NSTextField(wrappingLabelWithString: "Allow Hint-mode to work on Electron applications such as Visual Studio Code.")
         electronSupportLabelHint.font = .labelFont(ofSize: 11)
         electronSupportLabelHint.textColor = .secondaryLabelColor
         grid.addRow(with: [NSGridCell.emptyContentView, electronSupportLabelHint])
+        
+        let electronSupportLabelHint2 = NSTextField(wrappingLabelWithString: "Sets the AXManualAccessibility attribute on applications. May lead to slow performance and high CPU usage.")
+        electronSupportLabelHint2.font = .labelFont(ofSize: 11)
+        electronSupportLabelHint2.textColor = .secondaryLabelColor
+        grid.addRow(with: [NSGridCell.emptyContentView, electronSupportLabelHint2])
         
         self.view.addSubview(grid)
         
@@ -66,5 +92,10 @@ class ExperimentalPreferenceViewController: NSViewController, NSTextFieldDelegat
     @objc func onElectronSupportChange() {
         let enabled = electronSupportView.state == .on
         UserDefaultsProperties.AXManualAccessibilityEnabled.write(enabled)
+    }
+    
+    @objc func onNonNativeSupportChange() {
+        let enabled = nonNativeSupportView.state == .on
+        UserDefaultsProperties.AXEnhancedUserInterfaceEnabled.write(enabled)
     }
 }

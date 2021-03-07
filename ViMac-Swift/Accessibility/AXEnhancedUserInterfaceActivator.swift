@@ -5,7 +5,7 @@ import RxSwift
 // http://dev.chromium.org/developers/design-documents/accessibility
 // Similarly, electron uses `AXManualAccessibility`:
 // https://electronjs.org/docs/tutorial/accessibility#assistive-technology
-class AXManualAccessibilityActivator {
+class AXEnhancedUserInterfaceActivator {
     static func activate(_ app: NSRunningApplication) {
         activate(AXUIElementCreateApplication(app.processIdentifier))
     }
@@ -33,7 +33,7 @@ class AXManualAccessibilityActivator {
     }
     
     private static func setAttribute(app: AXUIElement, value: Bool) -> AXError {
-        let attribute = "AXManualAccessibility"
+        let attribute = "AXEnhancedUserInterface"
         return AXUIElementSetAttributeValue(app, attribute as CFString, value as AnyObject)
     }
 }
