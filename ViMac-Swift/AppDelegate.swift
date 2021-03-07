@@ -181,14 +181,6 @@ import Preferences
         
         let scheduler = ConcurrentDispatchQueueScheduler.init(qos: .default)
         
-        let frontmostAppChangeWhereAXManualAccessibilityEnabled = frontmostAppChange
-            .withLatestFrom(
-                isAXManualAccessibilityEnabled,
-                resultSelector: { ($0.0, $0.1, $1) }
-            )
-            .filter { $0.2 }
-            .map { ($0.0, $0.1) }
-        
         _ = self.compositeDisposable.insert(
             AXManualAccessibilityDisabled
                 .observeOn(scheduler)
@@ -198,7 +190,7 @@ import Preferences
         )
         
         _ = self.compositeDisposable.insert(
-            frontmostAppChangeWhereAXManualAccessibilityEnabled
+            frontmostAppChange.onlyWhen(isAXManualAccessibilityEnabled)
                 .observeOn(scheduler)
                 .subscribe(onNext: { (__previousApp, currentApp) in
                     if let _previousApp = __previousApp {
