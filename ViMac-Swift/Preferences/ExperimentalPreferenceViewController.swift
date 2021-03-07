@@ -67,7 +67,7 @@ class ExperimentalPreferenceViewController: NSViewController, NSTextFieldDelegat
         electronSupportView.state = UserDefaultsProperties.AXManualAccessibilityEnabled.read() ? .on : .off
         grid.addRow(with: [electronSupportLabel, electronSupportView])
         
-        let electronSupportLabelHint = NSTextField(wrappingLabelWithString: "Allow Hint-mode to work on Electron applications such as Visual Studio Code.")
+        let electronSupportLabelHint = NSTextField(wrappingLabelWithString: "Allow Hint-mode to work on Electron applications such as Visual Studio Code. There is no need to enable this option if Non-native Support is enabled.")
         electronSupportLabelHint.font = .labelFont(ofSize: 11)
         electronSupportLabelHint.textColor = .secondaryLabelColor
         grid.addRow(with: [NSGridCell.emptyContentView, electronSupportLabelHint])
