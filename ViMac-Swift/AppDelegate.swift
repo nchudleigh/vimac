@@ -19,7 +19,6 @@ import Preferences
     var welcomeWindowController: NSWindowController?
     var permissionPollingTimer: Timer?
     
-    private lazy var applicationObservable: Observable<NSRunningApplication?> = createApplicationObservable()
     private lazy var focusedWindowDisturbedObservable: Observable<FrontmostApplicationService.ApplicationNotification> = createFocusedWindowDisturbedObservable()
     private lazy var windowObservable: Observable<Element?> = createFocusedWindowObservable()
 
@@ -67,6 +66,7 @@ import Preferences
         if self.isAccessibilityPermissionsGranted() {
             self.checkForUpdatesInBackground()
             self.setupWindowEventAndShortcutObservables()
+            self.setupAXManualAccessibilityObservables()
             self.openPreferences()
             return
         }
@@ -171,9 +171,9 @@ import Preferences
             self.setupWindowEventAndShortcutObservables()
         }
     }
-    
-    func setupWindowEventAndShortcutObservables() {
-        let frontmostAppChange = applicationObservable.withPrevious()
+        
+    func setupAXManualAccessibilityObservables() {
+        let frontmostAppChange = createApplicationObservable().withPrevious()
         let isAXManualAccessibilityEnabled = UserDefaultsProperties.AXManualAccessibilityEnabled.readLive()
         let AXManualAccessibilityDisabled: Observable<Void> = isAXManualAccessibilityEnabled
             .filter({ !$0 })
@@ -204,7 +204,9 @@ import Preferences
                     }
                 })
         )
-
+    }
+    
+    func setupWindowEventAndShortcutObservables() {
         _ = self.compositeDisposable.insert(focusedWindowDisturbedObservable
             .observeOn(MainScheduler.instance)
             .subscribe(onNext: { notification in
