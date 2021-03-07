@@ -44,11 +44,11 @@ open Vimac.xcworkspace
 
 Modify the Signing and Capabilities to the following (note the `Disable Library Validation` option):
 
-![](misc/remove_signing.png)
+![](docs/remove_signing.png)
 
 Add Vimac and Xcode (for running AppleScript) to the list of Accessibility apps under **System Preferences > Security & Privacy > Accessibility**:
 
-![](misc/vimac_xcode_accessibility.png)
+![](docs/vimac_xcode_accessibility.png)
 
 Keep System Preferences open under this section during development with the settings unlocked. This is because the `grant-accessibility-permission-dev.scpt` AppleScript is scheduled to run after each build to re-grant Accessibility permissions.
 
