@@ -6,9 +6,9 @@ Vimac is heavily inspired by [Vimium](https://github.com/philc/vimium/).
 
 ## Getting Started
 
-## Installing
+### Installing
 
-You can download all versions of Vimac [here](https://install.appcenter.ms/users/dexterleng/apps/vimac/distribution_groups/sparkle). Unzip the file and move `Vimac.app` to `Applications/`
+You can download all versions of Vimac [here](https://install.appcenter.ms/users/dexterleng/apps/vimac/distribution_groups/sparkle). Unzip the file and move `Vimac.app` to `Applications/`.
 
 ### Workflow
 
@@ -17,19 +17,6 @@ The current Vimac workflow works like this:
 1. Activate a mode
 2. Perform actions within the activated mode
 3. Exit the mode, either manually or automatically when the mode's task is complete
-
-### Activation
-
-There are two ways to activate modes:
-
-- Keyboard Shortcut (e.g. `Control-F`)
-- Key Sequence (e.g. `fd`)
-  - Must be at least two characters long
-  - Does not share a prefix with another registered key sequence
-
-You may configure the bindings in the Bindings tab in Preferences:
-
-![](docs/bindings.png)
 
 ### Modes
 
@@ -78,6 +65,19 @@ HJKL keys can be used to scroll within the scroll area.
 | Exit | `Escape` |
 
 You can also scroll up/down/left/right by half a page by holding `Shift` when pressing the `hjkl` keys.
+
+### Activation
+
+There are two ways to activate modes:
+
+- Keyboard Shortcut (e.g. `Control-F`)
+- Key Sequence (e.g. `fd`)
+  - Must be at least two characters long
+  - Does not share a prefix with another registered key sequence
+
+You may configure the bindings in the Bindings tab in Preferences:
+
+![](docs/bindings.png)
 
 ## Building
 
