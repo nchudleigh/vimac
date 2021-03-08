@@ -40,8 +40,8 @@ Simply type the assigned "hint-text" (eg. "sa") to perform a click a the locatio
 | Rotate hints | `Space` |
 | Exit | `Escape` |
 
-Tips:
-- After executing a right-click command, use CTRL-N and CTRL-P to select the next and previous menu bar item respectively.
+Tip(s):
+- After executing a right-click action, use `Control-N` and `Control-P` to select the next and previous context menu item respectively.
 
 #### Scroll-mode
 
