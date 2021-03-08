@@ -77,7 +77,7 @@ There are two ways to activate modes:
 
 You may configure the bindings in the Bindings tab in Preferences:
 
-![](docs/bindings.png)
+<img src="docs/bindings.png" width="400">
 
 ## Building
 
