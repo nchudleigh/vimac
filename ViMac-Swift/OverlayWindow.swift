@@ -14,10 +14,12 @@ class OverlayWindow: NSPanel {
         super.init(contentRect: NSZeroRect, styleMask: .nonactivatingPanel, backing: backingStoreType, defer: flag)
         self.isOpaque = false
         self.backgroundColor = NSColor.clear
-        self.level = .popUpMenu
         self.ignoresMouseEvents = true
         
         self.hasShadow = false
+        
+        self.level = .mainMenu
+        self.collectionBehavior = [.fullScreenAuxiliary]
     }
 
     override var canBecomeKey: Bool {

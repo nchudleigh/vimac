@@ -91,6 +91,8 @@ class HintsViewController: NSViewController {
         let globalFrame = GeometryUtils.convertAXFrameToGlobal(
             element.clippedFrame ?? element.frame)
         let windowFrame = window.convertFromScreen(globalFrame)
-        return window.contentView?.convert(windowFrame, to: self.view)
+        let viewFrame = window.contentView?.convert(windowFrame, to: self.view)
+        
+        return viewFrame
     }
 }
