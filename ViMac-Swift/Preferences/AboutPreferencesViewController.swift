@@ -51,10 +51,18 @@ class AboutPreferencesViewController: NSViewController, PreferencePane {
         copyrightNoticeLabel.font = .labelFont(ofSize: 11)
         copyrightNoticeLabel.textColor = .secondaryLabelColor
         
+        let buttonsStackView = NSStackView(views: [
+            NSButton(title: "Visit Website", target: self, action: #selector(visitWebsite)),
+            NSButton(title: "Github Repository", target: self, action: #selector(visitGithubRepo))
+        ])
+        buttonsStackView.alignment = .leading
+        buttonsStackView.orientation = .horizontal
+        
         let descriptionStackView = NSStackView(views: [
             appNameLabel,
             versionLabel,
-            copyrightNoticeLabel
+            copyrightNoticeLabel,
+            buttonsStackView
         ])
         descriptionStackView.alignment = .leading
         descriptionStackView.orientation = .vertical
@@ -74,5 +82,15 @@ class AboutPreferencesViewController: NSViewController, PreferencePane {
             stackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             stackView.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ])
+    }
+    
+    @objc func visitWebsite() {
+        let url = URL(string: "https://vimacapp.com/")!
+        _ = NSWorkspace.shared.open(url)
+    }
+    
+    @objc func visitGithubRepo() {
+        let url = URL(string: "https://github.com/dexterleng/vimac/")!
+        _ = NSWorkspace.shared.open(url)
     }
 }
