@@ -73,7 +73,7 @@ There are two ways to activate modes:
 - Keyboard Shortcut (e.g. `Control-F`)
 - Key Sequence (e.g. `fd`)
   - Must be at least two characters long
-  - Does not share a prefix with another registered key sequence
+  - Is not a prefix of another registered key sequence
 
 You may configure the bindings in the Bindings tab in Preferences:
 
