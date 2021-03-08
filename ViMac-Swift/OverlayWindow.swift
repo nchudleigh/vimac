@@ -18,7 +18,7 @@ class OverlayWindow: NSPanel {
         
         self.hasShadow = false
         
-        self.level = .mainMenu
+        self.level = .statusBar
         self.collectionBehavior = [.fullScreenAuxiliary]
     }
 
