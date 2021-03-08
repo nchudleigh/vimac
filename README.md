@@ -49,7 +49,7 @@ Activating Scroll-mode allows one to scroll through the scrollable areas of the 
 
 Upon activation (default shortcut is `Control-J`), a red border surrounds the active scroll area:
 
-<img src="docs/scroll-mode.png" height="400px;">
+<img src="docs/scroll-mode.gif" height="400px;">
 
 HJKL keys can be used to scroll within the scroll area.
 
