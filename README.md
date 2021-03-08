@@ -1,38 +1,83 @@
-# Vimac
+# Vimac - Productive macOS keyboard-driven navigation
 
-Vimium for macOS.
+Vimac is a macOS productivity application that provides keyboard-driven navigation and control of the macOS Graphical User Interface (GUI).
 
-## Download
+Vimac is heavily inspired by [Vimium](https://github.com/philc/vimium/).
 
-You can download all versions of Vimac [here](https://install.appcenter.ms/users/dexterleng/apps/vimac/distribution_groups/sparkle).
+## Getting Started
 
 ## Installing
 
-You will need to give Vimac **Accessibility** permissions in **Security & Privacy.**
+You can download all versions of Vimac [here](https://install.appcenter.ms/users/dexterleng/apps/vimac/distribution_groups/sparkle). Unzip the file and move `Vimac.app` to `Applications/`
 
-:warning: **When you update Vimac, even though the app is in the permissions list, you have to untick and tick it (or remove and add back) for permissions to be granted.**
+### Workflow
 
-## How to use Vimac
+The current Vimac workflow works like this:
 
-**Hint Mode (CTRL+SPACE)** \
-Once Hint Mode is activated you can typed the hint letters to perform a click.
+1. Activate a mode
+2. Perform actions within the activated mode
+3. Exit the mode, either manually or automatically when the mode's task is complete
 
-**Right-Click** \
-Hold SHIFT while typing the hint text.
+### Activation
 
-**Double-Click** \
-Hold CMD while typing the hint text. \
-You can cycle between all hints and hints only for actionable elements with TAB.
+There are two ways to activate modes:
 
-**Scrolling (CTRL+S)** \
-Scroll mode allows you to scroll with HJKL + DU keys. \
-D and U scroll the page down and up respectively by half the height of the scroll area. \
-You can cycle through the scroll areas with the TAB key.
+- Keyboard Shortcut (e.g. `Control-F`)
+- Key Sequence (e.g. `fd`)
+  - Must be at least two characters long
+  - Does not share a prefix with another registered key sequence
 
-## Tips
+You may configure the bindings in the Bindings tab in Preferences:
 
-* When the yellow hints are shown on-screen, you can use the Spacebar to rotate the height of the overlapping hints.
-* After executing a right-click command, use CTRL-N and CTRL-P to select the next and previous menu bar item respectively.
+![](docs/bindings.png)
+
+### Modes
+
+There are two modes in Vimac.
+
+#### Hint-mode
+
+Activating Hint-mode allows one to perform a click, double-click, or right-click on an actionable UI element
+
+Upon activation (default shortcut is `Control-F`), "hints" will be generated for each actionable element on the frontmost window:
+
+![](docs/hints.png)
+
+Simply type the assigned "hint-text" (eg. "sa") to perform a click a the location!
+
+| Action      | How to trigger |
+|-----------|-------------
+| Left click | Type the assigned hint-text |
+| Right click | Type the assigned hint-text while holding `Shift` |
+| Double left click | Type the assigned hint-text while holding `Command` |
+| Rotate hints | `Space` |
+| Exit | `Escape` |
+
+Tips:
+- After executing a right-click command, use CTRL-N and CTRL-P to select the next and previous menu bar item respectively.
+
+#### Scroll-mode
+
+Activating Scroll-mode allows one to scroll through the scrollable areas of the frontmost window.
+
+Upon activation (default shortcut is `Control-J`), a red border surrounds the active scroll area:
+
+![](docs/scroll-mode.png)
+
+HJKL keys can be used to scroll within the scroll area.
+
+| Action      | Default Key |
+|-----------|-------------
+| Scroll down | j |
+| Scroll up | k |
+| Scroll left | h |
+| Scroll right | l |
+| Scroll down by half the height of the scroll area | d |
+| Scroll up by half the height of the scroll area | u |
+| Activate another scroll area | `Tab` |
+| Exit | `Escape` |
+
+You can also scroll up/down/left/right by half a page by holding `Shift` when pressing the `hjkl` keys.
 
 ## Building
 
