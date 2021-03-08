@@ -28,7 +28,7 @@ Activating Hint-mode allows one to perform a click, double-click, or right-click
 
 Upon activation (default shortcut is `Control-F`), "hints" will be generated for each actionable element on the frontmost window:
 
-![](docs/hints.png)
+<img src="docs/hints.png" height="400px;">
 
 Simply type the assigned "hint-text" (eg. "sa") to perform a click a the location!
 
@@ -49,7 +49,7 @@ Activating Scroll-mode allows one to scroll through the scrollable areas of the 
 
 Upon activation (default shortcut is `Control-J`), a red border surrounds the active scroll area:
 
-![](docs/scroll-mode.png)
+<img src="docs/scroll-mode.png" height="400px;">
 
 HJKL keys can be used to scroll within the scroll area.
 
@@ -77,7 +77,7 @@ There are two ways to activate modes:
 
 You may configure the bindings in the Bindings tab in Preferences:
 
-<img src="docs/bindings.png" width="400">
+<img src="docs/bindings.png" height="400px;">
 
 ## Building
 
