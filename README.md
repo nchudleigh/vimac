@@ -28,7 +28,7 @@ Activating Hint-mode allows one to perform a click, double-click, or right-click
 
 Upon activation (default shortcut is `Control-F`), "hints" will be generated for each actionable element on the frontmost window:
 
-<img src="docs/hints.png" height="400px;">
+<img src="docs/hint-mode.gif" height="400px;">
 
 Simply type the assigned "hint-text" (eg. "sa") to perform a click a the location!
 
