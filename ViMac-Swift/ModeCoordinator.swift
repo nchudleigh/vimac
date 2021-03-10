@@ -84,6 +84,13 @@ class ModeCoordinator : Coordinator {
             return
         }
         
+        // the app crashes when talking to its own accessibility server
+        let isTargetVimac = frontmostApp.bundleIdentifier == Bundle.main.bundleIdentifier
+        if isTargetVimac {
+            self.exitMode()
+            return
+        }
+        
         let focusedWindowFrame = GeometryUtils.convertAXFrameToGlobal(focusedWindow.frame)
         let screenFrame = activeScreenFrame(focusedWindowFrame: focusedWindowFrame)
         
@@ -100,6 +107,13 @@ class ModeCoordinator : Coordinator {
     func setHintMode() {
         guard let frontmostApp = NSWorkspace.shared.frontmostApplication,
             let focusedWindow = focusedWindow(app: frontmostApp) else {
+            self.exitMode()
+            return
+        }
+        
+        // the app crashes when talking to its own accessibility server
+        let isTargetVimac = frontmostApp.bundleIdentifier == Bundle.main.bundleIdentifier
+        if isTargetVimac {
             self.exitMode()
             return
         }
