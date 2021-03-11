@@ -92,7 +92,9 @@ class ModeCoordinator : Coordinator {
             return
         }
         
-        Analytics.shared().track("Scroll Mode Activated")
+        Analytics.shared().track("Scroll Mode Activated", properties: [
+            "Target Application": frontmostApp.bundleIdentifier as Any
+        ])
         
         let focusedWindowFrame = GeometryUtils.convertAXFrameToGlobal(focusedWindow.frame)
         let screenFrame = activeScreenFrame(focusedWindowFrame: focusedWindowFrame)
@@ -129,7 +131,9 @@ class ModeCoordinator : Coordinator {
             }
         }
         
-        Analytics.shared().track("Hint Mode Activated")
+        Analytics.shared().track("Hint Mode Activated", properties: [
+            "Target Application": frontmostApp.bundleIdentifier as Any
+        ])
         
         self.priorKBLayout = InputSourceManager.currentInputSource()
         if let forceKBLayout = self.forceKBLayout {
