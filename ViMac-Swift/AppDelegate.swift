@@ -67,7 +67,6 @@ import Preferences
             self.checkForUpdatesInBackground()
             self.setupWindowEventAndShortcutObservables()
             self.setupAXAttributeObservables()
-            self.openPreferences()
             return
         }
         
