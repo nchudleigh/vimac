@@ -185,7 +185,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     func onHintQueryCompleted(hints: [Hint]) {
         self.hints = hints
 
-        self.hintsViewController = HintsViewController(hints: self.hints!, textSize: CGFloat(textSize), hintCharacters: possibleHintCharacters)
+        self.hintsViewController = HintsViewController(hints: self.hints!, textSize: CGFloat(textSize))
         self.addChild(hintsViewController!)
         hintsViewController!.view.frame = self.view.frame
         self.view.addSubview(hintsViewController!.view)

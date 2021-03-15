@@ -58,6 +58,49 @@ class ContentViewController: NSViewController {
     }
 }
 
+class HintModeUserInterface {
+    let frame: NSRect
+    let windowController: OverlayWindowController
+    let contentViewController: ContentViewController
+    var hintsViewController: HintsViewController?
+    
+    let textSize = UserPreferences.HintMode.TextSizeProperty.readAsFloat()
+    
+    init(frame: NSRect) {
+        self.frame = frame
+        self.windowController = OverlayWindowController()
+        self.contentViewController = ContentViewController()
+        self.windowController.window?.contentViewController = self.contentViewController
+        self.windowController.fitToFrame(frame)
+    }
+    
+    func show() {
+        self.windowController.showWindow(nil)
+        self.windowController.window?.makeKeyAndOrderFront(nil)
+    }
+
+    func hide() {
+        self.contentViewController.view.removeFromSuperview()
+        self.windowController.window?.contentViewController = nil
+        self.windowController.close()
+    }
+    
+    func setHints(hints: [Hint]) {
+        self.hintsViewController = HintsViewController(hints: hints, textSize: CGFloat(textSize), typed: "")
+        self.contentViewController.setChildViewController(self.hintsViewController!)
+    }
+    
+    func updateInput(input: String) {
+        guard let hintsViewController = self.hintsViewController else { return }
+        hintsViewController.updateTyped(typed: input)
+    }
+
+    func rotateHints() {
+        guard let hintsViewController = self.hintsViewController else { return }
+        hintsViewController.rotateHints()
+    }
+}
+
 class HintModeController {
     let app: NSRunningApplication
     let window: Element
@@ -65,14 +108,10 @@ class HintModeController {
     private let startTime = CFAbsoluteTimeGetCurrent()
     private let disposeBag = DisposeBag()
     
-    // preferences
     let hintCharacters = UserPreferences.HintMode.CustomCharactersProperty.read()
-    let textSize = UserPreferences.HintMode.TextSizeProperty.readAsFloat()
-    
-    var windowController: OverlayWindowController!
-    var contentViewController: ContentViewController!
-    var hintsViewController: HintsViewController!
+
     let inputListener = HintModeInputListener()
+    var ui: HintModeUserInterface!
     
     init(app: NSRunningApplication, window: Element) {
         self.app = app
@@ -83,13 +122,9 @@ class HintModeController {
         let focusedWindowFrame: NSRect = GeometryUtils.convertAXFrameToGlobal(window.frame)
         let screenFrame = activeScreenFrame(focusedWindowFrame: focusedWindowFrame)
         
-        self.windowController = OverlayWindowController()
-        self.contentViewController = ContentViewController()
-        self.windowController.window?.contentViewController = self.contentViewController
-        self.windowController.fitToFrame(screenFrame)
-        self.windowController.showWindow(nil)
-        self.windowController.window?.makeKeyAndOrderFront(nil)
-        
+        ui = HintModeUserInterface(frame: screenFrame)
+        ui.show()
+
         handleEvent(.activate)
     }
     
@@ -141,9 +176,8 @@ class HintModeController {
     
     private func drawHints() {
         switch state {
-        case .activated(let hints, let input):
-            self.hintsViewController = HintsViewController(hints: hints, textSize: CGFloat(textSize), hintCharacters: hintCharacters, typed: input)
-            self.contentViewController.setChildViewController(self.hintsViewController)
+        case .activated(let hints, _):
+            ui.setHints(hints: hints)
             return
         default:
             return
@@ -153,7 +187,7 @@ class HintModeController {
     private func updateInput() {
         switch state {
         case .activated(_, let input):
-            self.hintsViewController.updateTyped(typed: input)
+            ui.updateInput(input: input)
             return
         default:
             return
@@ -193,13 +227,11 @@ class HintModeController {
     }
     
     private func _deactivate() {
-        self.contentViewController?.view.removeFromSuperview()
-        self.windowController?.window?.contentViewController = nil
-        self.windowController?.close()
+        ui.hide()
     }
     
     private func rotateHints() {
-        hintsViewController.rotateHints()
+        ui.rotateHints()
     }
     
     private func logQueryTime() {

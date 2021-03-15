@@ -38,7 +38,7 @@ protocol StateType {
     // exit. We could add that, or not.
 }
 
-enum HintModeState: StateType, Equatable {
+enum HintModeState: StateType {
     typealias InputEvent = Event
     typealias OutputCommand = Command
     
