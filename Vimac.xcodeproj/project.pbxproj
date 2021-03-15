@@ -15,6 +15,8 @@
 		E20451B125F3ADB600CBFC7A /* UserDefaultsProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20451B025F3ADB600CBFC7A /* UserDefaultsProperties.swift */; };
 		E20451B525F3B50400CBFC7A /* ExperimentalPreferenceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20451B425F3B50400CBFC7A /* ExperimentalPreferenceViewController.swift */; };
 		E20451B925F4DDDC00CBFC7A /* AXEnhancedUserInterfaceActivator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20451B825F4DDDC00CBFC7A /* AXEnhancedUserInterfaceActivator.swift */; };
+		E204522A25FF4F0F00CBFC7A /* HintModeState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E204522925FF4F0F00CBFC7A /* HintModeState.swift */; };
+		E204523A25FF7C1900CBFC7A /* HintModeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E204523925FF7C1800CBFC7A /* HintModeController.swift */; };
 		E20696F923290D41001EFDB2 /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20696F823290D41001EFDB2 /* Log.swift */; };
 		E2069700232A52EA001EFDB2 /* AlphabetHints.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20696FF232A52EA001EFDB2 /* AlphabetHints.swift */; };
 		E20D0CB425581AEF00A5CAEE /* Trie.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20D0CB325581AEF00A5CAEE /* Trie.swift */; };
@@ -143,6 +145,8 @@
 		E20451B025F3ADB600CBFC7A /* UserDefaultsProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsProperties.swift; sourceTree = "<group>"; };
 		E20451B425F3B50400CBFC7A /* ExperimentalPreferenceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExperimentalPreferenceViewController.swift; sourceTree = "<group>"; };
 		E20451B825F4DDDC00CBFC7A /* AXEnhancedUserInterfaceActivator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AXEnhancedUserInterfaceActivator.swift; sourceTree = "<group>"; };
+		E204522925FF4F0F00CBFC7A /* HintModeState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HintModeState.swift; sourceTree = "<group>"; };
+		E204523925FF7C1800CBFC7A /* HintModeController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HintModeController.swift; sourceTree = "<group>"; };
 		E20696F823290D41001EFDB2 /* Log.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Log.swift; sourceTree = "<group>"; };
 		E20696FC232A0021001EFDB2 /* VimacBridgingHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VimacBridgingHeader.h; sourceTree = "<group>"; };
 		E20696FF232A52EA001EFDB2 /* AlphabetHints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlphabetHints.swift; sourceTree = "<group>"; };
@@ -466,6 +470,8 @@
 				E267778D25613A900034B131 /* ScrollModeActiveViewController.swift */,
 				E267778F256187230034B131 /* ScrollModeActiveScrollAreaViewController.swift */,
 				E23A1A7F25E62DEA00D71D6E /* HintsViewController.swift */,
+				E204522925FF4F0F00CBFC7A /* HintModeState.swift */,
+				E204523925FF7C1800CBFC7A /* HintModeController.swift */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -750,6 +756,7 @@
 				E20DF9DE25E671F20065711A /* HintModeQueryService.swift in Sources */,
 				E20451B125F3ADB600CBFC7A /* UserDefaultsProperties.swift in Sources */,
 				E270F5CF2504DC4600AD305A /* TraverseSearchPredicateCompatibleWebAreaElementService.swift in Sources */,
+				E204523A25FF7C1900CBFC7A /* HintModeController.swift in Sources */,
 				E2795353249633DE006D8D7A /* Scroller.swift in Sources */,
 				E2C3221E23BC828C00508B44 /* HideCursorGlobally.m in Sources */,
 				E2B3F64B24F24B9800FD5594 /* HintModeInputListener.swift in Sources */,
@@ -798,6 +805,7 @@
 				E25BBB5B250CC4AA00D11213 /* ObserveFrontmostApplicationService.swift in Sources */,
 				E225BD1D233292B800ECDEF4 /* StatusItemManager.swift in Sources */,
 				E267778E25613A900034B131 /* ScrollModeActiveViewController.swift in Sources */,
+				E204522A25FF4F0F00CBFC7A /* HintModeState.swift in Sources */,
 				E2F15BC525B30A9D00E2F29E /* BindingsConfig.swift in Sources */,
 				E26981B323C99DBB00E46217 /* WelcomeWindowController.swift in Sources */,
 				E26172242322968500E396CA /* AppDelegate.swift in Sources */,

@@ -27,6 +27,7 @@ class ModeCoordinator : Coordinator {
     private let keySequenceListener: VimacKeySequenceListener
     
     var windowController: OverlayWindowController
+    var hintModeController: HintModeController?
     
     init(windowController: OverlayWindowController) {
         self.windowController = windowController
@@ -54,6 +55,8 @@ class ModeCoordinator : Coordinator {
     }
     
     func exitMode() {
+        hintModeController?.deactivate()
+        
         guard let vc = self.windowController.window?.contentViewController else {
             return
         }
@@ -126,8 +129,8 @@ class ModeCoordinator : Coordinator {
             forceKBLayout.select()
         }
 
-        let vc = HintModeViewController.init(app: frontmostApp, window: focusedWindow)
-        self.setViewController(vc: vc, screenFrame: screenFrame)
+        self.hintModeController = HintModeController(app: frontmostApp, window: focusedWindow)
+        self.hintModeController?.activate()
         
         keySequenceListener.stop()
     }
