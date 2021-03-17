@@ -24,8 +24,8 @@ enum HintAction {
 }
 
 class HintModeViewController: ModeViewController, NSTextFieldDelegate {
-    let app: NSRunningApplication
-    let window: Element
+    let app: NSRunningApplication?
+    let window: Element?
     
     var hints: [Hint]?
     var hintsViewController: HintsViewController?
@@ -41,7 +41,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     
     let disposeBag = DisposeBag()
     
-    init(app: NSRunningApplication, window: Element) {
+    init(app: NSRunningApplication?, window: Element?) {
         self.app = app
         self.window = window
         super.init()

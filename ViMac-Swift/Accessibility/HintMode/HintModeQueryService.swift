@@ -10,11 +10,11 @@ import Cocoa
 import RxSwift
 
 class HintModeQueryService {
-    let app: NSRunningApplication
-    let window: Element
+    let app: NSRunningApplication?
+    let window: Element?
     let hintCharacters: String
     
-    init(app: NSRunningApplication, window: Element, hintCharacters: String) {
+    init(app: NSRunningApplication?, window: Element?, hintCharacters: String) {
         self.app = app
         self.window = window
         self.hintCharacters = hintCharacters
@@ -33,23 +33,31 @@ class HintModeQueryService {
     }
     
     private func elementObservable() -> Observable<Element> {
+        let nothing: Observable<Element> = Observable.empty()
+        
+        var menuBarElements = nothing
+        if let app = app {
+            menuBarElements = Utils.singleToObservable(single: queryMenuBarSingle(app: app))
+        }
+        
+        var windowElements = nothing
+        if let app = app,
+           let window = window {
+            windowElements = Utils.singleToObservable(single: queryWindowElementsSingle(app: app, window: window))
+        }
+        
         return Utils.eagerConcat(observables: [
-            Utils.singleToObservable(single: queryMenuBarSingle()),
+            menuBarElements,
             Utils.singleToObservable(single: queryMenuBarExtrasSingle()),
             Utils.singleToObservable(single: queryNotificationCenterSingle()),
-            Utils.singleToObservable(single: queryWindowElementsSingle())
+            windowElements
         ])
     }
     
-    private func queryWindowElementsSingle() -> Single<[Element]> {
-        return Single.create(subscribe: { [weak self] event in
-            guard let self = self else {
-                event(.success([]))
-                return Disposables.create()
-            }
-            
+    private func queryWindowElementsSingle(app: NSRunningApplication, window: Element) -> Single<[Element]> {
+        return Single.create(subscribe: { event in
             let thread = Thread.init(block: {
-                let service = QueryWindowService.init(app: self.app, window: self.window)
+                let service = QueryWindowService.init(app: app, window: window)
                 let elements = try? service.perform()
                 event(.success(elements ?? []))
             })
@@ -60,15 +68,10 @@ class HintModeQueryService {
         })
     }
     
-    private func queryMenuBarSingle() -> Single<[Element]> {
-        return Single.create(subscribe: { [weak self] event in
-            guard let self = self else {
-                event(.success([]))
-                return Disposables.create()
-            }
-            
+    private func queryMenuBarSingle(app: NSRunningApplication) -> Single<[Element]> {
+        return Single.create(subscribe: { event in
             let thread = Thread.init(block: {                
-                let service = QueryMenuBarItemsService.init(app: self.app)
+                let service = QueryMenuBarItemsService.init(app: app)
                 let elements = try? service.perform()
                 event(.success(elements ?? []))
             })
