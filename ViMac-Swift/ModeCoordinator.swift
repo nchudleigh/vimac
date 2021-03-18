@@ -114,7 +114,7 @@ class ModeCoordinator : Coordinator {
                 let screenFrame = activeScreenFrame(focusedWindowFrame: focusedWindowFrame)
                 return screenFrame
             }
-            return NSScreen.screens.first!.frame
+            return NSScreen.main!.frame
         }()
         
         if let app = app {
@@ -164,7 +164,7 @@ class ModeCoordinator : Coordinator {
         // When the focused window is in full screen mode in a secondary display,
         // NSScreen.main will point to the primary display.
         // this is a workaround.
-        var activeScreen = NSScreen.screens.first!
+        var activeScreen = NSScreen.main!
         var maxArea: CGFloat = 0
         for screen in NSScreen.screens {
             let intersection = screen.frame.intersection(focusedWindowFrame)
