@@ -745,11 +745,11 @@
                                 </connections>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="yLo-ZK-jNY">
-                                <rect key="frame" x="44" y="124" width="412" height="64"/>
+                                <rect key="frame" x="44" y="124" width="412" height="48"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" alignment="left" id="pVZ-1G-n72">
                                     <font key="font" metaFont="system"/>
-                                    <string key="title">Click on Grant Permission to grant Vimac Accessibility permissions. Note that you will have to uncheck and check Vimac from the list of approved apps after updating Vimac. This window will automatically close after permissions have been granted.</string>
+                                    <string key="title">Click on Grant Permission to grant Vimac Accessibility permissions. This window will automatically close after permissions have been granted.</string>
                                     <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
