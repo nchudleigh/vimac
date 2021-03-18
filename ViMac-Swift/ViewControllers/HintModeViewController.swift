@@ -94,7 +94,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     
         if matchingHints.count == 0 && typed.count > 0 {
             Analytics.shared().track("Hint Mode Deadend", properties: [
-                "Target Application": app.bundleIdentifier as Any
+                "Target Application": app?.bundleIdentifier as Any
             ])
             self.modeCoordinator?.exitMode()
             return
@@ -102,7 +102,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
 
         if matchingHints.count == 1 {
             Analytics.shared().track("Hint Mode Action Performed", properties: [
-                "Target Application": app.bundleIdentifier as Any
+                "Target Application": app?.bundleIdentifier as Any
             ])
             
             let hint = matchingHints.first!
@@ -171,7 +171,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     func observeEscKey() {
         inputListener.observeEscapeKey(onEvent: { [weak self] _ in
             Analytics.shared().track("Hint Mode Deactivated", properties: [
-                "Target Application": self?.app.bundleIdentifier as Any
+                "Target Application": self?.app?.bundleIdentifier as Any
             ])
             self?.onEscape()
         })
@@ -190,7 +190,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     func observeSpaceKey() {
         inputListener.observeSpaceKey(onEvent: { [weak self] _ in
             Analytics.shared().track("Hint Mode Rotated Hints", properties: [
-                "Target Application": self?.app.bundleIdentifier as Any
+                "Target Application": self?.app?.bundleIdentifier as Any
             ])
             self?.rotateHints()
         })

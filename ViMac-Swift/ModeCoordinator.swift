@@ -132,7 +132,7 @@ class ModeCoordinator : Coordinator {
         }
         
         Analytics.shared().track("Hint Mode Activated", properties: [
-            "Target Application": frontmostApp.bundleIdentifier as Any
+            "Target Application": app?.bundleIdentifier as Any
         ])
         
         self.priorKBLayout = InputSourceManager.currentInputSource()
