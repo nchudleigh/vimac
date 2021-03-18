@@ -73,8 +73,7 @@ import Preferences
     }
         
     func onAXPermissionGranted() {
-        self.welcomeWindowController?.close()
-        self.welcomeWindowController = nil
+        closePermissionRequestingWindow()
         
         self.checkForUpdatesInBackground()
         self.setupWindowEventAndShortcutObservables()
@@ -159,6 +158,11 @@ import Preferences
         NSApp.activate(ignoringOtherApps: true)
         welcomeWindowController?.showWindow(nil)
         welcomeWindowController?.window?.makeKeyAndOrderFront(nil)
+    }
+        
+    func closePermissionRequestingWindow() {
+        self.welcomeWindowController?.close()
+        self.welcomeWindowController = nil
     }
         
     func setupAXAttributeObservables() {
