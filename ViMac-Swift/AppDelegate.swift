@@ -17,7 +17,6 @@ import Preferences
 @NSApplicationMain
     class AppDelegate: NSObject, NSApplicationDelegate {
     var welcomeWindowController: NSWindowController?
-    var permissionPollingTimer: Timer?
     
     private lazy var focusedWindowDisturbedObservable: Observable<FrontmostApplicationService.ApplicationNotification> = createFocusedWindowDisturbedObservable()
     private lazy var windowObservable: Observable<Element?> = createFocusedWindowObservable()
@@ -62,16 +61,23 @@ import Preferences
         
         setupPreferences()
         setupStatusItem()
-        
-        if self.isAccessibilityPermissionsGranted() {
-            self.checkForUpdatesInBackground()
-            self.setupWindowEventAndShortcutObservables()
-            self.setupAXAttributeObservables()
-            self.openPreferences()
-            return
+
+        if AXIsProcessTrusted() {
+            self.onAXPermissionGranted()
+        } else {
+            pollAccessibility {
+                self.onAXPermissionGranted()
+            }
+            showPermissionRequestingWindow()
         }
+    }
         
-        showWelcomeWindowController()
+    func onAXPermissionGranted() {
+        closePermissionRequestingWindow()
+        
+        self.checkForUpdatesInBackground()
+        self.setupWindowEventAndShortcutObservables()
+        self.setupAXAttributeObservables()
     }
         
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
@@ -146,31 +152,17 @@ import Preferences
         }
     }
     
-    func showWelcomeWindowController() {
+    func showPermissionRequestingWindow() {
         let storyboard = NSStoryboard.init(name: "Main", bundle: nil)
         welcomeWindowController = storyboard.instantiateController(withIdentifier: "WelcomeWindowController") as? NSWindowController
         NSApp.activate(ignoringOtherApps: true)
         welcomeWindowController?.showWindow(nil)
         welcomeWindowController?.window?.makeKeyAndOrderFront(nil)
-        permissionPollingTimer = Timer.scheduledTimer(
-            timeInterval: 2.0,
-            target: self,
-            selector: #selector(closeWelcomeWindowControllerWhenPermissionGranted),
-            userInfo: nil,
-            repeats: true
-        )
     }
-    
-    @objc func closeWelcomeWindowControllerWhenPermissionGranted() {
-        if self.isAccessibilityPermissionsGranted() {
-            permissionPollingTimer?.invalidate()
-            permissionPollingTimer = nil
-            welcomeWindowController?.close()
-            welcomeWindowController = nil
-            
-            self.checkForUpdatesInBackground()
-            self.setupWindowEventAndShortcutObservables()
-        }
+        
+    func closePermissionRequestingWindow() {
+        self.welcomeWindowController?.close()
+        self.welcomeWindowController = nil
     }
         
     func setupAXAttributeObservables() {
@@ -279,9 +271,15 @@ import Preferences
         SUUpdater.shared()?.sendsSystemProfile = true
         SUUpdater.shared()?.checkForUpdatesInBackground()
     }
-    
-    func isAccessibilityPermissionsGranted() -> Bool {
-        return UIElement.isProcessTrusted(withPrompt: false)
+
+    func pollAccessibility(completion: @escaping () -> Void) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            if AXIsProcessTrusted() {
+                completion()
+            } else {
+                self.pollAccessibility(completion: completion)
+            }
+        }
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {
