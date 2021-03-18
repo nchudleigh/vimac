@@ -105,28 +105,33 @@ class ModeCoordinator : Coordinator {
     }
     
     func setHintMode() {
-        guard let frontmostApp = NSWorkspace.shared.frontmostApplication,
-            let focusedWindow = focusedWindow(app: frontmostApp) else {
-            self.exitMode()
-            return
-        }
+        let app = NSWorkspace.shared.frontmostApplication
+        let window = app.flatMap { focusedWindow(app: $0) }
+
+        let screenFrame: NSRect = {
+            if let window = window {
+                let focusedWindowFrame: NSRect = GeometryUtils.convertAXFrameToGlobal(window.frame)
+                let screenFrame = activeScreenFrame(focusedWindowFrame: focusedWindowFrame)
+                return screenFrame
+            }
+            return NSScreen.main!.frame
+        }()
         
-        // the app crashes when talking to its own accessibility server
-        let isTargetVimac = frontmostApp.bundleIdentifier == Bundle.main.bundleIdentifier
-        if isTargetVimac {
-            self.exitMode()
-            return
+        if let app = app {
+            // the app crashes when talking to its own accessibility server
+            let isTargetVimac = app.bundleIdentifier == Bundle.main.bundleIdentifier
+            if isTargetVimac {
+                self.exitMode()
+                return
+            }
         }
-        
-        let focusedWindowFrame: NSRect = GeometryUtils.convertAXFrameToGlobal(focusedWindow.frame)
-        let screenFrame = activeScreenFrame(focusedWindowFrame: focusedWindowFrame)
         
         self.priorKBLayout = InputSourceManager.currentInputSource()
         if let forceKBLayout = self.forceKBLayout {
             forceKBLayout.select()
         }
 
-        let vc = HintModeViewController.init(app: frontmostApp, window: focusedWindow)
+        let vc = HintModeViewController.init(app: app, window: window)
         self.setViewController(vc: vc, screenFrame: screenFrame)
         
         keySequenceListener.stop()
