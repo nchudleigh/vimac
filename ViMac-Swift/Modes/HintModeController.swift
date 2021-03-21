@@ -127,7 +127,7 @@ class HintModeUserInterface {
     }
 
     func setHints(hints: [Hint]) {
-        self.hintsViewController = HintsViewController(hints: hints, textSize: CGFloat(textSize), hintCharacters: "", typed: "")
+        self.hintsViewController = HintsViewController(hints: hints, textSize: CGFloat(textSize), typed: "")
         self.contentViewController.setChildViewController(self.hintsViewController!)
     }
 
