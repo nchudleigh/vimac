@@ -15,7 +15,7 @@ class HintsViewController: NSViewController {
 
     var hintViews: [HintView]!
     
-    init(hints: [Hint], textSize: CGFloat, hintCharacters: String, typed: String = "") {
+    init(hints: [Hint], textSize: CGFloat, typed: String = "") {
         self.hints = hints
         self.textSize = textSize
         self.typed = typed

@@ -67,6 +67,8 @@ class ModeCoordinator : Coordinator {
         self.windowController.window?.contentViewController = nil
         self.windowController.close()
         
+        HintMode.shared.deactivate()
+        
         keySequenceListener.start()
     }
     
@@ -112,15 +114,6 @@ class ModeCoordinator : Coordinator {
     func setHintMode() {
         let app = NSWorkspace.shared.frontmostApplication
         let window = app.flatMap { focusedWindow(app: $0) }
-
-        let screenFrame: NSRect = {
-            if let window = window {
-                let focusedWindowFrame: NSRect = GeometryUtils.convertAXFrameToGlobal(window.frame)
-                let screenFrame = activeScreenFrame(focusedWindowFrame: focusedWindowFrame)
-                return screenFrame
-            }
-            return NSScreen.main!.frame
-        }()
         
         if let app = app {
             // the app crashes when talking to its own accessibility server
@@ -140,8 +133,7 @@ class ModeCoordinator : Coordinator {
             forceKBLayout.select()
         }
 
-        let vc = HintModeViewController.init(app: app, window: window)
-        self.setViewController(vc: vc, screenFrame: screenFrame)
+        HintMode.shared.activate(app: app, window: window)
         
         keySequenceListener.stop()
     }
