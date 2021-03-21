@@ -240,16 +240,32 @@ import Segment
         _ = self.compositeDisposable.insert(hintModeShortcutObservable
             .observeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak self] _ in
-                // TODO: deactivate if hint mode already active
-                self?.modeCoordinator.setHintMode()
+                guard let self = self else { return }
+
+                if let modeController = self.modeCoordinator.modeController {
+                    if let _  = modeController as? HintModeController {
+                        self.modeCoordinator.deactivate()
+                        return
+                    }
+                }
+                
+                self.modeCoordinator.setHintMode()
             })
         )
         
         _ = self.compositeDisposable.insert(scrollModeShortcutObservable
             .observeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak self] _ in
-                // TODO: deactivate if scroll mode already active
-                self?.modeCoordinator.setScrollMode()
+                guard let self = self else { return }
+                
+                if let modeController = self.modeCoordinator.modeController {
+                    if let _  = modeController as? ScrollModeController {
+                        self.modeCoordinator.deactivate()
+                        return
+                    }
+                }
+                
+                self.modeCoordinator.setScrollMode()
             })
         )
     }
