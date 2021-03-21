@@ -25,6 +25,8 @@ enum HintAction {
 }
 
 class HintModeViewController: ModeViewController, NSTextFieldDelegate {
+    weak var delegate: HintModeController?
+    
     let app: NSRunningApplication?
     let window: Element?
     
@@ -69,7 +71,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
             .do(onError: { e in self.logError(e) })
             .subscribe(
                 onSuccess: { self.onHintQueryCompleted(hints: $0) },
-                onError: { _ in self.modeCoordinator?.exitMode()}
+                onError: { _ in self.delegate?.deactivate() }
             )
             .disposed(by: disposeBag)
     }
@@ -96,7 +98,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
             Analytics.shared().track("Hint Mode Deadend", properties: [
                 "Target Application": app?.bundleIdentifier as Any
             ])
-            self.modeCoordinator?.exitMode()
+            self.delegate?.deactivate()
             return
         }
 
@@ -109,7 +111,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
             
             // close the window before performing click(s)
             // Chrome's bookmark bar doesn't let you right click if Chrome is not the active window
-            self.modeCoordinator?.exitMode()
+            self.delegate?.deactivate()
 
             let originalMousePosition: NSPoint = {
                 let invertedPos = NSEvent.mouseLocation
@@ -173,7 +175,7 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
             Analytics.shared().track("Hint Mode Deactivated", properties: [
                 "Target Application": self?.app?.bundleIdentifier as Any
             ])
-            self?.onEscape()
+            self?.delegate?.deactivate()
         })
     }
     

@@ -11,12 +11,9 @@ import Cocoa
 import AXSwift
 import RxSwift
 import Segment
+import os
 
-protocol Coordinator {
-    var windowController: OverlayWindowController { get set }
-}
-
-class ModeCoordinator : Coordinator {
+class ModeCoordinator: ModeControllerDelegate {
     let disposeBag = DisposeBag()
     
     var priorKBLayout: InputSource?
@@ -27,11 +24,9 @@ class ModeCoordinator : Coordinator {
     let hintModeKeySequence: [Character] = ["f", "d"]
     private let keySequenceListener: VimacKeySequenceListener
     
-    var windowController: OverlayWindowController
+    var modeController: ModeController?
     
-    init(windowController: OverlayWindowController) {
-        self.windowController = windowController
-
+    init() {
         self.keySequenceListener = VimacKeySequenceListener()
         self.keySequenceListener.start()
         
@@ -54,96 +49,85 @@ class ModeCoordinator : Coordinator {
         }
     }
     
-    func exitMode() {
-        guard let vc = self.windowController.window?.contentViewController else {
-            return
+    func deactivate() {
+        self.modeController?.deactivate()
+    }
+    
+    func beforeModeActivation() {
+        self.priorKBLayout = InputSourceManager.currentInputSource()
+        if let forceKBLayout = self.forceKBLayout {
+            forceKBLayout.select()
         }
+        
+        keySequenceListener.stop()
+
+        os_log("[beforeModeActivation]: priorKBLayout=%@, forceKBLayout=%@", log: Log.accessibility, self.priorKBLayout?.id ?? "nil", self.forceKBLayout?.id ?? "nil")
+    }
+    
+    func modeDeactivated(controller: ModeController) {
+        self.modeController = nil
         
         if self.forceKBLayout != nil {
             self.priorKBLayout?.select()
         }
-
-        vc.view.removeFromSuperview()
-        self.windowController.window?.contentViewController = nil
-        self.windowController.close()
         
         keySequenceListener.start()
-    }
-    
-    func setViewController(vc: ModeViewController, screenFrame: NSRect) {
-        vc.modeCoordinator = self
-        self.windowController.window?.contentViewController = vc
-        self.windowController.fitToFrame(screenFrame)
-        self.windowController.showWindow(nil)
-        self.windowController.window?.makeKeyAndOrderFront(nil)
+        
+        os_log("[modeDeactivated]: priorKBLayout=%@, forceKBLayout=%@", log: Log.accessibility, self.priorKBLayout?.id ?? "nil", self.forceKBLayout?.id ?? "nil")
     }
 
     func setScrollMode() {
+        if let modeController = modeController {
+            modeController.deactivate()
+        }
+        
         guard let frontmostApp = NSWorkspace.shared.frontmostApplication,
             let focusedWindow = focusedWindow(app: frontmostApp) else {
-            self.exitMode()
             return
         }
         
         // the app crashes when talking to its own accessibility server
         let isTargetVimac = frontmostApp.bundleIdentifier == Bundle.main.bundleIdentifier
         if isTargetVimac {
-            self.exitMode()
             return
         }
+        
+        beforeModeActivation()
         
         Analytics.shared().track("Scroll Mode Activated", properties: [
             "Target Application": frontmostApp.bundleIdentifier as Any
         ])
         
-        let focusedWindowFrame = GeometryUtils.convertAXFrameToGlobal(focusedWindow.frame)
-        let screenFrame = activeScreenFrame(focusedWindowFrame: focusedWindowFrame)
-        
-        self.priorKBLayout = InputSourceManager.currentInputSource()
-        if let forceKBLayout = self.forceKBLayout {
-            forceKBLayout.select()
-        }
-        let vc = ScrollModeViewController.init(window: focusedWindow)
-        self.setViewController(vc: vc, screenFrame: screenFrame)
-        
-        keySequenceListener.stop()
+        modeController = ScrollModeController(window: focusedWindow)
+        modeController?.delegate = self
+        modeController!.activate()
     }
     
     func setHintMode() {
+        if let modeController = modeController {
+            modeController.deactivate()
+        }
+        
         let app = NSWorkspace.shared.frontmostApplication
         let window = app.flatMap { focusedWindow(app: $0) }
-
-        let screenFrame: NSRect = {
-            if let window = window {
-                let focusedWindowFrame: NSRect = GeometryUtils.convertAXFrameToGlobal(window.frame)
-                let screenFrame = activeScreenFrame(focusedWindowFrame: focusedWindowFrame)
-                return screenFrame
-            }
-            return NSScreen.main!.frame
-        }()
         
         if let app = app {
             // the app crashes when talking to its own accessibility server
             let isTargetVimac = app.bundleIdentifier == Bundle.main.bundleIdentifier
             if isTargetVimac {
-                self.exitMode()
                 return
             }
         }
+        
+        beforeModeActivation()
         
         Analytics.shared().track("Hint Mode Activated", properties: [
             "Target Application": app?.bundleIdentifier as Any
         ])
         
-        self.priorKBLayout = InputSourceManager.currentInputSource()
-        if let forceKBLayout = self.forceKBLayout {
-            forceKBLayout.select()
-        }
-
-        let vc = HintModeViewController.init(app: app, window: window)
-        self.setViewController(vc: vc, screenFrame: screenFrame)
-        
-        keySequenceListener.stop()
+        modeController = HintModeController(app: app, window: window)
+        modeController?.delegate = self
+        modeController!.activate()
     }
     
     func observeForceKBInputSource() -> NSKeyValueObservation {
@@ -167,6 +151,147 @@ class ModeCoordinator : Coordinator {
         guard let axWindow = axWindowOptional else { return nil }
         
         return Element.initialize(rawElement: axWindow.element)
+    }
+    
+}
+
+protocol ModeController {
+    var delegate: ModeControllerDelegate? { get set }
+
+    func activate()
+    func deactivate()
+}
+
+protocol ModeControllerDelegate: AnyObject {
+    func modeDeactivated(controller: ModeController)
+}
+
+class HintModeController: ModeController {
+    weak var delegate: ModeControllerDelegate?
+    private var activated = false
+    
+    private var windowController: OverlayWindowController?
+    private var viewController: HintModeViewController?
+    
+    let app: NSRunningApplication?
+    let window: Element?
+    
+    init(app: NSRunningApplication?, window: Element?) {
+        self.app = app
+        self.window = window
+    }
+    
+    func activate() {
+        if activated { return }
+        activated = true
+        
+        let wc = OverlayWindowController()
+        let vc = HintModeViewController(app: app, window: window)
+        
+        let screenFrame: NSRect = {
+            if let window = window {
+                let focusedWindowFrame: NSRect = GeometryUtils.convertAXFrameToGlobal(window.frame)
+                let screenFrame = activeScreenFrame(focusedWindowFrame: focusedWindowFrame)
+                return screenFrame
+            }
+            return NSScreen.main!.frame
+        }()
+        
+        wc.window?.contentViewController = vc
+        wc.fitToFrame(screenFrame)
+        wc.showWindow(nil)
+        wc.window?.makeKeyAndOrderFront(nil)
+        
+        vc.delegate = self
+        
+        self.windowController = wc
+        self.viewController = vc
+    }
+    
+    func deactivate() {
+        if !activated { return }
+        activated = false
+        
+        let wc = self.windowController!
+        let vc = self.viewController!
+
+        self.windowController = nil
+        self.viewController = nil
+        
+        vc.view.removeFromSuperview()
+        wc.window?.contentViewController = nil
+        wc.close()
+        
+        self.delegate?.modeDeactivated(controller: self)
+    }
+    
+    private func activeScreenFrame(focusedWindowFrame: NSRect) -> NSRect {
+        // When the focused window is in full screen mode in a secondary display,
+        // NSScreen.main will point to the primary display.
+        // this is a workaround.
+        var activeScreen = NSScreen.main!
+        var maxArea: CGFloat = 0
+        for screen in NSScreen.screens {
+            let intersection = screen.frame.intersection(focusedWindowFrame)
+            let area = intersection.width * intersection.height
+            if area > maxArea {
+                maxArea = area
+                activeScreen = screen
+            }
+        }
+        return activeScreen.frame
+    }
+}
+
+class ScrollModeController: ModeController {
+    weak var delegate: ModeControllerDelegate?
+    private var activated = false
+    
+    private var windowController: OverlayWindowController?
+    private var viewController: ScrollModeViewController?
+    
+    let window: Element
+    
+    init(window: Element) {
+        self.window = window
+    }
+    
+    func activate() {
+        if activated { return }
+        activated = true
+        
+        let wc = OverlayWindowController()
+        let vc = ScrollModeViewController(window: window)
+        
+        let focusedWindowFrame = GeometryUtils.convertAXFrameToGlobal(window.frame)
+        let screenFrame = activeScreenFrame(focusedWindowFrame: focusedWindowFrame)
+
+        wc.window?.contentViewController = vc
+        wc.fitToFrame(screenFrame)
+        wc.showWindow(nil)
+        wc.window?.makeKeyAndOrderFront(nil)
+        
+        vc.delegate = self
+        
+        self.windowController = wc
+        self.viewController = vc
+    }
+    
+    func deactivate() {
+        if !activated { return }
+        activated = false
+        
+        let wc = self.windowController!
+        let vc = self.viewController!
+
+        self.windowController = nil
+        self.viewController = nil
+        
+        vc.view.removeFromSuperview()
+        wc.window?.contentViewController = nil
+        wc.close()
+        
+        self.delegate?.modeDeactivated(controller: self)
     }
     
     private func activeScreenFrame(focusedWindowFrame: NSRect) -> NSRect {

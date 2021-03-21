@@ -41,7 +41,7 @@ import Segment
         
         InputSourceManager.initialize()
         overlayWindowController = OverlayWindowController()
-        modeCoordinator = ModeCoordinator(windowController: overlayWindowController)
+        modeCoordinator = ModeCoordinator()
         
         LaunchAtLogin.isEnabled = UserDefaults.standard.bool(forKey: Utils.shouldLaunchOnStartupKey)
         KeyboardShortcuts.shared.registerDefaults()
@@ -226,36 +226,30 @@ import Segment
         _ = self.compositeDisposable.insert(focusedWindowDisturbedObservable
             .observeOn(MainScheduler.instance)
             .subscribe(onNext: { notification in
-                self.modeCoordinator.exitMode()
+                self.modeCoordinator.deactivate()
             })
         )
         
         _ = self.compositeDisposable.insert(windowObservable
             .observeOn(MainScheduler.instance)
             .subscribe(onNext: { windowOptional in
-                self.modeCoordinator.exitMode()
+                self.modeCoordinator.deactivate()
             })
         )
 
         _ = self.compositeDisposable.insert(hintModeShortcutObservable
             .observeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak self] _ in
-                if self?.modeCoordinator.windowController.window?.contentViewController?.className == HintModeViewController.className() {
-                    self?.modeCoordinator.exitMode()
-                } else {
-                    self?.modeCoordinator.setHintMode()
-                }
+                // TODO: deactivate if hint mode already active
+                self?.modeCoordinator.setHintMode()
             })
         )
         
         _ = self.compositeDisposable.insert(scrollModeShortcutObservable
             .observeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak self] _ in
-                if self?.modeCoordinator.windowController.window?.contentViewController?.className == ScrollModeViewController.className() {
-                    self?.modeCoordinator.exitMode()
-                } else {
-                    self?.modeCoordinator.setScrollMode()
-                }
+                // TODO: deactivate if scroll mode already active
+                self?.modeCoordinator.setScrollMode()
             })
         )
     }
