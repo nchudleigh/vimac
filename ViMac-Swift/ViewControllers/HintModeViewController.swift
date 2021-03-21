@@ -13,17 +13,6 @@ import Carbon.HIToolbox
 import os
 import Segment
 
-struct Hint {
-    let element: Element
-    let text: String
-}
-
-enum HintAction {
-    case leftClick
-    case rightClick
-    case doubleLeftClick
-}
-
 class HintModeViewController: ModeViewController, NSTextFieldDelegate {
     weak var delegate: HintModeController?
     
