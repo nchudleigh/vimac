@@ -100,19 +100,41 @@ enum HintAction {
 }
 
 class HintModeUserInterface {
-    let frame: NSRect
+    let window: Element?
     let windowController: OverlayWindowController
     let contentViewController: ContentViewController
     var hintsViewController: HintsViewController?
 
     let textSize = UserPreferences.HintMode.TextSizeProperty.readAsFloat()
 
-    init(frame: NSRect) {
-        self.frame = frame
+    init(window: Element?) {
+        self.window = window
         self.windowController = OverlayWindowController()
         self.contentViewController = ContentViewController()
         self.windowController.window?.contentViewController = self.contentViewController
-        self.windowController.fitToFrame(frame)
+
+        let _frame = frame()
+        self.windowController.fitToFrame(_frame)
+    }
+    
+    func frame() -> NSRect {
+        guard let window = window else {
+            return NSScreen.main!.frame
+        }
+
+        let windowFrame = GeometryUtils.convertAXFrameToGlobal(window.frame)
+
+        // expected: When an active window is fullscreen in a non-primary display, NSScreen.main returns the non-primary display
+        // actual: it returns the primary display
+        // this is a workaround for that edge case
+        let fullscreenScreen = NSScreen.screens.first(where: { $0.frame == windowFrame })
+        if let fullscreenScreen = fullscreenScreen {
+            return fullscreenScreen.frame
+        }
+        
+        // a window can extend outside the screen it belongs to (NSScreen.main)
+        // it is visible in other screens if the "Displays have separate spaces" option is disabled
+        return windowFrame.union(NSScreen.main!.frame)
     }
 
     func show() {
@@ -167,19 +189,10 @@ class HintModeController: ModeController {
         if activated { return }
         activated = true
         
-        let screenFrame: NSRect = {
-            if let window = window {
-                let focusedWindowFrame: NSRect = GeometryUtils.convertAXFrameToGlobal(window.frame)
-                let screenFrame = activeScreenFrame(focusedWindowFrame: focusedWindowFrame)
-                return screenFrame
-            }
-            return NSScreen.main!.frame
-        }()
-        
         HideCursorGlobally.hide()
         
         self.input = ""
-        self.ui = HintModeUserInterface(frame: screenFrame)
+        self.ui = HintModeUserInterface(window: window)
         self.ui.show()
         
         self.queryHints(
@@ -279,23 +292,6 @@ class HintModeController: ModeController {
                 onEvent(event)
             })
             .disposed(by: disposeBag)
-    }
-    
-    private func activeScreenFrame(focusedWindowFrame: NSRect) -> NSRect {
-        // When the focused window is in full screen mode in a secondary display,
-        // NSScreen.main will point to the primary display.
-        // this is a workaround.
-        var activeScreen = NSScreen.main!
-        var maxArea: CGFloat = 0
-        for screen in NSScreen.screens {
-            let intersection = screen.frame.intersection(focusedWindowFrame)
-            let area = intersection.width * intersection.height
-            if area > maxArea {
-                maxArea = area
-                activeScreen = screen
-            }
-        }
-        return activeScreen.frame
     }
     
     private func performHintAction(_ hint: Hint, action: HintAction) {
