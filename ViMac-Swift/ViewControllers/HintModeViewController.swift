@@ -111,16 +111,6 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
             // Chrome's bookmark bar doesn't let you right click if Chrome is not the active window
             self.modeCoordinator?.exitMode()
 
-            let originalMousePosition: NSPoint = {
-                let invertedPos = NSEvent.mouseLocation
-                let frame = GeometryUtils.convertAXFrameToGlobal(
-                    NSRect(
-                        origin: invertedPos,
-                        size: NSSize.zero
-                    )
-                )
-                return frame.origin
-            }()
             let action: HintAction = {
                 if (event.modifierFlags.rawValue & NSEvent.ModifierFlags.shift.rawValue == NSEvent.ModifierFlags.shift.rawValue) {
                     return .rightClick
@@ -131,8 +121,6 @@ class HintModeViewController: ModeViewController, NSTextFieldDelegate {
                 }
             }()
             performHintAction(hint, action: action)
-            
-            Utils.moveMouse(position: originalMousePosition)
         }
 
         // update hints to reflect new typed text
