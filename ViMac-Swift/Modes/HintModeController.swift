@@ -173,9 +173,9 @@ class HintModeController: ModeController {
 
     let hintCharacters = UserPreferences.HintMode.CustomCharactersProperty.read()
     
-    private var ui: HintModeUserInterface!
-    private var input: String!
-    private var hints: [Hint]!
+    private var ui: HintModeUserInterface?
+    private var input: String?
+    private var hints: [Hint]?
     
     let app: NSRunningApplication?
     let window: Element?
@@ -193,7 +193,7 @@ class HintModeController: ModeController {
         
         self.input = ""
         self.ui = HintModeUserInterface(window: window)
-        self.ui.show()
+        self.ui!.show()
         
         self.queryHints(
             onSuccess: { [weak self] hints in
@@ -207,6 +207,8 @@ class HintModeController: ModeController {
     
     func deactivate() {
         if !activated { return }
+        guard let ui = ui else { return }
+
         activated = false
         
         Analytics.shared().track("Hint Mode Deactivated", properties: [
@@ -215,13 +217,15 @@ class HintModeController: ModeController {
         
         HideCursorGlobally.unhide()
         
-        self.ui!.hide()
+        ui.hide()
         self.ui = nil
         
         self.delegate?.modeDeactivated(controller: self)
     }
     
     func onHintQuerySuccess(hints: [Hint]) {
+        guard let ui = ui else { return }
+        
         self.hints = hints
         ui.setHints(hints: hints)
         
@@ -237,16 +241,25 @@ class HintModeController: ModeController {
         case .exit:
             self.deactivate()
         case .rotate:
+            guard let ui = ui else { return }
             Analytics.shared().track("Hint Mode Rotated Hints", properties: [
                 "Target Application": self.app?.bundleIdentifier as Any
             ])
-            self.ui.rotateHints()
+            ui.rotateHints()
         case .backspace:
-            _ = self.input.popLast()
+            guard let ui = ui,
+                  let input = input else { return }
+            _ = self.input!.popLast()
             ui.updateInput(input: input)
         case .advance(let by, let action):
-            self.input = self.input + by
-            let hintsWithInputAsPrefix = hints.filter { $0.text.starts(with: input.uppercased()) }
+            guard let ui = ui,
+                  let input = input,
+                  let hints = hints else { return }
+            
+            let newInput = input + by
+            self.input = newInput
+
+            let hintsWithInputAsPrefix = hints.filter { $0.text.starts(with: newInput.uppercased()) }
 
             if hintsWithInputAsPrefix.count == 0 {
                 Analytics.shared().track("Hint Mode Deadend", properties: [
@@ -256,7 +269,7 @@ class HintModeController: ModeController {
                 return
             }
 
-            let matchingHint = hintsWithInputAsPrefix.first(where: { $0.text == input.uppercased() })
+            let matchingHint = hintsWithInputAsPrefix.first(where: { $0.text == newInput.uppercased() })
 
             if let matchingHint = matchingHint {
                 Analytics.shared().track("Hint Mode Action Performed", properties: [
@@ -268,7 +281,7 @@ class HintModeController: ModeController {
                 return
             }
 
-            ui.updateInput(input: self.input)
+            ui.updateInput(input: newInput)
         }
     }
     
