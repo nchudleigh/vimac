@@ -248,9 +248,9 @@ class HintModeController: ModeController {
             ui.rotateHints()
         case .backspace:
             guard let ui = ui,
-                  let input = input else { return }
+                  let _ = input else { return }
             _ = self.input!.popLast()
-            ui.updateInput(input: input)
+            ui.updateInput(input: self.input!)
         case .advance(let by, let action):
             guard let ui = ui,
                   let input = input,
