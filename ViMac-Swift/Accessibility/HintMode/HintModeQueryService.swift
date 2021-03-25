@@ -21,7 +21,7 @@ class HintModeQueryService {
     }
     
     func perform() -> Observable<Hint> {
-        let elements = elementObservable()
+        let elements = elementObservable().share()
         let count = elements.toArray().map({ $0.count })
         let hintStrings: Observable<String> = count
             .map { AlphabetHints().hintStrings(linkCount: $0, hintCharacters: self.hintCharacters) }
@@ -50,6 +50,7 @@ class HintModeQueryService {
             menuBarElements,
             Utils.singleToObservable(single: queryMenuBarExtrasSingle()),
             Utils.singleToObservable(single: queryNotificationCenterSingle()),
+            Utils.singleToObservable(single: queryNonActiveWindows()),
             windowElements
         ])
     }
@@ -102,6 +103,20 @@ class HintModeQueryService {
                 let service = QueryNotificationCenterItemsService.init()
                 let elements = try? service.perform()
                 event(.success(elements ?? []))
+            })
+            thread.start()
+            return Disposables.create {
+                thread.cancel()
+            }
+        })
+    }
+    
+    private func queryNonActiveWindows() -> Single<[Element]> {
+        return Single.create(subscribe: { event in
+            let thread = Thread.init(block: {
+                let service = QueryVisibleWindowsService()
+                let elements = try? service.perform()
+                event(.success([]))
             })
             thread.start()
             return Disposables.create {

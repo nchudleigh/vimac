@@ -35,8 +35,7 @@ import Segment
     
     let frontmostAppService = FrontmostApplicationService.init()
     
-    override init() {
-        
+    override init() {        
         UIElement.globalMessagingTimeout = 1
         
         InputSourceManager.initialize()

@@ -19,7 +19,7 @@ class ElementTreeNode {
         self.children = children
     }
     
-    func isHintable() -> Bool {
+    func    isHintable() -> Bool {
         if root.role == "AXWindow" || root.role == "AXScrollArea" {
             return false
         }
