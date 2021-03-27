@@ -93,16 +93,14 @@ struct UserPreferences {
                 let scrollRightKey = keySequences[3]
                 let scrollHalfDownKey = keySequences.count >= 6 ? (keySequences[4]) : nil
                 let scrollHalfUpKey = keySequences.count >= 6 ? (keySequences[5]) : nil
-                let scrollBottomKey = keySequences[6]
-                let scrollTopKey = keySequences[7]
+                let scrollBottomKey = keySequences.count >= 8 ? keySequences[6] : nil
+                let scrollTopKey = keySequences.count >= 8 ? keySequences[7] : nil
                 
                 var bindings: [ScrollKeyConfig.Binding] = [
                     .init(keys: Array(scrollLeftKey), direction: .left),
                     .init(keys: Array(scrollDownKey), direction: .down),
                     .init(keys: Array(scrollUpKey), direction: .up),
                     .init(keys: Array(scrollRightKey), direction: .right),
-                    .init(keys: Array(scrollBottomKey), direction: .bottom),
-                    .init(keys: Array(scrollTopKey), direction: .top),
                     
                     .init(keys: Array(scrollLeftKey.uppercased()), direction: .halfLeft),
                     .init(keys: Array(scrollDownKey.uppercased()), direction: .halfDown),
@@ -119,6 +117,18 @@ struct UserPreferences {
                 if let k = scrollHalfUpKey {
                     bindings.append(
                         .init(keys: Array(k), direction: .halfUp)
+                    )
+                }
+                
+                if let k = scrollBottomKey {
+                    bindings.append(
+                        .init(keys: Array(k), direction: .bottom)
+                    )
+                }
+                
+                if let k = scrollTopKey {
+                    bindings.append(
+                        .init(keys: Array(k), direction: .top)
                     )
                 }
                 
