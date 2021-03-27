@@ -75,45 +75,50 @@ struct UserPreferences {
             typealias T = String
             
             static var key = "ScrollCharacters"
-            static var defaultValue = "hjkldu"
+            static var defaultValue = "h,j,k,l,d,u,G,gg"
             
             static func isValid(value keys: String) -> Bool {
-                let isCountValid = keys.count == 4 || keys.count == 6
-                let areKeysUnique = keys.count == Set(keys).count
-                return isCountValid && areKeysUnique
+                let keySequences = keys.components(separatedBy: ",")
+                let isCountValid = keySequences.count == 4 || keySequences.count == 6 || keySequences.count == 8
+                let areKeySequencesUnique = keySequences.count == Set(keySequences).count
+                return isCountValid && areKeySequencesUnique
             }
             
             static func readAsConfig() -> ScrollKeyConfig {
                 let s = read()
-                
-                let scrollLeftKey = s[s.index(s.startIndex, offsetBy: 0)]
-                let scrollDownKey = s[s.index(s.startIndex, offsetBy: 1)]
-                let scrollUpKey = s[s.index(s.startIndex, offsetBy: 2)]
-                let scrollRightKey = s[s.index(s.startIndex, offsetBy: 3)]
-                let scrollHalfDownKey = s.count == 6 ? (s[s.index(s.startIndex, offsetBy: 4)]) : nil
-                let scrollHalfUpKey = s.count == 6 ? (s[s.index(s.startIndex, offsetBy: 5)]) : nil
+                let keySequences = s.components(separatedBy: ",")
+                let scrollLeftKey = keySequences[0]
+                let scrollDownKey = keySequences[1]
+                let scrollUpKey = keySequences[2]
+                let scrollRightKey = keySequences[3]
+                let scrollHalfDownKey = keySequences.count >= 6 ? (keySequences[4]) : nil
+                let scrollHalfUpKey = keySequences.count >= 6 ? (keySequences[5]) : nil
+                let scrollBottomKey = keySequences[6]
+                let scrollTopKey = keySequences[7]
                 
                 var bindings: [ScrollKeyConfig.Binding] = [
-                    .init(keys: [scrollLeftKey], direction: .left),
-                    .init(keys: [scrollDownKey], direction: .down),
-                    .init(keys: [scrollUpKey], direction: .up),
-                    .init(keys: [scrollRightKey], direction: .right),
+                    .init(keys: Array(scrollLeftKey), direction: .left),
+                    .init(keys: Array(scrollDownKey), direction: .down),
+                    .init(keys: Array(scrollUpKey), direction: .up),
+                    .init(keys: Array(scrollRightKey), direction: .right),
+                    .init(keys: Array(scrollBottomKey), direction: .bottom),
+                    .init(keys: Array(scrollTopKey), direction: .top),
                     
-                    .init(keys: [Character(scrollLeftKey.uppercased())], direction: .halfLeft),
-                    .init(keys: [Character(scrollDownKey.uppercased())], direction: .halfDown),
-                    .init(keys: [Character(scrollUpKey.uppercased())], direction: .halfUp),
-                    .init(keys: [Character(scrollRightKey.uppercased())], direction: .halfRight),
+                    .init(keys: Array(scrollLeftKey.uppercased()), direction: .halfLeft),
+                    .init(keys: Array(scrollDownKey.uppercased()), direction: .halfDown),
+                    .init(keys: Array(scrollUpKey.uppercased()), direction: .halfUp),
+                    .init(keys: Array(scrollRightKey.uppercased()), direction: .halfRight),
                 ]
                 
                 if let k = scrollHalfDownKey {
                     bindings.append(
-                        .init(keys: [k], direction: .halfDown)
+                        .init(keys: Array(k), direction: .halfDown)
                     )
                 }
                 
                 if let k = scrollHalfUpKey {
                     bindings.append(
-                        .init(keys: [k], direction: .halfUp)
+                        .init(keys: Array(k), direction: .halfUp)
                     )
                 }
                 
