@@ -44,7 +44,7 @@ final class ScrollModePreferenceViewController: NSViewController, NSTextFieldDel
         let scrollKeysRow: [NSView] = [scrollKeysLabel, scrollKeysField]
         grid.addRow(with: scrollKeysRow)
         
-        let scrollKeysHint1 = NSTextField(wrappingLabelWithString: "Format: {left}{down}{up}{right}{half-down}{half-up}{bottom}{top}")
+        let scrollKeysHint1 = NSTextField(wrappingLabelWithString: "Format: {left},{down},{up},{right},{half-down},{half-up},{bottom},{top}")
         scrollKeysHint1.font = .labelFont(ofSize: 11)
         scrollKeysHint1.textColor = .secondaryLabelColor
         grid.addRow(with: [NSGridCell.emptyContentView, scrollKeysHint1])
