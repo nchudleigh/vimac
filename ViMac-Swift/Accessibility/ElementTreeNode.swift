@@ -24,7 +24,7 @@ class ElementTreeNode {
             return false
         }
         
-        return isActionable() || isRowWithoutHintableChildren()
+        return isActionable() || isContainerWithoutHintableChildren()
     }
     
     private func isActionable() -> Bool {
@@ -36,8 +36,9 @@ class ElementTreeNode {
         return actions.count > 0
     }
     
-    private func isRowWithoutHintableChildren() -> Bool {
-        hintableChildrenCount() == 0 && root.role == "AXRow"
+    private func isContainerWithoutHintableChildren() -> Bool {
+        kAXGroup
+        hintableChildrenCount() == 0 && (root.role == "AXRow" || root.role == "AXWebArea")
     }
     
     private func hintableChildrenCount() -> Int {
