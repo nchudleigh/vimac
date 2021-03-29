@@ -46,7 +46,7 @@ class ElementTreeNode {
         }
         let children = self.children ?? []
         let hintableChildrenCount = children
-            .map { $0.hintableChildrenCount() }
+            .map { $0.hintableChildrenCount() + ($0.isHintable() ? 1 : 0) }
             .reduce(0, +)
         self.cachedHintableChildrenCount = hintableChildrenCount
         return hintableChildrenCount
