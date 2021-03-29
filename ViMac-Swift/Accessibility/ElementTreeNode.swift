@@ -31,6 +31,8 @@ class ElementTreeNode {
         let ignoredActions: Set = [
             "AXShowMenu",
             "AXScrollToVisible",
+            "AXShowDefaultUI",
+            "AXShowAlternateUI"
         ]
         let actions = Set(root.actions).subtracting(ignoredActions)
         return actions.count > 0
