@@ -31,13 +31,15 @@ class ElementTreeNode {
         let ignoredActions: Set = [
             "AXShowMenu",
             "AXScrollToVisible",
+            "AXShowDefaultUI",
+            "AXShowAlternateUI"
         ]
         let actions = Set(root.actions).subtracting(ignoredActions)
         return actions.count > 0
     }
     
     private func isRowWithoutHintableChildren() -> Bool {
-        hintableChildrenCount() == 0 && root.role == "AXRow"
+         root.role == "AXRow" && hintableChildrenCount() == 0
     }
     
     private func hintableChildrenCount() -> Int {
@@ -46,16 +48,9 @@ class ElementTreeNode {
         }
         let children = self.children ?? []
         let hintableChildrenCount = children
-            .map { $0.hintableChildrenCount() }
+            .map { $0.hintableChildrenCount() + ($0.isHintable() ? 1 : 0) }
             .reduce(0, +)
         self.cachedHintableChildrenCount = hintableChildrenCount
         return hintableChildrenCount
     }
 }
-
-class SafariWebAreaElementTreeNode : ElementTreeNode {
-    override func isHintable() -> Bool {
-        return true
-    }
-}
-
