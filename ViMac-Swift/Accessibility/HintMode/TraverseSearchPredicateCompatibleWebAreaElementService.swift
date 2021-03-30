@@ -10,24 +10,33 @@ import Cocoa
 import AXSwift
 
 class TraverseSearchPredicateCompatibleWebAreaElementService : TraverseElementService {
+    let tree: ElementTree
     let element: Element
+    let parent: Element?
     let app: NSRunningApplication
     let windowElement: Element
     let clipBounds: NSRect?
     
-    required init(element: Element, app: NSRunningApplication, windowElement: Element, clipBounds: NSRect?) {
+    required init(tree: ElementTree, element: Element, parent: Element?, app: NSRunningApplication, windowElement: Element, clipBounds: NSRect?) {
+        self.tree = tree
         self.element = element
+        self.parent = parent
         self.app = app
         self.windowElement = windowElement
         self.clipBounds = clipBounds
     }
     
-    func perform() -> ElementTreeNode? {
+    func perform() {
         if !isElementVisible() {
-            return nil
+            return
         }
         
         element.setClippedFrame(elementClipBounds())
+        
+        if !tree.insert(element, isRoot: parent == nil) { return }
+        if let parent = parent {
+            tree.addChild(parent.rawElement, childId: element.rawElement)
+        }
         
         let children: [Element]? = {
             if isSafari() {
@@ -45,9 +54,10 @@ class TraverseSearchPredicateCompatibleWebAreaElementService : TraverseElementSe
             }
         }
 
-        let recursiveChildrenNodes = visibleChildren
-            .map { ElementTreeNode(root: $0, children: nil) }
-        return ElementTreeNode(root: element, children: recursiveChildrenNodes)
+        for child in visibleChildren {
+            if !tree.insert(child) { continue }
+            tree.addChild(element.rawElement, childId: child.rawElement)
+        }
     }
     
     private func isElementVisible() -> Bool {
