@@ -8,9 +8,7 @@
 
 import Cocoa
 
-class ModeViewController: NSViewController {
-    weak var modeCoordinator: ModeCoordinator?
-    
+class ModeViewController: NSViewController {    
     init() {
         super.init(nibName: nil, bundle: nil)
     }
@@ -22,8 +20,7 @@ class ModeViewController: NSViewController {
     override func loadView() {
         self.view = NSView()
     }
-    
-    func onEscape() {
-        self.modeCoordinator?.exitMode()
-    }
 }
+
+
+
