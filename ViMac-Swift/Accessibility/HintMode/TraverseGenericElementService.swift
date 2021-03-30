@@ -33,10 +33,7 @@ class TraverseGenericElementService : TraverseElementService {
         
         element.setClippedFrame(elementClippedBounds())
 
-        if !tree.insert(element, isRoot: parent == nil) { return }
-        if let parent = parent {
-            tree.addChild(parent.rawElement, childId: element.rawElement)
-        }
+        if !tree.insert(element, parentId: parent?.rawElement) { return }
         
         let children: [Element]? = try? getChildren(element)
 

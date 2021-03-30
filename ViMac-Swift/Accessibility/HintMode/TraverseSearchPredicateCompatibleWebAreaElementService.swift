@@ -33,11 +33,8 @@ class TraverseSearchPredicateCompatibleWebAreaElementService : TraverseElementSe
         
         element.setClippedFrame(elementClipBounds())
         
-        if !tree.insert(element, isRoot: parent == nil) { return }
-        if let parent = parent {
-            tree.addChild(parent.rawElement, childId: element.rawElement)
-        }
-        
+        if !tree.insert(element, parentId: parent?.rawElement) { return }
+
         let children: [Element]? = {
             if isSafari() {
                 return try? getRecursiveChildrenThroughSearchPredicateWithSearchKeys()
@@ -55,8 +52,7 @@ class TraverseSearchPredicateCompatibleWebAreaElementService : TraverseElementSe
         }
 
         for child in visibleChildren {
-            if !tree.insert(child) { continue }
-            tree.addChild(element.rawElement, childId: child.rawElement)
+            if !tree.insert(child, parentId: self.element.rawElement) { continue }
         }
     }
     

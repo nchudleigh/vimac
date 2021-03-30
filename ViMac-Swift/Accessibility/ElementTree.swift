@@ -20,18 +20,29 @@ class ElementTree {
         childrenById = [:]
     }
     
-    func insert(_ element: Element, isRoot: Bool = false) -> Bool {
-        if let _ = find(element.rawElement) { return false }
-        if isRoot && self.rootId != nil { return false }
+    func insert(_ element: Element, parentId: AXUIElement?) -> Bool {
+        let isRoot = parentId == nil
+
+        if find(element.rawElement) != nil { return false }
+        if let parentId = parentId {
+            if find(parentId) == nil { return false }
+        }
         
         if isRoot {
+            if self.rootId != nil { return false }
             self.rootId = element.rawElement
         }
+
         elementsById[element.rawElement] = element
+        
+        if let parentId = parentId {
+            addChild(parentId, childId: element.rawElement)
+        }
+
         return true
     }
     
-    func addChild(_ id: AXUIElement, childId: AXUIElement) {
+    private func addChild(_ id: AXUIElement, childId: AXUIElement) {
         guard let _ = find(id),
               let _ = find(childId) else { return }
         
