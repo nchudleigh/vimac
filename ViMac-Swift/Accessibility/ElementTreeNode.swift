@@ -39,7 +39,7 @@ class ElementTreeNode {
     }
     
     private func isRowWithoutHintableChildren() -> Bool {
-        hintableChildrenCount() == 0 && root.role == "AXRow"
+         root.role == "AXRow" && hintableChildrenCount() == 0
     }
     
     private func hintableChildrenCount() -> Int {
@@ -54,10 +54,3 @@ class ElementTreeNode {
         return hintableChildrenCount
     }
 }
-
-class SafariWebAreaElementTreeNode : ElementTreeNode {
-    override func isHintable() -> Bool {
-        return true
-    }
-}
-
