@@ -30,9 +30,9 @@ class Element {
         guard let role: String = values[Attribute.role] as! String? else { return nil }
         let frame = NSRect(origin: position, size: size)
 
-        guard let actions = try? uiElement.actionsAsStrings() else { return nil }
+        let actions = try? uiElement.actionsAsStrings()
         
-        return Element.init(rawElement: rawElement, frame: frame, actions: actions, role: role)
+        return Element.init(rawElement: rawElement, frame: frame, actions: actions ?? [], role: role)
     }
     
     init(rawElement: AXUIElement, frame: NSRect, actions: [String], role: String) {
