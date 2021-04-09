@@ -8,7 +8,7 @@ Vimac is heavily inspired by [Vimium](https://github.com/philc/vimium/).
 
 ### Installing
 
-You can download all versions of Vimac [here](https://install.appcenter.ms/users/dexterleng/apps/vimac/distribution_groups/sparkle). Unzip the file and move `Vimac.app` to `Applications/`.
+You can download Vimac [here](https://vimacapp.com). Unzip the file and move `Vimac.app` to `Applications/`.
 
 ### Workflow
 
