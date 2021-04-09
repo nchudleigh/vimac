@@ -10,32 +10,36 @@ import Cocoa
 import AXSwift
 
 class TraverseGenericElementService : TraverseElementService {
+    let tree: ElementTree
     let element: Element
+    let parent: Element?
     let app: NSRunningApplication
     let windowElement: Element
     let clipBounds: NSRect?
     
-    required init(element: Element, app: NSRunningApplication, windowElement: Element, clipBounds: NSRect?) {
+    required init(tree: ElementTree, element: Element, parent: Element?, app: NSRunningApplication, windowElement: Element, clipBounds: NSRect?) {
+        self.tree = tree
         self.element = element
+        self.parent = parent
         self.app = app
         self.windowElement = windowElement
         self.clipBounds = clipBounds
     }
     
-    func perform() -> ElementTreeNode? {
+    func perform() {
         if !isElementVisible() {
-            return nil
+            return
         }
         
         element.setClippedFrame(elementClippedBounds())
+
+        if !tree.insert(element, parentId: parent?.rawElement) { return }
         
         let children: [Element]? = try? getChildren(element)
 
-        let childrenNodes = children?
-            .map { traverseElement($0) }
-            .compactMap({ $0 })
-
-        return ElementTreeNode.init(root: element, children: childrenNodes)
+        children?.forEach { child in
+            traverseElement(child)
+        }
     }
     
     private func isElementVisible() -> Bool {
@@ -54,10 +58,10 @@ class TraverseGenericElementService : TraverseElementService {
         return element.frame
     }
     
-    private func traverseElement(_ element: Element) -> ElementTreeNode? {
+    private func traverseElement(_ element: Element) {
         TraverseElementServiceFinder
             .init(app: app, element: element).find()
-            .init(element: element, app: app, windowElement: windowElement, clipBounds: elementClippedBounds()).perform()
+            .init(tree: tree, element: element, parent: self.element, app: app, windowElement: windowElement, clipBounds: elementClippedBounds()).perform()
     }
 
     private func getChildren(_ element: Element) throws -> [Element]? {
