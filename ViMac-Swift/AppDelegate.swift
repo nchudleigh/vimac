@@ -249,7 +249,7 @@ import Segment
                     }
                 }
                 
-                self.modeCoordinator.setHintMode()
+                self.modeCoordinator.setHintMode(mechanism: "Shortcut")
             })
         )
         
@@ -265,7 +265,7 @@ import Segment
                     }
                 }
                 
-                self.modeCoordinator.setScrollMode()
+                self.modeCoordinator.setScrollMode(mechanism: "Shortcut")
             })
         )
     }
