@@ -33,20 +33,12 @@ class ModeCoordinator: ModeControllerDelegate {
         self.forceKBLayoutObservation = observeForceKBInputSource()
         
         disposeBag.insert(keySequenceListener.scrollMode.bind(onNext: { [weak self] _ in
-            self?.setScrollMode()
+            self?.setScrollMode(mechanism: "Key Sequence")
         }))
         
         disposeBag.insert(keySequenceListener.hintMode.bind(onNext: { [weak self] _ in
-            self?.setHintMode()
+            self?.setHintMode(mechanism: "Key Sequence")
         }))
-    }
-
-    func onKeySequenceTyped(sequence: [Character]) {
-        if sequence == scrollModeKeySequence {
-            setScrollMode()
-        } else if sequence == hintModeKeySequence {
-            setHintMode()
-        }
     }
     
     func deactivate() {
@@ -76,7 +68,7 @@ class ModeCoordinator: ModeControllerDelegate {
         os_log("[modeDeactivated]: priorKBLayout=%@, forceKBLayout=%@", log: Log.accessibility, self.priorKBLayout?.id ?? "nil", self.forceKBLayout?.id ?? "nil")
     }
 
-    func setScrollMode() {
+    func setScrollMode(mechanism: String) {
         if let modeController = modeController {
             modeController.deactivate()
         }
@@ -95,7 +87,8 @@ class ModeCoordinator: ModeControllerDelegate {
         beforeModeActivation()
         
         Analytics.shared().track("Scroll Mode Activated", properties: [
-            "Target Application": frontmostApp.bundleIdentifier as Any
+            "Target Application": frontmostApp.bundleIdentifier as Any,
+            "Activation Mechanism": mechanism
         ])
         
         modeController = ScrollModeController(window: focusedWindow)
@@ -103,7 +96,7 @@ class ModeCoordinator: ModeControllerDelegate {
         modeController!.activate()
     }
     
-    func setHintMode() {
+    func setHintMode(mechanism: String) {
         if let modeController = modeController {
             modeController.deactivate()
         }
@@ -122,7 +115,8 @@ class ModeCoordinator: ModeControllerDelegate {
         beforeModeActivation()
         
         Analytics.shared().track("Hint Mode Activated", properties: [
-            "Target Application": app?.bundleIdentifier as Any
+            "Target Application": app?.bundleIdentifier as Any,
+            "Activation Mechanism": mechanism
         ])
         
         modeController = HintModeController(app: app, window: window)
