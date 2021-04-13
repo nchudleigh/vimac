@@ -9,6 +9,7 @@
 import Cocoa
 import Sparkle
 import Preferences
+import Segment
 
 class StatusItemManager: NSObject {
     let menu: NSMenu
@@ -20,11 +21,25 @@ class StatusItemManager: NSObject {
         self.statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
         self.statusItem.button!.image = NSImage(named: "StatusBarButtonImage")
         self.preferencesWindowController = preferencesWindowController
+        self.preferencesWindowController.window?.delegate = self.preferencesWindowController
         
         super.init()
         
         self.statusItem.menu = self.menu
         self.menu.delegate = self
+    }
+}
+
+extension PreferencesWindowController: NSWindowDelegate {
+    public func windowWillClose(_ notification: Notification) {
+        Analytics.shared().identify(nil, traits: [
+            "Launch At Login": UserDefaults.standard.bool(forKey: Utils.shouldLaunchOnStartupKey),
+            "Force KB Layout ID": UserDefaults.standard.string(forKey: Utils.forceKeyboardLayoutKey),
+            "Hint Mode Key Sequence Enabled": UserDefaultsProperties.keySequenceHintModeEnabled.read(),
+            "Scroll Mode Key Sequence Enabled": UserDefaultsProperties.keySequenceScrollModeEnabled.read(),
+            "Non Native Support Enabled": UserDefaultsProperties.AXEnhancedUserInterfaceEnabled.read(),
+            "Electron Support Enabled": UserDefaultsProperties.AXManualAccessibilityEnabled.read()
+        ])
     }
 }
 
