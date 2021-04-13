@@ -54,7 +54,7 @@ import Segment
         super.init()
     }
 
-    func applicationDidFinishLaunching(_ aNotification: Notification) {
+    func applicationDidFinishLaunching(_ aNotification: Notification) {        
         if isDuplicateAppInstance() {
             NSApp.terminate(self)
             return
