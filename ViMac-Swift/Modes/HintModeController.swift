@@ -93,7 +93,7 @@ struct Hint {
     let text: String
 }
 
-enum HintAction {
+enum HintAction: String {
     case leftClick
     case rightClick
     case doubleLeftClick
@@ -273,7 +273,8 @@ class HintModeController: ModeController {
 
             if let matchingHint = matchingHint {
                 Analytics.shared().track("Hint Mode Action Performed", properties: [
-                    "Target Application": app?.bundleIdentifier as Any
+                    "Target Application": app?.bundleIdentifier as Any,
+                    "Hint Action": action.rawValue
                 ])
                 
                 self.deactivate()

@@ -16,7 +16,7 @@ import Preferences
 import Segment
 
 @NSApplicationMain
-    class AppDelegate: NSObject, NSApplicationDelegate {
+class AppDelegate: NSObject, NSApplicationDelegate {
     var welcomeWindowController: NSWindowController?
     
     private lazy var focusedWindowDisturbedObservable: Observable<FrontmostApplicationService.ApplicationNotification> = createFocusedWindowDisturbedObservable()
