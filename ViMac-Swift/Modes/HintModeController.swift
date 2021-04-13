@@ -47,6 +47,8 @@ enum HintModeInputIntent {
                     return .rightClick
                 } else if (event.modifierFlags.rawValue & NSEvent.ModifierFlags.command.rawValue == NSEvent.ModifierFlags.command.rawValue) {
                     return .doubleLeftClick
+                } else if (event.modifierFlags.rawValue & NSEvent.ModifierFlags.option.rawValue == NSEvent.ModifierFlags.option.rawValue) {
+                    return .move
                 } else {
                     return .leftClick
                 }
@@ -97,6 +99,7 @@ enum HintAction: String {
     case leftClick
     case rightClick
     case doubleLeftClick
+    case move
 }
 
 class HintModeUserInterface {
@@ -328,6 +331,8 @@ class HintModeController: ModeController {
             Utils.rightClickMouse(position: centerPosition)
         case .doubleLeftClick:
             Utils.doubleLeftClickMouse(position: centerPosition)
+        case .move:
+            Utils.moveMouse(position: centerPosition)
         }
     }
     
