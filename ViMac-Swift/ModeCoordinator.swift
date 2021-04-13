@@ -12,6 +12,7 @@ import AXSwift
 import RxSwift
 import Segment
 import os
+import UserNotifications
 
 class ModeCoordinator: ModeControllerDelegate {
     let disposeBag = DisposeBag()
@@ -66,6 +67,13 @@ class ModeCoordinator: ModeControllerDelegate {
         keySequenceListener.start()
         
         os_log("[modeDeactivated]: priorKBLayout=%@, forceKBLayout=%@", log: Log.accessibility, self.priorKBLayout?.id ?? "nil", self.forceKBLayout?.id ?? "nil")
+        
+        let activationCount = UserDefaults.standard.integer(forKey: "hintModeActivationCount")
+        let sentPMFSurvey = UserDefaults.standard.bool(forKey: "shownPMFSurveyAlert")
+        if activationCount > 350 && !sentPMFSurvey {
+            UserDefaults.standard.set(true, forKey: "shownPMFSurveyAlert")
+            showPMFSurvey()
+        }
     }
 
     func setScrollMode(mechanism: String) {
@@ -119,6 +127,9 @@ class ModeCoordinator: ModeControllerDelegate {
             "Activation Mechanism": mechanism
         ])
         
+        let activationCount = UserDefaults.standard.integer(forKey: "hintModeActivationCount")
+        UserDefaults.standard.set(activationCount + 1, forKey: "hintModeActivationCount")
+        
         modeController = HintModeController(app: app, window: window)
         modeController?.delegate = self
         modeController!.activate()
@@ -147,6 +158,25 @@ class ModeCoordinator: ModeControllerDelegate {
         return Element.initialize(rawElement: axWindow.element)
     }
     
+    func showPMFSurvey() {
+        Analytics.shared().track("PMF Survey Alert Shown")
+        
+        let alert = NSAlert()
+        alert.messageText = "Help us improve Vimac!"
+        alert.informativeText = "Mind sharing your experience using Vimac? This would really help us improve Vimac."
+        alert.alertStyle = .informational
+        alert.addButton(withTitle: "Yes")
+        alert.addButton(withTitle: "No")
+        let response = alert.runModal()
+        if response == .alertFirstButtonReturn {
+            Analytics.shared().track("Opening PMF Survey")
+
+            let url = URL(string: "https://vimacapp.com/pmf-survey")!
+            _ = NSWorkspace.shared.open(url)
+        } else {
+            Analytics.shared().track("PMF Survey Alert Dismissed")
+        }
+    }
 }
 
 extension UserDefaults
