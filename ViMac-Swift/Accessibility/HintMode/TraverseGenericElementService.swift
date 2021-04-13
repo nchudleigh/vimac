@@ -65,12 +65,13 @@ class TraverseGenericElementService : TraverseElementService {
     }
 
     private func getChildren(_ element: Element) throws -> [Element]? {
-        let rawElements: [AXUIElement]? = try {
+        let uiElements: [UIElement]? = try {
             if element.role == "AXTable" || element.role == "AXOutline" {
-                return try UIElement(element.rawElement).attribute(.visibleRows)
+                return try UIElement(element.rawElement).valuesForAttribute(.visibleRows, startAtIndex: 0, maxValues: 999)
             }
-            return try UIElement(element.rawElement).attribute(.children)
+            return try UIElement(element.rawElement).valuesForAttribute(.children, startAtIndex: 0, maxValues: 999)
         }()
+        let rawElements = uiElements?.map { $0.element }
         return rawElements?
             .map { Element.initialize(rawElement: $0) }
             .compactMap({ $0 })
