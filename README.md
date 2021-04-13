@@ -37,6 +37,7 @@ Simply type the assigned "hint-text" (eg. "sa") to perform a click at the locati
 | Left click | Type the assigned hint-text |
 | Right click | Type the assigned hint-text while holding `Shift` |
 | Double left click | Type the assigned hint-text while holding `Command` |
+| Move cursor | Type the assigned hint-text while holding `Option` |
 | Rotate hints | `Space` |
 | Exit | `Escape` |
 
