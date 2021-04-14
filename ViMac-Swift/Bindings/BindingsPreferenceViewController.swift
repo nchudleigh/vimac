@@ -170,38 +170,52 @@ class BindingsPreferenceViewController: NSViewController, PreferencePane, NSText
         UserDefaultsProperties.keySequenceScrollModeEnabled.write(enabled)
     }
     
-    private func onHintModeKeySequenceTextFieldEndEditing() {
+    private func onHintModeKeySequenceTextFieldChange() {
         let value = hintModeKeySequenceTextField.stringValue
         UserDefaultsProperties.keySequenceHintMode.write(value)
     }
     
-    private func onScrollModeKeySequenceTextFieldEndEditing() {
+    private func onScrollModeKeySequenceTextFieldChange() {
         let value = scrollModeKeySequenceTextField.stringValue
         UserDefaultsProperties.keySequenceScrollMode.write(value)
     }
     
+    private func onResetDelayTextFieldChange() {
+        let valueString = resetDelayTextField.stringValue
+        UserDefaultsProperties.keySequenceResetDelay.write(valueString)
+    }
+    
     private func onResetDelayTextFieldEndEditing() {
         let valueString = resetDelayTextField.stringValue
-        guard let value = Double(valueString) else {
+        if valueString.count > 0 && Double(valueString) == nil {
             showInvalidValueDialog(valueString)
             return
         }
-
-        UserDefaultsProperties.keySequenceResetDelay.write(value)
     }
-    
-    func controlTextDidEndEditing(_ notification: Notification) {
+
+    func controlTextDidChange(_ notification: Notification) {
         guard let textField = notification.object as? NSTextField else {
             return
         }
         
         if textField == hintModeKeySequenceTextField {
-            onHintModeKeySequenceTextFieldEndEditing()
+            onHintModeKeySequenceTextFieldChange()
             return
         }
 
         if textField == scrollModeKeySequenceTextField {
-            onScrollModeKeySequenceTextFieldEndEditing()
+            onScrollModeKeySequenceTextFieldChange()
+            return
+        }
+        
+        if textField == resetDelayTextField {
+            onResetDelayTextFieldChange()
+            return
+        }
+    }
+    
+    func controlTextDidEndEditing(_ notification: Notification) {
+        guard let textField = notification.object as? NSTextField else {
             return
         }
         
