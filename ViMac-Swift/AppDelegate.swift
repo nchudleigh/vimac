@@ -302,6 +302,15 @@ extension AppDelegate : NSWindowDelegate {
     }
     
     func windowWillClose(_ notification: Notification) {
+        Analytics.shared().identify(nil, traits: [
+            "Launch At Login": UserDefaults.standard.bool(forKey: Utils.shouldLaunchOnStartupKey),
+            "Force KB Layout ID": UserDefaults.standard.string(forKey: Utils.forceKeyboardLayoutKey),
+            "Hint Mode Key Sequence Enabled": UserDefaultsProperties.keySequenceHintModeEnabled.read(),
+            "Scroll Mode Key Sequence Enabled": UserDefaultsProperties.keySequenceScrollModeEnabled.read(),
+            "Non Native Support Enabled": UserDefaultsProperties.AXEnhancedUserInterfaceEnabled.read(),
+            "Electron Support Enabled": UserDefaultsProperties.AXManualAccessibilityEnabled.read()
+        ])
+        
         let transformState = ProcessApplicationTransformState(kProcessTransformToUIElementApplication)
         var psn = ProcessSerialNumber(highLongOfPSN: 0, lowLongOfPSN: UInt32(kCurrentProcess))
         TransformProcessType(&psn, transformState)
