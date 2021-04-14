@@ -10,9 +10,10 @@ import Cocoa
 import RxRelay
 
 class KeySequenceListener {
-    let mask = CGEventMask(1 << CGEventType.keyDown.rawValue)
+    let mask = CGEventMask(1 << CGEventType.keyDown.rawValue | 1 << CGEventType.keyUp.rawValue)
     var eventTap: GlobalEventTap?
     private let inputState: InputState
+    private var keyUps: [CGEvent] = []
     private var typed: [CGEvent] = []
     private var sequences: [[Character]] = []
     private var timer: Timer?
@@ -90,6 +91,11 @@ class KeySequenceListener {
             resetInput()
             return event
         }
+        
+        if event.type == .keyUp {
+            keyUps.append(event)
+            return event
+        }
 
         typed.append(event)
         try! inputState.advance(c)
@@ -123,16 +129,27 @@ class KeySequenceListener {
     
     private func emitTyped() {
         for keyDownEvent in typed {
+            guard let nsEvent = NSEvent(cgEvent: keyDownEvent) else { continue }
+
             keyDownEvent.post(tap: .cghidEventTap)
             
-            let keyUpEvent = keyDownEvent.copy()!
-            keyUpEvent.type = .keyUp
-            keyUpEvent.post(tap: .cghidEventTap)
+            let associatedKeyEvent = keyUps.first(where: { keyUp in
+                if let e = NSEvent(cgEvent: keyUp) {
+                    if e.charactersIgnoringModifiers == nsEvent.charactersIgnoringModifiers {
+                        return true
+                    }
+                }
+                return false
+            })
+            if let associatedKeyEvent = associatedKeyEvent {
+                associatedKeyEvent.post(tap: .cghidEventTap)
+            }
         }
     }
     
     private func resetInput() {
         typed = []
+        keyUps = []
         inputState.resetInput()
         timer?.invalidate()
     }
