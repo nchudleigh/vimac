@@ -57,8 +57,27 @@ class KeySequenceListener {
     func start() {
         if eventTap == nil {
             eventTap = GlobalEventTap(eventMask: mask, onEvent: { [weak self] event -> CGEvent? in
-                guard let self = self else { return event}
-                return self.onEvent(event: event)
+                guard let self = self else { return event }
+
+                if let nsEvent = NSEvent(cgEvent: event) {
+                    print("onEvent: characters:\(nsEvent.charactersIgnoringModifiers), keyUp?:\(event.type == .keyUp), repeat: \(nsEvent.isARepeat)")
+                    
+                    if !nsEvent.isARepeat {
+                        return nil
+                    }
+                }
+                
+                return event
+                
+//                let e =  self.onEvent(event: event)
+//
+//                if  let e = e,
+//                    let nsEvent = NSEvent(cgEvent: e) {
+//                    print("onEvent transformed: characters:\(nsEvent.charactersIgnoringModifiers), keyUp?:\(event.type == .keyUp), repeat: \(nsEvent.isARepeat)")
+//                } else {
+//                    print("onEvent suppressed event")
+//                }
+//                return e
             })
         }
         
@@ -75,6 +94,8 @@ class KeySequenceListener {
             resetInput()
             return event
         }
+        
+        print("onEvent: characters:\(nsEvent.charactersIgnoringModifiers), keyUp?:\(event.type == .keyUp), repeat: \(nsEvent.isARepeat)")
         
         let modifiersPresent = nsEvent.modifierFlags.rawValue != 256
         if modifiersPresent {
@@ -128,6 +149,7 @@ class KeySequenceListener {
     }
     
     private func emitTyped() {
+        print("emitTyped() called")
         for keyDownEvent in typed {
             guard let nsEvent = NSEvent(cgEvent: keyDownEvent) else { continue }
 
@@ -148,6 +170,8 @@ class KeySequenceListener {
     }
     
     private func resetInput() {
+        print("resetInput() called")
+        
         typed = []
         keyUps = []
         inputState.resetInput()
@@ -160,6 +184,8 @@ class KeySequenceListener {
     }
     
     private func setTimeout() {
+        print("setTimeout() called")
+        
         self.timer = Timer.scheduledTimer(timeInterval: resetDelay, target: self, selector: #selector(onTimeout), userInfo: nil, repeats: false)
     }
 }
