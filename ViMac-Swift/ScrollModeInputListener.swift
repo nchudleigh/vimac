@@ -19,6 +19,8 @@ enum ScrollDirection {
     case halfDown
     case halfUp
     case halfRight
+    case top
+    case bottom
 }
 
 enum ScrollState {

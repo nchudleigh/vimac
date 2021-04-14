@@ -12,6 +12,7 @@ import RxSwift
 class ScrollModeActiveScrollAreaViewController: NSViewController {
     let scrollArea: Element
     let inputListener: InputListener
+    var keySequenceTimer: Timer = Timer()
     var scrollModeInputState: ScrollModeInputState
     var borderView: BorderView?
     var scroller: Scroller?
@@ -76,6 +77,7 @@ class ScrollModeActiveScrollAreaViewController: NSViewController {
                 let status = try! self.scrollModeInputState.advance(key: c)
                 switch status {
                 case .advancable:
+                    self.setKeySequenceTimeout()
                     break
                 case .deadend:
                     self.resetInputState()
@@ -88,6 +90,16 @@ class ScrollModeActiveScrollAreaViewController: NSViewController {
         })
     }
     
+    @objc private func onTimeout() {
+        self.resetInputState()
+    }
+    
+    private func setKeySequenceTimeout() {
+        let resetDelay = 0.25
+        self.keySequenceTimer.invalidate()
+        self.keySequenceTimer = Timer.scheduledTimer(timeInterval: resetDelay, target: self, selector: #selector(onTimeout), userInfo: nil, repeats: false)
+    }
+    
     private func observeKeyUp() -> Disposable {
         return inputListener.keyUpEvents.bind(onNext: { [weak self] event in
             guard let self = self else { return }
@@ -97,7 +109,7 @@ class ScrollModeActiveScrollAreaViewController: NSViewController {
     }
     
     private func scroll(_ direction: ScrollDirection) {
-        if [.left, .right, .up, .down].contains(direction) {
+        if [.left, .right, .up, .down, .top, .bottom].contains(direction) {
             self.scroller = ChunkyScroller.instantiateForSmoothScroll(direction: direction)
             self.scroller?.start()
             return

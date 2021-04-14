@@ -62,6 +62,8 @@ HJKL keys can be used to scroll within the scroll area.
 | Scroll right | l |
 | Scroll down by half the height of the scroll area | d |
 | Scroll up by half the height of the scroll area | u |
+| Scroll to top of page | gg |
+| Scroll to bottom of page | G |
 | Activate another scroll area | `Tab` |
 | Exit | `Escape` |
 

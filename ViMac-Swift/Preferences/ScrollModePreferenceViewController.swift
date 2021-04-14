@@ -44,7 +44,7 @@ final class ScrollModePreferenceViewController: NSViewController, NSTextFieldDel
         let scrollKeysRow: [NSView] = [scrollKeysLabel, scrollKeysField]
         grid.addRow(with: scrollKeysRow)
         
-        let scrollKeysHint1 = NSTextField(wrappingLabelWithString: "Format: {left}{down}{up}{right}{half-down}{half-up}")
+        let scrollKeysHint1 = NSTextField(wrappingLabelWithString: "Format: {left},{down},{up},{right},{half-down},{half-up},{bottom},{top}")
         scrollKeysHint1.font = .labelFont(ofSize: 11)
         scrollKeysHint1.textColor = .secondaryLabelColor
         grid.addRow(with: [NSGridCell.emptyContentView, scrollKeysHint1])
@@ -82,9 +82,7 @@ final class ScrollModePreferenceViewController: NSViewController, NSTextFieldDel
     }
     
     func isScrollKeysValid(keys: String) -> Bool {
-        let isCountValid = keys.count == 4 || keys.count == 6
-        let areKeysUnique = keys.count == Set(keys).count
-        return isCountValid && areKeysUnique
+        return UserPreferences.ScrollMode.ScrollKeysProperty.isValid(value: keys)
     }
 
     func onScrollKeysFieldEndEditing() {
