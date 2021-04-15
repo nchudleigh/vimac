@@ -70,7 +70,15 @@ class HintsViewController: NSViewController {
     func renderHint(_ hint: Hint) -> HintView? {
         let view = HintView(associatedElement: hint.element, hintTextSize: CGFloat(textSize), hintText: hint.text, typedHintText: "")
         guard let elementFrame = self.elementFrame(hint.element) else { return nil }
-        let elementCenter: NSPoint = GeometryUtils.center(elementFrame)
+        
+        var elementCenter: NSPoint
+        if hint.element.role == "AXLink" {
+            // It's likely that the hint text size chosen by the user is roughly equivalent to their viewing text size, hence textSize being used as the offset.
+            elementCenter = GeometryUtils.corner(elementFrame, top: false, right: false, offset: CGFloat(textSize))
+        }
+        else {
+            elementCenter = GeometryUtils.center(elementFrame)
+        }
 
         let hintOrigin = NSPoint(
             x: elementCenter.x - (view.intrinsicContentSize.width / 2),
