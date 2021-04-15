@@ -41,6 +41,7 @@ class ScrollModeInputListener {
     
     let scrollEventSubject: PublishSubject<ScrollEvent> = PublishSubject()
     let escapeEventSubject: PublishSubject<Void> = PublishSubject()
+    let controlLeftBracketEventSubject: PublishSubject<Void> = PublishSubject()
     let tabEventSubject: PublishSubject<Void> = PublishSubject()
     
     init(scrollKeyConfig: ScrollKeyConfig, inputListener: InputListener) {
@@ -49,6 +50,7 @@ class ScrollModeInputListener {
 
         disposeBag.insert(observeScrollEvent(bindings: scrollKeyConfig.bindings))
         disposeBag.insert(observeEscapeKey())
+        disposeBag.insert(observeControlLeftBracketKeyCombo())
         disposeBag.insert(observeTabKey())
     }
     
@@ -70,6 +72,17 @@ class ScrollModeInputListener {
         })
         return escapeEvents.bind(onNext: { [weak self] _ in
             self!.escapeEventSubject.onNext(())
+        })
+    }
+    
+    func observeControlLeftBracketKeyCombo() -> Disposable {
+        let controlLeftBracketEvents = events().filter({ event in
+            event.keyCode == kVK_ANSI_LeftBracket &&
+                event.type == .keyDown &&
+                event.modifierFlags.rawValue & NSEvent.ModifierFlags.control.rawValue == NSEvent.ModifierFlags.control.rawValue
+        })
+        return controlLeftBracketEvents.bind(onNext: { [weak self] _ in
+            self!.controlLeftBracketEventSubject.onNext(())
         })
     }
     
