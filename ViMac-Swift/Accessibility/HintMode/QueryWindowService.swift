@@ -18,19 +18,13 @@ class QueryWindowService {
         self.window = window
     }
     
-    func perform() throws -> [Element] {
-        let elementTree = TraverseElementServiceFinder
+    func perform() -> [Element] {
+        let tree = ElementTree()
+        TraverseElementServiceFinder
             .init(app: app, element: window).find()
-            .init(element: window, app: app, windowElement: window, clipBounds: nil).perform()
+            .init(tree: tree, element: window, parent: nil, app: app, windowElement: window, clipBounds: nil).perform()
         
-        let elements: [Element] = {
-            if let elementTree = elementTree { return flattenElementTreeNode(node: elementTree) }
-            return []
-        }()
+        let elements = tree.query() ?? []
         return elements
-    }
-    
-    private func flattenElementTreeNode(node: ElementTreeNode) -> [Element] {
-        FlattenElementTreeNode(node).perform()
     }
 }

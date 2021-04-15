@@ -16,7 +16,7 @@ import Preferences
 import Segment
 
 @NSApplicationMain
-    class AppDelegate: NSObject, NSApplicationDelegate {
+class AppDelegate: NSObject, NSApplicationDelegate {
     var welcomeWindowController: NSWindowController?
     
     private lazy var focusedWindowDisturbedObservable: Observable<FrontmostApplicationService.ApplicationNotification> = createFocusedWindowDisturbedObservable()
@@ -41,7 +41,7 @@ import Segment
         
         InputSourceManager.initialize()
         overlayWindowController = OverlayWindowController()
-        modeCoordinator = ModeCoordinator(windowController: overlayWindowController)
+        modeCoordinator = ModeCoordinator()
         
         LaunchAtLogin.isEnabled = UserDefaults.standard.bool(forKey: Utils.shouldLaunchOnStartupKey)
         KeyboardShortcuts.shared.registerDefaults()
@@ -54,7 +54,7 @@ import Segment
         super.init()
     }
 
-    func applicationDidFinishLaunching(_ aNotification: Notification) {
+    func applicationDidFinishLaunching(_ aNotification: Notification) {        
         if isDuplicateAppInstance() {
             NSApp.terminate(self)
             return
@@ -226,36 +226,46 @@ import Segment
         _ = self.compositeDisposable.insert(focusedWindowDisturbedObservable
             .observeOn(MainScheduler.instance)
             .subscribe(onNext: { notification in
-                self.modeCoordinator.exitMode()
+                self.modeCoordinator.deactivate()
             })
         )
         
         _ = self.compositeDisposable.insert(windowObservable
             .observeOn(MainScheduler.instance)
             .subscribe(onNext: { windowOptional in
-                self.modeCoordinator.exitMode()
+                self.modeCoordinator.deactivate()
             })
         )
 
         _ = self.compositeDisposable.insert(hintModeShortcutObservable
             .observeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak self] _ in
-                if self?.modeCoordinator.windowController.window?.contentViewController?.className == HintModeViewController.className() {
-                    self?.modeCoordinator.exitMode()
-                } else {
-                    self?.modeCoordinator.setHintMode()
+                guard let self = self else { return }
+
+                if let modeController = self.modeCoordinator.modeController {
+                    if let _  = modeController as? HintModeController {
+                        self.modeCoordinator.deactivate()
+                        return
+                    }
                 }
+                
+                self.modeCoordinator.setHintMode(mechanism: "Shortcut")
             })
         )
         
         _ = self.compositeDisposable.insert(scrollModeShortcutObservable
             .observeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak self] _ in
-                if self?.modeCoordinator.windowController.window?.contentViewController?.className == ScrollModeViewController.className() {
-                    self?.modeCoordinator.exitMode()
-                } else {
-                    self?.modeCoordinator.setScrollMode()
+                guard let self = self else { return }
+                
+                if let modeController = self.modeCoordinator.modeController {
+                    if let _  = modeController as? ScrollModeController {
+                        self.modeCoordinator.deactivate()
+                        return
+                    }
                 }
+                
+                self.modeCoordinator.setScrollMode(mechanism: "Shortcut")
             })
         )
     }
@@ -292,6 +302,15 @@ extension AppDelegate : NSWindowDelegate {
     }
     
     func windowWillClose(_ notification: Notification) {
+        Analytics.shared().identify(nil, traits: [
+            "Launch At Login": UserDefaults.standard.bool(forKey: Utils.shouldLaunchOnStartupKey),
+            "Force KB Layout ID": UserDefaults.standard.string(forKey: Utils.forceKeyboardLayoutKey),
+            "Hint Mode Key Sequence Enabled": UserDefaultsProperties.keySequenceHintModeEnabled.read(),
+            "Scroll Mode Key Sequence Enabled": UserDefaultsProperties.keySequenceScrollModeEnabled.read(),
+            "Non Native Support Enabled": UserDefaultsProperties.AXEnhancedUserInterfaceEnabled.read(),
+            "Electron Support Enabled": UserDefaultsProperties.AXManualAccessibilityEnabled.read()
+        ])
+        
         let transformState = ProcessApplicationTransformState(kProcessTransformToUIElementApplication)
         var psn = ProcessSerialNumber(highLongOfPSN: 0, lowLongOfPSN: UInt32(kCurrentProcess))
         TransformProcessType(&psn, transformState)

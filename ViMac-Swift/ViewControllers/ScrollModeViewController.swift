@@ -11,6 +11,8 @@ import RxSwift
 import Segment
 
 class ScrollModeViewController: ModeViewController {
+    weak var delegate: ScrollModeController?
+    
     private let disposeBag = DisposeBag()
     private let inputListener = InputListener()
     private let window: Element
@@ -55,7 +57,7 @@ class ScrollModeViewController: ModeViewController {
             .subscribe(onSuccess: { [weak self] scrollAreas in
                 self?.setActiveState(scrollAreas: scrollAreas)
             }, onError: { [weak self] _ in
-                self?.modeCoordinator?.exitMode()
+                self?.delegate?.deactivate()
             })
     }
 
@@ -64,7 +66,7 @@ class ScrollModeViewController: ModeViewController {
         return escEvents
             .bind(onNext: { [weak self] _ in
                 Analytics.shared().track("Scroll Mode Deactivated")
-                self?.modeCoordinator?.exitMode()
+                self?.delegate?.deactivate()
             })
     }
 

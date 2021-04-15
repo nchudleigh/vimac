@@ -11,12 +11,10 @@ import Cocoa
 import AXSwift
 import RxSwift
 import Segment
+import os
+import UserNotifications
 
-protocol Coordinator {
-    var windowController: OverlayWindowController { get set }
-}
-
-class ModeCoordinator : Coordinator {
+class ModeCoordinator: ModeControllerDelegate {
     let disposeBag = DisposeBag()
     
     var priorKBLayout: InputSource?
@@ -27,123 +25,114 @@ class ModeCoordinator : Coordinator {
     let hintModeKeySequence: [Character] = ["f", "d"]
     private let keySequenceListener: VimacKeySequenceListener
     
-    var windowController: OverlayWindowController
+    var modeController: ModeController?
     
-    init(windowController: OverlayWindowController) {
-        self.windowController = windowController
-
+    init() {
         self.keySequenceListener = VimacKeySequenceListener()
         self.keySequenceListener.start()
         
         self.forceKBLayoutObservation = observeForceKBInputSource()
         
         disposeBag.insert(keySequenceListener.scrollMode.bind(onNext: { [weak self] _ in
-            self?.setScrollMode()
+            self?.setScrollMode(mechanism: "Key Sequence")
         }))
         
         disposeBag.insert(keySequenceListener.hintMode.bind(onNext: { [weak self] _ in
-            self?.setHintMode()
+            self?.setHintMode(mechanism: "Key Sequence")
         }))
     }
-
-    func onKeySequenceTyped(sequence: [Character]) {
-        if sequence == scrollModeKeySequence {
-            setScrollMode()
-        } else if sequence == hintModeKeySequence {
-            setHintMode()
-        }
+    
+    func deactivate() {
+        self.modeController?.deactivate()
     }
     
-    func exitMode() {
-        guard let vc = self.windowController.window?.contentViewController else {
-            return
+    func beforeModeActivation() {
+        self.priorKBLayout = InputSourceManager.currentInputSource()
+        if let forceKBLayout = self.forceKBLayout {
+            forceKBLayout.select()
         }
+        
+        keySequenceListener.stop()
+
+        os_log("[beforeModeActivation]: priorKBLayout=%@, forceKBLayout=%@", log: Log.accessibility, self.priorKBLayout?.id ?? "nil", self.forceKBLayout?.id ?? "nil")
+    }
+    
+    func modeDeactivated(controller: ModeController) {
+        self.modeController = nil
         
         if self.forceKBLayout != nil {
             self.priorKBLayout?.select()
         }
-
-        vc.view.removeFromSuperview()
-        self.windowController.window?.contentViewController = nil
-        self.windowController.close()
         
         keySequenceListener.start()
-    }
-    
-    func setViewController(vc: ModeViewController, screenFrame: NSRect) {
-        vc.modeCoordinator = self
-        self.windowController.window?.contentViewController = vc
-        self.windowController.fitToFrame(screenFrame)
-        self.windowController.showWindow(nil)
-        self.windowController.window?.makeKeyAndOrderFront(nil)
+        
+        os_log("[modeDeactivated]: priorKBLayout=%@, forceKBLayout=%@", log: Log.accessibility, self.priorKBLayout?.id ?? "nil", self.forceKBLayout?.id ?? "nil")
+        
+        let activationCount = UserDefaults.standard.integer(forKey: "hintModeActivationCount")
+        let sentPMFSurvey = UserDefaults.standard.bool(forKey: "shownPMFSurveyAlert")
+        if activationCount > 350 && !sentPMFSurvey {
+            UserDefaults.standard.set(true, forKey: "shownPMFSurveyAlert")
+            showPMFSurvey()
+        }
     }
 
-    func setScrollMode() {
+    func setScrollMode(mechanism: String) {
+        if let modeController = modeController {
+            modeController.deactivate()
+        }
+        
         guard let frontmostApp = NSWorkspace.shared.frontmostApplication,
             let focusedWindow = focusedWindow(app: frontmostApp) else {
-            self.exitMode()
             return
         }
         
         // the app crashes when talking to its own accessibility server
         let isTargetVimac = frontmostApp.bundleIdentifier == Bundle.main.bundleIdentifier
         if isTargetVimac {
-            self.exitMode()
             return
         }
         
+        beforeModeActivation()
+        
         Analytics.shared().track("Scroll Mode Activated", properties: [
-            "Target Application": frontmostApp.bundleIdentifier as Any
+            "Target Application": frontmostApp.bundleIdentifier as Any,
+            "Activation Mechanism": mechanism
         ])
         
-        let focusedWindowFrame = GeometryUtils.convertAXFrameToGlobal(focusedWindow.frame)
-        let screenFrame = activeScreenFrame(focusedWindowFrame: focusedWindowFrame)
-        
-        self.priorKBLayout = InputSourceManager.currentInputSource()
-        if let forceKBLayout = self.forceKBLayout {
-            forceKBLayout.select()
-        }
-        let vc = ScrollModeViewController.init(window: focusedWindow)
-        self.setViewController(vc: vc, screenFrame: screenFrame)
-        
-        keySequenceListener.stop()
+        modeController = ScrollModeController(window: focusedWindow)
+        modeController?.delegate = self
+        modeController!.activate()
     }
     
-    func setHintMode() {
+    func setHintMode(mechanism: String) {
+        if let modeController = modeController {
+            modeController.deactivate()
+        }
+        
         let app = NSWorkspace.shared.frontmostApplication
         let window = app.flatMap { focusedWindow(app: $0) }
-
-        let screenFrame: NSRect = {
-            if let window = window {
-                let focusedWindowFrame: NSRect = GeometryUtils.convertAXFrameToGlobal(window.frame)
-                let screenFrame = activeScreenFrame(focusedWindowFrame: focusedWindowFrame)
-                return screenFrame
-            }
-            return NSScreen.main!.frame
-        }()
         
         if let app = app {
             // the app crashes when talking to its own accessibility server
             let isTargetVimac = app.bundleIdentifier == Bundle.main.bundleIdentifier
             if isTargetVimac {
-                self.exitMode()
                 return
             }
         }
         
+        beforeModeActivation()
+        
         Analytics.shared().track("Hint Mode Activated", properties: [
-            "Target Application": app?.bundleIdentifier as Any
+            "Target Application": app?.bundleIdentifier as Any,
+            "Activation Mechanism": mechanism
         ])
         
-        self.priorKBLayout = InputSourceManager.currentInputSource()
-        if let forceKBLayout = self.forceKBLayout {
-            forceKBLayout.select()
-        }
-
-        let vc = HintModeViewController.init(app: app, window: window)
-        self.setViewController(vc: vc, screenFrame: screenFrame)
+        let activationCount = UserDefaults.standard.integer(forKey: "hintModeActivationCount")
+        UserDefaults.standard.set(activationCount + 1, forKey: "hintModeActivationCount")
         
-        keySequenceListener.stop()
+        modeController = HintModeController(app: app, window: window)
+        modeController?.delegate = self
+        modeController!.activate()
     }
     
     func observeForceKBInputSource() -> NSKeyValueObservation {
@@ -169,21 +158,24 @@ class ModeCoordinator : Coordinator {
         return Element.initialize(rawElement: axWindow.element)
     }
     
-    private func activeScreenFrame(focusedWindowFrame: NSRect) -> NSRect {
-        // When the focused window is in full screen mode in a secondary display,
-        // NSScreen.main will point to the primary display.
-        // this is a workaround.
-        var activeScreen = NSScreen.main!
-        var maxArea: CGFloat = 0
-        for screen in NSScreen.screens {
-            let intersection = screen.frame.intersection(focusedWindowFrame)
-            let area = intersection.width * intersection.height
-            if area > maxArea {
-                maxArea = area
-                activeScreen = screen
-            }
+    func showPMFSurvey() {
+        Analytics.shared().track("PMF Survey Alert Shown")
+        
+        let alert = NSAlert()
+        alert.messageText = "Help us improve Vimac!"
+        alert.informativeText = "Mind sharing your experience using Vimac? This would really help us improve Vimac."
+        alert.alertStyle = .informational
+        alert.addButton(withTitle: "Yes")
+        alert.addButton(withTitle: "No")
+        let response = alert.runModal()
+        if response == .alertFirstButtonReturn {
+            Analytics.shared().track("Opening PMF Survey")
+
+            let url = URL(string: "https://vimacapp.com/pmf-survey")!
+            _ = NSWorkspace.shared.open(url)
+        } else {
+            Analytics.shared().track("PMF Survey Alert Dismissed")
         }
-        return activeScreen.frame
     }
 }
 
