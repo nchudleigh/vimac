@@ -58,9 +58,11 @@ class ChunkyScroller: Scroller {
             case .up:
                 yAxis = Int32(sensitivity)
             case .bottom:
-                yAxis = -Int32.max
+                yAxis = Int32(Int16.min)
             case .top:
-                yAxis = Int32.max
+                // Some applications (VS Code) have issues using Int32.max to scroll. Instead of scrolling to the top, they scroll to the bottom.
+                // Not sure what causes this.
+                yAxis = Int32(Int16.max)
             default:
                 fatalError("half-<direction> scroll directions should not used for smooth scrolling")
         }
@@ -68,6 +70,7 @@ class ChunkyScroller: Scroller {
         let isHorizontalScrollReversed = UserPreferences.ScrollMode.ReverseHorizontalScrollProperty.read()
         let isVerticalScrollReversed = UserPreferences.ScrollMode.ReverseVerticalScrollProperty.read()
         
+        var frequency: Double
         if ![.bottom, .top].contains(direction) {
             if isHorizontalScrollReversed {
                 xAxis = -xAxis
@@ -76,9 +79,12 @@ class ChunkyScroller: Scroller {
             if isVerticalScrollReversed {
                 yAxis = -yAxis
             }
+            
+            frequency = 1.0 / 50.0
         }
-        
-        let frequency = 1.0 / 50.0
+        else {
+            frequency = 0.25
+        }
         
         return ChunkyScroller(frequency: frequency, xAxis: xAxis, yAxis: yAxis)
     }

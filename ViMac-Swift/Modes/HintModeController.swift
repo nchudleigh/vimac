@@ -37,7 +37,11 @@ enum HintModeInputIntent {
 
     static func from(event: NSEvent) -> HintModeInputIntent? {
         if event.type != .keyDown { return nil }
-        if event.keyCode == kVK_Escape { return .exit }
+        if event.keyCode == kVK_Escape ||
+            (event.keyCode == kVK_ANSI_LeftBracket &&
+                event.modifierFlags.rawValue & NSEvent.ModifierFlags.control.rawValue == NSEvent.ModifierFlags.control.rawValue) {
+            return .exit
+        }
         if event.keyCode == kVK_Delete { return .backspace }
         if event.keyCode == kVK_Space { return .rotate }
 
