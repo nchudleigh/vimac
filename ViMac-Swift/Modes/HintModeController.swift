@@ -313,26 +313,30 @@ class HintModeController: ModeController {
     
     private func performHintAction(_ hint: Hint, action: HintAction) {
         let element = hint.element
+        let clickPosition: NSPoint = {
+            // hints are shown at the bottom-left for AXLinks (see HintsViewController#renderHint),
+            // so a click is performed there
+            if element.role == "AXLink" {
+                return NSPoint(
+                    // tiny offset in case clicking on the edge of the element does nothing
+                    x: element.frame.origin.x + 5,
+                    y: element.frame.origin.y + element.frame.height - 5
+                )
+            }
+            return GeometryUtils.center(element.frame)
+        }()
 
-        let frame = element.clippedFrame ?? element.frame
-        let position = frame.origin
-        let size = frame.size
-
-        let centerPositionX = position.x + (size.width / 2)
-        let centerPositionY = position.y + (size.height / 2)
-        let centerPosition = NSPoint(x: centerPositionX, y: centerPositionY)
-
-        Utils.moveMouse(position: centerPosition)
+        Utils.moveMouse(position: clickPosition)
 
         switch action {
         case .leftClick:
-            Utils.leftClickMouse(position: centerPosition)
+            Utils.leftClickMouse(position: clickPosition)
         case .rightClick:
-            Utils.rightClickMouse(position: centerPosition)
+            Utils.rightClickMouse(position: clickPosition)
         case .doubleLeftClick:
-            Utils.doubleLeftClickMouse(position: centerPosition)
+            Utils.doubleLeftClickMouse(position: clickPosition)
         case .move:
-            Utils.moveMouse(position: centerPosition)
+            Utils.moveMouse(position: clickPosition)
         }
     }
     

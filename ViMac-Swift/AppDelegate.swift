@@ -310,7 +310,7 @@ extension AppDelegate : NSWindowDelegate {
             "Non Native Support Enabled": UserDefaultsProperties.AXEnhancedUserInterfaceEnabled.read(),
             "Electron Support Enabled": UserDefaultsProperties.AXManualAccessibilityEnabled.read()
         ])
-        
+            
         let transformState = ProcessApplicationTransformState(kProcessTransformToUIElementApplication)
         var psn = ProcessSerialNumber(highLongOfPSN: 0, lowLongOfPSN: UInt32(kCurrentProcess))
         TransformProcessType(&psn, transformState)
