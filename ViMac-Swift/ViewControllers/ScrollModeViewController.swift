@@ -29,6 +29,7 @@ class ScrollModeViewController: ModeViewController {
     override func viewWillAppear() {
         observeScrollAreas().disposed(by: disposeBag)
         observeEscKey().disposed(by: disposeBag)
+        observeControlLeftBracketKeyCombo().disposed(by: disposeBag)
     }
 
     private func setActiveState(scrollAreas: [Element]) {
@@ -65,7 +66,19 @@ class ScrollModeViewController: ModeViewController {
         let escEvents = inputListener.keyDownEvents.filter { $0.keyCode == kVK_Escape }
         return escEvents
             .bind(onNext: { [weak self] _ in
-                Analytics.shared().track("Scroll Mode Deactivated")
+                Analytics.shared().track("Scroll Mode Deactivated with Escape")
+                self?.delegate?.deactivate()
+            })
+    }
+    
+    private func observeControlLeftBracketKeyCombo() -> Disposable {
+        let controlLeftBracketEvents = inputListener.keyDownEvents.filter {
+            $0.keyCode == kVK_ANSI_LeftBracket &&
+            $0.modifierFlags.rawValue & NSEvent.ModifierFlags.control.rawValue == NSEvent.ModifierFlags.control.rawValue
+        }
+        return controlLeftBracketEvents
+            .bind(onNext: { [weak self] _ in
+                Analytics.shared().track("Scroll Mode Deactivated with Control + [")
                 self?.delegate?.deactivate()
             })
     }

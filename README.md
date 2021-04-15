@@ -39,7 +39,7 @@ Simply type the assigned "hint-text" (eg. "sa") to perform a click at the locati
 | Double left click | Type the assigned hint-text while holding `Command` |
 | Move cursor | Type the assigned hint-text while holding `Option` |
 | Rotate hints | `Space` |
-| Exit | `Escape` |
+| Exit | `Escape` or `Control + [`|
 
 Tip(s):
 - After executing a right-click action, use `Control-N` and `Control-P` to select the next and previous context menu item respectively.
@@ -65,7 +65,7 @@ HJKL keys can be used to scroll within the scroll area.
 | Scroll to top of page | gg |
 | Scroll to bottom of page | G |
 | Activate another scroll area | `Tab` |
-| Exit | `Escape` |
+| Exit | `Escape` or `Control + [`|
 
 You can also scroll up/down/left/right by half a page by holding `Shift` when pressing the `hjkl` keys.
 
