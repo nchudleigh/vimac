@@ -66,7 +66,9 @@ class HintsViewController: NSViewController {
         }
         self.hintViews = shuffledHintViews
     }
-    
+
+    // are you changing the location where hints are rendered?
+    // make sure to update HintModeController#performHintAction as well
     func renderHint(_ hint: Hint) -> HintView? {
         let view = HintView(associatedElement: hint.element, hintTextSize: CGFloat(textSize), hintText: hint.text, typedHintText: "")
         guard let elementFrame = self.elementFrame(hint.element) else { return nil }
