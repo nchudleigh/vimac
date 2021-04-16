@@ -301,6 +301,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             "Force KB Layout ID": UserDefaults.standard.string(forKey: Utils.forceKeyboardLayoutKey),
             "Hint Mode Key Sequence Enabled": UserDefaultsProperties.keySequenceHintModeEnabled.read(),
             "Scroll Mode Key Sequence Enabled": UserDefaultsProperties.keySequenceScrollModeEnabled.read(),
+            "Hint Mode Key Sequence": UserDefaultsProperties.keySequenceHintMode.read(),
+            "Scroll Mode Key Sequence": UserDefaultsProperties.keySequenceScrollMode.read(),
             "Non Native Support Enabled": UserDefaultsProperties.AXEnhancedUserInterfaceEnabled.read(),
             "Electron Support Enabled": UserDefaultsProperties.AXManualAccessibilityEnabled.read()
         ])
