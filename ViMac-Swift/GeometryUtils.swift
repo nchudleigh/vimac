@@ -16,6 +16,44 @@ class GeometryUtils {
         )
     }
     
+    static func corner(_ frame: NSRect, top: Bool, right: Bool, offset: CGFloat) -> NSPoint {
+        var x = CGFloat(0)
+        var y = CGFloat(0)
+        
+        var xOffset = CGFloat(0)
+        var yOffset = CGFloat(0)
+        
+        if offset < frame.width {
+            xOffset = offset
+        }
+        else {
+            xOffset = CGFloat(0)
+        }
+        
+        if offset < frame.height {
+            yOffset = offset
+        }
+        else {
+            yOffset = CGFloat(0)
+        }
+        
+        if right {
+            x = frame.maxX - xOffset
+        }
+        else {
+            x = frame.origin.x + xOffset
+        }
+        
+        if top {
+            y = frame.maxY - yOffset
+        }
+        else {
+            y = frame.origin.y + yOffset
+        }
+        
+        return NSPoint(x: x, y: y)
+    }
+    
     static func convertGlobalFrame(_ globalFrame: NSRect, relativeTo: NSPoint) -> NSRect {
         let menuBarScreen = NSScreen.screens.first!
         
