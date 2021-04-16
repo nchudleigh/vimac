@@ -20,11 +20,9 @@ class ModeCoordinator: ModeControllerDelegate {
     var priorKBLayout: InputSource?
     var forceKBLayout: InputSource?
     var forceKBLayoutObservation: NSKeyValueObservation?
-    
-    let scrollModeKeySequence: [Character] = ["j", "k"]
-    let hintModeKeySequence: [Character] = ["f", "d"]
+
     private let keySequenceListener: VimacKeySequenceListener
-    
+    lazy var holdKeyListener = HoldKeyListener(keys: ["f", "a"])
     var modeController: ModeController?
     
     init() {
@@ -40,6 +38,9 @@ class ModeCoordinator: ModeControllerDelegate {
         disposeBag.insert(keySequenceListener.hintMode.bind(onNext: { [weak self] _ in
             self?.setHintMode(mechanism: "Key Sequence")
         }))
+        
+        self.holdKeyListener.delegate = self
+        self.holdKeyListener.start()
     }
     
     func deactivate() {
@@ -175,6 +176,30 @@ class ModeCoordinator: ModeControllerDelegate {
             _ = NSWorkspace.shared.open(url)
         } else {
             Analytics.shared().track("PMF Survey Alert Dismissed")
+        }
+    }
+}
+
+extension ModeCoordinator: HoldKeyListenerDelegate {
+    func onKeyHeld(key: String) {
+        if key == "f" {
+            if let modeController = self.modeController {
+                if let _  = modeController as? HintModeController {
+                    self.deactivate()
+                    return
+                }
+            }
+            
+            self.setHintMode(mechanism: "Key Hold")
+        } else if key == "a" {
+            if let modeController = self.modeController {
+                if let _  = modeController as? ScrollModeController {
+                    self.deactivate()
+                    return
+                }
+            }
+            
+            self.setScrollMode(mechanism: "Key Hold")
         }
     }
 }

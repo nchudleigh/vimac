@@ -9,6 +9,135 @@
 import Cocoa
 import RxRelay
 
+enum HoldState: Equatable {
+    case nothing
+    case awaitingDelay(key: String)
+    case postAction(key: String)
+}
+
+protocol HoldKeyListenerDelegate: AnyObject {
+    func onKeyHeld(key: String)
+}
+
+class HoldKeyListener {
+    let keys: [String]
+    
+    var state = HoldState.nothing
+    
+    var suppressedHintModeKeyDown: CGEvent?
+    var suppressedScrollModeKeyDown: CGEvent?
+    var timer: Timer?
+
+    var eventTap: GlobalEventTap?
+    weak var delegate: HoldKeyListenerDelegate?
+    
+    init(keys: [String]) {
+        self.keys = keys
+    }
+        
+    func start() {
+        if eventTap == nil {
+            let mask = CGEventMask(1 << CGEventType.keyDown.rawValue | 1 << CGEventType.keyUp.rawValue)
+            eventTap = GlobalEventTap(eventMask: mask, onEvent: { [weak self] event -> CGEvent? in
+                guard let self = self else { return event}
+                return self.onEvent(event: event)
+            })
+        }
+        
+        _ = eventTap?.enable()
+    }
+    
+    func onEvent(event: CGEvent) -> CGEvent? {
+        guard let nsEvent = NSEvent(cgEvent: event) else { return event }
+        
+        let modifiersPresent = nsEvent.modifierFlags.rawValue != 256
+        if modifiersPresent { return event }
+
+        guard let characters = nsEvent.characters else { return event }
+        
+        if state == .nothing  {
+            if nsEvent.type == .keyDown && !nsEvent.isARepeat && keys.contains(characters) {
+                self.suppressedHintModeKeyDown = event
+                setAwaitingKey(characters)
+                return nil
+            }
+            return event
+        }
+        
+        if case let .postAction(key) = state {
+            if nsEvent.type == .keyUp && characters == key {
+                self.state = .nothing
+                return nil
+            }
+            
+            if nsEvent.type == .keyDown && nsEvent.isARepeat && characters == key {
+                return nil
+            }
+            
+            return nil
+        }
+        
+        if case let .awaitingDelay(key) = state {
+            if nsEvent.type == .keyDown && nsEvent.isARepeat && characters == key {
+                return nil
+            }
+            
+            if nsEvent.type == .keyUp && characters == key {
+                self.timer!.invalidate()
+                self.timer = nil
+                self.state = .nothing
+                
+                self.suppressedHintModeKeyDown!.post(tap: .cghidEventTap)
+                let keyUp = suppressedHintModeKeyDown!.copy()!
+                keyUp.type = .keyUp
+                keyUp.post(tap: .cghidEventTap)
+                
+                return nil
+            }
+
+            if nsEvent.type == .keyDown && characters != key {
+                self.timer!.invalidate()
+                self.timer = nil
+                self.state = .nothing
+                
+                self.suppressedHintModeKeyDown!.post(tap: .cghidEventTap)
+                event.post(tap: .cghidEventTap)
+                
+                return nil
+            }
+            
+            return nil
+        }
+        
+        fatalError("onEvent(): unhandled state \(state)")
+    }
+    
+    func setAwaitingKey(_ key: String) {
+        if self.timer != nil {
+            fatalError("setAwaitingHintMode() called with self.timer != nil")
+        }
+        
+        self.state = .awaitingDelay(key: key)
+        self.timer = Timer.scheduledTimer(timeInterval: 0.25, target: self, selector: #selector(onAwaitingKeyTimeout), userInfo: nil, repeats: false)
+    }
+    
+    @objc func onAwaitingKeyTimeout() {
+        guard case let .awaitingDelay(key) = state else {
+            fatalError("onAwaitingKeyTimeout() called with invalid state \(state)")
+        }
+        
+        self.timer = nil
+        self.state = .postAction(key: key)
+        
+        onKeyHeld(key: key)
+    }
+    
+    func onKeyHeld(key: String) {
+        print("onKeyHeld(): \(key)")
+        self.delegate?.onKeyHeld(key: key)
+    }
+}
+
 class KeySequenceListener {
     let mask = CGEventMask(1 << CGEventType.keyDown.rawValue | 1 << CGEventType.keyUp.rawValue)
     var eventTap: GlobalEventTap?
@@ -81,6 +210,7 @@ class KeySequenceListener {
         let modifiersPresent = nsEvent.modifierFlags.rawValue != 256
         if modifiersPresent {
             self.lastTypeDate = Date()
+            
             resetInput()
             return event
         }
