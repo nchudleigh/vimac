@@ -46,7 +46,7 @@ class ModeCoordinator: ModeControllerDelegate {
         self.modeController?.deactivate()
     }
     
-    func beforeModeActivation() {
+    func beforeModeActivation() {        
         self.priorKBLayout = InputSourceManager.currentInputSource()
         if let forceKBLayout = self.forceKBLayout {
             forceKBLayout.select()
@@ -162,16 +162,16 @@ class ModeCoordinator: ModeControllerDelegate {
         Analytics.shared().track("PMF Survey Alert Shown")
         
         let alert = NSAlert()
-        alert.messageText = "Help us improve Vimac!"
-        alert.informativeText = "Mind sharing your experience using Vimac? This would really help us improve Vimac."
+        alert.messageText = "Congrats on hitting 350 activations! 🚀"
+        alert.informativeText = "Mind sharing your experience using Vimac? Your feedback is valuable and will help us make Vimac even better."
         alert.alertStyle = .informational
-        alert.addButton(withTitle: "Yes")
+        alert.addButton(withTitle: "Yes!")
         alert.addButton(withTitle: "No")
         let response = alert.runModal()
         if response == .alertFirstButtonReturn {
             Analytics.shared().track("Opening PMF Survey")
 
-            let url = URL(string: "https://vimacapp.com/pmf-survey")!
+            let url = URL(string: "https://vimacapp.com/pmf-survey?anon-id=\(Analytics.shared().getAnonymousId())")!
             _ = NSWorkspace.shared.open(url)
         } else {
             Analytics.shared().track("PMF Survey Alert Dismissed")
