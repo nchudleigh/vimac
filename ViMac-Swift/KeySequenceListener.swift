@@ -18,7 +18,7 @@ class KeySequenceListener {
     private var sequences: [[Character]] = []
     private var timer: Timer?
     private let resetDelay: TimeInterval
-    private let typingDelay: TimeInterval = 1
+    private let typingDelay: TimeInterval = 0.5
     private var lastTypeDate: Date?
     
     private let matchRelay: PublishRelay<([Character])> = .init()
