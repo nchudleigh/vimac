@@ -13,7 +13,7 @@ struct UserDefaultsProperties {
     static let keySequenceHintMode = UserDefaultsProperty<String>.init("keySequenceHintMode", defaultValue: "")
     static let keySequenceScrollModeEnabled = UserDefaultsProperty<Bool>.init("keySequenceScrollModeEnabled", defaultValue: false)
     static let keySequenceScrollMode = UserDefaultsProperty<String>.init("keySequenceScrollMode", defaultValue: "")
-    static let keySequenceResetDelay = UserDefaultsProperty<TimeInterval>.init("keySequenceResetDelay", defaultValue: 0.25)
+    static let keySequenceResetDelay = UserDefaultsProperty<String>.init("keySequenceResetDelay", defaultValue: "0.25")
     
     static let AXEnhancedUserInterfaceEnabled = UserDefaultsProperty<Bool>.init("AXEnhancedUserInterfaceEnabled", defaultValue: false)
     static let AXManualAccessibilityEnabled = UserDefaultsProperty<Bool>.init("AXManualAccessibilityEnabled", defaultValue: false)

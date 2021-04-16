@@ -16,7 +16,7 @@ class BindingsRepository {
             hintModeKeySequence: UserDefaultsProperties.keySequenceHintMode.read(),
             scrollModeKeySequenceEnabled: UserDefaultsProperties.keySequenceScrollModeEnabled.read(),
             scrollModeKeySequence: UserDefaultsProperties.keySequenceScrollMode.read(),
-            resetDelay: UserDefaultsProperties.keySequenceResetDelay.read()
+            resetDelay: Double(UserDefaultsProperties.keySequenceResetDelay.read()) ?? Double(UserDefaultsProperties.keySequenceResetDelay.defaultValue)!
         )
     }
     

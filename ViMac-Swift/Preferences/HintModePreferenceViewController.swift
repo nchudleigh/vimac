@@ -38,6 +38,7 @@ final class HintModePreferenceViewController: NSViewController, NSTextFieldDeleg
         customCharactersField = NSTextField()
         customCharactersField.delegate = self
         customCharactersField.stringValue = UserPreferences.HintMode.CustomCharactersProperty.readUnvalidated() ?? ""
+        customCharactersField.placeholderString = UserPreferences.HintMode.CustomCharactersProperty.defaultValue
         let customCharactersRow: [NSView] = [customCharactersLabel, customCharactersField]
         grid.addRow(with: customCharactersRow)
         
@@ -71,14 +72,17 @@ final class HintModePreferenceViewController: NSViewController, NSTextFieldDeleg
         ])
     }
     
+    func onCustomCharactersFieldChange() {
+        let value = customCharactersField.stringValue
+        UserPreferences.HintMode.CustomCharactersProperty.save(value: value)
+    }
+    
     func onCustomCharactersFieldEndEditing() {
         let value = customCharactersField.stringValue
         let isValid = UserPreferences.HintMode.CustomCharactersProperty.isValid(value: value)
         
         if value.count > 0 && !isValid {
             showInvalidValueDialog(value)
-        } else {
-            UserPreferences.HintMode.CustomCharactersProperty.save(value: value)
         }
     }
     
@@ -88,8 +92,27 @@ final class HintModePreferenceViewController: NSViewController, NSTextFieldDeleg
 
         if value.count > 0 && !isValid {
             showInvalidValueDialog(value)
-        } else {
-            UserPreferences.HintMode.TextSizeProperty.save(value: value)
+        }
+    }
+    
+    func onTextSizeFieldChange() {
+        let value = textSizeField.stringValue
+        UserPreferences.HintMode.TextSizeProperty.save(value: value)
+    }
+    
+    func controlTextDidChange(_ notification: Notification) {
+        guard let textField = notification.object as? NSTextField else {
+            return
+        }
+        
+        if textField == customCharactersField {
+            onCustomCharactersFieldChange()
+            return
+        }
+
+        if textField == textSizeField {
+            onTextSizeFieldChange()
+            return
         }
     }
     

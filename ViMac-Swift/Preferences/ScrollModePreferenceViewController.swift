@@ -84,6 +84,11 @@ final class ScrollModePreferenceViewController: NSViewController, NSTextFieldDel
     func isScrollKeysValid(keys: String) -> Bool {
         return UserPreferences.ScrollMode.ScrollKeysProperty.isValid(value: keys)
     }
+    
+    func onScrollKeysFieldChange() {
+        let value = scrollKeysField.stringValue
+        UserPreferences.ScrollMode.ScrollKeysProperty.save(value: value)
+    }
 
     func onScrollKeysFieldEndEditing() {
         let value = scrollKeysField.stringValue
@@ -91,8 +96,6 @@ final class ScrollModePreferenceViewController: NSViewController, NSTextFieldDel
         
         if value.count > 0 && !isValid {
             showInvalidValueDialog(value)
-        } else {
-            UserPreferences.ScrollMode.ScrollKeysProperty.save(value: value)
         }
     }
     
@@ -114,6 +117,17 @@ final class ScrollModePreferenceViewController: NSViewController, NSTextFieldDel
     @objc func onRevVerticalScrollEdit() {
         let value = revVerticalScrollView.state == .on
         UserPreferences.ScrollMode.ReverseVerticalScrollProperty.save(value: value)
+    }
+    
+    func controlTextDidChange(_ notification: Notification) {
+        guard let textField = notification.object as? NSTextField else {
+            return
+        }
+        
+        if textField == scrollKeysField {
+            onScrollKeysFieldChange()
+            return
+        }
     }
     
     func controlTextDidEndEditing(_ notification: Notification) {
