@@ -80,6 +80,7 @@ class KeySequenceListener {
         
         let modifiersPresent = nsEvent.modifierFlags.rawValue != 256
         if modifiersPresent {
+            self.lastTypeDate = Date()
             resetInput()
             return event
         }
@@ -101,6 +102,7 @@ class KeySequenceListener {
         
         if let lastTypeDate = lastTypeDate {
             if Date() < lastTypeDate.addingTimeInterval(self.typingDelay) {
+                self.lastTypeDate = Date()
                 return event
             }
         }
