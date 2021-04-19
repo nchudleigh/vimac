@@ -10,7 +10,7 @@ You can download Vimac [here](https://vimacapp.com). Unzip the file and move `Vi
 
 You will be redirected to a tutorial that will get you up-and-running with Vimac.
 
-Alternatively, you can refer to the manual [here](https://github.com/dexterleng/vimac/blob/master/docs/manual.md).
+Alternatively, you can refer to the manual [here](https://vimacapp.com/manual).
 
 ## How does Vimac work?
 
