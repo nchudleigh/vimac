@@ -96,10 +96,10 @@ class VimacKeySequenceListener {
     
     func createKeySequenceListener(config: BindingsConfig) -> KeySequenceListener? {
         var sequences: [[Character]] = []
-        if config.hintModeKeySequenceEnabled {
+        if config.hintModeKeySequenceEnabled && config.hintModeKeySequence.count > 1 {
             sequences.append(Array(config.hintModeKeySequence))
         }
-        if config.scrollModeKeySequenceEnabled {
+        if config.scrollModeKeySequenceEnabled && config.scrollModeKeySequence.count > 1 {
             sequences.append(Array(config.scrollModeKeySequence))
         }
         
