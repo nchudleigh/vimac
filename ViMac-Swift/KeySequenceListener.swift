@@ -71,6 +71,11 @@ class KeySequenceListener {
     }
     
     private func onEvent(event: CGEvent) -> CGEvent? {
+        // crashes if you attempt to cast it to NSEvent
+        if event.type == .tapDisabledByTimeout || event.type == .tapDisabledByUserInput {
+            return event
+        }
+        
         guard let nsEvent = NSEvent(cgEvent: event) else {
             resetInput()
             return event
