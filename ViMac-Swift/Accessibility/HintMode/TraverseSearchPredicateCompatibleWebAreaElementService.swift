@@ -68,7 +68,7 @@ class TraverseSearchPredicateCompatibleWebAreaElementService : TraverseElementSe
     }
     
     private func getRecursiveChildrenThroughSearchPredicate() throws -> [Element]? {
-        var query: [String: Any] = [
+        let queryAnySearchKey: [String: Any] = [
             "AXDirection": "AXDirectionNext",
             "AXImmediateDescendantsOnly": false,
             "AXResultsLimit": -1,
@@ -76,7 +76,8 @@ class TraverseSearchPredicateCompatibleWebAreaElementService : TraverseElementSe
             "AXSearchKey": "AXAnyTypeSearchKey"
         ]
         
-        let searchKeys = [
+        var queryWithSearchKeys = queryAnySearchKey
+        queryWithSearchKeys["AXSearchKey"] = [
             "AXButtonSearchKey",
             "AXCheckBoxSearchKey",
             "AXControlSearchKey",
@@ -86,11 +87,12 @@ class TraverseSearchPredicateCompatibleWebAreaElementService : TraverseElementSe
             "AXTextFieldSearchKey"
         ]
         
-        if app.bundleIdentifier == "com.apple.Safari" || app.bundleIdentifier == "com.google.Chrome.canary" {
-            query["AXSearchKey"] = searchKeys
-        }
+        let queryToUse: [String : Any] = {
+            let searchKeysCount: Int = (try? UIElement(element.rawElement).parameterizedAttribute("AXUIElementCountForSearchPredicate", param: queryWithSearchKeys)) ?? 0
+            return searchKeysCount == 0 ? queryAnySearchKey : queryWithSearchKeys
+        }()
         
-        let rawElements: [AXUIElement]? = try UIElement(element.rawElement).parameterizedAttribute("AXUIElementsForSearchPredicate", param: query)
+        let rawElements: [AXUIElement]? = try UIElement(element.rawElement).parameterizedAttribute("AXUIElementsForSearchPredicate", param: queryToUse)
         let elements = rawElements?
             .map({ Element.initialize(rawElement: $0) })
             .compactMap({ $0 })
