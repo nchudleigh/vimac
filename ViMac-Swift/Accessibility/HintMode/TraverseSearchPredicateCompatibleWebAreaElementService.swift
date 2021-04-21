@@ -67,6 +67,11 @@ class TraverseSearchPredicateCompatibleWebAreaElementService : TraverseElementSe
         return element.frame
     }
     
+    // use search predicates to query for web area children elements
+    // Note: There is a difference in implementation of search keys for Chromium and WebKit,
+    // hence the need to have different approaches "one-shot with all search keys" (WebKit) vs "multiple-shots with a single search key" (Chromium)
+    // Chromium has fixed their implementation to act like WebKit, but current versions (~90.0) need this workaround.
+    // https://chromium-review.googlesource.com/c/chromium/src/+/2773520
     private func getRecursiveChildrenThroughSearchPredicate() throws -> [Element]? {
         let queryAnySearchKey: [String: Any] = [
             "AXDirection": "AXDirectionNext",
