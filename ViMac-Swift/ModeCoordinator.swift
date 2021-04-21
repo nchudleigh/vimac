@@ -22,7 +22,7 @@ class ModeCoordinator: ModeControllerDelegate {
     var forceKBLayoutObservation: NSKeyValueObservation?
 
     private let keySequenceListener: VimacKeySequenceListener
-    lazy var holdKeyListener = HoldKeyListener(keys: ["f", "a"])
+    lazy var holdKeyListener = HoldKeyListener(keys: [" "])
     var modeController: ModeController?
     
     init() {
@@ -182,7 +182,7 @@ class ModeCoordinator: ModeControllerDelegate {
 
 extension ModeCoordinator: HoldKeyListenerDelegate {
     func onKeyHeld(key: String) {
-        if key == "f" {
+        if key == " " {
             if let modeController = self.modeController {
                 if let _  = modeController as? HintModeController {
                     self.deactivate()
