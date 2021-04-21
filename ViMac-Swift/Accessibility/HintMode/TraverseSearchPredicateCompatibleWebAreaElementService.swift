@@ -76,8 +76,7 @@ class TraverseSearchPredicateCompatibleWebAreaElementService : TraverseElementSe
             "AXSearchKey": "AXAnyTypeSearchKey"
         ]
         
-        var queryWithSearchKeys = queryAnySearchKey
-        queryWithSearchKeys["AXSearchKey"] = [
+        let searchKeys = [
             "AXButtonSearchKey",
             "AXCheckBoxSearchKey",
             "AXControlSearchKey",
@@ -87,15 +86,41 @@ class TraverseSearchPredicateCompatibleWebAreaElementService : TraverseElementSe
             "AXTextFieldSearchKey"
         ]
         
-        let queryToUse: [String : Any] = {
-            let searchKeysCount: Int = (try? UIElement(element.rawElement).parameterizedAttribute("AXUIElementCountForSearchPredicate", param: queryWithSearchKeys)) ?? 0
-            return searchKeysCount == 0 ? queryAnySearchKey : queryWithSearchKeys
-        }()
+        var queryWithSearchKeys = queryAnySearchKey
+        queryWithSearchKeys["AXSearchKey"] = searchKeys
         
-        let rawElements: [AXUIElement]? = try UIElement(element.rawElement).parameterizedAttribute("AXUIElementsForSearchPredicate", param: queryToUse)
-        let elements = rawElements?
+        let searchKeysCount: Int = (try UIElement(element.rawElement).parameterizedAttribute("AXUIElementCountForSearchPredicate", param: queryWithSearchKeys)) ?? 0
+        let useSearchKeys = searchKeysCount > 0
+        
+        if useSearchKeys {
+            let rawElements: [AXUIElement]? = try UIElement(element.rawElement).parameterizedAttribute("AXUIElementsForSearchPredicate", param: queryWithSearchKeys)
+            let elements = rawElements?
+                .map({ Element.initialize(rawElement: $0) })
+                .compactMap({ $0 })
+            return elements
+        }
+        
+        var elements: [AXUIElement] = []
+        for searchKey in searchKeys {
+            var query = queryAnySearchKey
+            query["AXSearchKey"] = searchKey
+            if let rawElements: [AXUIElement] = try UIElement(element.rawElement).parameterizedAttribute("AXUIElementsForSearchPredicate", param: query) {
+                elements.append(contentsOf: rawElements)
+            }
+        }
+        
+        let uniqueElements = elements.uniqued()
+        
+        return uniqueElements
             .map({ Element.initialize(rawElement: $0) })
             .compactMap({ $0 })
-        return elements
+    }
+}
+
+// https://stackoverflow.com/a/25739498
+extension Sequence where Element: Hashable {
+    func uniqued() -> [Element] {
+        var set = Set<Element>()
+        return filter { set.insert($0).inserted }
     }
 }
