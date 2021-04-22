@@ -29,9 +29,6 @@ class HoldKeyListener {
 
     var eventTap: GlobalEventTap?
     weak var delegate: HoldKeyListenerDelegate?
-    
-    // avoid triggering timeout if some other keys are held down
-    var keyDownUpCounter = 0
 
     func start() {
         if eventTap == nil {
@@ -63,13 +60,7 @@ class HoldKeyListener {
     func onEvent(event: CGEvent) -> CGEvent? {
         guard let nsEvent = NSEvent(cgEvent: event) else { return event }
         
-        if nsEvent.type == .keyDown && !nsEvent.isARepeat {
-            keyDownUpCounter += 1
-        } else if nsEvent.type == .keyUp {
-            keyDownUpCounter -= 1
-        }
-        
-        log("onEvent() called. state=\(self.state) keyDown=\(nsEvent.type == .keyDown) characters=\(nsEvent.characters) modifiers=\(nsEvent.modifierFlags) isARepeat=\(nsEvent.isARepeat) counter=\(keyDownUpCounter)")
+        log("onEvent() called. state=\(self.state) keyDown=\(nsEvent.type == .keyDown) characters=\(nsEvent.characters) modifiers=\(nsEvent.modifierFlags) isARepeat=\(nsEvent.isARepeat)")
 
         let modifiersPresent = nsEvent.modifierFlags.rawValue != 256
         if modifiersPresent {
@@ -84,7 +75,7 @@ class HoldKeyListener {
         guard let characters = nsEvent.characters else { return event }
 
         if state == .nothing  {
-            if nsEvent.type == .keyDown && !nsEvent.isARepeat && characters == key && keyDownUpCounter == 1 {
+            if nsEvent.type == .keyDown && !nsEvent.isARepeat && characters == key {
                 self.suppressedHintModeKeyDown = event
                 setAwaitingKey(characters)
                 return nil
@@ -132,6 +123,10 @@ class HoldKeyListener {
                 event.post(tap: .cghidEventTap)
 
                 return nil
+            }
+            
+            if nsEvent.type == .keyUp && characters != key {
+                return event
             }
 
             return nil
