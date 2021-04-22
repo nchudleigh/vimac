@@ -1,6 +1,7 @@
-# State of Chromium and Electron Support (22 April)
+# State of Chromium and Electron Support (22 April 2021)
 
-TLDR
+TLDR:
+
 1. Chrome and Brave now work with non-native support disabled. Firefox does not.
 2. Keep Electron Support enabled until Electron 12 is released and all your Electron apps are on Electron 12. Ask developers of Electron apps to update their Electron versions to v12 so that it is compatible with Voice Control and Vimac.
 3. Only enable Non-native Support / VoiceOver emulation if you really need it for Firefox or CEF apps (Spotify). I recommend reaching out to them asking for Voice Control support.
