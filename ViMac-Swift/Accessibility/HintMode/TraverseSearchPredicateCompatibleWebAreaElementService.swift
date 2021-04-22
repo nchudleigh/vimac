@@ -73,12 +73,11 @@ class TraverseSearchPredicateCompatibleWebAreaElementService : TraverseElementSe
     // Chromium has fixed their implementation to act like WebKit, but current versions (~90.0) need this workaround.
     // https://chromium-review.googlesource.com/c/chromium/src/+/2773520
     private func getRecursiveChildrenThroughSearchPredicate() throws -> [Element]? {
-        let queryAnySearchKey: [String: Any] = [
+        let query: [String: Any] = [
             "AXDirection": "AXDirectionNext",
             "AXImmediateDescendantsOnly": false,
             "AXResultsLimit": -1,
-            "AXVisibleOnly": true,
-            "AXSearchKey": "AXAnyTypeSearchKey"
+            "AXVisibleOnly": true
         ]
         
         let searchKeys = [
@@ -91,14 +90,13 @@ class TraverseSearchPredicateCompatibleWebAreaElementService : TraverseElementSe
             "AXTextFieldSearchKey"
         ]
         
-        var queryWithSearchKeys = queryAnySearchKey
-        queryWithSearchKeys["AXSearchKey"] = searchKeys
+        var multiSearchKeyQuery = query
+        multiSearchKeyQuery["AXSearchKey"] = searchKeys
         
-        let searchKeysCount: Int = (try UIElement(element.rawElement).parameterizedAttribute("AXUIElementCountForSearchPredicate", param: queryWithSearchKeys)) ?? 0
-        let useSearchKeys = searchKeysCount > 0
+        let multiSearchKeyQueryMatches: Int = (try UIElement(element.rawElement).parameterizedAttribute("AXUIElementCountForSearchPredicate", param: multiSearchKeyQuery)) ?? 0
         
-        if useSearchKeys {
-            let rawElements: [AXUIElement]? = try UIElement(element.rawElement).parameterizedAttribute("AXUIElementsForSearchPredicate", param: queryWithSearchKeys)
+        if multiSearchKeyQueryMatches > 0 {
+            let rawElements: [AXUIElement]? = try UIElement(element.rawElement).parameterizedAttribute("AXUIElementsForSearchPredicate", param: multiSearchKeyQuery)
             let elements = rawElements?
                 .map({ Element.initialize(rawElement: $0) })
                 .compactMap({ $0 })
@@ -107,9 +105,9 @@ class TraverseSearchPredicateCompatibleWebAreaElementService : TraverseElementSe
         
         var elements: [AXUIElement] = []
         for searchKey in searchKeys {
-            var query = queryAnySearchKey
-            query["AXSearchKey"] = searchKey
-            if let rawElements: [AXUIElement] = try UIElement(element.rawElement).parameterizedAttribute("AXUIElementsForSearchPredicate", param: query) {
+            var singleSearchKeyQuery = query
+            singleSearchKeyQuery["AXSearchKey"] = searchKey
+            if let rawElements: [AXUIElement] = try UIElement(element.rawElement).parameterizedAttribute("AXUIElementsForSearchPredicate", param: singleSearchKeyQuery) {
                 elements.append(contentsOf: rawElements)
             }
         }
