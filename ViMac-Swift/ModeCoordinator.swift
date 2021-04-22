@@ -24,6 +24,7 @@ class ModeCoordinator: ModeControllerDelegate {
     let scrollModeKeySequence: [Character] = ["j", "k"]
     let hintModeKeySequence: [Character] = ["f", "d"]
     private let keySequenceListener: VimacKeySequenceListener
+    private let holdKeyListener = HoldKeyListener()
     
     var modeController: ModeController?
     
@@ -40,6 +41,9 @@ class ModeCoordinator: ModeControllerDelegate {
         disposeBag.insert(keySequenceListener.hintMode.bind(onNext: { [weak self] _ in
             self?.setHintMode(mechanism: "Key Sequence")
         }))
+        
+        holdKeyListener.delegate = self
+        holdKeyListener.start()
     }
     
     func deactivate() {
@@ -176,6 +180,19 @@ class ModeCoordinator: ModeControllerDelegate {
         } else {
             Analytics.shared().track("PMF Survey Alert Dismissed")
         }
+    }
+}
+
+extension ModeCoordinator: HoldKeyListenerDelegate {
+    func onKeyHeld(key: String) {
+        if let modeController = self.modeController {
+            if let _  = modeController as? HintModeController {
+                self.deactivate()
+                return
+            }
+        }
+
+        self.setHintMode(mechanism: "Hold Space")
     }
 }
 
