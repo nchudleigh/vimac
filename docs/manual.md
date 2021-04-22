@@ -71,3 +71,13 @@ There are two ways to activate modes:
 You may configure the bindings in the Bindings tab in Preferences:
 
 <img src="bindings.png">
+
+## Chrome/Firefox/VSCode/Non-native Support
+
+Refer to [State of Non-native Support](./state-of-non-native-support.md).
+
+TLDR:
+
+1. Browser Support: Safari, Chrome, and Brave works by default. You need to enable `Non-native Support` for Firefox to work.
+2. Pre Electron v12 apps need `Electron Support` enabled to work.
+3. Only enable `Non-native Support` / `VoiceOver Emulation` if you really need it for Firefox or CEF apps (Spotify). I recommend reaching out to them asking for Voice Control support.

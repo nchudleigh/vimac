@@ -42,32 +42,12 @@ class ExperimentalPreferenceViewController: NSViewController, NSTextFieldDelegat
         grid.column(at: 0).xPlacement = .trailing
         grid.translatesAutoresizingMaskIntoConstraints = false
         
-        let nonNativeSupportLabel = NSTextField(labelWithString: "Non-native Support:")
-        nonNativeSupportView = NSButton(checkboxWithTitle: "Enabled", target: self, action: #selector(onNonNativeSupportChange))
-        nonNativeSupportView.state = UserDefaultsProperties.AXEnhancedUserInterfaceEnabled.read() ? .on : .off
-        grid.addRow(with: [nonNativeSupportLabel, nonNativeSupportView])
-        
-        let nonNativeSupportLabelHint = NSTextField(wrappingLabelWithString: "Allow Hint-mode to work on non-native applications such as Google Chrome and Visual Studio Code.")
-        nonNativeSupportLabelHint.font = .labelFont(ofSize: 11)
-        nonNativeSupportLabelHint.textColor = .secondaryLabelColor
-        grid.addRow(with: [NSGridCell.emptyContentView, nonNativeSupportLabelHint])
-        
-        let nonNativeSupportLabelHint2 = NSTextField(wrappingLabelWithString: "Sets the AXEnhancedUserInterface attribute on applications. May lead to slow performance and high CPU usage.")
-        nonNativeSupportLabelHint2.font = .labelFont(ofSize: 11)
-        nonNativeSupportLabelHint2.textColor = .secondaryLabelColor
-        grid.addRow(with: [NSGridCell.emptyContentView, nonNativeSupportLabelHint2])
-        
-        let nonNativeSupportLabelHint3 = NSTextField(wrappingLabelWithString: "Enabling this option breaks window managers that do not handle the AXEnhancedUserInterface edge case. Please use a compatible window manager like Rectangle.")
-        nonNativeSupportLabelHint3.font = .labelFont(ofSize: 11)
-        nonNativeSupportLabelHint3.textColor = .secondaryLabelColor
-        grid.addRow(with: [NSGridCell.emptyContentView, nonNativeSupportLabelHint3])
-        
         let electronSupportLabel = NSTextField(labelWithString: "Electron Support:")
         electronSupportView = NSButton(checkboxWithTitle: "Enabled", target: self, action: #selector(onElectronSupportChange))
         electronSupportView.state = UserDefaultsProperties.AXManualAccessibilityEnabled.read() ? .on : .off
         grid.addRow(with: [electronSupportLabel, electronSupportView])
         
-        let electronSupportLabelHint = NSTextField(wrappingLabelWithString: "Allow Hint-mode to work on Electron applications such as Visual Studio Code. There is no need to enable this option if Non-native Support is enabled.")
+        let electronSupportLabelHint = NSTextField(wrappingLabelWithString: "Allow Hint-mode to work on older Electron applications (e.g. Visual Studio Code and Slack)")
         electronSupportLabelHint.font = .labelFont(ofSize: 11)
         electronSupportLabelHint.textColor = .secondaryLabelColor
         grid.addRow(with: [NSGridCell.emptyContentView, electronSupportLabelHint])
@@ -76,6 +56,26 @@ class ExperimentalPreferenceViewController: NSViewController, NSTextFieldDelegat
         electronSupportLabelHint2.font = .labelFont(ofSize: 11)
         electronSupportLabelHint2.textColor = .secondaryLabelColor
         grid.addRow(with: [NSGridCell.emptyContentView, electronSupportLabelHint2])
+        
+        let nonNativeSupportLabel = NSTextField(labelWithString: "Emulate VoiceOver:")
+        nonNativeSupportView = NSButton(checkboxWithTitle: "Enabled", target: self, action: #selector(onNonNativeSupportChange))
+        nonNativeSupportView.state = UserDefaultsProperties.AXEnhancedUserInterfaceEnabled.read() ? .on : .off
+        grid.addRow(with: [nonNativeSupportLabel, nonNativeSupportView])
+        
+        let nonNativeSupportLabelHint = NSTextField(wrappingLabelWithString: "Allow Hint-mode to work on non-native applications such as Firefox.")
+        nonNativeSupportLabelHint.font = .labelFont(ofSize: 11)
+        nonNativeSupportLabelHint.textColor = .secondaryLabelColor
+        grid.addRow(with: [NSGridCell.emptyContentView, nonNativeSupportLabelHint])
+        
+        let nonNativeSupportLabelHint2 = NSTextField(wrappingLabelWithString: "Enable this option as a last resort. Emulating VoiceOver has side effects. It breaks window managers and may change the behaviour of your applications.")
+        nonNativeSupportLabelHint2.font = .labelFont(ofSize: 11)
+        nonNativeSupportLabelHint2.textColor = .secondaryLabelColor
+        grid.addRow(with: [NSGridCell.emptyContentView, nonNativeSupportLabelHint2])
+        
+        let nonNativeSupportLabelHint3 = NSTextField(wrappingLabelWithString: "Please use a compatible window manager like Rectangle.")
+        nonNativeSupportLabelHint3.font = .labelFont(ofSize: 11)
+        nonNativeSupportLabelHint3.textColor = .secondaryLabelColor
+        grid.addRow(with: [NSGridCell.emptyContentView, nonNativeSupportLabelHint3])
         
         self.view.addSubview(grid)
         
