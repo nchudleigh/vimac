@@ -39,7 +39,7 @@ I’ll request for them to update their Chromium/Electron versions since both Vo
 
 Going forward, as more non-native apps update their Chromium/Electron versions, there will be less of a need for these two Experimental options.
 
-When Electron 12 is launched, I’ll update the descriptions of the Electron option to state that these are for legacy Electron apps.
+When Electron 12 gains more adoption, I’ll update the descriptions of the Electron option to state that these are for legacy Electron apps.
 
 Meanwhile (for v0.3.18), since the latest stable version of Chrome already works without enabling Non-native support, I will update the description of the Non-native support option to discourage enabling it.
 
