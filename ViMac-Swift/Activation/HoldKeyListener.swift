@@ -50,6 +50,11 @@ class HoldKeyListener {
 
         _ = eventTap?.enable()
     }
+    
+    func stop() {
+        eventTap?.disable()
+        eventTap = nil
+    }
 
     func onEvent(event: CGEvent) -> CGEvent? {
         guard let nsEvent = NSEvent(cgEvent: event) else { return event }
