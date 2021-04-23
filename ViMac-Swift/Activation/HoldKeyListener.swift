@@ -62,19 +62,11 @@ class HoldKeyListener {
         log("onEvent() called. state=\(self.state) keyDown=\(nsEvent.type == .keyDown) characters=\(nsEvent.characters) modifiers=\(nsEvent.modifierFlags) isARepeat=\(nsEvent.isARepeat)")
 
         let modifiersPresent = nsEvent.modifierFlags.rawValue != 256
-        if modifiersPresent {
-            // its possible that a key down is Space and key up is Shift-Space
-            // revert from postAction to nothing
-            self.state = .nothing
-            self.timer?.invalidate()
-            self.timer = nil
-            return event
-        }
 
-        guard let characters = nsEvent.characters else { return event }
-
+        guard let characters = nsEvent.charactersIgnoringModifiers else { return event }
+        
         if state == .nothing  {
-            if nsEvent.type == .keyDown && !nsEvent.isARepeat && characters == key {
+            if nsEvent.type == .keyDown && !nsEvent.isARepeat && characters == key && !modifiersPresent {
                 self.suppressedHintModeKeyDown = event
                 setAwaitingKey(characters)
                 return nil
@@ -83,10 +75,13 @@ class HoldKeyListener {
         }
 
         if case let .awaitingDelay = state {
-            if nsEvent.type == .keyDown && nsEvent.isARepeat && characters == key {
+            if nsEvent.type == .keyDown && nsEvent.isARepeat && characters == key && !modifiersPresent {
                 return nil
             }
 
+            // notice the lack of modifier check.
+            // its possible that a key down is Space and key up is Shift-Space
+            // since we suppressed the original key down, we need to emit it here
             if nsEvent.type == .keyUp && characters == key {
                 self.timer!.invalidate()
                 self.timer = nil
