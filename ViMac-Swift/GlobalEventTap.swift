@@ -8,6 +8,7 @@
 
 import Cocoa
 import Foundation
+import os
 
 class GlobalEventTap {
     let eventMask: CGEventMask
@@ -69,6 +70,21 @@ class GlobalEventTap {
         
         let e = self.eventHandler(event)
         if let e = e {
+            if e.type == .tapDisabledByTimeout {
+                log("GlobalEventTap: received .tapDisabledByTimeout, enabling tap again.")
+                if let tap = eventTap {
+                    CGEvent.tapEnable(tap: tap, enable: true)
+                }
+                return Unmanaged.passUnretained(e)
+            }
+            if e.type == .tapDisabledByUserInput {
+                log("GlobalEventTap: received .tapDisabledByUserInput, enabling tap again.")
+                if let tap = eventTap {
+                    CGEvent.tapEnable(tap: tap, enable: true)
+                }
+                return Unmanaged.passUnretained(e)
+            }
+            
             return Unmanaged.passRetained(e).autorelease()
         }
         
@@ -83,5 +99,9 @@ class GlobalEventTap {
         },
         userInfo: selfPtr.toOpaque())
         return eventTap
+    }
+    
+    func log(_ str: String) {
+        os_log("%@", str)
     }
 }

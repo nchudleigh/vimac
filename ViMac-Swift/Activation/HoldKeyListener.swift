@@ -11,7 +11,6 @@ import os
 enum HoldState: Equatable {
     case nothing
     case awaitingDelay
-    case postAction
 }
 
 protocol HoldKeyListenerDelegate: AnyObject {
@@ -36,16 +35,11 @@ class HoldKeyListener {
             eventTap = GlobalEventTap(eventMask: mask, onEvent: { [weak self] event -> CGEvent? in
                 guard let self = self else { return event }
                 
-                // crashes if you attempt to cast it to NSEvent
-                if event.type == .tapDisabledByTimeout || event.type == .tapDisabledByUserInput {
-                    return event
-                }
-                
                 let e = self.onEvent(event: event)
                 
                 if let e = e {
                     let nsEvent = NSEvent(cgEvent: e)!
-                    self.log("transformed eventsist. state=\(self.state) keyDown=\(nsEvent.type == .keyDown) characters=\(nsEvent.characters) modifiers=\(nsEvent.modifierFlags) isARepeat=\(nsEvent.isARepeat)")
+                    self.log("transformed event. state=\(self.state) keyDown=\(nsEvent.type == .keyDown) characters=\(nsEvent.characters) modifiers=\(nsEvent.modifierFlags) isARepeat=\(nsEvent.isARepeat)")
                 } else {
                     self.log("onEvent transformed to nil")
                 }
@@ -81,19 +75,6 @@ class HoldKeyListener {
                 return nil
             }
             return event
-        }
-
-        if case let .postAction = state {
-            if nsEvent.type == .keyUp && characters == key {
-                self.state = .nothing
-                return nil
-            }
-
-            if nsEvent.type == .keyDown && nsEvent.isARepeat && characters == key {
-                return nil
-            }
-
-            return nil
         }
 
         if case let .awaitingDelay = state {
@@ -152,7 +133,7 @@ class HoldKeyListener {
         }
 
         self.timer = nil
-        self.state = .postAction
+        self.state = .nothing
 
         onKeyHeld()
     }
