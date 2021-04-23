@@ -68,6 +68,13 @@ class BindingsPreferenceViewController: NSViewController, PreferencePane, NSText
         holdSpaceToActivateHintModeCheckbox = NSButton(checkboxWithTitle: "Enabled", target: self, action: #selector(onHoldSpaceToActivateHintModeCheckboxClick))
         grid.addRow(with: [holdSpaceToActivateHintModeLabel, holdSpaceToActivateHintModeCheckbox])
         
+        grid.addRow(with: [])
+        grid.addRow(with: [])
+        
+        let shortcutActivationLabel = NSTextField(labelWithString: "Shortcut Activation")
+        shortcutActivationLabel.font = .boldSystemFont(ofSize: 13)
+        grid.addRow(with: [shortcutActivationLabel])
+        
         let hintModeShortcutLabel = NSTextField(labelWithString: "Hint Mode Shortcut:")
         hintModeShortcut = MASShortcutView()
         hintModeShortcut.associatedUserDefaultsKey = KeyboardShortcuts.shared.hintModeShortcutKey
@@ -77,6 +84,9 @@ class BindingsPreferenceViewController: NSViewController, PreferencePane, NSText
         scrollModeShortcut = MASShortcutView()
         scrollModeShortcut.associatedUserDefaultsKey = KeyboardShortcuts.shared.scrollModeShortcutKey
         grid.addRow(with: [scrollModeShortcutLabel, scrollModeShortcut])
+        
+        grid.addRow(with: [])
+        grid.addRow(with: [])
         
         let keySequenceHeaderLabel = NSTextField(labelWithString: "Key Sequence Activation")
         keySequenceHeaderLabel.font = .boldSystemFont(ofSize: 13)
@@ -88,22 +98,6 @@ class BindingsPreferenceViewController: NSViewController, PreferencePane, NSText
         grid.addRow(with: [keySequenceHeaderHint1])
         spanCellHorizontally(
             cell: grid.cell(for: keySequenceHeaderHint1)!,
-            length: 2
-        )
-
-        let keySequenceHeaderHint2 = NSTextField(wrappingLabelWithString: "You will need to enable Input Monitoring permissions under System Preferences > Security & Privacy > Privacy > Input Monitoring")
-        keySequenceHeaderHint2.font = .labelFont(ofSize: 13)
-        keySequenceHeaderHint2.textColor = .secondaryLabelColor
-        grid.addRow(with: [keySequenceHeaderHint2])
-        spanCellHorizontally(
-            cell: grid.cell(for: keySequenceHeaderHint2)!,
-            length: 2
-        )
-        
-        let openSystemPreferencesSecurityButton = NSButton(title: "Open Security & Privacy System Preferences", target: self, action: #selector(openSystemPreferencesSecurity))
-        grid.addRow(with: [openSystemPreferencesSecurityButton])
-        spanCellHorizontally(
-            cell: grid.cell(for: openSystemPreferencesSecurityButton)!,
             length: 2
         )
         
@@ -140,11 +134,6 @@ class BindingsPreferenceViewController: NSViewController, PreferencePane, NSText
             inHorizontalRange: .init(location: 0, length: length),
             verticalRange: .init(location: row, length: 1)
         )
-    }
-    
-    @objc private func openSystemPreferencesSecurity() {
-        let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_ListenEvent")!
-        NSWorkspace.shared.open(url)
     }
     
     private func fillFields() {
