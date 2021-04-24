@@ -146,7 +146,7 @@ class HintModeUserInterface {
 
     func show() {
         self.windowController.showWindow(nil)
-        self.windowController.window?.makeKeyAndOrderFront(nil)
+        self.windowController.window?.orderFront(nil)
     }
 
     func hide() {
@@ -196,16 +196,15 @@ class HintModeController: ModeController {
         if activated { return }
         activated = true
         
+        HideCursorGlobally.hide()
+        
+        self.input = ""
+        self.ui = HintModeUserInterface(window: self.window)
+        self.ui!.show()
+        
         self.queryHints(
             onSuccess: { [weak self] hints in
                 guard let self = self else { return }
-                
-                HideCursorGlobally.hide()
-                
-                self.input = ""
-                self.ui = HintModeUserInterface(window: self.window)
-                self.ui!.show()
-                
                 self.onHintQuerySuccess(hints: hints)
             },
             onError: { [weak self] e in

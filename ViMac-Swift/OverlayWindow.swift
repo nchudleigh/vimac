@@ -18,11 +18,11 @@ class OverlayWindow: NSPanel {
         
         self.hasShadow = false
         
-        self.level = .statusBar
+        self.level = .popUpMenu
         self.collectionBehavior = [.fullScreenAuxiliary]
     }
 
     override var canBecomeKey: Bool {
-        return true
+        return false
     }
 }
