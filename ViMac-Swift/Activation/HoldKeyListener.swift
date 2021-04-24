@@ -6,8 +6,6 @@
 //  Copyright © 2021 Dexter Leng. All rights reserved.
 //
 
-import os
-
 enum HoldState: Equatable {
     case nothing
     case awaitingDelay
@@ -35,16 +33,7 @@ class HoldKeyListener {
             eventTap = GlobalEventTap(eventMask: mask, onEvent: { [weak self] event -> CGEvent? in
                 guard let self = self else { return event }
                 
-                let e = self.onEvent(event: event)
-                
-                if let e = e {
-                    let nsEvent = NSEvent(cgEvent: e)!
-                    self.log("transformed event. state=\(self.state) keyDown=\(nsEvent.type == .keyDown) characters=\(nsEvent.characters) modifiers=\(nsEvent.modifierFlags) isARepeat=\(nsEvent.isARepeat)")
-                } else {
-                    self.log("onEvent transformed to nil")
-                }
-                
-                return e
+                return self.onEvent(event: event)
             })
         }
 
@@ -58,8 +47,6 @@ class HoldKeyListener {
 
     func onEvent(event: CGEvent) -> CGEvent? {
         guard let nsEvent = NSEvent(cgEvent: event) else { return event }
-        
-        log("onEvent() called. state=\(self.state) keyDown=\(nsEvent.type == .keyDown) characters=\(nsEvent.characters) modifiers=\(nsEvent.modifierFlags) isARepeat=\(nsEvent.isARepeat)")
 
         let modifiersPresent = nsEvent.modifierFlags.rawValue != 256
 
@@ -117,7 +104,6 @@ class HoldKeyListener {
     }
 
     func setAwaitingKey(_ key: String) {
-        log("setAwaitingKey() called")
         if self.state != .nothing {
             fatalError("setAwaitingHintMode() called with invalid state \(state)")
         }
@@ -127,7 +113,6 @@ class HoldKeyListener {
     }
 
     @objc func onAwaitingKeyTimeout() {
-        log("onAwaitingKeyTimeout() called")
         if state != .awaitingDelay {
             fatalError("onAwaitingKeyTimeout() called with invalid state \(state)")
         }
@@ -139,11 +124,6 @@ class HoldKeyListener {
     }
 
     func onKeyHeld() {
-        log("onKeyHeld(): \(key)")
         self.delegate?.onKeyHeld(key: key)
-    }
-    
-    func log(_ str: String) {
-        os_log("%@", str)
     }
 }
