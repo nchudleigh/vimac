@@ -98,8 +98,7 @@ class HintsViewController: NSViewController {
     func elementFrame(_ element: Element) -> NSRect? {
         guard let window = self.view.window else { return nil }
 
-        let globalFrame = GeometryUtils.convertAXFrameToGlobal(
-            element.clippedFrame ?? element.frame)
+        let globalFrame = GeometryUtils.convertAXFrameToGlobal(element.renderFrame())
         let windowFrame = window.convertFromScreen(globalFrame)
         let viewFrame = window.contentView?.convert(windowFrame, to: self.view)
         

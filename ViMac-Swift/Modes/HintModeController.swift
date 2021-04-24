@@ -196,15 +196,17 @@ class HintModeController: ModeController {
         if activated { return }
         activated = true
         
-        HideCursorGlobally.hide()
-        
-        self.input = ""
-        self.ui = HintModeUserInterface(window: window)
-        self.ui!.show()
-        
         self.queryHints(
             onSuccess: { [weak self] hints in
-                self?.onHintQuerySuccess(hints: hints)
+                guard let self = self else { return }
+                
+                HideCursorGlobally.hide()
+                
+                self.input = ""
+                self.ui = HintModeUserInterface(window: self.window)
+                self.ui!.show()
+                
+                self.onHintQuerySuccess(hints: hints)
             },
             onError: { [weak self] e in
                 self?.deactivate()
