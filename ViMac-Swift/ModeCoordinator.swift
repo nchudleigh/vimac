@@ -152,6 +152,9 @@ class ModeCoordinator: ModeControllerDelegate {
         let axAppOptional = Application.init(app)
         guard let axApp = axAppOptional else { return nil }
         
+        // HACK: Chromium activates its accessibility feature when accessibilityRole is accessed
+        let _: Any? = try? axApp.attribute( .role)
+        
         let axWindowOptional: UIElement? = try? axApp.attribute(.focusedWindow)
         guard let axWindow = axWindowOptional else { return nil }
         
