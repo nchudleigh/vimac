@@ -43,6 +43,10 @@ class TraverseGenericElementService : TraverseElementService {
     }
     
     private func isElementVisible() -> Bool {
+        if element.role == "AXMenuItem" {
+            return true
+        }
+        
         if let clipBounds = clipBounds {
             if !clipBounds.intersects(element.frame) {
                 return false

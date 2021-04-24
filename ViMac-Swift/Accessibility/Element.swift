@@ -15,7 +15,7 @@ class Element {
     let actions: [String]
     let role: String
     
-    var clippedFrame: NSRect?
+    private var clippedFrame: NSRect?
     
     static func initialize(rawElement: AXUIElement) -> Element? {
         let uiElement = UIElement.init(rawElement)
@@ -44,5 +44,15 @@ class Element {
     
     func setClippedFrame(_ clippedFrame: NSRect) {
         self.clippedFrame = clippedFrame
+    }
+    
+    func renderFrame() -> NSRect {
+        // I noticed there are AXMenus smaller than its children items.
+        // e.g. Xcode tab menu
+        if role == "AXMenuItem" {
+            return self.frame
+        }
+        
+        return self.clippedFrame ?? self.frame
     }
 }
