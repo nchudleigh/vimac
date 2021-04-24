@@ -9,6 +9,7 @@
 import Cocoa
 
 struct BindingsConfig {
+    let holdSpaceHintModeActivationEnabled: Bool
     let hintModeKeySequenceEnabled: Bool
     let hintModeKeySequence: String
     let scrollModeKeySequenceEnabled: Bool

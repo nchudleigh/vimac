@@ -14,7 +14,7 @@ You can refer to the manual [here](https://vimacapp.com/manual).
 
 The current Vimac workflow works like this:
 
-1. Activate a mode
+1. Activate a mode (`Hold Space to activate Hint-mode` is the default)
 2. Perform actions within the activated mode
 3. Exit the mode, either manually or automatically when the mode's task is complete
 
