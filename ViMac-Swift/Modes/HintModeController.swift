@@ -12,17 +12,22 @@ import os
 import Segment
 
 extension NSEvent {
-    static func localEventMonitor(matching: EventTypeMask) -> Observable<NSEvent> {
+    static func suppressingGlobalEventMonitor(matching: CGEventMask) -> Observable<NSEvent> {
         Observable.create({ observer in
-            let keyMonitor = NSEvent.addLocalMonitorForEvents(matching: matching, handler: { event -> NSEvent? in
-                observer.onNext(event)
-                // return nil to prevent the event from being dispatched
-                // this removes the "doot doot" sound when typing with CMD / CTRL held down
+            let tap = GlobalEventTap.init(eventMask: matching, onEvent: { cgEvent -> CGEvent? in
+                guard let nsEvent = NSEvent(cgEvent: cgEvent) else {
+                    return cgEvent
+                }
+                
+                observer.onNext(nsEvent)
+                
                 return nil
-            })!
+            })
+            
+            tap.enable()
 
             let cancel = Disposables.create {
-                NSEvent.removeMonitor(keyMonitor)
+                tap.disable()
             }
             return cancel
         })
@@ -308,7 +313,8 @@ class HintModeController: ModeController {
     }
 
     private func listenForKeyPress(onEvent: @escaping (NSEvent) -> Void) {
-        NSEvent.localEventMonitor(matching: .keyDown)
+        let mask = CGEventMask(1 << CGEventType.keyDown.rawValue)
+        NSEvent.suppressingGlobalEventMonitor(matching: mask)
             .observeOn(MainScheduler.instance)
             .subscribe(onNext: { event in
                 onEvent(event)
