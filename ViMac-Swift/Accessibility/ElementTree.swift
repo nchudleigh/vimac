@@ -65,6 +65,11 @@ class ElementTree {
         var stack: [Element] = [elementsById[rootId!]!]
         
         while let element = stack.popLast() {
+            if element.role == "AXMenu" {
+                results = self.children(element.rawElement) ?? []
+                break
+            }
+            
             if isHintable(element) {
                 results.append(element)
             }
