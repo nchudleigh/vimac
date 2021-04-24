@@ -32,7 +32,6 @@ extension StatusItemManager : NSMenuDelegate {
     func menuWillOpen(_ _menu: NSMenu) {
         if let menu = statusItem.menu {
             menu.removeAllItems()
-            menu.addItem(withTitle: "Getting Started", action: #selector(gettingStartedClick), keyEquivalent: "").target = self
             menu.addItem(withTitle: "Manual", action: #selector(manualClick), keyEquivalent: "").target = self
             menu.addItem(withTitle: "Report bugs / Suggest features", action: #selector(openGithubIssues), keyEquivalent: "").target = self
             menu.addItem(withTitle: "Follow Vimac on Twitter", action: #selector(followVimacClick), keyEquivalent: "").target = self
@@ -53,12 +52,7 @@ extension StatusItemManager : NSMenuDelegate {
     @objc func aboutClick() {
         preferencesWindowController.show(preferencePane: .about)
     }
-    
-    @objc func gettingStartedClick() {
-        let url = URL(string: "https://vimacapp.com/tutorial")!
-        _ = NSWorkspace.shared.open(url)
-    }
-    
+
     @objc func manualClick() {
         let url = URL(string: "https://vimacapp.com/manual")!
         _ = NSWorkspace.shared.open(url)
