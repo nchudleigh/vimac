@@ -12,6 +12,7 @@ import RxSwift
 class BindingsRepository {
     func read() -> BindingsConfig {
         BindingsConfig.init(
+            holdSpaceHintModeActivationEnabled: UserDefaultsProperties.holdSpaceHintModeActivationEnabled.read(),
             hintModeKeySequenceEnabled: UserDefaultsProperties.keySequenceHintModeEnabled.read(),
             hintModeKeySequence: UserDefaultsProperties.keySequenceHintMode.read(),
             scrollModeKeySequenceEnabled: UserDefaultsProperties.keySequenceScrollModeEnabled.read(),
@@ -22,6 +23,7 @@ class BindingsRepository {
     
     func readLive() -> Observable<BindingsConfig> {
         Observable.combineLatest(
+            UserDefaultsProperties.holdSpaceHintModeActivationEnabled.readLive(),
             UserDefaultsProperties.keySequenceHintModeEnabled.readLive(),
             UserDefaultsProperties.keySequenceHintMode.readLive(),
             UserDefaultsProperties.keySequenceScrollModeEnabled.readLive(),

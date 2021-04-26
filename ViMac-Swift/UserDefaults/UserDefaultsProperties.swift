@@ -9,6 +9,7 @@
 import Cocoa
 
 struct UserDefaultsProperties {
+    static let holdSpaceHintModeActivationEnabled = UserDefaultsProperty<Bool>.init("holdSpaceHintModeActivationEnabled", defaultValue: true)
     static let keySequenceHintModeEnabled = UserDefaultsProperty<Bool>.init("keySequenceHintModeEnabled", defaultValue: false)
     static let keySequenceHintMode = UserDefaultsProperty<String>.init("keySequenceHintMode", defaultValue: "")
     static let keySequenceScrollModeEnabled = UserDefaultsProperty<Bool>.init("keySequenceScrollModeEnabled", defaultValue: false)

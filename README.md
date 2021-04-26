@@ -8,15 +8,13 @@ Vimac is heavily inspired by [Vimium](https://github.com/philc/vimium/).
 
 You can download Vimac [here](https://vimacapp.com). Unzip the file and move `Vimac.app` to `Applications/`.
 
-You will be redirected to a tutorial that will get you up-and-running with Vimac.
-
-Alternatively, you can refer to the manual [here](https://vimacapp.com/manual).
+You can refer to the manual [here](https://vimacapp.com/manual).
 
 ## How does Vimac work?
 
 The current Vimac workflow works like this:
 
-1. Activate a mode
+1. Activate a mode (`Hold Space to activate Hint-mode` is the default)
 2. Perform actions within the activated mode
 3. Exit the mode, either manually or automatically when the mode's task is complete
 

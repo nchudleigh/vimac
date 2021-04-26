@@ -24,6 +24,7 @@ class ModeCoordinator: ModeControllerDelegate {
     let scrollModeKeySequence: [Character] = ["j", "k"]
     let hintModeKeySequence: [Character] = ["f", "d"]
     private let keySequenceListener: VimacKeySequenceListener
+    private var holdKeyListener: HoldKeyListener?
     
     var modeController: ModeController?
     
@@ -40,6 +41,25 @@ class ModeCoordinator: ModeControllerDelegate {
         disposeBag.insert(keySequenceListener.hintMode.bind(onNext: { [weak self] _ in
             self?.setHintMode(mechanism: "Key Sequence")
         }))
+        
+        UserDefaultsProperties.holdSpaceHintModeActivationEnabled.readLive()
+            .bind(onNext: { [weak self] enabled in
+                guard let self = self else { return }
+
+                self.log("Hold Space to activate hint-mode enabled: \(enabled)")
+                
+                if let holdKeyListener = self.holdKeyListener {
+                    holdKeyListener.stop()
+                    self.holdKeyListener = nil
+                }
+
+                if enabled {
+                    self.holdKeyListener = HoldKeyListener()
+                    self.holdKeyListener?.delegate = self
+                    self.holdKeyListener?.start()
+                }
+            })
+            .disposed(by: disposeBag)
     }
     
     func deactivate() {
@@ -152,6 +172,9 @@ class ModeCoordinator: ModeControllerDelegate {
         let axAppOptional = Application.init(app)
         guard let axApp = axAppOptional else { return nil }
         
+        // HACK: Chromium activates its accessibility feature when accessibilityRole is accessed
+        let _: Any? = try? axApp.attribute( .role)
+        
         let axWindowOptional: UIElement? = try? axApp.attribute(.focusedWindow)
         guard let axWindow = axWindowOptional else { return nil }
         
@@ -176,6 +199,23 @@ class ModeCoordinator: ModeControllerDelegate {
         } else {
             Analytics.shared().track("PMF Survey Alert Dismissed")
         }
+    }
+    
+    func log(_ str: String) {
+        os_log("%@", str)
+    }
+}
+
+extension ModeCoordinator: HoldKeyListenerDelegate {
+    func onKeyHeld(key: String) {
+        if let modeController = self.modeController {
+            if let _  = modeController as? HintModeController {
+                self.deactivate()
+                return
+            }
+        }
+
+        self.setHintMode(mechanism: "Hold Space")
     }
 }
 
