@@ -17,6 +17,7 @@
 		E20451B925F4DDDC00CBFC7A /* AXEnhancedUserInterfaceActivator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20451B825F4DDDC00CBFC7A /* AXEnhancedUserInterfaceActivator.swift */; };
 		E20696F923290D41001EFDB2 /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20696F823290D41001EFDB2 /* Log.swift */; };
 		E2069700232A52EA001EFDB2 /* AlphabetHints.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20696FF232A52EA001EFDB2 /* AlphabetHints.swift */; };
+		E20A43122631BEC400E7F3CE /* HoldKeyListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20A43112631BEC400E7F3CE /* HoldKeyListener.swift */; };
 		E20D0CB425581AEF00A5CAEE /* Trie.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20D0CB325581AEF00A5CAEE /* Trie.swift */; };
 		E20D0CB625581B3A00A5CAEE /* TrieTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20D0CB525581B3A00A5CAEE /* TrieTests.swift */; };
 		E20D0CB825583DD200A5CAEE /* InputState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20D0CB725583DD200A5CAEE /* InputState.swift */; };
@@ -146,6 +147,7 @@
 		E20696F823290D41001EFDB2 /* Log.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Log.swift; sourceTree = "<group>"; };
 		E20696FC232A0021001EFDB2 /* VimacBridgingHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VimacBridgingHeader.h; sourceTree = "<group>"; };
 		E20696FF232A52EA001EFDB2 /* AlphabetHints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlphabetHints.swift; sourceTree = "<group>"; };
+		E20A43112631BEC400E7F3CE /* HoldKeyListener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoldKeyListener.swift; sourceTree = "<group>"; };
 		E20D0CB325581AEF00A5CAEE /* Trie.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Trie.swift; sourceTree = "<group>"; };
 		E20D0CB525581B3A00A5CAEE /* TrieTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrieTests.swift; sourceTree = "<group>"; };
 		E20D0CB725583DD200A5CAEE /* InputState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputState.swift; sourceTree = "<group>"; };
@@ -295,6 +297,14 @@
 			path = UserDefaults;
 			sourceTree = "<group>";
 		};
+		E20A43082631BEA800E7F3CE /* Activation */ = {
+			isa = PBXGroup;
+			children = (
+				E20A43112631BEC400E7F3CE /* HoldKeyListener.swift */,
+			);
+			path = Activation;
+			sourceTree = "<group>";
+		};
 		E222EB112607433700B38564 /* Modes */ = {
 			isa = PBXGroup;
 			children = (
@@ -379,6 +389,7 @@
 		E26172222322968500E396CA /* ViMac-Swift */ = {
 			isa = PBXGroup;
 			children = (
+				E20A43082631BEA800E7F3CE /* Activation */,
 				E222EB112607433700B38564 /* Modes */,
 				E20451A525F3ACA300CBFC7A /* UserDefaults */,
 				E204519E25F3A6BB00CBFC7A /* Extensions */,
@@ -786,6 +797,7 @@
 				E270F5CB2504D9DE00AD305A /* TraverseElementService.swift in Sources */,
 				E25FFA4825E1656F00721F2F /* GeometryUtils.swift in Sources */,
 				E26981BB23C9E35D00E46217 /* TISInputSourceExtension.swift in Sources */,
+				E20A43122631BEC400E7F3CE /* HoldKeyListener.swift in Sources */,
 				E2DFF5AD24815D3E00B4090D /* GeneralPreferenceViewController.swift in Sources */,
 				E23A1A8025E62DEA00D71D6E /* HintsViewController.swift in Sources */,
 				E266D916248AAC99005A261F /* UserPreferences.swift in Sources */,

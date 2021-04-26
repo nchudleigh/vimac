@@ -28,7 +28,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var compositeDisposable: CompositeDisposable
     var scrollModeDisposable: CompositeDisposable? = CompositeDisposable()
     
-    let modeCoordinator: ModeCoordinator
+    var modeCoordinator: ModeCoordinator!
     let overlayWindowController: OverlayWindowController
     var preferencesWindowController: PreferencesWindowController!
     var statusItemManager: StatusItemManager!
@@ -36,12 +36,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let frontmostAppService = FrontmostApplicationService.init()
     
     override init() {
-        
-        UIElement.globalMessagingTimeout = 1
-        
         InputSourceManager.initialize()
         overlayWindowController = OverlayWindowController()
-        modeCoordinator = ModeCoordinator()
         
         LaunchAtLogin.isEnabled = UserDefaults.standard.bool(forKey: Utils.shouldLaunchOnStartupKey)
         KeyboardShortcuts.shared.registerDefaults()
@@ -83,7 +79,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func onAXPermissionGranted() {
         closePermissionRequestingWindow()
         
+        UIElement.globalMessagingTimeout = 1
+        
         self.checkForUpdatesInBackground()
+        self.modeCoordinator = ModeCoordinator()
         self.setupWindowEventAndShortcutObservables()
         self.setupAXAttributeObservables()
     }

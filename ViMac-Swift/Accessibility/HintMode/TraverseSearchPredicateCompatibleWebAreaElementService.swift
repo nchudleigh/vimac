@@ -35,12 +35,7 @@ class TraverseSearchPredicateCompatibleWebAreaElementService : TraverseElementSe
         
         if !tree.insert(element, parentId: parent?.rawElement) { return }
 
-        let children: [Element]? = {
-            if isSafari() {
-                return try? getRecursiveChildrenThroughSearchPredicateWithSearchKeys()
-            }
-            return try? getRecursiveChildrenThroughSearchPredicate()
-        }()
+        let children: [Element]? = try? getRecursiveChildrenThroughSearchPredicate()
 
         var visibleChildren: [Element] = []
         for child in children ?? [] {
@@ -72,45 +67,63 @@ class TraverseSearchPredicateCompatibleWebAreaElementService : TraverseElementSe
         return element.frame
     }
     
-    private func isSafari() -> Bool {
-        app.bundleIdentifier == "com.apple.Safari"
-    }
-    
+    // use search predicates to query for web area children elements
+    // Note: There is a difference in implementation of search keys for Chromium and WebKit,
+    // hence the need to have different approaches "one-shot with all search keys" (WebKit) vs "multiple-shots with a single search key" (Chromium)
+    // Chromium has fixed their implementation to act like WebKit, but current versions (~90.0) need this workaround.
+    // https://chromium-review.googlesource.com/c/chromium/src/+/2773520
     private func getRecursiveChildrenThroughSearchPredicate() throws -> [Element]? {
         let query: [String: Any] = [
             "AXDirection": "AXDirectionNext",
             "AXImmediateDescendantsOnly": false,
             "AXResultsLimit": -1,
-            "AXVisibleOnly": true,
-            "AXSearchKey": "AXAnyTypeSearchKey"
+            "AXVisibleOnly": true
         ]
-        let rawElements: [AXUIElement]? = try UIElement(element.rawElement).parameterizedAttribute("AXUIElementsForSearchPredicate", param: query)
-        let elements = rawElements?
+        
+        let searchKeys = [
+            "AXButtonSearchKey",
+            "AXCheckBoxSearchKey",
+            "AXControlSearchKey",
+            "AXGraphicSearchKey",
+            "AXLinkSearchKey",
+            "AXRadioGroupSearchKey",
+            "AXTextFieldSearchKey"
+        ]
+        
+        var multiSearchKeyQuery = query
+        multiSearchKeyQuery["AXSearchKey"] = searchKeys
+        
+        let multiSearchKeyQueryMatches: Int = (try UIElement(element.rawElement).parameterizedAttribute("AXUIElementCountForSearchPredicate", param: multiSearchKeyQuery)) ?? 0
+        
+        if multiSearchKeyQueryMatches > 0 {
+            let rawElements: [AXUIElement]? = try UIElement(element.rawElement).parameterizedAttribute("AXUIElementsForSearchPredicate", param: multiSearchKeyQuery)
+            let elements = rawElements?
+                .map({ Element.initialize(rawElement: $0) })
+                .compactMap({ $0 })
+            return elements
+        }
+        
+        var elements: [AXUIElement] = []
+        for searchKey in searchKeys {
+            var singleSearchKeyQuery = query
+            singleSearchKeyQuery["AXSearchKey"] = searchKey
+            if let rawElements: [AXUIElement] = try UIElement(element.rawElement).parameterizedAttribute("AXUIElementsForSearchPredicate", param: singleSearchKeyQuery) {
+                elements.append(contentsOf: rawElements)
+            }
+        }
+        
+        let uniqueElements = elements.uniqued()
+        
+        return uniqueElements
             .map({ Element.initialize(rawElement: $0) })
             .compactMap({ $0 })
-        return elements
     }
-    
-    private func getRecursiveChildrenThroughSearchPredicateWithSearchKeys() throws -> [Element]? {
-        let query: [String: Any] = [
-            "AXDirection": "AXDirectionNext",
-            "AXImmediateDescendantsOnly": false,
-            "AXResultsLimit": -1,
-            "AXVisibleOnly": true,
-            "AXSearchKey": [
-                "AXButtonSearchKey",
-                "AXCheckBoxSearchKey",
-                "AXControlSearchKey",
-                "AXGraphicSearchKey",
-                "AXLinkSearchKey",
-                "AXRadioGroupSearchKey",
-                "AXTextFieldSearchKey"
-            ]
-        ]
-        let rawElements: [AXUIElement]? = try UIElement(element.rawElement).parameterizedAttribute("AXUIElementsForSearchPredicate", param: query)
-        let elements = rawElements?
-            .map({ Element.initialize(rawElement: $0) })
-            .compactMap({ $0 })
-        return elements
+}
+
+// https://stackoverflow.com/a/25739498
+extension Sequence where Element: Hashable {
+    func uniqued() -> [Element] {
+        var set = Set<Element>()
+        return filter { set.insert($0).inserted }
     }
 }
