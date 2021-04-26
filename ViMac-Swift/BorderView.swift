@@ -9,8 +9,8 @@
 import Cocoa
 
 class BorderView: NSView {
-    let SIZE = CGFloat(2)
-    let borderColor = NSColor.red
+    let SIZE = CGFloat(3)
+    let borderColor = UserDefaultsProperties.scrollFrameColor.read()
 
     override func draw(_ dirtyRect: NSRect) {
         let rect = cleanRect(dirtyRect: dirtyRect, size: SIZE)
