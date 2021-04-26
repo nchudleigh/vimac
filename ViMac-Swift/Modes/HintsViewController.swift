@@ -70,22 +70,19 @@ class HintsViewController: NSViewController {
     // are you changing the location where hints are rendered?
     // make sure to update HintModeController#performHintAction as well
     func renderHint(_ hint: Hint) -> HintView? {
-        let view = HintView(associatedElement: hint.element, hintTextSize: CGFloat(textSize), hintText: hint.text, typedHintText: "")
         guard let elementFrame = self.elementFrame(hint.element) else { return nil }
         
-        let hintOrigin: NSPoint = {
-            // position hint on bottom-left of AXLinks (see #373)
-            if hint.element.role == "AXLink" {
-                return elementFrame.origin
-            }
-            
-            // position hint on center of element
-            let elementCenter = GeometryUtils.center(elementFrame)
-            return NSPoint(
-                x: elementCenter.x - (view.intrinsicContentSize.width / 2),
-                y: elementCenter.y - (view.intrinsicContentSize.height / 2)
-            )
-        }()
+        let elementCenter = GeometryUtils.center(elementFrame)
+
+        //let clickPosition = hint.clickPosition()
+
+        let view = HintView(associatedElement: hint.element, hintTextSize: CGFloat(textSize), hintText: hint.text, typedHintText: "")
+
+        // position hint just below element
+        let hintOrigin = NSPoint(
+            x: elementCenter.x - (view.intrinsicContentSize.width / 2),
+            y: elementCenter.y - (view.intrinsicContentSize.height * 1.2)// / 2)
+        )
 
         if hintOrigin.x.isNaN || hintOrigin.y.isNaN {
             return nil
