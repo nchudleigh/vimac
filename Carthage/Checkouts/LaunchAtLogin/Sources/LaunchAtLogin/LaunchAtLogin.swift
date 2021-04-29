@@ -9,19 +9,19 @@ public enum LaunchAtLogin {
 	public static let observable = Observable()
 
 	@available(macOS 10.15, *)
-	private static var _publisher = CurrentValueSubject<Bool, Never>(isEnabled)
+	private static let _publisher = CurrentValueSubject<Bool, Never>(isEnabled)
 	@available(macOS 10.15, *)
-	public static var publisher = _publisher.eraseToAnyPublisher()
+	public static let publisher = _publisher.eraseToAnyPublisher()
 
 	private static let id = "\(Bundle.main.bundleIdentifier!)-LaunchAtLoginHelper"
 
 	public static var isEnabled: Bool {
 		get {
-			guard let jobs = (SMCopyAllJobDictionaries(kSMDomainUserLaunchd).takeRetainedValue() as? [[String: AnyObject]]) else {
+			guard let jobs = (SMCopyAllJobDictionaries(kSMDomainUserLaunchd)?.takeRetainedValue() as? [[String: AnyObject]]) else {
 				return false
 			}
 
-			let job = jobs.first { $0["Label"] as! String == id }
+			let job = jobs.first { ($0["Label"] as? String) == id }
 
 			return job?["OnDemand"] as? Bool ?? false
 		}
