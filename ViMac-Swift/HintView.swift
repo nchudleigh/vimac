@@ -32,15 +32,9 @@ class HintView: NSView {
 
         self.wantsLayer = true
         
- //       self.layer?.borderWidth = borderWidth
-
-//        self.layer?.backgroundColor = NSColor.red.cgColor // HintView.backgroundColor.cgColor
-//        self.layer?.borderColor = HintView.borderColor.cgColor
-//        self.layer?.cornerRadius = cornerRadius
 
         self.translatesAutoresizingMaskIntoConstraints = false
         
-//        self.hintTextView!.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true
         self.hintTextView!.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -2 * borderWidth).isActive = true
 
         self.hintTextView!.centerXAnchor.constraint(equalTo: self.centerXAnchor).isActive = true
