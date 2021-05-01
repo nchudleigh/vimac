@@ -81,7 +81,7 @@ class HintsViewController: NSViewController {
         // position hint just below element
         let hintOrigin = NSPoint(
             x: elementCenter.x - (view.intrinsicContentSize.width / 2),
-            y: elementCenter.y - (view.intrinsicContentSize.height * 1.2)// / 2)
+            y: elementCenter.y - (view.intrinsicContentSize.height)
         )
 
         if hintOrigin.x.isNaN || hintOrigin.y.isNaN {
