@@ -8,15 +8,18 @@
 
 import Cocoa
 import RxSwift
+import AXSwift
 
 class HintModeQueryService {
     let app: NSRunningApplication?
     let window: Element?
+    let menu: Element?
     let hintCharacters: String
     
-    init(app: NSRunningApplication?, window: Element?, hintCharacters: String) {
+    init(app: NSRunningApplication?, window: Element?, menu: Element?, hintCharacters: String) {
         self.app = app
         self.window = window
+        self.menu = menu
         self.hintCharacters = hintCharacters
     }
     
@@ -40,6 +43,15 @@ class HintModeQueryService {
             menuBarElements = Utils.singleToObservable(single: queryMenuBarSingle(app: app))
         }
         
+        if let menu = menu {
+            return Utils.eagerConcat(observables: [
+                menuBarElements,
+                Utils.singleToObservable(single: queryMenuBarExtrasSingle()),
+                Utils.singleToObservable(single: queryNotificationCenterSingle()),
+                Utils.singleToObservable(single: queryOpenedMenuSingle(menu: menu))
+            ])
+        }
+        
         var windowElements = nothing
         if let app = app,
            let window = window {
@@ -60,6 +72,26 @@ class HintModeQueryService {
                 let service = QueryWindowService.init(app: app, window: window)
                 let elements = try? service.perform()
                 event(.success(elements ?? []))
+            })
+            thread.start()
+            return Disposables.create {
+                thread.cancel()
+            }
+        })
+    }
+    
+    private func queryOpenedMenuSingle(menu: Element) -> Single<[Element]> {
+        return Single.create(subscribe: { event in
+            let thread = Thread.init(block: {
+                print(menu.role)
+                let menuItemsOptional: [AXUIElement]? = try? UIElement(menu.rawElement).attribute(.children)
+                print(menuItemsOptional?.count)
+                let menuItems = menuItemsOptional ?? []
+                let menuItemElements = menuItems
+                    .map { Element.initialize(rawElement: $0) }
+                    .compactMap({ $0 })
+                print(menuItemElements)
+                event(.success(menuItemElements))
             })
             thread.start()
             return Disposables.create {

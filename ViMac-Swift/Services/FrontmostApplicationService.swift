@@ -15,6 +15,7 @@ class FrontmostApplicationService {
     struct ApplicationNotification {
         let pid: pid_t
         let notification: String
+        let element: AXUIElement
     }
     
     private let disposeBag = DisposeBag()
@@ -85,6 +86,24 @@ class FrontmostApplicationService {
         disposeBag.insert(disposable)
     }
     
+    func observeMenuOpened(_ onEvent: @escaping (_ element: AXUIElement) -> ()) {
+        applicationNotificationObservable
+            .filter { $0.notification == kAXMenuOpenedNotification }
+            .bind { notification in
+                onEvent(notification.element)
+            }
+            .disposed(by: self.disposeBag)
+    }
+    
+    func observeMenuClosed(_ onEvent: @escaping (_ element: AXUIElement) -> ()) {
+        applicationNotificationObservable
+            .filter { $0.notification == kAXMenuClosedNotification }
+            .bind { notification in
+                onEvent(notification.element)
+            }
+            .disposed(by: self.disposeBag)
+    }
+    
     private func createFrontmostApplicationObservable() -> Observable<NSRunningApplication?> {
         Observable.create { observer in
             let service = ObserveFrontmostApplicationService.init()
@@ -114,16 +133,6 @@ class FrontmostApplicationService {
             }
     }
     
-    private func createMenuOpenedObservable() -> Observable<Element?> {
-        applicationNotificationObservable
-            .filter { $0.notification == kAXMenuOpenedNotification }
-            .map { notification in
-                let windowOptional: UIElement? = try? Application(forProcessID: notification.pid)?.attribute(Attribute.focusedWindow)
-                guard let window = windowOptional else { return nil }
-                return Element.initialize(rawElement: window.element)
-            }
-    }
-    
     private func createFocusedWindowDisturbedObservable() -> Observable<ApplicationNotification> {
         applicationNotificationObservable
             .filter { notification in
@@ -141,7 +150,8 @@ extension FrontmostApplicationService: ObserveApplicationNotificationsServiceDel
     func onNotification(pid: pid_t, notification: String, element: AXUIElement) {
         _applicationNotification.onNext(.init(
             pid: pid,
-            notification: notification
+            notification: notification,
+            element: element
         ))
     }
 }

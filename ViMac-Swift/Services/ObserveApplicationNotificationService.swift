@@ -65,7 +65,7 @@ class ObserveApplicationNotificationService {
     func addNotification(observer: AXObserver, element: AXUIElement, notification: String) {
         let selfPtr = UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque())
         let error = AXObserverAddNotification(observer, element, notification as CFString, selfPtr)
-        if error != .success {
+    if error != .success {
             os_log("AXObserverAddNotification %@ failed with error code %@", notification, String(describing: error.rawValue) )
             return
         }
