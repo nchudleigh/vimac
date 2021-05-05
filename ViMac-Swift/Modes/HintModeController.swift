@@ -30,7 +30,7 @@ extension NSEvent {
     
     static func suppressingGlobalEventMonitor(matching: CGEventMask) -> Observable<NSEvent> {
         Observable.create({ observer in
-            let tap = GlobalEventTap.init(eventMask: matching, onEvent: { cgEvent -> CGEvent? in
+            let tap = GlobalEventTap.init(eventMask: matching, placement: .tailAppendEventTap, onEvent: { cgEvent -> CGEvent? in
                 guard let nsEvent = NSEvent(cgEvent: cgEvent) else {
                     return cgEvent
                 }

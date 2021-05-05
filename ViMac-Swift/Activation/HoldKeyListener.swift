@@ -30,7 +30,7 @@ class HoldKeyListener {
     func start() {
         if eventTap == nil {
             let mask = CGEventMask(1 << CGEventType.keyDown.rawValue | 1 << CGEventType.keyUp.rawValue)
-            eventTap = GlobalEventTap(eventMask: mask, onEvent: { [weak self] event -> CGEvent? in
+            eventTap = GlobalEventTap(eventMask: mask, placement: .headInsertEventTap, onEvent: { [weak self] event -> CGEvent? in
                 guard let self = self else { return event }
                 
                 return self.onEvent(event: event)
