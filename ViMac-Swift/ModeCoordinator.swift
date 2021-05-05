@@ -80,6 +80,7 @@ class ModeCoordinator: ModeControllerDelegate {
     
     func modeDeactivated(controller: ModeController) {
         self.modeController = nil
+        self.openedMenu = nil
         
         if self.forceKBLayout != nil {
             self.priorKBLayout?.select()
