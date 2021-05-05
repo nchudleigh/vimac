@@ -147,7 +147,8 @@ class ModeCoordinator: ModeControllerDelegate {
         
         Analytics.shared().track("Hint Mode Activated", properties: [
             "Target Application": app?.bundleIdentifier as Any,
-            "Activation Mechanism": mechanism
+            "Activation Mechanism": mechanism,
+            "Root Element Role": openedMenu?.role ?? window?.role
         ])
         
         let activationCount = UserDefaults.standard.integer(forKey: "hintModeActivationCount")
