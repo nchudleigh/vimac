@@ -322,9 +322,9 @@ class HintModeController: ModeController {
             // so a click is performed there
             if element.role == "AXLink" {
                 return NSPoint(
-                    // tiny offset in case clicking on the edge of the element does nothing
-                    x: element.frame.origin.x + 5,
-                    y: element.frame.origin.y + element.frame.height - 5
+                    // inset from corner by 10 pixels, but no more than halfway
+                    x: element.frame.origin.x + min(element.frame.width / 2, 10),
+                    y: element.frame.origin.y + element.frame.height - min(element.frame.height / 2, 10)
                 )
             }
             return GeometryUtils.center(element.frame)
