@@ -32,6 +32,17 @@ extension PreferenceProperty {
     }
 }
 
+func stringColor(colorString: String) -> NSColor {
+    let components =  colorString.split(separator: " ")
+    return NSColor(red: CGFloat((components[0] as NSString).doubleValue),
+                green: CGFloat((components[1] as NSString).doubleValue),
+                blue: CGFloat((components[2] as NSString).doubleValue),
+                alpha: CGFloat((components[3] as NSString).doubleValue) )
+}
+func colorString(color: NSColor) -> String {
+    return String(format: "%f %f %f %f", color.redComponent, color.greenComponent, color.blueComponent, color.alphaComponent)
+}
+
 struct UserPreferences {
     struct HintMode {
         class CustomCharactersProperty : PreferenceProperty {
@@ -67,6 +78,29 @@ struct UserPreferences {
             static func readAsFloat() -> Float {
                 return Float(read())!
             }
+        }
+
+        class HintColorProperty : PreferenceProperty {
+
+            typealias T = String
+
+            static var key = "HintColor"
+
+            static var defaultValue = colorString(color: UserDefaultsProperties.hintColor.read())
+
+            static func readColor() -> NSColor {
+                let string = read()
+                return stringColor(colorString: string)
+            }
+
+            static func saveColor(value: NSColor) {
+                self.save(value: colorString(color: value))
+            }
+
+            static func isValid(value: String) -> Bool {
+                return true
+            }
+
         }
     }
     
@@ -168,5 +202,29 @@ struct UserPreferences {
                 return true
             }
         }
+
+        class ScrollFrameColorProperty : PreferenceProperty {
+
+            typealias T = String
+
+            static var key = "ScrollColor"
+
+            static var defaultValue = colorString(color: UserDefaultsProperties.scrollFrameColor.read())
+
+            static func readColor() -> NSColor {
+                let string = read()
+                return stringColor(colorString: string)
+            }
+
+            static func saveColor(value: NSColor) {
+                self.save(value: colorString(color: value))
+            }
+
+            static func isValid(value: String) -> Bool {
+                return true
+            }
+
+        }
+
     }
 }

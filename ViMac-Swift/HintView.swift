@@ -11,7 +11,6 @@ import AXSwift
 
 class HintView: NSView {
     static let borderColor = NSColor.darkGray
-    static let backgroundColor = UserDefaultsProperties.hintColor.read()
     static let untypedHintColor = NSColor.black
     static let typedHintColor = NSColor(red: 212 / 255, green: 172 / 255, blue: 58 / 255, alpha: 1)
 
@@ -33,7 +32,7 @@ class HintView: NSView {
         
         self.layer?.borderWidth = borderWidth
         
-        self.layer?.backgroundColor = HintView.backgroundColor.cgColor
+        self.layer?.backgroundColor = UserPreferences.HintMode.HintColorProperty.readColor().cgColor    
         self.layer?.borderColor = HintView.borderColor.cgColor
         self.layer?.cornerRadius = cornerRadius
 

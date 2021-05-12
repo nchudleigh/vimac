@@ -10,13 +10,12 @@ import Cocoa
 
 class BorderView: NSView {
     let SIZE = CGFloat(3)
-    let borderColor = UserDefaultsProperties.scrollFrameColor.read()
 
     override func draw(_ dirtyRect: NSRect) {
         let rect = cleanRect(dirtyRect: dirtyRect, size: SIZE)
         let border = NSBezierPath.init(rect: rect)
         border.lineWidth = SIZE
-        self.borderColor.set()
+        UserPreferences.ScrollMode.ScrollFrameColorProperty.readColor().set()
         border.stroke()
     }
 

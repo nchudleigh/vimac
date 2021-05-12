@@ -11,7 +11,8 @@ final class ScrollModePreferenceViewController: NSViewController, NSTextFieldDel
     private var scrollSensitivityView: NSSlider!
     private var revHorizontalScrollView: NSButton!
     private var revVerticalScrollView: NSButton!
-    
+    private var scrollFrameColorWell: NSColorWell!
+
     init() {
         if #available(OSX 11.0, *) {
             self.toolbarItemIcon = NSImage(systemSymbolName: "dpad", accessibilityDescription: nil)!
@@ -68,6 +69,15 @@ final class ScrollModePreferenceViewController: NSViewController, NSTextFieldDel
         revVerticalScrollView.state = UserPreferences.ScrollMode.ReverseVerticalScrollProperty.read() ? .on : .off
         grid.addRow(with: [NSGridCell.emptyContentView, revVerticalScrollView])
         
+        let scrollColorLabel = NSTextField(labelWithString: "Scroll Color:")
+        scrollFrameColorWell = NSColorWell()
+        scrollFrameColorWell.action = #selector(onScrollFrameColorWellEdit)
+        scrollFrameColorWell.color = UserPreferences.ScrollMode.ScrollFrameColorProperty.readColor()
+        scrollFrameColorWell.widthAnchor.constraint(equalToConstant: 25).isActive = true
+        scrollFrameColorWell.heightAnchor.constraint(equalToConstant: 25).isActive = true
+
+        let scrollColorRow: [NSView] = [scrollColorLabel, scrollFrameColorWell]
+        grid.addRow(with: scrollColorRow)
 
         self.view.addSubview(grid)
         
@@ -81,7 +91,12 @@ final class ScrollModePreferenceViewController: NSViewController, NSTextFieldDel
         ])
     }
     
-    func isScrollKeysValid(keys: String) -> Bool {
+    @objc func onScrollFrameColorWellEdit() {
+        let value = scrollFrameColorWell.color
+        UserPreferences.ScrollMode.ScrollFrameColorProperty.saveColor(value: value)
+    }
+
+     func isScrollKeysValid(keys: String) -> Bool {
         return UserPreferences.ScrollMode.ScrollKeysProperty.isValid(value: keys)
     }
     
