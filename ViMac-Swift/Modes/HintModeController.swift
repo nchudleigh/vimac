@@ -563,7 +563,7 @@ class QueryHintableWindowsService {
             windows.remove(at: mainIndex)
         }
         
-        return windows
+        return windows.sorted(by: { $0.ax.frame.origin.x <  $1.ax.frame.origin.x })
     }
 
     private func isWindowVisibleAtPoint(window: AXUIElement, x: Float, y: Float) throws -> Bool {
