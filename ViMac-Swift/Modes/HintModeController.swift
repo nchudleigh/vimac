@@ -96,7 +96,7 @@ class ContentViewController: NSViewController {
     }
 
     override func loadView() {
-        self.view = NSView()
+        self.view = NSView()        
     }
 
     func setChildViewController(_ vc: NSViewController) {
@@ -193,6 +193,64 @@ class HintModeUserInterface {
     }
 }
 
+class WindowHintsUserInterface {
+    var windowHints: [WindowHint]?
+    var wcVcPairs: [(OverlayWindowController, WindowHintsViewController)]?
+    
+    func show() {
+        guard let windowHints = windowHints else {
+            return
+        }
+        
+        var windowHintsByScreen: [NSScreen : [WindowHint]] = [:]
+        for windowHint in windowHints {
+            // window belongs to screen where its top-left lies
+            let windowFrame = GeometryUtils.convertAXFrameToGlobal(windowHint.window.ax.frame)
+            if let screen = NSScreen.screens.first(where: { $0.frame.contains(GeometryUtils.center(windowFrame)) }) {
+                if windowHintsByScreen[screen] == nil {
+                    windowHintsByScreen[screen] = []
+                }
+                windowHintsByScreen[screen]!.append(windowHint)
+            }
+        }
+        
+        var pairs: [(OverlayWindowController, WindowHintsViewController)] = []
+        for (screen, windowHints) in windowHintsByScreen {
+
+            let windowController = OverlayWindowController()
+            windowController.window = NonKeyOverlayWindow()
+            let windowHintsViewController = WindowHintsViewController(hints: windowHints)
+            
+            windowController.window?.contentViewController = windowHintsViewController
+            windowController.fitToFrame(screen.frame)
+            
+            pairs.append((windowController, windowHintsViewController))
+        }
+        
+        self.wcVcPairs = pairs
+        
+        for (wc, _) in pairs {
+            wc.showWindow(nil)
+            wc.window?.orderFront(nil)
+        }
+    }
+    
+    func hide() {
+        for (wc, vc) in (self.wcVcPairs ?? []) {
+            vc.view.removeFromSuperview()
+            wc.window?.contentViewController = nil
+            wc.close()
+        }
+    }
+    
+    func updateInput(input: String) {
+        for (_, vc) in (self.wcVcPairs ?? []) {
+            vc.updateTyped(typed: input)
+        }
+    }
+
+}
+
 class HintModeController: ModeController {
     weak var delegate: ModeControllerDelegate?
     private var activated = false
@@ -203,8 +261,10 @@ class HintModeController: ModeController {
     let hintCharacters = UserPreferences.HintMode.CustomCharactersProperty.read()
     
     private var ui: HintModeUserInterface?
+    private var windowHintsUi: WindowHintsUserInterface?
     private var input: String?
     private var hints: [Hint]?
+    private var windowHints: [WindowHint]?
     
     let app: NSRunningApplication?
     let window: Element?
@@ -235,11 +295,20 @@ class HintModeController: ModeController {
                 self?.deactivate()
             }
         )
+        
+        self.queryWindowHints(onComplete: { [weak self] windowHints in
+            guard let self = self else { return }
+            
+            let windowHintsUi = WindowHintsUserInterface()
+            windowHintsUi.windowHints = windowHints
+            windowHintsUi.show()
+            self.windowHintsUi = windowHintsUi
+            self.windowHints = windowHints
+        })
     }
     
     func deactivate() {
         if !activated { return }
-        guard let ui = ui else { return }
 
         activated = false
         
@@ -249,7 +318,10 @@ class HintModeController: ModeController {
         
         HideCursorGlobally.unhide()
         
-        ui.hide()
+        windowHintsUi?.hide()
+        self.windowHintsUi = nil
+        
+        ui?.hide()
         self.ui = nil
         
         self.delegate?.modeDeactivated(controller: self)
@@ -280,16 +352,33 @@ class HintModeController: ModeController {
             ui.rotateHints()
         case .backspace:
             guard let ui = ui,
+                  let windowHintsUi = windowHintsUi,
                   let _ = input else { return }
             _ = self.input!.popLast()
             ui.updateInput(input: self.input!)
+            windowHintsUi.updateInput(input: self.input!)
         case .advance(let by, let action):
             guard let ui = ui,
+                  let windowHintsUi = windowHintsUi,
                   let input = input,
-                  let hints = hints else { return }
+                  let hints = hints,
+                  let windowHints = windowHints else { return }
             
             let newInput = input + by
             self.input = newInput
+            
+            ui.updateInput(input: newInput)
+            windowHintsUi.updateInput(input: newInput)
+
+            if let matchingWindowHint = windowHints.first(where: { $0.text.starts(with: newInput.uppercased() )}) {
+                Analytics.shared().track("Hint Mode Action Performed", properties: [
+                    "Target Application": app?.bundleIdentifier as Any,
+                    "Hint Action": "Window Raised"
+                ])
+                self.deactivate()
+                focusWindow(window: matchingWindowHint.window.ax.rawElement, pid: matchingWindowHint.window.cg.pid)
+                return
+            }
 
             let hintsWithInputAsPrefix = hints.filter { $0.text.starts(with: newInput.uppercased()) }
 
@@ -313,9 +402,17 @@ class HintModeController: ModeController {
                 performHintAction(matchingHint, action: action)
                 return
             }
-
-            ui.updateInput(input: newInput)
         }
+    }
+    
+    // activate window without bringing forward other windows of the same app
+    // uses the depreciated SetFrontProcessWithOptions since it has the above behaviour
+    private func focusWindow(window: AXUIElement, pid: pid_t) {
+        if AXUIElementSetAttributeValue(window, kAXMainAttribute as CFString, kCFBooleanTrue) != .success {
+            return
+        }
+        HideCursorGlobally._activateWindow(pid)
+
     }
     
     private func queryHints(onSuccess: @escaping ([Hint]) -> Void, onError: @escaping (Error) -> Void) {
@@ -329,6 +426,24 @@ class HintModeController: ModeController {
                 onError: { onError($0) }
             )
             .disposed(by: disposeBag)
+    }
+    
+    private func queryWindowHints(onComplete: @escaping ([WindowHint]) -> Void) {
+        DispatchQueue.global(qos: .userInitiated).async {
+            let windows = QueryHintableWindowsService.init()
+                .perform()
+            var windowHints: [WindowHint] = []
+            var count = 1
+            for window in windows {
+                let hint = WindowHint(window: window, text: String(count))
+                windowHints.append(hint)
+                count += 1
+            }
+            
+            DispatchQueue.main.async {
+                onComplete(windowHints)
+            }
+        }
     }
 
     private func listenForKeyPress(onEvent: @escaping (NSEvent) -> Void) {
@@ -377,5 +492,171 @@ class HintModeController: ModeController {
 
     private func logError(_ e: Error) {
         os_log("[Hint mode] query error: %@", log: Log.accessibility, String(describing: e))
+    }
+}
+
+import AXSwift
+
+struct WindowInfo {
+    let pid: pid_t
+    let frame: NSRect
+    let layer: Int
+    let rawInfo: [String: AnyObject]
+    let number: CGWindowID
+}
+
+struct Window {
+    let cg: WindowInfo
+    let ax: Element
+    let visiblePoint: NSPoint
+}
+
+struct WindowHint {
+    let window: Window
+    let text: String
+}
+
+class QueryHintableWindowsService {
+    func perform() -> [Window] {
+        let cgWindows = fetchCgWindows()
+                            // remove menu bar items
+                            .filter { $0.frame.height > 50 }
+                            // remove floating windows
+                            .filter { $0.layer == 0 }
+        var axWindowsByPid = fetchAxWindowsByPid()
+        var windows: [Window] = []
+        
+        for cgWindow in cgWindows {
+            guard let axWindows = axWindowsByPid[cgWindow.pid] else { continue }
+            // best guess based on frame and order
+            // TODO: look into associating by title, ideally without screen recording permission
+            guard let associatedAxWindowIndex = axWindows.firstIndex(where: { $0.frame == cgWindow.frame }) else { continue }
+            let axWindow = axWindows[associatedAxWindowIndex]
+            
+            // remove the ax window so other cgWindows cannot match with it
+            axWindowsByPid[cgWindow.pid]!.remove(at: associatedAxWindowIndex)
+
+            let center = GeometryUtils.center(axWindow.frame)
+            let isVisibleAtCenter = try? isWindowVisibleAtPoint(window: axWindow.rawElement, x: Float(center.x), y: Float(center.y))
+            if isVisibleAtCenter ?? false {
+                let window = Window(cg: cgWindow, ax: axWindow, visiblePoint: center)
+                windows.append(window)
+                continue
+            }
+            
+            let topLeft = NSPoint(
+                x: axWindow.frame.origin.x + min(50, axWindow.frame.width),
+                y: axWindow.frame.origin.y + min(50, axWindow.frame.height)
+            )
+            let isVisibleAtTopLeft = try? isWindowVisibleAtPoint(window: axWindow.rawElement, x: Float(topLeft.x), y: Float(topLeft.y))
+            if isVisibleAtTopLeft ?? false {
+                let window = Window(cg: cgWindow, ax: axWindow, visiblePoint: topLeft)
+                windows.append(window)
+                continue
+            }
+        }
+        
+        if let mainIndex = windows.firstIndex(where: { window in
+            let main: Bool? = try? UIElement(window.ax.rawElement).attribute(.main)
+            return main ?? false
+        }) {
+            windows.remove(at: mainIndex)
+        }
+        
+        return windows
+    }
+
+    private func isWindowVisibleAtPoint(window: AXUIElement, x: Float, y: Float) throws -> Bool {
+        guard let element = try systemWideElement.elementAtPosition(x, y) else { return false }
+        guard let role: String = try element.attribute(.role) else { return false }
+        
+        var _windowAtPosition: UIElement?
+        if role == "AXWindow" {
+            _windowAtPosition = element
+        } else {
+            guard let window: UIElement = try element.attribute(.window) else { return false }
+            _windowAtPosition = window
+        }
+        let windowAtPosition = _windowAtPosition!
+        
+        return windowAtPosition.element == window
+        
+    }
+    
+    // fetches all windows
+    // windows are ordered from top to bottom
+    private func fetchCgWindows() -> [WindowInfo] {
+        let windowInfosRef = CGWindowListCopyWindowInfo(
+            CGWindowListOption(rawValue:
+                CGWindowListOption.optionOnScreenOnly.rawValue | CGWindowListOption.excludeDesktopElements.rawValue
+            ),
+            kCGNullWindowID
+        )
+
+        var windowInfos: [WindowInfo] = []
+        for i in 0..<CFArrayGetCount(windowInfosRef) {
+            let lineUnsafePointer: UnsafeRawPointer = CFArrayGetValueAtIndex(windowInfosRef, i)
+            let lineRef = unsafeBitCast(lineUnsafePointer, to: CFDictionary.self)
+            let dict = lineRef as [NSObject: AnyObject]
+
+            guard let item = dict as? [String: AnyObject] else {
+                continue
+            }
+            
+            if let x = item["kCGWindowBounds"]?["X"] as? Int,
+                let y = item["kCGWindowBounds"]?["Y"] as? Int,
+                let width = item["kCGWindowBounds"]?["Width"] as? Int,
+                let height = item["kCGWindowBounds"]?["Height"] as? Int,
+                let pid = item["kCGWindowOwnerPID"] as? pid_t,
+                let layer = item["kCGWindowLayer"] as? Int,
+                let number = item["kCGWindowNumber"] as? CGWindowID {
+                let frame = NSRect(x: x, y: y, width: width, height: height)
+                windowInfos.append(
+                    .init(pid: pid, frame: frame, layer: layer, rawInfo: item, number: number)
+                )
+            }
+        }
+        return windowInfos
+    }
+    
+    // ax windows are of the same pid are in descending order
+    private func fetchAxWindowsByPid() -> [pid_t : [Element]] {
+        let apps = NSWorkspace.shared.runningApplications
+        var axWindowsByPid: [pid_t : [Element]] = [:]
+
+        for app in apps {
+            if let axApp = Application(forProcessID: app.processIdentifier) {
+                if let axWindows = try? axApp.windows() {
+                    let elements = axWindows
+                        .map({ $0.element })
+                        .map({ Element.initialize(rawElement: $0) })
+                        .compactMap({ $0 })
+                    axWindowsByPid[app.processIdentifier] = elements
+                }
+            }
+        }
+
+        return axWindowsByPid
+    }
+    
+    // groups windows into clusters of intersecting windows
+    // windows of the same cluster are in same order as in the original window array input
+    private func clusterCgWindows(windows: [WindowInfo]) -> [[WindowInfo]] {
+        var windowInfosClusters: [[WindowInfo]] = []
+        for windowInfo in windows {
+            let clusterIndex = windowInfosClusters.firstIndex(where: { cluster in
+                return cluster.contains(where: { clusterWindow in
+                    clusterWindow.frame.intersects(windowInfo.frame)
+                })
+            })
+
+            if let clusterIndex = clusterIndex {
+                windowInfosClusters[clusterIndex].append(windowInfo)
+            } else {
+                let cluster = [windowInfo]
+                windowInfosClusters.append(cluster)
+            }
+        }
+        return windowInfosClusters
     }
 }

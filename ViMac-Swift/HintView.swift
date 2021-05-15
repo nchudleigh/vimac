@@ -74,26 +74,96 @@ class HintView: NSView {
     }
 }
 
+class WindowHintView: NSView {
+    let borderColor = NSColor.darkGray
+    let backgroundColor = NSColor(red: 25 / 255, green: 25 / 255, blue: 25 / 255, alpha: 1)
+    let untypedHintColor = NSColor.white
+    let typedHintColor = NSColor.darkGray
+
+    let associatedElement: Element
+    var hintTextView: HintText?
+    
+    let borderWidth: CGFloat = 1.0
+    let cornerRadius: CGFloat = 3.0
+    let hintTextSize: CGFloat = 40
+
+    required init(associatedElement: Element, hintText: String, typedHintText: String) {
+        self.associatedElement = associatedElement
+        super.init(frame: .zero)
+
+        self.hintTextView = HintText(hintTextSize: hintTextSize, hintText: hintText, typedHintText: typedHintText, untypedHintColor: untypedHintColor, typedHintColor: typedHintColor)
+        self.subviews.append(hintTextView!)
+
+        self.wantsLayer = true
+        
+        
+        self.layer?.borderWidth = borderWidth
+        
+        self.layer?.backgroundColor = backgroundColor.cgColor
+        self.layer?.borderColor = borderColor.cgColor
+        self.layer?.cornerRadius = cornerRadius
+
+        self.translatesAutoresizingMaskIntoConstraints = false
+        
+        self.hintTextView!.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true
+        self.hintTextView!.centerXAnchor.constraint(equalTo: self.centerXAnchor).isActive = true
+        
+        self.widthAnchor.constraint(equalToConstant: width()).isActive = true
+        self.heightAnchor.constraint(equalToConstant: height()).isActive = true
+    }
+    
+    private func width() -> CGFloat {
+        return self.hintTextView!.intrinsicContentSize.width + 2 * borderWidth
+    }
+    
+    private func height() -> CGFloat {
+        self.hintTextView!.intrinsicContentSize.height + 2 * borderWidth
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError()
+    }
+    
+    override init(frame frameRect: NSRect) {
+        fatalError()
+    }
+    
+    override var intrinsicContentSize: NSSize {
+        return .init(
+            width: width(),
+            height: height()
+        )
+    }
+    
+    func updateTypedText(typed: String) {
+        self.hintTextView!.updateTypedText(typed: typed)
+    }
+}
+
 class HintText: NSTextField {
+    let hintText: String
+    let hintTextSize: CGFloat
     let untypedHintColor: NSColor
     let typedHintColor: NSColor
 
     required init(hintTextSize: CGFloat, hintText: String, typedHintText: String, untypedHintColor: NSColor, typedHintColor: NSColor) {
+        self.hintText = hintText
+        self.hintTextSize = hintTextSize
         self.untypedHintColor = untypedHintColor
         self.typedHintColor = typedHintColor
         super.init(frame: .zero)
         self.translatesAutoresizingMaskIntoConstraints = false
-        self.setup(hintTextSize: hintTextSize, hintText: hintText, typedHintText: typedHintText)
+        self.setup()
     }
 
     required init(coder: NSCoder) {
         fatalError()
     }
     
-    func setup(hintTextSize: CGFloat, hintText: String, typedHintText: String) {
+    func setup() {
         self.stringValue = hintText
         self.font = NSFont.systemFont(ofSize: hintTextSize, weight: .bold)
-        self.textColor = .black
+        self.textColor = untypedHintColor
 
         // isBezeled causes unwanted padding.
         self.isBezeled = false
