@@ -38,7 +38,7 @@ Tip(s):
 
 Activating Scroll-mode allows one to scroll through the scrollable areas of the frontmost window.
 
-Upon activation (default shortcut is `Control-J`), a red border surrounds the active scroll area:
+Upon activation (default shortcut is `Control-S`), a red border surrounds the active scroll area:
 
 <img src="scroll-mode.gif">
 
