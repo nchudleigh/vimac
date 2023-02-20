@@ -13,6 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface HideCursorGlobally : NSObject
 + (void) hide;
 + (void) unhide;
++ (void) _activateWindow: (pid_t) pid;
 @end
 
 NS_ASSUME_NONNULL_END

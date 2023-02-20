@@ -10,10 +10,10 @@ import Cocoa
 import AXSwift
 
 class HintView: NSView {
-    static let borderColor = NSColor.darkGray
-    static let backgroundColor = NSColor(red: 255 / 255, green: 224 / 255, blue: 112 / 255, alpha: 1)
-    static let untypedHintColor = NSColor.black
-    static let typedHintColor = NSColor(red: 212 / 255, green: 172 / 255, blue: 58 / 255, alpha: 1)
+    let borderColor = NSColor.darkGray
+    let backgroundColor = NSColor(red: 255 / 255, green: 224 / 255, blue: 112 / 255, alpha: 1)
+    let untypedHintColor = NSColor.black
+    let typedHintColor = NSColor(red: 212 / 255, green: 172 / 255, blue: 58 / 255, alpha: 1)
 
     let associatedElement: Element
     var hintTextView: HintText?
@@ -25,7 +25,7 @@ class HintView: NSView {
         self.associatedElement = associatedElement
         super.init(frame: .zero)
 
-        self.hintTextView = HintText(hintTextSize: hintTextSize, hintText: hintText, typedHintText: typedHintText)
+        self.hintTextView = HintText(hintTextSize: hintTextSize, hintText: hintText, typedHintText: typedHintText, untypedHintColor: untypedHintColor, typedHintColor: typedHintColor)
         self.subviews.append(hintTextView!)
 
         self.wantsLayer = true
@@ -33,8 +33,8 @@ class HintView: NSView {
         
         self.layer?.borderWidth = borderWidth
         
-        self.layer?.backgroundColor = HintView.backgroundColor.cgColor
-        self.layer?.borderColor = HintView.borderColor.cgColor
+        self.layer?.backgroundColor = backgroundColor.cgColor
+        self.layer?.borderColor = borderColor.cgColor
         self.layer?.cornerRadius = cornerRadius
 
         self.translatesAutoresizingMaskIntoConstraints = false
@@ -68,10 +68,71 @@ class HintView: NSView {
             height: height()
         )
     }
+    
+    func updateTypedText(typed: String) {
+        self.hintTextView!.updateTypedText(typed: typed)
+    }
+}
 
-    func addHintText(hintTextSize: CGFloat, hintText: String, typedHintText: String) {
-        self.hintTextView = HintText(hintTextSize: hintTextSize, hintText: hintText, typedHintText: typedHintText)
+class WindowHintView: NSView {
+    let borderColor = NSColor.darkGray
+    let backgroundColor = NSColor(red: 25 / 255, green: 25 / 255, blue: 25 / 255, alpha: 1)
+    let untypedHintColor = NSColor.white
+    let typedHintColor = NSColor.darkGray
+
+    let associatedElement: Element
+    var hintTextView: HintText?
+    
+    let borderWidth: CGFloat = 1.0
+    let cornerRadius: CGFloat = 3.0
+    let hintTextSize: CGFloat = 40
+
+    required init(associatedElement: Element, hintText: String, typedHintText: String) {
+        self.associatedElement = associatedElement
+        super.init(frame: .zero)
+
+        self.hintTextView = HintText(hintTextSize: hintTextSize, hintText: hintText, typedHintText: typedHintText, untypedHintColor: untypedHintColor, typedHintColor: typedHintColor)
         self.subviews.append(hintTextView!)
+
+        self.wantsLayer = true
+        
+        
+        self.layer?.borderWidth = borderWidth
+        
+        self.layer?.backgroundColor = backgroundColor.cgColor
+        self.layer?.borderColor = borderColor.cgColor
+        self.layer?.cornerRadius = cornerRadius
+
+        self.translatesAutoresizingMaskIntoConstraints = false
+        
+        self.hintTextView!.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true
+        self.hintTextView!.centerXAnchor.constraint(equalTo: self.centerXAnchor).isActive = true
+        
+        self.widthAnchor.constraint(equalToConstant: width()).isActive = true
+        self.heightAnchor.constraint(equalToConstant: height()).isActive = true
+    }
+    
+    private func width() -> CGFloat {
+        return self.hintTextView!.intrinsicContentSize.width + 2 * borderWidth
+    }
+    
+    private func height() -> CGFloat {
+        self.hintTextView!.intrinsicContentSize.height + 2 * borderWidth
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError()
+    }
+    
+    override init(frame frameRect: NSRect) {
+        fatalError()
+    }
+    
+    override var intrinsicContentSize: NSSize {
+        return .init(
+            width: width(),
+            height: height()
+        )
     }
     
     func updateTypedText(typed: String) {
@@ -80,21 +141,29 @@ class HintView: NSView {
 }
 
 class HintText: NSTextField {
+    let hintText: String
+    let hintTextSize: CGFloat
+    let untypedHintColor: NSColor
+    let typedHintColor: NSColor
 
-    required init(hintTextSize: CGFloat, hintText: String, typedHintText: String) {
+    required init(hintTextSize: CGFloat, hintText: String, typedHintText: String, untypedHintColor: NSColor, typedHintColor: NSColor) {
+        self.hintText = hintText
+        self.hintTextSize = hintTextSize
+        self.untypedHintColor = untypedHintColor
+        self.typedHintColor = typedHintColor
         super.init(frame: .zero)
         self.translatesAutoresizingMaskIntoConstraints = false
-        self.setup(hintTextSize: hintTextSize, hintText: hintText, typedHintText: typedHintText)
+        self.setup()
     }
 
     required init(coder: NSCoder) {
         fatalError()
     }
     
-    func setup(hintTextSize: CGFloat, hintText: String, typedHintText: String) {
+    func setup() {
         self.stringValue = hintText
         self.font = NSFont.systemFont(ofSize: hintTextSize, weight: .bold)
-        self.textColor = .black
+        self.textColor = untypedHintColor
 
         // isBezeled causes unwanted padding.
         self.isBezeled = false
@@ -114,10 +183,10 @@ class HintText: NSTextField {
         let hintText = self.attributedStringValue.string
         let attr = NSMutableAttributedString(string: hintText)
         let range = NSMakeRange(0, hintText.count)
-        attr.addAttributes([NSAttributedString.Key.foregroundColor : HintView.untypedHintColor], range: range)
+        attr.addAttributes([NSAttributedString.Key.foregroundColor : untypedHintColor], range: range)
         if hintText.lowercased().starts(with: typed.lowercased()) {
             let typedRange = NSMakeRange(0, typed.count)
-            attr.addAttributes([NSAttributedString.Key.foregroundColor : HintView.typedHintColor], range: typedRange)
+            attr.addAttributes([NSAttributedString.Key.foregroundColor : typedHintColor], range: typedRange)
         }
         self.attributedStringValue = attr
     }

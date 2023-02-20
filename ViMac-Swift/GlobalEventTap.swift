@@ -12,14 +12,16 @@ import os
 
 class GlobalEventTap {
     let eventMask: CGEventMask
+    let placement: CGEventTapPlacement
     let eventHandler: (CGEvent) -> CGEvent?
     
     var runLoopSource: CFRunLoopSource?
     var eventTap: CFMachPort?
     var selfPtr: Unmanaged<GlobalEventTap>!
     
-    init(eventMask: CGEventMask, onEvent: @escaping (CGEvent) -> CGEvent?) {
+    init(eventMask: CGEventMask, placement: CGEventTapPlacement, onEvent: @escaping (CGEvent) -> CGEvent?) {
         self.eventMask = eventMask
+        self.placement = placement
         self.eventHandler = onEvent
         selfPtr = Unmanaged.passRetained(self)
     }
@@ -92,7 +94,7 @@ class GlobalEventTap {
     }
     
     private func createEventTap() -> CFMachPort? {
-        let eventTap = CGEvent.tapCreate(tap: .cgSessionEventTap, place: .headInsertEventTap, options: .defaultTap, eventsOfInterest: eventMask, callback: { proxy, type, event, refcon in
+        let eventTap = CGEvent.tapCreate(tap: .cgSessionEventTap, place: placement, options: .defaultTap, eventsOfInterest: eventMask, callback: { proxy, type, event, refcon in
             // Trick from https://stackoverflow.com/questions/33260808/how-to-use-instance-method-as-callback-for-function-which-takes-only-func-or-lit
             let mySelf = Unmanaged<GlobalEventTap>.fromOpaque(refcon!).takeUnretainedValue()
             return mySelf.eventTapCallback(proxy: proxy, type: type, event: event, refcon: refcon)

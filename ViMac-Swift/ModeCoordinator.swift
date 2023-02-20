@@ -25,6 +25,7 @@ class ModeCoordinator: ModeControllerDelegate {
     let hintModeKeySequence: [Character] = ["f", "d"]
     private let keySequenceListener: VimacKeySequenceListener
     private var holdKeyListener: HoldKeyListener?
+    var openedMenu: AXUIElement?
     
     var modeController: ModeController?
     
@@ -79,6 +80,7 @@ class ModeCoordinator: ModeControllerDelegate {
     
     func modeDeactivated(controller: ModeController) {
         self.modeController = nil
+        self.openedMenu = nil
         
         if self.forceKBLayout != nil {
             self.priorKBLayout?.select()
@@ -130,12 +132,13 @@ class ModeCoordinator: ModeControllerDelegate {
         }
         
         let app = NSWorkspace.shared.frontmostApplication
+        let openedMenu = openedMenuElement()
         let window = app.flatMap { focusedWindow(app: $0) }
         
         if let app = app {
             // the app crashes when talking to its own accessibility server
             let isTargetVimac = app.bundleIdentifier == Bundle.main.bundleIdentifier
-            if isTargetVimac {
+        if isTargetVimac {
                 return
             }
         }
@@ -144,13 +147,14 @@ class ModeCoordinator: ModeControllerDelegate {
         
         Analytics.shared().track("Hint Mode Activated", properties: [
             "Target Application": app?.bundleIdentifier as Any,
-            "Activation Mechanism": mechanism
+            "Activation Mechanism": mechanism,
+            "Root Element Role": openedMenu?.role ?? window?.role
         ])
         
         let activationCount = UserDefaults.standard.integer(forKey: "hintModeActivationCount")
         UserDefaults.standard.set(activationCount + 1, forKey: "hintModeActivationCount")
         
-        modeController = HintModeController(app: app, window: window)
+        modeController = HintModeController(app: app, window: window, menu: openedMenu)
         modeController?.delegate = self
         modeController!.activate()
     }
@@ -165,6 +169,13 @@ class ModeCoordinator: ModeControllerDelegate {
             self?.forceKBLayout = inputSource
         })
         return observation
+    }
+    
+    func openedMenuElement() -> Element? {
+        guard let e = openedMenu else { return nil }
+        
+        // in addition to querying for useful attributes, it also tests for death of opened menu since it may no longer exist
+        return Element.initialize(rawElement: e)
     }
     
     // fun fact, focusedWindow need not return "AXWindow"...
