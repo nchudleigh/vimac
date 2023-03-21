@@ -97,6 +97,18 @@ class ContentViewController: NSViewController {
 struct Hint {
     let element: Element
     let text: String
+    func clickPosition() -> NSPoint {
+        // hints are shown at the bottom-left for AXLinks (see HintsViewController#renderHint),
+        // so a click is performed there
+        if element.role == "AXLink" {
+            return NSPoint(
+                // inset from corner by 10 pixels, but no more than halfway
+                x: element.frame.origin.x + min(element.frame.width / 2, 10),
+                y: element.frame.origin.y + element.frame.height - min(element.frame.height / 2, 10)
+            )
+        }
+        return GeometryUtils.center(element.frame)
+    }
 }
 
 enum HintAction: String {
@@ -316,19 +328,7 @@ class HintModeController: ModeController {
     }
     
     private func performHintAction(_ hint: Hint, action: HintAction) {
-        let element = hint.element
-        let clickPosition: NSPoint = {
-            // hints are shown at the bottom-left for AXLinks (see HintsViewController#renderHint),
-            // so a click is performed there
-            if element.role == "AXLink" {
-                return NSPoint(
-                    // tiny offset in case clicking on the edge of the element does nothing
-                    x: element.frame.origin.x + 5,
-                    y: element.frame.origin.y + element.frame.height - 5
-                )
-            }
-            return GeometryUtils.center(element.frame)
-        }()
+        let clickPosition = hint.clickPosition()
 
         Utils.moveMouse(position: clickPosition)
 
