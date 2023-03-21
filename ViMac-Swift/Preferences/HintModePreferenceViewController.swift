@@ -9,6 +9,7 @@ final class HintModePreferenceViewController: NSViewController, NSTextFieldDeleg
     private var grid: NSGridView!
     private var customCharactersField: NSTextField!
     private var textSizeField: NSTextField!
+    private var hintColorWell: NSColorWell!
     
     init() {
         if #available(OSX 11.0, *) {
@@ -59,7 +60,17 @@ final class HintModePreferenceViewController: NSViewController, NSTextFieldDeleg
         textSizeField.stringValue = UserPreferences.HintMode.TextSizeProperty.readUnvalidated() ?? ""
         let textSizeRow: [NSView] = [textSizeLabel, textSizeField]
         grid.addRow(with: textSizeRow)
-        
+
+        let hintColorLabel = NSTextField(labelWithString: "Hint Color:")
+        hintColorWell = NSColorWell()
+        hintColorWell.action = #selector(onHintColorWellEdit)
+        hintColorWell.color = UserPreferences.HintMode.HintColorProperty.readColor()
+        hintColorWell.widthAnchor.constraint(equalToConstant: 25).isActive = true
+        hintColorWell.heightAnchor.constraint(equalToConstant: 25).isActive = true
+
+        let hintColorRow: [NSView] = [hintColorLabel, hintColorWell]
+        grid.addRow(with: hintColorRow)
+
         self.view.addSubview(grid)
         
         NSLayoutConstraint.activate([
@@ -71,7 +82,12 @@ final class HintModePreferenceViewController: NSViewController, NSTextFieldDeleg
             grid.centerYAnchor.constraint(equalTo: view.centerYAnchor),
         ])
     }
-    
+
+    @objc func onHintColorWellEdit() {
+        let value = hintColorWell.color
+        UserPreferences.HintMode.HintColorProperty.saveColor(value: value)
+    }
+
     func onCustomCharactersFieldChange() {
         let value = customCharactersField.stringValue
         UserPreferences.HintMode.CustomCharactersProperty.save(value: value)
