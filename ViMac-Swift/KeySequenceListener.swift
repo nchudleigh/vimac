@@ -18,6 +18,8 @@ class KeySequenceListener {
     private var sequences: [[Character]] = []
     private var timer: Timer?
     private let resetDelay: TimeInterval
+    private let typingDelay: TimeInterval = 0.5
+    private var lastTypeDate: Date?
     
     private let matchRelay: PublishRelay<([Character])> = .init()
     lazy var matchEvents = matchRelay.asObservable()
@@ -78,6 +80,7 @@ class KeySequenceListener {
         
         let modifiersPresent = nsEvent.modifierFlags.rawValue != 256
         if modifiersPresent {
+            self.lastTypeDate = Date()
             resetInput()
             return event
         }
@@ -96,6 +99,13 @@ class KeySequenceListener {
             keyUps.append(event)
             return event
         }
+        
+        if let lastTypeDate = lastTypeDate {
+            if Date() < lastTypeDate.addingTimeInterval(self.typingDelay) {
+                self.lastTypeDate = Date()
+                return event
+            }
+        }
 
         typed.append(event)
         try! inputState.advance(c)
@@ -108,6 +118,8 @@ class KeySequenceListener {
             resetInput()
             return nil
         } else if inputState.state == .deadend {
+            self.lastTypeDate = Date()
+            
             // returning the event to the tap should be faster than emitting it.
             if typed.count == 1 {
                 let e = typed.first!
