@@ -1,7 +1,7 @@
 #!/bin/bash
 
-HELPER_CHECKSUM="6eaaced9173120f82ef98452b2d8cb3705c12db39d4286c70c4f5bb6b67a5e43"
-HELPER_CHECKSUM_RUNTIME="c5a48f5ba681088aa7922b79f2f1b55a1a006904b8de378790eb0e8b0ac66234"
+HELPER_CHECKSUM="0a3d09438fb595802d554ce0a7c4ba8e1d2d91d5170362adc965da82e70d74cb"
+HELPER_CHECKSUM_RUNTIME="98ef556b490e02f4084a11d8a07c33a880177a9816b355885a11f58c95876d62"
 
 verlte() {
 	[ "$1" = "`echo -e "$1\n$2" | sort -V | head -n1`" ]
@@ -39,11 +39,12 @@ unzip "$helper_path" -d "$login_items/"
 defaults write "$login_helper_path/Contents/Info" CFBundleIdentifier -string "$PRODUCT_BUNDLE_IDENTIFIER-LaunchAtLoginHelper"
 
 if [[ -n $CODE_SIGN_ENTITLEMENTS ]]; then
-	codesign --force --entitlements="$package_resources_path/LaunchAtLogin.entitlements" --options=runtime --sign="$EXPANDED_CODE_SIGN_IDENTITY_NAME" "$login_helper_path"
+	codesign --force --entitlements="$package_resources_path/LaunchAtLogin.entitlements" --deep --options=runtime --sign="$EXPANDED_CODE_SIGN_IDENTITY_NAME" "$login_helper_path"
 else
-	codesign --force --options=runtime --sign="$EXPANDED_CODE_SIGN_IDENTITY_NAME" "$helper_path"
+	codesign --force --deep --options=runtime --sign="$EXPANDED_CODE_SIGN_IDENTITY_NAME" "$helper_path"
 fi
 
-if [[ $CONFIGURATION == "Release" ]]; then
+# If this is being built for multiple architectures, assume it is a release build and we should clean up.
+if [[ $ONLY_ACTIVE_ARCH == "NO" ]]; then
 	rm -rf "$contents_path/Resources/LaunchAtLogin_LaunchAtLogin.bundle"
 fi
