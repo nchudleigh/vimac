@@ -27,6 +27,27 @@ extension NSEvent {
             return cancel
         })
     }
+    
+    static func suppressingGlobalEventMonitor(matching: CGEventMask) -> Observable<NSEvent> {
+        Observable.create({ observer in
+            let tap = GlobalEventTap.init(eventMask: matching, placement: .tailAppendEventTap, onEvent: { cgEvent -> CGEvent? in
+                guard let nsEvent = NSEvent(cgEvent: cgEvent) else {
+                    return cgEvent
+                }
+                
+                observer.onNext(nsEvent)
+                
+                return nil
+            })
+            
+            tap.enable()
+
+            let cancel = Disposables.create {
+                tap.disable()
+            }
+            return cancel
+        })
+    }
 }
 
 enum HintModeInputIntent {
@@ -117,6 +138,7 @@ class HintModeUserInterface {
     init(window: Element?) {
         self.window = window
         self.windowController = OverlayWindowController()
+        self.windowController.window = NonKeyOverlayWindow()
         self.contentViewController = ContentViewController()
         self.windowController.window?.contentViewController = self.contentViewController
 
@@ -146,7 +168,7 @@ class HintModeUserInterface {
 
     func show() {
         self.windowController.showWindow(nil)
-        self.windowController.window?.makeKeyAndOrderFront(nil)
+        self.windowController.window?.orderFront(nil)
     }
 
     func hide() {
@@ -186,10 +208,12 @@ class HintModeController: ModeController {
     
     let app: NSRunningApplication?
     let window: Element?
+    let menu: Element?
     
-    init(app: NSRunningApplication?, window: Element?) {
+    init(app: NSRunningApplication?, window: Element?, menu: Element?) {
         self.app = app
         self.window = window
+        self.menu = menu
     }
 
     func activate() {
@@ -199,12 +223,13 @@ class HintModeController: ModeController {
         HideCursorGlobally.hide()
         
         self.input = ""
-        self.ui = HintModeUserInterface(window: window)
+        self.ui = HintModeUserInterface(window: self.window)
         self.ui!.show()
         
         self.queryHints(
             onSuccess: { [weak self] hints in
-                self?.onHintQuerySuccess(hints: hints)
+                guard let self = self else { return }
+                self.onHintQuerySuccess(hints: hints)
             },
             onError: { [weak self] e in
                 self?.deactivate()
@@ -294,7 +319,7 @@ class HintModeController: ModeController {
     }
     
     private func queryHints(onSuccess: @escaping ([Hint]) -> Void, onError: @escaping (Error) -> Void) {
-        HintModeQueryService.init(app: app, window: window, hintCharacters: hintCharacters).perform()
+        HintModeQueryService.init(app: app, window: window, menu: menu, hintCharacters: hintCharacters).perform()
             .toArray()
             .observeOn(MainScheduler.instance)
             .do(onSuccess: { _ in self.logQueryTime() })
@@ -307,7 +332,8 @@ class HintModeController: ModeController {
     }
 
     private func listenForKeyPress(onEvent: @escaping (NSEvent) -> Void) {
-        NSEvent.localEventMonitor(matching: .keyDown)
+        let mask = CGEventMask(1 << CGEventType.keyDown.rawValue)
+        NSEvent.suppressingGlobalEventMonitor(matching: mask)
             .observeOn(MainScheduler.instance)
             .subscribe(onNext: { event in
                 onEvent(event)

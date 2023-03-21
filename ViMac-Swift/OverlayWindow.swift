@@ -9,7 +9,6 @@
 import Cocoa
 
 class OverlayWindow: NSPanel {
-    
     override init(contentRect: NSRect, styleMask style: NSWindow.StyleMask, backing backingStoreType: NSWindow.BackingStoreType, defer flag: Bool) {
         super.init(contentRect: NSZeroRect, styleMask: .nonactivatingPanel, backing: backingStoreType, defer: flag)
         self.isOpaque = false
@@ -18,7 +17,7 @@ class OverlayWindow: NSPanel {
         
         self.hasShadow = false
         
-        self.level = .statusBar
+        self.level = .popUpMenu
         self.collectionBehavior = [.fullScreenAuxiliary]
     }
 
@@ -26,3 +25,22 @@ class OverlayWindow: NSPanel {
         return true
     }
 }
+
+class NonKeyOverlayWindow: NSPanel {
+    override init(contentRect: NSRect, styleMask style: NSWindow.StyleMask, backing backingStoreType: NSWindow.BackingStoreType, defer flag: Bool) {
+        super.init(contentRect: NSZeroRect, styleMask: .nonactivatingPanel, backing: backingStoreType, defer: flag)
+        self.isOpaque = false
+        self.backgroundColor = NSColor.clear
+        self.ignoresMouseEvents = true
+        
+        self.hasShadow = false
+        
+        self.level = .popUpMenu
+        self.collectionBehavior = [.fullScreenAuxiliary]
+    }
+
+    override var canBecomeKey: Bool {
+        return false
+    }
+}
+

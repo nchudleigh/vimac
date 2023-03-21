@@ -13,8 +13,9 @@ import os
 
 class FrontmostApplicationService {
     struct ApplicationNotification {
-        let app: NSRunningApplication
+        let pid: pid_t
         let notification: String
+        let element: AXUIElement
     }
     
     private let disposeBag = DisposeBag()
@@ -24,7 +25,10 @@ class FrontmostApplicationService {
                 os_log("Current frontmost application: %@", log: Log.accessibility, String(describing: app))
             })
             .share()
-    private lazy var applicationNotificationObservable: Observable<ApplicationNotification> = createApplicationNotificationObservable().share()
+    
+    var observeAppNotificationService: ObserveApplicationNotificationService?
+    private let _applicationNotification = PublishSubject<ApplicationNotification>()
+    private lazy var applicationNotificationObservable: Observable<ApplicationNotification> = _applicationNotification.asObservable()
     private lazy var focusedWindowObservable: Observable<Element?> =
         Observable
             .merge([
@@ -37,6 +41,29 @@ class FrontmostApplicationService {
             .share()
 
     private lazy var focusedWindowDisturbedObservable: Observable<ApplicationNotification> = createFocusedWindowDisturbedObservable().share()
+    
+    init() {
+        frontmostApplicationObservable
+            .compactMap({ $0 })
+            .bind(onNext: { [weak self] app in
+                guard let self = self else { return }
+                
+                if let service = self.observeAppNotificationService {
+                    service.stop()
+                }
+                let service = ObserveApplicationNotificationService(pid: app.processIdentifier, notifications: [
+                    kAXWindowMiniaturizedNotification,
+                    kAXWindowMovedNotification,
+                    kAXFocusedWindowChangedNotification,
+                    kAXMenuOpenedNotification,
+                    kAXMenuClosedNotification
+                ])
+                service.delegate = self
+                service.start()
+                self.observeAppNotificationService = service
+            })
+            .disposed(by: self.disposeBag)
+    }
     
     func observeFrontmostApp(_ onApp: @escaping (NSRunningApplication?) -> ()) {
         let disposable = frontmostApplicationObservable.bind { app in
@@ -59,6 +86,24 @@ class FrontmostApplicationService {
         disposeBag.insert(disposable)
     }
     
+    func observeMenuOpened(_ onEvent: @escaping (_ element: AXUIElement) -> ()) {
+        applicationNotificationObservable
+            .filter { $0.notification == kAXMenuOpenedNotification }
+            .bind { notification in
+                onEvent(notification.element)
+            }
+            .disposed(by: self.disposeBag)
+    }
+    
+    func observeMenuClosed(_ onEvent: @escaping (_ element: AXUIElement) -> ()) {
+        applicationNotificationObservable
+            .filter { $0.notification == kAXMenuClosedNotification }
+            .bind { notification in
+                onEvent(notification.element)
+            }
+            .disposed(by: self.disposeBag)
+    }
+    
     private func createFrontmostApplicationObservable() -> Observable<NSRunningApplication?> {
         Observable.create { observer in
             let service = ObserveFrontmostApplicationService.init()
@@ -67,32 +112,6 @@ class FrontmostApplicationService {
             })
             return Disposables.create()
         }
-    }
-    
-    private func createApplicationNotificationObservable() -> Observable<ApplicationNotification> {
-        frontmostApplicationObservable
-            .compactMap({ $0 })
-            .flatMapLatest({ app -> Observable<ApplicationNotification> in
-                let serviceOptional = ObserveApplicationNotificationService.fromNSRunningApplication(app)
-                guard let service = serviceOptional else { return Observable.empty() }
-                
-                let windowNotifications: [AXNotification] = [
-                    .windowMiniaturized,
-                    .windowMoved,
-                    .focusedWindowChanged
-                ]
-                let windowNotificationsStr = windowNotifications.map({ $0.rawValue })
-                
-                return Observable.create { observer in
-                    service.observe(notifications: windowNotificationsStr, { notification in
-                        observer.onNext(ApplicationNotification(
-                            app: app,
-                            notification: notification
-                        ))
-                    })
-                    return Disposables.create { _ = service /* keeping a reference here to prevent the service from being GC'd */ }
-                }
-            })
     }
 
     private func createInitialFocusedWindowObservable() -> Observable<Element?> {
@@ -108,7 +127,7 @@ class FrontmostApplicationService {
         applicationNotificationObservable
             .filter { $0.notification == AXNotification.focusedWindowChanged.rawValue }
             .map { notification in
-                let windowOptional: UIElement? = try? Application(notification.app)?.attribute(Attribute.focusedWindow)
+                let windowOptional: UIElement? = try? Application(forProcessID: notification.pid)?.attribute(Attribute.focusedWindow)
                 guard let window = windowOptional else { return nil }
                 return Element.initialize(rawElement: window.element)
             }
@@ -124,5 +143,15 @@ class FrontmostApplicationService {
                 let disturbedNotificationsStr = disturbedNotifications.map({ $0.rawValue })
                 return disturbedNotificationsStr.contains(notification.notification)
             }
+    }
+}
+
+extension FrontmostApplicationService: ObserveApplicationNotificationsServiceDelegate {
+    func onNotification(pid: pid_t, notification: String, element: AXUIElement) {
+        _applicationNotification.onNext(.init(
+            pid: pid,
+            notification: notification,
+            element: element
+        ))
     }
 }

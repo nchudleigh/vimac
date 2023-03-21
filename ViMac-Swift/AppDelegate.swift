@@ -237,6 +237,20 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 self.modeCoordinator.deactivate()
             })
         )
+        
+        self.frontmostAppService.observeMenuOpened({ [weak self] menu in
+            guard let self = self else { return }
+            
+            self.modeCoordinator.openedMenu = menu
+        })
+        
+        self.frontmostAppService.observeMenuClosed({ [weak self] menu in
+            guard let self = self else { return }
+            
+            if self.modeCoordinator.openedMenu == menu {
+                self.modeCoordinator.openedMenu = nil
+            }
+        })
 
         _ = self.compositeDisposable.insert(hintModeShortcutObservable
             .observeOn(MainScheduler.instance)

@@ -56,7 +56,7 @@ class KeySequenceListener {
     
     func start() {
         if eventTap == nil {
-            eventTap = GlobalEventTap(eventMask: mask, onEvent: { [weak self] event -> CGEvent? in
+            eventTap = GlobalEventTap(eventMask: mask, placement: .headInsertEventTap, onEvent: { [weak self] event -> CGEvent? in
                 guard let self = self else { return event}
                 return self.onEvent(event: event)
             })
